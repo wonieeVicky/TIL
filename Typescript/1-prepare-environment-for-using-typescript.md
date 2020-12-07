@@ -1,4 +1,8 @@
-﻿### 1. 환경준비
+﻿## 1. 타입스크립트 사용 환경 준비하기
+
+알아두면 유용한 타입스크립트 기초 핵심 - velopert님 글 참조 ([링크](https://velog.io/@velopert/typescript-basics))
+
+### 1) 환경준비
 
 ```powershell
 $ mkdir ts-playground
@@ -46,7 +50,7 @@ $ tsc --init
 }
 ```
 
-### 2. 타입스크립트 파일 만들기
+### 2) 타입스크립트 파일 만들기
 
 **src/practice.ts**
 
@@ -61,7 +65,7 @@ console.log(message);
 
 ![https://s3-us-west-2.amazonaws.com/secure.notion-static.com/7baea712-5a24-47d6-84cf-7ef38b45a082/_2020-12-07__11.25.33.png]`(https://s3-us-west-2.amazonaws.com/secure.notion-static.com/7baea712-5a24-47d6-84cf-7ef38b45a082/_2020-12-07__11.25.33.png)`
 
-### 3. 타입스크립트 컴파일하기
+### 3) 타입스크립트 컴파일하기
 
 코드 작성 후 해당 프로젝트의 디렉터리에서 터미널로 `tsc` 입력 (또는 `npx tsc`)
 
