@@ -1,10 +1,11 @@
 ﻿## 1. 타입스크립트 사용 환경 준비하기
 
 알아두면 유용한 타입스크립트 기초 핵심 - velopert님 글 참조 ([링크](https://velog.io/@velopert/typescript-basics))
+한눈에 보는 타입스크립트 - HEROPY Tech 글 참조 ([링크](https://heropy.blog/2020/01/27/typescript/))
 
 ### 1) 환경준비
 
-```powershell
+```bash
 $ mkdir ts-playground
 $ cd ts-playground
 $ yarn init -y # 또는 npm init -y
@@ -14,7 +15,7 @@ $ tsc --init
 
 **tsconfig.json**
 
-타입스크립트 설정파일은 `tsconfig.json`에 만들어진다. 프로젝트 내에 타입스크립트를 설치하면 자동 생성된다. `tsconfig.json` 에 기본적으로 설정되어 있는 속성은 아래와 같다. (더 자세한 옵션은 [여기](https://aka.ms/tsconfig.json)에서 확인)
+타입스크립트 설정파일은 `tsconfig.json`에 만들어진다. 프로젝트 내에 타입스크립트를 설치하면 자동 생성된다. `tsconfig.json` 에 기본적으로 설정되어 있는 속성(compilerOptions)은 아래와 같다. (더 자세한 옵션은 [여기](https://aka.ms/tsconfig.json)에서 확인)
 
 - target
 
@@ -38,6 +39,8 @@ $ tsc --init
 
   컴파일된 파일들이 저장되는 경로 지정
 
+`include`와 `exclude` 옵션을 통해 컴파일에 포함할 경로와 제외할 경로를 설정할 수 있다.
+
 ```powershell
 {
   "compilerOptions": {
@@ -46,7 +49,13 @@ $ tsc --init
     "strict": true,
     "esModuleInterop": true,
     "outDir": "./dist"
-  }
+  },
+	"include": [
+		"src/**/*.ts"
+	],
+	"exclude": [
+		"nodu_modules"
+	]
 }
 ```
 
@@ -107,3 +116,15 @@ $ yarn add typescript # 또는 npm install --save typescript
 ```
 
 추후 빌드 시 `yarn build` (또는 `npm run build`) 라고 입력한다.
+
+### 4) 타입스크립트 로컬에서 테스트하기
+
+```bash
+$ mkdir typescript-playground
+$ cd typescript-playground
+$ npm init -y
+$ npm install -D typescript parcel-bundler
+
+$ npx parcel index.html // Parcel 번들러로 빌드
+# Server running at http://localhost:1234
+```
