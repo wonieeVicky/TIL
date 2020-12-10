@@ -1,4 +1,4 @@
-﻿## 2. 기본 타입
+﻿## 2. 타입 지정과 타입 에러
 
 알아두면 유용한 타입스크립트 기초 핵심 - velopert님 글 참조 ([링크](https://velog.io/@velopert/typescript-basics))
 한눈에 보는 타입스크립트 - HEROPY Tech 글 참조 ([링크](https://heropy.blog/2020/01/27/typescript/))
