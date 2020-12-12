@@ -117,3 +117,70 @@ arrA.push(123); // 'readonly number[]' 형식에 'push' 속성이 없다.
 arrB[0] = 123; // 'readonly number[]' 형식의 인덱스 시그니처는 읽기만 허용된다.
 arrB.push(123); // 'readonly number[]' 형식에 'push' 속성이 없다.
 ```
+
+### 5) 튜플: Tuple
+
+- Tuple 타입은 배열과 매우 유사하나 정해진 타입의 고정된 길이(length)배열을 표현한다.
+
+```tsx
+// Tuple 타입은 배열과 매우 유사하나 정해진 타입의 고정된 길이(length)배열을 표현한다.
+let tuple: [string, number];
+tuple = ["a", 1];
+tuple = ["a", 1, 2]; // Error - TS2322
+tuple = [1, "a"]; // Error - TS2322
+```
+
+- 데이터를 개별 변수로 지정하지 않고, 단일 tuple 타입으로 지정해 사용할 수 있다.
+
+```tsx
+// variable
+let userId: number = 1234;
+let userName: string = "vicky";
+let isValid: boolean = true;
+
+// tuple
+let user: [number, string, boolean] = [1234, "vicky", true];
+console.log(user[0]); // 1234
+console.log(user[1]); // vicky
+console.log(user[2]); // true
+```
+
+- 위 방식을 활용해 다음과 같은 Tuple 타입의 배열(2차원 배열)을 사용할 수 있다.
+
+```tsx
+let users: [number, string, boolean][];
+// or
+// let users: Array<[number, string, boolean]>;
+users = [
+  [1, "choi", true],
+  [2, "sun", true],
+  [3, "jin", false],
+];
+```
+
+- 또한 값으로 타입을 대신할 수도 있다.
+
+```tsx
+let tuple_2: [1, number];
+tuple_2 = [1, 2];
+tuple_2 = [1, 3];
+tuple_2 = [2, 3]; // Error - TS2322: '2' 형식은 '1' 형식에 할당할 수 없다.
+```
+
+- Tuple은 **정해진 타입의 고정된 길이 배열**을 표현하지만, 이는 할당(Assign)에 국한된다. 곧 `push()` 나 `splice()`등을 통해 값을 넣는 행위는 막을 수 없다.
+
+```tsx
+let tuple_3: [string, number];
+tuple_3 = ["a", 1];
+tuple_3 = ["b", 2];
+tuple_3.push(3);
+console.log(tuple_3); // ['b', 2, 3];
+tuple_3.push(true); // Error - TS2345: boolean 형식의 인수는 string, number 형식의 매개 변수에 할당될 수 없다.
+```
+
+- 배열에서 사용한 것과 같이 `readonly` 키워드로 읽기 전용 튜플을 생성할 수도 있다.
+
+```tsx
+let a: readonly [string, number] = ["hello", 123];
+a[0] = "world"; // Error - TS2540: 읽기 전용 속성이므로 '0'에 할당할 수 없다.
+```
