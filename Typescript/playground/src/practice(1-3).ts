@@ -110,8 +110,8 @@ let arrB: ReadonlyArray<number> = [0, 9, 8, 7];
 // Tuple 타입은 배열과 매우 유사하나 정해진 타입의 고정된 길이(length)배열을 표현한다.
 let tuple: [string, number];
 tuple = ["a", 1];
-tuple = ["a", 1, 2]; // Error - TS2322
-tuple = [1, "a"]; // Error - TS2322
+// tuple = ["a", 1, 2]; // Error - TS2322
+// tuple = [1, "a"]; // Error - TS2322
 
 // 데이터를 개별 변수로 지정하지 않고, 단일 tuple 타입으로 지정해 사용할 수 있다.
 // variable
@@ -138,7 +138,7 @@ users = [
 let tuple_2: [1, number];
 tuple_2 = [1, 2];
 tuple_2 = [1, 3];
-tuple_2 = [2, 3]; // Error - TS2322: '2' 형식은 '1' 형식에 할당할 수 없다.
+// tuple_2 = [2, 3]; // Error - TS2322: '2' 형식은 '1' 형식에 할당할 수 없다.
 
 // Tuple은 정해진 타입의 고정된 길이 배열을 표현하지만 이는 할당(Assign)에 국한된다. 값을 넣는 행위는 불가함
 let tuple_3: [string, number];
@@ -146,8 +146,57 @@ tuple_3 = ["a", 1];
 tuple_3 = ["b", 2];
 tuple_3.push(3);
 console.log(tuple_3); // ['b', 2, 3];
-tuple_3.push(true); // Error - TS2345: boolean 형식의 인수는 string, number 형식의 매개 변수에 할당될 수 없다.
+// tuple_3.push(true); // Error - TS2345: boolean 형식의 인수는 string, number 형식의 매개 변수에 할당될 수 없다.
 
 // 배열에 사용한 것과 같이 readonly 키워드를 사용해 읽기 전용 튜플을 생성할 수도 있다.
 let a: readonly [string, number] = ["hello", 123];
 a[0] = "world"; // Error - TS2540: 읽기 전용 속성이므로 '0'에 할당할 수 없다.
+
+// 6) 열거형
+// enum 타입은 기본적으로 0부터 시작하여 값은 1씩 증가
+enum Week {
+  Sun,
+  Mon,
+  Tue,
+  Wed,
+  Thu,
+  Fri,
+  Sat,
+}
+console.log(Week.Mon); // 1
+// 수동으로 값을 변경할 수 있고, 값을 변경한 부분부터 다시 1씩 증가
+enum Weeks {
+  Sun,
+  Mon = 22,
+  Tue,
+  Wed,
+  Thu,
+  Fri,
+  Sat,
+}
+console.log(Weeks.Mon); // 23
+
+// Enum타입은 역방향 매핑(Reverse Mapping)을 지원한다.
+enum Week {
+  Sun,
+  Mon,
+  Tue,
+  Wed,
+  Thu,
+  Fri,
+  Sat,
+}
+console.log(Week);
+console.log(Week.Sun); // 0
+console.log(Week["Sun"]); // 0
+console.log(Week[0]); // 'Sun'
+
+// Enum 타입은 숫자 값 열거 뿐만 아니라 문자열 값으로 초기화도 가능하다.
+// 이 방법은 역방향 매핑(Reverse Mapping)을 지원하지 않으며 개별적으로 초기화해야하는 단점이 있다.
+enum Color {
+  Red = "red",
+  Green = "green",
+  Blue = "blue",
+}
+console.log(Color.Red); // red
+console.log(Color["Green"]); // green
