@@ -255,3 +255,119 @@ enum Color {
 console.log(Color.Red); // red
 console.log(Color["Green"]); // green
 ```
+
+### 7) 모든 타입: Any
+
+Any는 모든 타입을 의미한다. 따라서 일반적인 자바스크립트 변수와 동일하게 어떠한 타입의 값도 할당이 가능함. 외부 자원을 활용해 개발할 때 불가피하게 타입을 단언할 수 없는 경우 유용할 수 있다.
+
+```tsx
+let any: any = 123;
+any = "hello world";
+any = true;
+any = {};
+any = null;
+```
+
+다양한 값을 포함하는 배열을 나타낼 때 사용할 수도 있다.
+
+```tsx
+const list: any[] = [1, true, "anything", {}, []];
+```
+
+강한 타입 시스템의 장점을 유지하기 위해 Any 사용을 엄격하게 금지하려면, 컴파일 옵션 `"noImplicitAny": true` 라는 옵션을 통해 Any 사용 시 에러를 발생시킬 수 있다.
+
+### 8) 알 수 없는 타입: Unknown
+
+Any와 같이 최상위 타입인 Unknown은 알 수 없는 타입을 의미한다. Any와 같이 Unknown에는 어떤 타입의 값도 할당할 수 있으나, Unknown을 다른 타입에는 할당할 수 없다.
+
+일반적으로 Unknown은 타입 단언(Assertions)이나 타입 가드(Guards)를 필요로 한다.
+
+```tsx
+let a: any = 123;
+let u: unknown = 123;
+let v1: boolean = a;
+let v2: any = u; // 알 수 없는 타입(unknown)은 모든 타입(any)에 할당할 수 있다.
+let v3: number = u; // 알 수 없는 타입(unknown)은 모든 타입(any)을 제외한 다른 타입에 할당할 수 없다.
+let v4: number = u as number; // 타입을 단언(Assertions)하면 할당할 수 있다.
+```
+
+Unknown 타입의 경우 다양한 타입을 반환할 수 있는 API에서 유용할 수 있다. 그러나 Unknown 보단 좀 더 명확한 타입을 사용하는 것이 좋다.
+
+```tsx
+interface IUser {
+  name: string;
+  age: number;
+  isValid: boolean;
+}
+
+type Result =
+  | {
+      success: true;
+      value: unknown;
+    }
+  | {
+      success: false;
+      error: Error;
+    };
+
+export default function getItems(user: IUser): Result {
+  // Some logic...
+  if (user.isValid) {
+    return {
+      success: true,
+      value: ["Apple", "Banana"],
+    };
+  } else {
+    return {
+      success: false,
+      error: new Error("Invalid user."),
+    };
+  }
+}
+```
+
+### 9) 객체: Object
+
+기본적으로 `typeof` 연산자가 `"object"`로 반환하는 모든 타입을 일컫는다.
+
+컴파일러 옵션에서 엄격한 타입 검사(strict)를 true로 설정할 경우 `null`은 포함되지 않는다.
+
+```tsx
+let obj: object = {};
+let arr: object = [];
+let func: object = function () {};
+let nullValue: object = null; // strict: true 일 경우 에러 발생!
+let date: object = new Date();
+```
+
+여러 타입(obj, arr, func 등)들의 상위 타입이므로 그다지 유용하지 않다. 보다 정확하게 타입을 지정하기 위해서는 아래와 같이 객체 속성(Properties)들에 대한 타입을 개별적으로 지정할 수 있다.
+
+```tsx
+let userA: { name: string; age: number } = {
+  name: "Vicky",
+  age: 31,
+};
+let userB: { name: string; age: number } = {
+  name: "vicky",
+  age: false, // error
+  email: "hwfongfing@gmail.com", // error
+};
+```
+
+반복적으로 사용하기 위해서는 `interface`나 `type`을 이용해 타입을 선언하여 사용하는 것이 좋다.
+
+```tsx
+interface IUser {
+  name: string;
+  age: number;
+}
+let userA: IUser = {
+  name: "VICKY",
+  age: 31,
+};
+let userB: IUser = {
+  name: "VICKY",
+  age: false, // error
+  email: "hwfongfing@gmail.com", // error
+};
+```
