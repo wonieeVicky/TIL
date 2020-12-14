@@ -280,7 +280,7 @@ const list: any[] = [1, true, "anything", {}, []];
 
 Any와 같이 최상위 타입인 Unknown은 알 수 없는 타입을 의미한다. Any와 같이 Unknown에는 어떤 타입의 값도 할당할 수 있으나, Unknown을 다른 타입에는 할당할 수 없다.
 
-일반적으로 Unknown은 타입 단언(Assertions)이나 타입 가드(Guards)를 필요로 한다.
+> 일반적으로 Unknown은 타입 단언(Assertions)이나 타입 가드(Guards)를 필요로 한다.
 
 ```tsx
 let a: any = 123;
@@ -330,7 +330,7 @@ export default function getItems(user: IUser): Result {
 
 기본적으로 `typeof` 연산자가 `"object"`로 반환하는 모든 타입을 일컫는다.
 
-컴파일러 옵션에서 엄격한 타입 검사(strict)를 true로 설정할 경우 `null`은 포함되지 않는다.
+> 컴파일러 옵션에서 엄격한 타입 검사(strict)를 true로 설정할 경우 `null`은 포함되지 않는다.
 
 ```tsx
 let obj: object = {};
