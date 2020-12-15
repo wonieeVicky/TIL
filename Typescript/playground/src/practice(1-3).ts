@@ -284,3 +284,52 @@ let userB: IUser = {
   age: false, // error
   email: "hwfongfing@gmail.com", // error
 };
+
+// 10) Null과 Undefined
+// 기본적으로 Null과 Undefined는 모든 타입의 하위 타입으로, 각 타입에 할당할 수 있다.
+// 심지어 서로의 타입에도 할당 가능하다. 단 strict: false일 때만 가능하다.
+let num: number = undefined;
+let str: string = null;
+let obj: { a: 1; b: false } = undefined;
+let arr: any[] = null;
+let und: undefined = null;
+let nul: null = undefined;
+let voi: void = null;
+
+// 다만 Void에는 Undefined를 할당할 수 있다.
+let voi: void = undefined;
+
+// 11) Void
+// Void는 일반적으로 값을 반환하지 않는 함수에서 사용한다. :void 위치는 함수가 반환 타입을 명시하는 곳이다.
+function Hello(msg: string): void {
+  console.log(`Hello ${msg}`);
+}
+
+// 값을 반환하지 않는 함수는 실제 undefined를 반환한다.
+function Hello(msg: string): void {
+  console.log(`Hello ${msg}`);
+}
+const hi: void = Hello("word");
+console.log(hi); // undefined
+
+// Error - TS2355: A function whose declared type is neither 'void' nor 'any' must return a value.
+function Hello(msg: string): undefined {
+  console.log(`Hello ${msg}`);
+}
+
+// 12) never
+// Never는 절대 발생하지 않을 값을 나타내며, 어떤 타입도 적용할 수 없다.
+function error(message: string): never {
+  throw new Error(message);
+}
+// 보통 아래와 같이 빈 배열을 타입으로 잘못 선언한 경우, Never를 볼 수 있다.
+const never: [] = [];
+never.push(3);
+
+// 13) Union
+// 2개 이상의 타입을 허용하는 경우, 이를 유니언(Union)이라고 한다.
+// `|(vertical bar)`를 통해 타입을 구분하며, `()`는 선택사항이다.
+let union: string | number;
+union = "hello typescript!";
+union = 123;
+union = false; // Error - TS2322: Type 'false' is not assignable to type 'string | number'.
