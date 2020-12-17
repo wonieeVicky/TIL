@@ -488,3 +488,21 @@ const evan: IUserNew = {
   isValid: false
 };
 ```
+
+### 15) 함수(Function)
+
+화살표 함수를 이용해 타입을 지정할 수 있다. 인수의 타입과 반환 값의 타입을 입력한다.
+
+```tsx
+// myFunc는 2개의 숫자 타입 인수를 가지고, 숫자 타입을 반환하는 함수
+let myFunc: (arg1: number, arg2: number) => number;
+myFunc = function (x, y) {
+  return x + y;
+};
+
+// 인수가 없고, 반환도 없는 경우는 아래와 같이 쓸 수 있다.
+let yourFunc: () => void;
+yourFunc = function () {
+  console.log("hello world!");
+};
+```
