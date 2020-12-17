@@ -4,7 +4,7 @@
 
 > [추론]: 어떠한 판단을 근거로 삼아 다른 판단을 이끌어 냄.
 
-아래의 코드를 보면 변수 `num`을 초기화하면서 숫자 `12`를 할당해 Number 타입으로 추론되었고,
+아래의 코드를 보면 변수 `num`을 초기화하면서 숫자 `12`를 할당해 Number 타입으로 추론되었고,  
 따라서 'hello Vicky!'이라는 String 타입의 값은 할당할 수 없기 때문에 에러가 발생한다.
 
 ```tsx
@@ -39,8 +39,7 @@ function add(a: number, b: number = 2): number {
 
 아래의 예제로 확인해본다.
 
-함수의 매개 변수 `val`은 유니언 타입으로 문자열(String)이거나 숫자(Number) 일 수 있다.
-그리고 매개 변수 `isNumber`는 불린(Boolean)이며, 이름을 통해 숫자 여부를 확인하는 값이라는 것을 추론할 수 있다. 따라서 우리는 `isNumber`가 `true`일 경우 `val`은 숫자일 것이고, 이에 `toFixed`를 사용할 수 있음을 확실히 알 수 있다. 하지만 타입스크립트는 'isNumber'라는 이름만으로 위 내용을 추론할 수 없으므로 "`val`이 문자열인 경우 `toFixed`를 사용할 수 없다"고 컴파일 단계에서 아래와 같은 에러를 반환한다.
+함수의 매개 변수 `val`은 유니언 타입으로 문자열(String)이거나 숫자(Number) 일 수 있다. 그리고 매개 변수 `isNumber`는 불린(Boolean)이며, 이름을 통해 숫자 여부를 확인하는 값이라는 것을 추론할 수 있다. 따라서 우리는 `isNumber`가 `true`일 경우 `val`은 숫자일 것이고, 이에 `toFixed`를 사용할 수 있음을 확실히 알 수 있다. 하지만 타입스크립트는 'isNumber'라는 이름만으로 위 내용을 추론할 수 없으므로 "`val`이 문자열인 경우 `toFixed`를 사용할 수 없다"고 컴파일 단계에서 아래와 같은 에러를 반환한다.
 
 ```tsx
 function someFunc(val: string | number, isNumber: boolean) {
