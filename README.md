@@ -10,3 +10,4 @@
 1. [prepare environment for using typescript](https://github.com/wonieeVicky/TIL/blob/main/Typescript/1-prepare-environment-for-using-typescript.md)
 2. [assign type & type error](https://github.com/wonieeVicky/TIL/blob/main/Typescript/2-assign-type-and-type-error.md)
 3. [declaration type](https://github.com/wonieeVicky/TIL/blob/main/Typescript/3-declaration-type.md)
+4. [type Inference & type Assertions](https://github.com/wonieeVicky/TIL/blob/main/Typescript/4-type-Inference-and-type-assertions.md)
