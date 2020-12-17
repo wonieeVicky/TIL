@@ -448,3 +448,43 @@ union = "hello typescript!";
 union = 123;
 union = false; // Error - TS2322: Type 'false' is not assignable to type 'string | number'.
 ```
+
+### 14) 인터섹션: Intersection
+
+`&(ampersand)`를 사용해 2개 이상의 타입을 조합하는 경우, 이를 인터섹션이라고 한다. 인터섹션은 새로운 타입을 생성하지 않고, 기존의 타입들을 조합할 수 있기 때문에 유용하지만 자주 사용되는 방법은 아니다.
+
+> 위에서 살펴본 유니언을 마치 '또는(or)'과 같이 이해할 수 있다면, 인터섹션은 '그리고(and)'와 같이 이해할 수 있다.
+
+```tsx
+// 기존 타입들이 조합 가능하다면 인터섹션을 활용할 수 있다.
+interface IUser {
+  name: string,
+  age: number
+}
+interface IValidation {
+  isValid: boolean
+}
+const vicky: IUser = {
+  name: 'vicky',
+  age: 36,
+  isValid: true; // Error TS2322: Type '{ name: string; age: number; isValid: boolean; }' is not assignable to type 'IUser'.
+}
+const neo: IUser & IValidation = {
+  name: 'wonny',
+  age: 31,
+  isValid: true;
+}
+
+// 혹은 기존 타입(IUser, IValidation)과 비슷하지만,
+// 정확히 일하는 타입이 없다면 새로운 타입을 생성해야 한다.
+interface IUserNew {
+  name: string,
+  age: number,
+  isValid: boolean
+}
+const evan: IUserNew = {
+  name: 'Evan',
+  age: 36,
+  isValid: false
+};
+```
