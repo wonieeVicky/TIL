@@ -11,3 +11,4 @@
 2. [assign type & type error](https://github.com/wonieeVicky/TIL/blob/main/Typescript/2-assign-type-and-type-error.md)
 3. [declaration type](https://github.com/wonieeVicky/TIL/blob/main/Typescript/3-declaration-type.md)
 4. [type Inference & type Assertions](https://github.com/wonieeVicky/TIL/blob/main/Typescript/4-type-Inference-and-type-assertions.md)
+5. [type Guards](https://github.com/wonieeVicky/TIL/blob/main/Typescript/5-type-guards.md)
