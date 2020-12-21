@@ -106,7 +106,7 @@ user3.name = "Wonny"; // Error
 interface IName {
   (PARAMETER: PARAM_TYPE): RETURN_TYPE; // 호출 시그니처(Call signature)
 }
-*/
+
 // 간단한 예시를 살펴보자. 인터페이스 IGetUser를 통해 함수 타입을 정의했으며,
 // 이는 name 매개 변수를 하나 가지고(이름이 일치할 필요는 없다.) IUser 타입을 반환해야 한다.
 interface IUser {
@@ -124,3 +124,100 @@ const getUser: IGetUser = function (n) {
   return user;
 };
 getUser("Vicky");
+*/
+// 3) 클래스 타입
+// 인터페이스로 클래스를 정의하는 경우, `implements` 키워드를 사용한다.
+interface IUser {
+  name: string;
+  getName(): string;
+}
+class User implements IUser {
+  constructor(public name: string) {}
+  getName() {
+    return this.name;
+  }
+}
+const vicky = new User("Vicky");
+vicky.getName(); // Vicky
+
+// 기본적인 사용법은 어렵지 않으나 만약 정의한 클래스를 인수로 사용하는 경우 다음과 같은 문제가 발생할 수 있다.
+// 아래의 예제에서 인터페이스 `ICat`은 호출 가능한 구조가 아니기 때문이다.
+interface ICat {
+  name: string;
+}
+
+class Cat implements ICat {
+  constructor(public name: string) {}
+}
+
+function makeKitten(c: ICat, n: string) {
+  return new c(n); // Error - TS2351: This expression is not constructable. Type 'ICat' has no construct signatures.
+}
+
+const kitten = makeKitten(Cat, "Lucy");
+console.log(kitten);
+
+// 이를 위해 구성 시그니처(Construct signature)를 제공할 수 있다.
+// 구성 시그니처는 위에서 살펴본 호출 시그니처와 비슷하지만, new 키워드를 사용해야 한다.
+interface IName {
+  new (PARAMETER: PARAM_TYPE): RETURN_TYPE; // Construct signature
+}
+
+// 위 예제를 아래와 같이 수정한다. ICatConstructor 라는 구성 시그니처를 가지는
+// 호출 가능한 인터페이스를 정의하면, 문제없이 동작하는 것을 확인할 수 있다.
+interface ICat {
+  name: string;
+}
+interface ICatConstructor {
+  new (name: string): ICat;
+}
+
+class Cat implements ICat {
+  constructor(public name: string) {}
+}
+
+function makeKitten(c: ICatConstructor, n: string) {
+  return new c(n); // ok
+}
+const kitten = makeKitten(Cat, "Lucy");
+console.log(kitten);
+
+// 조금 어렵게 느껴진다. 비슷하지만 좀 더 재미있는 예제를 보자
+// 에러가 발생하는 부분을 확인하고 내용을 이해했다면 충분하다.
+interface IFullName {
+  firshName: string;
+  lastName: string;
+}
+interface IFullNameConstructor {
+  new (firstName: string): IFullName;
+}
+
+function makeSon(c: IFullNameConstructor, firstName: string) {
+  return new c(firstName);
+}
+function getFullName(son: IFullName) {
+  return `${son.firshName}${son.lastName}`;
+}
+
+// Anderson family
+class Anderson implements IFullName {
+  public lastName: string;
+  constructor(public firshName: string) {
+    this.lastName = "Anderson";
+  }
+}
+
+const tomas = makeSon(Anderson, "Tomas");
+const jack = makeSon(Anderson, "Jack");
+getFullName(tomas); // Tomas Anderson
+getFullName(jack); // Jack Anderson
+
+// Smith family?
+class Smith implements IFullName {
+  public lastName: string;
+  constructor(public firshName: string, agentCode: number) {
+    this.lastName = `Smith ${agentCode}`;
+  }
+}
+const smith = makeSon(Smith, 7); // Error - TS2345: Argument of type 'typeof Smith' is not assignable to parameter of type 'IFullNameConstructor'.
+getFullName(smith);
