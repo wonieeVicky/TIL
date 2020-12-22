@@ -124,7 +124,7 @@ const getUser: IGetUser = function (n) {
   return user;
 };
 getUser("Vicky");
-*/
+
 // 3) 클래스 타입
 // 인터페이스로 클래스를 정의하는 경우, `implements` 키워드를 사용한다.
 interface IUser {
@@ -221,3 +221,74 @@ class Smith implements IFullName {
 }
 const smith = makeSon(Smith, 7); // Error - TS2345: Argument of type 'typeof Smith' is not assignable to parameter of type 'IFullNameConstructor'.
 getFullName(smith);
+*/
+// 4) 인덱싱 가능 타입(Indexable types)
+// 우리는 인터페이스를 통해 특정 속성(메소드 등)의 타입을 정의할 순 있지만,
+// 수많은 속성을 가지거나 단언할 수 없는 임의의 속성이 포함되는 구조에서는 기존의 방식만으론 한계가 있다.
+// 이런 상황에서 유용한 인덱스 시그니처(Index signature)에 대해 살펴보자
+interface INAME {
+  [INDEXER_NAME: INDEXER_TYPE]: RETURN_TYPE; // Index signature
+}
+
+// 배열(객체)에서 위치를 가리키는 숫자(문자)를 인덱스(index)라고 하며,
+// 각 배열 요소(객체 속성)에 접근하기 위하여 인덱스를 사용하는 것을 인덱싱(indexing)이라고 한다.
+// (배열을 구성하는 각각의 값은 배열 요소(element)라고 한다)
+
+// - 숫자로 인덱싱하는 예제
+// 인터페이스 `ITem`은 인덱스 시그니처를 가지고 있으며, 그 `ITem`을 타입(인터페이스)으로 하는 `item`이 있고,
+// 그 `item`을 `item[0]`이나 `item[1]`과 같이 숫자로 인덱싱할 때 반환되는 값은 `'a'`나 `'b'`같은 문자여야 한다.
+// `item`을 `item['0']`과 같이 문자로 인덱싱하는 경우 에러가 발생한다.
+interface ITem {
+  [itemIndex: number]: string;
+}
+let item: ITem = ["a", "b", "c"]; // Indexable type
+console.log(item[0]); // 'a' is string
+console.log(item[1]); // 'b' is string
+console.log(item["0"]); // Error - TS7015: Element implicitly has an 'any' type because index expression is not of type 'number'.
+// 인덱싱 결과의 반환 타입으로 유니온을 사용하면 다음과 같이 활용할 수도 있다.
+interface ITem {
+  [itemIndex: number]: string | boolean | number[];
+}
+let item: ITem = ["Hello", false, [1, 2, 3]];
+console.log(item[0]); // Hello
+console.log(item[1]); // false
+console.log(item[2]); // [1, 2, 3]
+
+// - 문자로 인덱싱하는 예제
+// 인터페이스 `IUser`는 인덱스 시그니처를 가지고 있으며, 그 `IUser`를 타입(인터페이스)로 하는 `user`가 있고,
+// 그 `user`를 `user['name']`, `user['email']` 또는 user['isValid']와 같이 문자로 인덱싱할 때
+// 반환되는 값은 `'Vicky'`나 `'hwfongfing@gmail.com'`과 같은 문자 혹은 `true`와 같은 불린이어야 한다.
+// 또한, `user[0]`과 가은 숫자로 인덱싱하는 경우나 `user['0']`과 같이 문자로 인덱싱하는 경우 모두 인덱싱 전에 숫자가 문자열로 변환되기 때문에 아래와 같이 값을 반환할 수 있다.
+interface IUser {
+  [userProp: string]: string | boolean;
+}
+let user: IUser = {
+  name: "Vicky",
+  email: "hwfongfing@gmail.com",
+  isValid: true,
+  0: false,
+};
+console.log(user["name"]); // "Vicky"
+console.log(user["email"]); // "hwfongfing@gmail.com"
+console.log(user["isValid"]); // true
+console.log(user[0]); // false is boolean
+console.log(user[1]); // undefined
+console.log(user[2]); // false is boolean
+
+//인덱스 시그니처를 사용하면 아래와 같이 인터페이스에 정의되지 않은 속성들을 사용할 때 유용하다.
+// 단, 해당 속성이 인덱스 시그니처에 정의된 반환 값을 가져야 함을 주의해야 한다.
+// 다음 예제에서 isAdult 속성을 정의된 string이나 number 타입을 반환하지 않기 때문에 에러가 발생한다.
+interface IUser {
+  [userProp: string]: string | number;
+  name: string;
+  age: number;
+}
+let user: IUser = {
+  name: "Vicky",
+  age: 31,
+  email: "hwfongfing@gmail.com",
+  isAdult: true, // // Error - TS2322: Type 'true' is not assignable to type 'string | number'.
+};
+console.log(user["name"]); // Vicky
+console.log(user["age"]); // 31
+console.log(user["email"]); // "hwfongfing@gmail.com"
