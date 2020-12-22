@@ -221,7 +221,7 @@ class Smith implements IFullName {
 }
 const smith = makeSon(Smith, 7); // Error - TS2345: Argument of type 'typeof Smith' is not assignable to parameter of type 'IFullNameConstructor'.
 getFullName(smith);
-*/
+
 // 4) 인덱싱 가능 타입(Indexable types)
 // 우리는 인터페이스를 통해 특정 속성(메소드 등)의 타입을 정의할 순 있지만,
 // 수많은 속성을 가지거나 단언할 수 없는 임의의 속성이 포함되는 구조에서는 기존의 방식만으론 한계가 있다.
@@ -292,3 +292,24 @@ let user: IUser = {
 console.log(user["name"]); // Vicky
 console.log(user["age"]); // 31
 console.log(user["email"]); // "hwfongfing@gmail.com"
+*/
+// 5) keyof
+// 인덱싱 가능 타입에서 keyof를 사용하여 속성 이름을 타입으로 사용하기
+interface ICountries {
+  KR: "대한민국";
+  US: "미국";
+  CP: "중국";
+}
+let country: keyof ICountries; // 'KP' | 'US' | 'CP'
+country = "KR"; // ok
+country = "RU"; // Error - TS2322: Type '"RU"' is not assignable to type "KR" | "US" | "CP"'.
+
+// keyof를 통한 인덱싱으로 타입의 개별 값에 접근하기
+interface ICountries {
+  KR: "대한민국";
+  US: "미국";
+  CP: "중국";
+}
+let country: ICountries[keyof ICountries]; // ICountries ["KR" | "US" | "CP"]
+country = "대한민국";
+country = "러시아"; // Error - TS2322: Type '"러시아"' is not assignable to type '"대한민국" | "미국" | "중국"'.

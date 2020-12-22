@@ -306,7 +306,9 @@ interface INAME {
 
 - 문자로 인덱싱하는 예제
 
-  인터페이스 `IUser`는 인덱스 시그니처를 가지고 있으며, 그 `IUser`를 타입(인터페이스)로 하는 `user`가 있고, 그 `user`를 `user['name']`, `user['email']` 또는 user['isValid']와 같이 문자로 인덱싱할 때 반환되는 값은 `'Vicky'`나 `'hwfongfing@gmail.com'`과 같은 문자 혹은 `true`와 같은 불린이어야 한다.
+  인터페이스 `IUser`는 인덱스 시그니처를 가지고 있으며, 그 `IUser`를 타입(인터페이스)로 하는 `user`가 있고,  
+  그 `user`를 `user['name']`, `user['email']` 또는 user['isValid']와 같이 문자로 인덱싱할 때 반환되는 값은  
+  `'Vicky'`나 `'hwfongfing@gmail.com'`과 같은 문자 혹은 `true`와 같은 불린이어야 한다.
 
   또한, `user[0]`과 가은 숫자로 인덱싱하는 경우나 `user['0']`과 같이 문자로 인덱싱하는 경우 모두 인덱싱 전에 숫자가 문자열로 변환되기 때문에 아래와 같이 값을 반환할 수 있다.
 
@@ -328,23 +330,54 @@ interface INAME {
   console.log(user[2]); // false is boolean
   ```
 
-인덱스 시그니처를 사용하면 아래와 같이 인터페이스에 정의되지 않은 속성들을 사용할 때 유용하다.  
-단, 해당 속성이 인덱스 시그니처에 정의된 반환 값을 가져야 함을 주의해야 한다.  
-다음 예제에서 isAdult 속성을 정의된 string이나 number 타입을 반환하지 않기 때문에 에러가 발생한다.
+  - 인터페이스에 정의되지 않은 속성들을 인덱싱하는 예제
 
-```tsx
-interface IUser {
-  [userProp: string]: string | number;
-  name: string;
-  age: number;
-}
-let user: IUser = {
-  name: "Vicky",
-  age: 31,
-  email: "hwfongfing@gmail.com",
-  isAdult: true, // // Error - TS2322: Type 'true' is not assignable to type 'string | number'.
-};
-console.log(user["name"]); // Vicky
-console.log(user["age"]); // 31
-console.log(user["email"]); // "hwfongfing@gmail.com"
-```
+  인덱스 시그니처를 사용하면 아래와 같이 인터페이스에 정의되지 않은 속성들을 사용할 때 유용하다.  
+   단, 해당 속성이 인덱스 시그니처에 정의된 반환 값을 가져야 함을 주의해야 한다.  
+   다음 예제에서 isAdult 속성을 정의된 string이나 number 타입을 반환하지 않기 때문에 에러가 발생한다.
+
+  ```tsx
+  interface IUser {
+    [userProp: string]: string | number;
+    name: string;
+    age: number;
+  }
+  let user: IUser = {
+    name: "Vicky",
+    age: 31,
+    email: "hwfongfing@gmail.com",
+    isAdult: true, // // Error - TS2322: Type 'true' is not assignable to type 'string | number'.
+  };
+  console.log(user["name"]); // Vicky
+  console.log(user["age"]); // 31
+  console.log(user["email"]); // "hwfongfing@gmail.com"
+  ```
+
+  - **keyof**
+
+  인덱싱 가능 타입에서 keyof를 사용하면 속성 이름을 타입으로 사용할 수 있다.  
+   인덱싱 가능 타입의 속성 이름들이 **유니온 타입으로 적용**되는데, 간단한 예제를 살펴보자
+
+  ```tsx
+  interface ICountries {
+    KR: "대한민국";
+    US: "미국";
+    CP: "중국";
+  }
+  let country: keyof ICountries; // 'KP' | 'US' | 'CP'
+  country = "KR"; // ok
+  country = "RU"; // Error - TS2322: Type '"RU"' is not assignable to type '"KR" | "US" | "CP"'.
+  ```
+
+  또한 keyof를 통한 인덱싱으로 타입의 개별 값에도 접근할 수 있다.
+
+  ```tsx
+  interface ICountries {
+    KR: "대한민국";
+    US: "미국";
+    CP: "중국";
+  }
+  let country: ICountries[keyof ICountries]; // ICountries ["KR" | "US" | "CP"]
+  country = "대한민국";
+  country = "러시아"; // Error - TS2322: Type '"러시아"' is not assignable to type '"대한민국" | "미국" | "중국"'.
+  ```
