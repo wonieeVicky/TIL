@@ -292,7 +292,7 @@ let user: IUser = {
 console.log(user["name"]); // Vicky
 console.log(user["age"]); // 31
 console.log(user["email"]); // "hwfongfing@gmail.com"
-*/
+
 // 5) keyof
 // 인덱싱 가능 타입에서 keyof를 사용하여 속성 이름을 타입으로 사용하기
 interface ICountries {
@@ -313,3 +313,33 @@ interface ICountries {
 let country: ICountries[keyof ICountries]; // ICountries ["KR" | "US" | "CP"]
 country = "대한민국";
 country = "러시아"; // Error - TS2322: Type '"러시아"' is not assignable to type '"대한민국" | "미국" | "중국"'.
+*/
+// 6) 타입 별칭
+// 하나 이상의 타입을 조합해 새로운 타입 조합 만들기 (각 타입들을 참조하는 별칭 만들기)
+type MyType = string;
+type YourType = string | number | boolean;
+type TUser =
+  | {
+      name: string;
+      age: number;
+      isValid: boolean;
+    }
+  | [string, number, boolean];
+
+let userA: TUser = {
+  name: "Vicky",
+  age: 31,
+  isValid: true,
+};
+let userB: TUser = ["Wonny", 32, false];
+
+function someFunc(arg: MyType): YourType {
+  switch (arg) {
+    case "s":
+      return arg.toString(); // string
+    case "n":
+      return parseInt(arg); // number
+    default:
+      return true; // boolean
+  }
+}
