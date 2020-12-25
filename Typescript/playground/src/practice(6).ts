@@ -1,4 +1,4 @@
-// 6. 인터페이스(Interface)
+/* // 6. 인터페이스(Interface)
 // 인터페이스(Interface)는 타입스크립트 여러 객체를 정의하는 일종의 규칙이며 구조이다.
 // 아래와 같이 `interface` 키워드와 함께 사용한다.
 interface IUser {
@@ -342,3 +342,4 @@ const fullName: IFullName = {
   middleNmae: "Wonny",
   lastName: "Choi",
 };
+ */

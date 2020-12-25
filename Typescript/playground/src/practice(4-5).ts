@@ -118,7 +118,7 @@ function someFunc(val: string | number) {
     val.length;
   }
 }
-*/
+
 // 위 방식 뿐만 아니라 제공이 가능한 타입 가드가 더 있다. `typeof`, `in` 그리고 `instanceof` 연산자를 직접 사용하는 타입 가드로 비교적 단순한 로직에서 추천되는 방식이다.
 // `typeof` 연산자는 `number`, `string`, `boolean` 그리고 `symbol`만 타입 가드로 인식할 수 있다.
 // `in` 연산자의 우변 객체(`val`)은 `any` 타입이어야 한다.
@@ -164,3 +164,4 @@ function sounds(ani: Cat | Dog) {
     ani.woof();
   }
 }
+*/

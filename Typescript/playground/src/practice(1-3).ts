@@ -1,5 +1,5 @@
 ﻿// 1-prepare-environment-for-using-typescript
-/* const message: string = "hello world";
+const message: string = "hello world";
 console.log(message);
 
 // 2-assign-type-and-type-error
@@ -366,7 +366,7 @@ const evan: IUserNew = {
   age: 36,
   isValid: false
 };
-*/
+
 // 15) 함수(Function)
 // 화살표 함수를 이용해 타입을 지정할 수 있다. 인수의 타입과 반환 값의 타입을 입력한다.
 // myFunc는 2개의 숫자 타입 인수를 가지고, 숫자 타입을 반환하는 함수
