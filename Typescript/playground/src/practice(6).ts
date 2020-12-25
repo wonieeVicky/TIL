@@ -1,7 +1,7 @@
-// 인터페이스(Interface)
+// 6. 인터페이스(Interface)
 // 인터페이스(Interface)는 타입스크립트 여러 객체를 정의하는 일종의 규칙이며 구조이다.
 // 아래와 같이 `interface` 키워드와 함께 사용한다.
-/* interface IUser {
+interface IUser {
   name: string;
   age: number;
   isAdult: boolean;
@@ -21,9 +21,9 @@ let user2: IUser = {
 
 // 콜론: , 콤마, 혹은 기호를 사용하지 않을 수도 있다.
 interface IUser {
-  name: string,
-  age: number,
-  isAdult: boolean,
+  name: string;
+  age: number;
+  isAdult: boolean;
 }
 // Or
 interface Iuser {
@@ -31,9 +31,9 @@ interface Iuser {
   age: number;
 }
 // Or
-interface Iuser{
-  name: string
-  age: number
+interface Iuser {
+  name: string;
+  age: number;
 }
 
 //다음과 같이 속성에 ? 를 사용하면 선택적 속성으로 정의할 수 있다.
@@ -314,65 +314,31 @@ let country: ICountries[keyof ICountries]; // ICountries ["KR" | "US" | "CP"]
 country = "대한민국";
 country = "러시아"; // Error - TS2322: Type '"러시아"' is not assignable to type '"대한민국" | "미국" | "중국"'.
 
-// 5) 타입 별칭
-// 하나 이상의 타입을 조합해 새로운 타입 조합 만들기 (각 타입들을 참조하는 별칭 만들기)
-type MyType = string;
-type YourType = string | number | boolean;
-type TUser =
-  | {
-      name: string;
-      age: number;
-      isValid: boolean;
-    }
-  | [string, number, boolean];
-
-let userA: TUser = {
-  name: "Vicky",
-  age: 31,
-  isValid: true,
-};
-let userB: TUser = ["Wonny", 32, false];
-
-function someFunc(arg: MyType): YourType {
-  switch (arg) {
-    case "s":
-      return arg.toString(); // string
-    case "n":
-      return parseInt(arg); // number
-    default:
-      return true; // boolean
+// 5) 인터페이스 확장
+// extends를 활용한 인터페이스 상속
+interface IAnimal {
+  name: string;
+}
+interface ICat extends IAnimal {
+  meow(): string;
+}
+class Cat implements ICat {
+  // Error - TS2420: Class 'Cat' incorrectly implements interface 'ICat'. Property 'name' is missing in type 'Cat' but required in type 'ICat'.
+  meow() {
+    return "MEOW~";
   }
 }
-*/
-
-// 6) 제네릭(Generic)
-// 사용 시점에 타입을 선언하는 제네릭 타입
-function toArray(a: number, b: number): number[] {
-  return [a, b];
+// 같은 이름의 인터페이스를 여러개 만들 수도 있음, 인터페이스에 내용을 추가하는 경우 유용함
+interface IFullName {
+  firstName: string;
+  lastName: string;
 }
-toArray(1, 2);
-toArray("1", "2"); // Error - TS2345: Argument of type '"1"' is not assignable to parameter of type 'number'.
-
-// 조금 더 범용적 사용을 위해 유니언 방식으로 사용하기
-// 문제점: String 타입을 인수로 받을 수 있으나 가독성이 떨어지고
-// 세번째 호출을 보면 의도치 않게 Number와 String 타입을 동시에 받을 수 있게됨
-function toArray(a: number | string, b: number | string): (number | string)[] {
-  return [a, b];
+interface IFullName {
+  middleNmae: string;
 }
-toArray(1, 2); // only Number
-toArray("1", "2"); // only String
-toArray(1, "2"); // Number & String
 
-// 제네릭을 사용해 위 이슈를 개선해보자
-function toArray<T>(a: T, b: T): T[] {
-  return [a, b];
-}
-toArray<number>(1, 2);
-toArray<string>("1", "2");
-toArray<string | number>(1, "2");
-toArray<number>(1, "2"); // Error
-
-// 타입 추론을 활용하면 굳이 사용 시점에 타입을 제공하지 않을 수 있음
-toArray(1, 2);
-toArray("1", "2");
-toArray(1, "2"); // Error
+const fullName: IFullName = {
+  firstName: "Vicky",
+  middleNmae: "Wonny",
+  lastName: "Choi",
+};
