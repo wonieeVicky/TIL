@@ -13,3 +13,6 @@
 4. [type Inference & type Assertions](https://github.com/wonieeVicky/TIL/blob/main/Typescript/4-type-Inference-and-type-assertions.md)
 5. [type Guards](https://github.com/wonieeVicky/TIL/blob/main/Typescript/5-type-guards.md)
 6. [interface](https://github.com/wonieeVicky/TIL/blob/main/Typescript/6-interface.md)
+7. [type Aliases](https://github.com/wonieeVicky/TIL/blob/main/Typescript/7-type-aliases.md)
+8. [generic](https://github.com/wonieeVicky/TIL/blob/main/Typescript/8-generic.md)
+9. [function](https://github.com/wonieeVicky/TIL/blob/main/Typescript/9-function.md)
