@@ -106,7 +106,7 @@ setTimeout(obj.b, 100); // undefined
 
    > 각 방법은 메모리와 성능에 대한 trade-off이므로 상황에 맞게 선택하는 것이 좋다.
 
-   ![[한눈에 보는 타입스크립트] 내 함수 - this 영역 설명 이미지 사용](../img/201225-1.png '[한눈에 보는 타입스크립트] 내 함수 - this 영역 설명 이미지 사용')
+   ![[한눈에 보는 타입스크립트] 내 함수 - this 영역 설명 이미지 사용](../img/201225-1.png)_[한눈에 보는 타입스크립트] 내 함수 - this 영역 설명 이미지 사용_
 
 ### 명시적 this
 
@@ -222,4 +222,4 @@ interface HTMLDivElement extends HTMLElement {
 }
 ```
 
-![Go to Definition in VSCode](../img/201226-1.png 'Go to Definition in VSCode')
+![Go to Definition in VSCode](../img/201226-1.png)_Go to Definition in VSCode_
