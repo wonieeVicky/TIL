@@ -143,3 +143,87 @@ function someFn(this: ICat, greeting: string) {
 }
 someFn.call(cat, 'Hello'); // Hello Nana
 ```
+
+### 오버로드(Overloads)
+
+타입스크립트의 '함수 오버로드(Overloads)'는 이름은 같지만 매개변수 타입과 반환 타입이 다른 여러 함수를 가질 수 있는 것을 말한다. 함수 오버로드를 통해 다양한 구조의 함수를 생성하고 관리할 수 있다.
+
+아래 예제의 `add`함수는 2개의 선언부와 1개의 구현부를 가지고 있다.  
+주의할 점은 함수 선언부와 구현부의 매개변수 갯수가 같아야 한다.
+
+> 함수 구현부에 any가 자주 사용된다.
+
+```tsx
+function add(a: string, b: string): string; // 함수 선언
+function add(a: number, b: number): number; // 함수 선언
+function add(a: any, b: any): any {
+  // 함수 구현
+  return a + b;
+}
+add('Hello ', 'world!');
+add(1, 2);
+add('Hello', 2); // Error - No overload matches this call.
+```
+
+인터페이스나 타입 별칭 등의 메소드 정의에서도 오버로드를 활용할 수 있다.  
+타입 단언이나 타입 가드를 통해 함수 선언부의 동적인 매개변수와 반환 값을 정의할 수 있다.
+
+```tsx
+interface IUser {
+  name: string;
+  age: number;
+  getData(x: string): string[];
+  getData(x: number): string;
+}
+let user: IUser = {
+  name: 'Vicky',
+  age: 31,
+  getData: (data: any) => {
+    if (typeof data === 'string') {
+      return data.split('');
+    } else {
+      return data.toString();
+    }
+  },
+};
+
+user.getData('Hello'); // ['H','e','l','l','o']
+user.getData(123); // '123'
+```
+
+HTMLDivElement 같이 DOM 타입의 선언부를 살펴보면 다음과 같다.
+
+```tsx
+/** Provides special properties (beyond the regular HTMLElement interface it also has available to it by inheritance) for manipulating <div> elements. */
+interface HTMLDivElement extends HTMLElement {
+  /**
+   * Sets or retrieves how the object is aligned with adjacent text.
+   */
+  /** @deprecated */
+  align: string;
+  addEventListener<K extends keyof HTMLElementEventMap>(
+    type: K,
+    listener: (this: HTMLDivElement, ev: HTMLElementEventMap[K]) => any,
+    options?: boolean | AddEventListenerOptions,
+  ): void;
+  addEventListener(
+    type: string,
+    listener: EventListenerOrEventListenerObject,
+    options?: boolean | AddEventListenerOptions,
+  ): void;
+  removeEventListener<K extends keyof HTMLElementEventMap>(
+    type: K,
+    listener: (this: HTMLDivElement, ev: HTMLElementEventMap[K]) => any,
+    options?: boolean | EventListenerOptions,
+  ): void;
+  removeEventListener(
+    type: string,
+    listener: EventListenerOrEventListenerObject,
+    options?: boolean | EventListenerOptions,
+  ): void;
+}
+```
+
+![](../img/201226-1.png)
+
+Go to Definition in VSCode
