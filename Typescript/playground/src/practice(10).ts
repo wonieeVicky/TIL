@@ -2,7 +2,6 @@
 //2. 클래스 바디(Class body)
 // 클래스 바디(Class body)에 별도로 타입을 선언하는 클래스 속성(properties)
 // {} 중괄호에 묶여있는 영역을 의미함
-
 class Animal {
   name: string;
   constructor(name: string) {
@@ -121,5 +120,47 @@ class Cat {
     }
     private static getLegs() {
         return 4;
+    }
+}
+
+// 추상(abstract)클래스
+// 인터페이스와 유사한 추상 클래스
+// 직접 인스턴스 생성할 수 없으므로 파생된 후손 클래스에서 인스턴스를 생성해야 함
+abstract class Animal {
+    abstract name: string; // 파생된 클래스에서 구현해야 한다.
+    abstract getName(): string; // 파생된 클래스에서 구현해야 한다.
+}
+class Cat extends Animal {
+    constructor(public name: string) {
+        super();
+    }
+    getName() {
+        return this.name;
+    }
+}
+new Animal(); // Error - TS2511: Cannot create an instance of an abstract class.
+const cat = new Cat("Nana");
+console.log(cat.getName()); // Nana
+
+// Interface
+interface IAnimal {
+    name: string;
+    getName(): string;
+}
+class Dog implements IAnimal {
+    constructor(public name: string) {}
+    getName() {
+        return this.name;
+    }
+}
+
+// 추상클래스는 인터페이스와 달리 속성이나 메소드 멤버에 대한 세부 구현이 가능함
+abstract class Animal {
+    abstract name: string;
+    abstract getName(): string;
+    // Abstract class constructor can be made protected.
+    protected constructor(public legs: string) {}
+    getLegs() {
+        return this.legs;
     }
 }
