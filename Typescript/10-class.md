@@ -169,3 +169,53 @@ class Cat {
     }
 }
 ```
+
+### 3) 추상(Abstract) 클래스
+
+추상(Abstract) 클래스는 다른 클래스가 파생될 수 있는 기본 클래스로, 인터페이스와 굉장히 유사하다.
+`abstract`는 클래스뿐만 아니라 속성과 메소드에도 사용할 수 있다. 추상 클래스는 직접 인스턴스를 생성할 수 없기 때문에 파생된 후손 클래스에서 인스턴스를 생성해야 한다.
+
+```tsx
+// abstract
+abstract class Animal {
+    abstract name: string; // 파생된 클래스에서 구현해야 한다.
+    abstract getName(): string; // 파생된 클래스에서 구현해야 한다.
+}
+class Cat extends Animal {
+    constructor(public name: string) {
+        super();
+    }
+    getName() {
+        return this.name;
+    }
+}
+new Animal(); // Error - TS2511: Cannot create an instance of an abstract class.
+const cat = new Cat("Nana");
+console.log(cat.getName()); // Nana
+
+// Interface
+interface IAnimal {
+    name: string;
+    getName(): string;
+}
+class Dog implements IAnimal {
+    constructor(public name: string) {}
+    getName() {
+        return this.name;
+    }
+}
+```
+
+추상 클래스가 인터페이스와 다른 점은 속성이나 메소드 멤버에 대한 세부 구현이 가능하다는 점이다.
+
+```tsx
+abstract class Animal {
+    abstract name: string;
+    abstract getName(): string;
+    // Abstract class constructor can be made protected.
+    protected constructor(public legs: string) {}
+    getLegs() {
+        return this.legs;
+    }
+}
+```
