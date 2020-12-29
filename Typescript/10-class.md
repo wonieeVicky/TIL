@@ -111,3 +111,61 @@ const cat = new Cat("Nana", 2);
 console.log(cat.getName()); // Nana
 console.log(cat.getAge()); // 2
 ```
+
+이번엔 `static`과 `readonly`에 대해 살펴보자.
+
+ES6에서는 `static`으로 정적 메소드만 생성할 수 있었는데, 타입스크립트에서는 **정적 속성**도 생성할 수 있다. 정적 속성은 클래스 바디에서 속성의 타입 선언과 같이 작용하며, 정적 메소드와 다르게 클래스 바디에서 값을 초기화할 수 없기 때문에 `constructor` 혹은 메소드에서 초기화가 필요하다.
+
+```tsx
+// 정적 속성을 static으로 생성
+class Cat {
+    static legs: number;
+    constructor() {
+        Cat.legs = 4; // Init static property
+    }
+}
+// 속성이므로 바로 읽힐 수 없다.
+console.log(Cat.legs); // undefined
+new Cat();
+console.log(Cat.legs); // 4
+
+// 정적 메서드를 static으로 생성
+class Dog {
+    // Init static method
+    static getLegs() {
+        return 4;
+    }
+}
+// 메서드이므로 바로 읽힐 수 있다.
+console.log(Dog.getLegs()); // 4
+```
+
+`readonly`를 사용하면 해당 속성은 '읽기전용'이다.
+
+```tsx
+class Animal {
+    readonly name: string;
+    constructor(n: string) {
+        this.name = n;
+    }
+}
+let dog = new Animal("Salgoo");
+console.log(dog.name); // Salgoo
+dog.name = "Dodo"; // Error - TS2540: Cannot assign to 'name' because it is a read-only property.
+```
+
+static과 readonly는 접근 제어자와 같이 사용할 수도 있다. 대신 접근 제어자를 먼저 작성해야 한다.
+
+```tsx
+class Cat {
+    public readonly name: string;
+    protected static eyes: number;
+    constructor(n: string) {
+        this.name = n;
+        Cat.eyes = 2;
+    }
+    private static getLegs() {
+        return 4;
+    }
+}
+```
