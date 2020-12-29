@@ -79,4 +79,47 @@ class Cat {
 
 const cat = new Cat("Nana", 2);
 console.log(cat.getName()); // Nana
-console.log(cat.getAge()); // 2
+console.log(cat.getAge()); // 2 
+
+// 정적 속성이 static인 경우
+class Cat {
+    static legs: number;
+    constructor() {
+        Cat.legs = 4; // Init static property
+    }
+}
+console.log(Cat.legs); // undefined
+new Cat();
+console.log(Cat.legs); // 4
+
+class Dog {
+    // Init static method
+    static getLegs() {
+        return 4;
+    }
+}
+console.log(Dog.getLegs()); // 4
+
+// 정적 속성이 readonly인 경우
+class Animal {
+    readonly name: string;
+    constructor(n: string) {
+        this.name = n;
+    }
+}
+let dog = new Animal("Salgoo");
+console.log(dog.name); // Salgoo
+dog.name = "Dodo"; // Error - TS2540: Cannot assign to 'name' because it is a read-only property.
+
+// 접근제어자와 같이 사용하는 static, readonly
+class Cat {
+    public readonly name: string;
+    protected static eyes: number;
+    constructor(n: string) {
+        this.name = n;
+        Cat.eyes = 2;
+    }
+    private static getLegs() {
+        return 4;
+    }
+}
