@@ -16,3 +16,4 @@
 7. [type Aliases](https://github.com/wonieeVicky/TIL/blob/main/Typescript/7-type-aliases.md)
 8. [generic](https://github.com/wonieeVicky/TIL/blob/main/Typescript/8-generic.md)
 9. [function](https://github.com/wonieeVicky/TIL/blob/main/Typescript/9-function.md)
+10. [class](https://github.com/wonieeVicky/TIL/blob/main/Typescript/10-class.md)
