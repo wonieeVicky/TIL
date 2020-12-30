@@ -1,4 +1,4 @@
-﻿// 1-prepare-environment-for-using-typescript
+﻿/* // 1-prepare-environment-for-using-typescript
 const message: string = "hello world";
 console.log(message);
 
@@ -380,3 +380,4 @@ let yourFunc: () => void;
 yourFunc = function () {
   console.log("hello world!");
 };
+ */

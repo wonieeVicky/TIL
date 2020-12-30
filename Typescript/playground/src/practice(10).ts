@@ -1,4 +1,4 @@
-// 10. 클래스
+/* // 10. 클래스
 //2. 클래스 바디(Class body)
 // 클래스 바디(Class body)에 별도로 타입을 선언하는 클래스 속성(properties)
 // {} 중괄호에 묶여있는 영역을 의미함
@@ -164,3 +164,4 @@ abstract class Animal {
         return this.legs;
     }
 }
+ */
