@@ -50,3 +50,23 @@ abstract class CUser {
   abstract isAdult?: boolean;
   abstract validate?(): boolean;
 }
+
+// 3) Chaining
+// 선택적 체이닝(Optional Chaining) 연산자 ?.
+function toString(str: string | undefined) {
+  return str.toString();
+}
+function toString(str: string | undefined) {
+  return (str as string).toString();
+}
+function toString(str?: string) {
+  return str?.toString();
+}
+
+// && 를 이용해 Nullish 체크
+// before
+if (foo && foo.bar && foo.bar.baz) {
+}
+// after
+if (foo?.bar?.bax) {
+}

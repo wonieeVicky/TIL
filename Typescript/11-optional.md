@@ -69,3 +69,43 @@ abstract class CUser {
   abstract validate?(): boolean;
 }
 ```
+
+### 3) 체이닝(Chaining)
+
+아래 예제는 `str` 속성이 `undefined`일 경우 `toString` 메소드를 사용할 수 없기 때문에 에러가 발생한다.
+`str` 속성이 문자열이라는 것을 단언하면 문제를 해결할 수 있지만, 더 간단하게 선택적 체이닝(Optional Chaining) 연산자 `?.` 를 사용할 수 있다.
+
+자세한 사용법은 MDN 문서([여기 클릭](https://developer.mozilla.org/ko/docs/Web/JavaScript/Reference/Operators/Optional_chaining)) 참고하자
+
+```tsx
+obj?.prop;
+obj?.[expr];
+obj?.[index];
+func?.(args);
+```
+
+```tsx
+// Error - TS2532: Object is possibly 'undefined'.
+function toString(str: string | undefined) {
+  return str.toString();
+}
+// Type Assertion
+function toString(str: string | undefined) {
+  return (str as string).toString();
+}
+// Optional Chaining
+function toString(str?: string) {
+  return str?.toString();
+}
+```
+
+특히 `&&` 연산자를 사용해 각 속성을 Nullish 체크(`null`이나 `undefined`를 확인)하는 부분에서 유용하다.
+
+```tsx
+// before
+if (foo && foo.bar && foo.bar.baz) {
+}
+// after
+if (foo?.bar?.bax) {
+}
+```
