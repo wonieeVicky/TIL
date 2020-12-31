@@ -70,3 +70,13 @@ if (foo && foo.bar && foo.bar.baz) {
 // after
 if (foo?.bar?.bax) {
 }
+
+// 4) Nullish 병합 연산자 (??)
+const foo = null ?? "hello nullish";
+console.log(foo); // hello nullish
+
+const bar = false ?? true;
+console.log(bar); // false
+
+const baz = 0 ?? 12;
+console.log(baz); // 0
