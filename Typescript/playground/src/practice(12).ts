@@ -29,6 +29,8 @@ import ABC from "abc";
 
 // 2) 모듈의 타입 선언(Ambient module declaration)
 // 참조 태그(Triple-slash directive)
-/// <reference path="../lodash.d.ts" />
 import * as _ from "lodash";
+
 console.log(_.camelCase("import lodash module"));
+console.log(_.snakeCase("import lodash module"));
+console.log(_.kebabCase("import lodash module"));
