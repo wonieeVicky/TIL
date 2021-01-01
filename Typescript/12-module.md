@@ -73,7 +73,7 @@ console.log(_.camelCase("import lodash module"));
 
 그럼 이제 Lodash에 대한 타입 선언을 해보자. 아래와 같이 루트 경로에 lodash.d.ts 파일을 생성한다.
 
-![https://s3-us-west-2.amazonaws.com/secure.notion-static.com/f1c5bc04-90b3-47f8-a2b8-f13c910cc944/_2021-01-01__8.19.00.png](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/f1c5bc04-90b3-47f8-a2b8-f13c910cc944/_2021-01-01__8.19.00.png)
+![](../img/210101-1.png)
 
 기본 구조는 단순한다. 모듈 가져오기(`import`)가 가능하도록 module 키워드를 사용해 모듈 이름을 명시한다. 그리고 그 범위 안에서, 타입(`interface`)을 가진 변수(`_`)를 선언하고 내보내기(`export`)만 하면 된다.
 
@@ -122,3 +122,68 @@ console.log(_.camelCase("import lodash module"));
 $ npx ts-node main.ts
 #importLodashModule
 ```
+
+### 1) Definitely Typed(@types)
+
+이전 파트에서 Lodash의 `camelCase` 메소드를 사용했고, 이번엔 추가로 `snakeCase`도 사용하려고 한다.
+하지만 우리는 `lodash.d.ts`에 `snakeCase`에 대한 타입선언을 하지 않았기 때문에 다음과 같이 에러가 발생한다.
+
+```tsx
+// main.ts
+
+/// <reference path="../lodash.d.ts" />
+import * as _ from "lodash";
+console.log(_.camelCase("import lodash module"));
+console.log(_.snakeCase("import lodash module));// Error - TS2339: Property 'snakeCase' does not exist on type 'ILodash'.
+```
+
+이는 `lodash.d.ts` 에 `snakeCase`에 대한 타임 선언을 하면 간단히 해결할 수 있다.
+
+```tsx
+// lodash.d.ts
+
+declare module "lodash" {
+  interface ILodash {
+    camelCase(str?: string): string;
+    snakeCase(str?: string): string; // 타입선언 추가
+  }
+
+  const _: ILodash;
+  export = _;
+}
+```
+
+하지만, 프로젝트에서 사용하는 모든 모듈에 대해 매번 직접 타입 선언을 작성하는 것은 매우 비효율적이다 !
+그래서 우리는 여러 사용자들의 기여로 만들어진 [Definitely Typed](https://github.com/DefinitelyTyped/DefinitelyTyped)를 사용할 수 있다. 수 많은 모듈의 타입이 정의되어 있으며, 지속적으로 추가되고 있다.
+
+`npm install -D @types/모듈이름` 으로 설치해 사용한다.
+`npm info @types/모듈이름`으로 검색하면 원하는 모듈의 타입 선언이 존재하는지 확인할 수 있다.
+
+다음과 같이 Lodash 타입 선언을 설치한다.
+
+```bash
+$ npm i -D @types/lodash
+```
+
+자! 이제 더 이상 필요치 않은 `lodash.d.ts` 는 삭제한다! main.ts의 참조 태그(Triple-slash directive)도 같이 삭제한다. 별도 설정이 없어도, 다양한 Lodash API를 사용할 수 있다.
+
+```tsx
+// main.ts
+
+import * as _ from "lodash";
+
+console.log(_.camelCase("import lodash module"));
+console.log(_.snakeCase("import lodash module"));
+console.log(_.kebabCase("import lodash module"));
+```
+
+```bash
+$ npx ts-node main.ts
+# importLodashModule
+# import_lodash_module
+# import-lodash-module
+```
+
+동작 원리는 간단하다. 타입 선언 모듈(`@types/lodash`)은 `node_modules/@types` 경로에 설치되며, 이 겨로의 모든 타입 선언은 **모듈 가져오기(Import)를 통해 컴파일에 자동으로 포함**된다.
+
+![](../img/210101-2.png)
