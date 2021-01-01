@@ -26,3 +26,9 @@ import ABC = require("abc");
 import * as ABC from "abc";
 // or `"esModuleInterop": true`
 import ABC from "abc";
+
+// 2) 모듈의 타입 선언(Ambient module declaration)
+// 참조 태그(Triple-slash directive)
+/// <reference path="../lodash.d.ts" />
+import * as _ from "lodash";
+console.log(_.camelCase("import lodash module"));
