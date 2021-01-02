@@ -187,3 +187,70 @@ $ npx ts-node main.ts
 동작 원리는 간단하다. 타입 선언 모듈(`@types/lodash`)은 `node_modules/@types` 경로에 설치되며, 이 겨로의 모든 타입 선언은 **모듈 가져오기(Import)를 통해 컴파일에 자동으로 포함**된다.
 
 ![](../img/210101-2.png)
+
+### 2) typeRoots와 types 옵션
+
+위에서 살펴본 것과 같이, 자바스크립트 모듈을 사용할 때 다음과 같이 타입 선언을 고민하지 않아도 되는 상황들이 있다.
+
+- 처음부터 타입스크립트로 작성된 모듈
+- 타입 선언(`.d.ts` 파일 등)을 같이 제공하는 자바스크립트 모듈
+- Definitely Typed(`@types/모듈`)에 타입 선언이 기여된 자바스크립트 모듈
+
+하지만 어쩔 수 없이 직접 타입 선언을 작성해야 하는 다음과 같은 상황도 고려해야 한다.
+
+- 타입 선언을 찾을 수 없는 자바스크립트 모듈
+- 가지고 있는 타입 선언을 수정해야 하는 경우
+
+위에서 작성했던 `lodash.d.ts`와 같이 직접 타입 선언을 작성해서 제공할 수 있으며, 이를 좀 더 쉽게 관리할 방법으로 컴파일 옵션 `typeRoots` 를 사용할 수 있다. `typeRoots` 옵션을 테스트하기 위해, 새로운 프로젝트를 만들어 아래와 같이 Lodash를 설치하고 `main.ts` 파일을 생성해보자.
+
+```bash
+$ npm install lodash
+```
+
+`main.ts`에서 Lodash 모듈의 `camelCase` API를 사용해 콘솔 출력하는 아주 단순한 코드를 작성한다.
+하지만 다음과 같이 '가져오기(import)'단계에서 에러가 발생한다. 이는 타입스크립트 컴파일러가 확인할 수 있는 모듈의 **타입 선언(Ambient module declaration)이 없기 때문**이다.
+
+```tsx
+// main.ts
+
+import * as _ from "lodash"; // Error - TS2307: Cannot find module 'lodash'.
+console.log(_.camelCase("import lodash module"));
+```
+
+이를 해결하기 위해, 아래와 같이 `index.d.ts` 파일을 `types/lodash` 경로에 생성하고, `tsconfig.json` 파일 컴파일 옵션으로 `"typeRoots": ["./types"]` 를 제공한다. 넘어가기 전, `typeRoots` 옵션의 특징에 대해 몇 가지 살펴보자면
+
+- 기본값은 `"typeRoots":["./node_modules/@types"]`이다.
+- `typeRoots` 옵션은 지정된 경로에서 index.d.ts 파일을 우선 탐색한다.
+- `index.d.ts` 파일이 없다면 `package.json`의 `types` 혹은 `typings` 속성에 작성된 경로와 파일 이름을 탐색한다.
+- 타입 선언을 찾을 수 없으면 컴파일 오류가 발생한다.
+
+```tsx
+// types/lodash/index.d.ts
+
+declare module "lodash" {
+  interface ILodash {
+    camelCase(str?: string): string;
+  }
+  const _: ILodash;
+  export = _;
+}
+```
+
+![](../img/210103-1.png)
+![](../img/210103-2.png)
+
+이제 정상적으로 동작한다.
+
+```bash
+$ npx ts-node main.ts
+#importLodashModule
+```
+
+이렇게 `typeRoots` 옵션을 통해 `types` 디렉터리에서 여러 모듈의 타입 선언을 관리할 수 있음
+디렉터리 이름은 `types` 뿐만 아니라 `@types`, `_types`, `typings` 등 자유롭게 사용할 수 있다.
+
+추가로 컴파일러 옵션 `types`를 통해 화이트리스트(Whitelist) 방식으로 사용할 모듈 이름만을 작성할 수 있는데, `"types": ["lodash"]`로 작성하면 `types` 디렉터리에서 Lodash의 타입 선언만을 사용하며, `"types": []` 로 작성하면 `types` 디렉터리의 **모든 모듈의 타입 선언을 사용하지 않음**을 의미하며, types 옵션을 사용하지 않으면 `types` 디렉터리의 **모든 모듈의 타입 선언을 사용**하게 된다.
+
+모듈 이름을 추가하고 삭제하면서 어떻게 동작하는지 확인하면 이해하는 데 도움이 된다.
+
+> 일반적인 경우 types 옵션을 작성할 필요가 없다.

@@ -18,3 +18,4 @@
 9. [function](https://github.com/wonieeVicky/TIL/blob/main/Typescript/9-function.md)
 10. [class](https://github.com/wonieeVicky/TIL/blob/main/Typescript/10-class.md)
 11. [optional](https://github.com/wonieeVicky/TIL/blob/main/Typescript/11-optional.md)
+12. [module](https://github.com/wonieeVicky/TIL/blob/main/Typescript/12-module.md)
