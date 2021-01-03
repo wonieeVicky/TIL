@@ -63,3 +63,36 @@ const user: Pick<IUser, TKey> = {
   email: "hwfongfing@gmail.com",
   age: 22, // TS2322: Type '{ name: string; email: string; age: number; }' is not assignable to type 'Pick<IUser, TKey>'.
 };
+
+// 6) Omit
+interface IUser {
+  name: string;
+  age: number;
+  email: string;
+  isValid: boolean;
+}
+type TKey = "name" | "email";
+const user: Omit<IUser, TKey> = {
+  age: 32,
+  isValid: true,
+  name: "Vicky", // TS2322: Type '{ age: number; isValid: true; name: string; }' is not assignable to type 'Pick<IUser, "age" | "isValid">'.
+};
+
+// 7) Exclude
+type T = string | number;
+const a: Exclude<T, number> = "only string";
+const b: Exclude<T, string> = "123"; // TS2322: Type '123' is not assignable to type 'string'.
+const c: T = "string";
+const d: T = 1235;
+
+// 8) Extract
+type T = string | number;
+type U = number | boolean;
+
+const a: Extract<T, U> = 123;
+const b: Extract<T, U> = "only number"; // TS2322: Type '"Only number"' is not assignable to type 'number'.
+
+// 9) NonNullable
+type T = string | number | undefined;
+const a: T = undefined;
+const b: NonNullable<T> = null; // TS2322: Type 'null' is not assignable to type 'string | number'.

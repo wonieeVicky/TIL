@@ -166,3 +166,83 @@ interface INewType {
   email: string;
 }
 ```
+
+### 6) Omit
+
+위에서 살펴본 `Pick`과 반대로, `TYPE`에서 `KEY`로 속성을 생략하고 나머지를 선택한 새로운 타입을 반환한다. `TYPE`은 속성을 가지는 인터페이스나 객체 타입이어야 한다.
+
+```tsx
+Omit<TYPE, KEY>
+```
+
+```tsx
+interface IUser {
+  name: string;
+  age: number;
+  email: string;
+  isValid: boolean;
+}
+type TKey = "name" | "email";
+const user: Omit<IUser, TKey> = {
+  age: 32,
+  isValid: true,
+  name: "Vicky", // TS2322: Type '{ age: number; isValid: true; name: string; }' is not assignable to type 'Pick<IUser, "age" | "isValid">'.
+};
+```
+
+위 예제의 Omit<IUser, TKey>은 아래와 같이 이해할 수 있다.
+
+```tsx
+interface INewType {
+  // name: string,
+  age: number;
+  // email: string,
+  isValid: boolean;
+}
+```
+
+### 7) Exclude
+
+유니언 `TYPE1`에서 유니언 `TYPE2`를 제외한 새로운 타입을 반환한다.
+
+```tsx
+Exclude<TYPE1, TYPE2>
+```
+
+```tsx
+type T = string | number;
+const a: Exclude<T, number> = "only string";
+const b: Exclude<T, string> = "123"; // TS2322: Type '123' is not assignable to type 'string'.
+const c: T = "string";
+const d: T = 1235;
+```
+
+### 8) Extract
+
+유니언 TYPE1에서 유니언 TYPE2를 추출한 새로운 타입을 반환한다.
+
+```tsx
+Extract<TYPE1, TYPE2>
+```
+
+```tsx
+type T = string | number;
+type U = number | boolean;
+
+const a: Extract<T, U> = 123;
+const b: Extract<T, U> = "only number"; // TS2322: Type '"Only number"' is not assignable to type 'number'.
+```
+
+### 9) NonNullable
+
+유니언 TYPE에서 Null과 undefined를 제외한 새로운 타입을 반환한다.
+
+```tsx
+NonNullable<TYPE>
+```
+
+```tsx
+type T = string | number | undefined;
+const a: T = undefined;
+const b: NonNullable<T> = null; // TS2322: Type 'null' is not assignable to type 'string | number'.
+```
