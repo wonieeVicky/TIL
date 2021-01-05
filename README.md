@@ -19,3 +19,4 @@
 10. [class](https://github.com/wonieeVicky/TIL/blob/main/Typescript/10-class.md)
 11. [optional](https://github.com/wonieeVicky/TIL/blob/main/Typescript/11-optional.md)
 12. [module](https://github.com/wonieeVicky/TIL/blob/main/Typescript/12-module.md)
+13. [utlity Type](https://github.com/wonieeVicky/TIL/blob/main/Typescript/13-utility-type.md)
