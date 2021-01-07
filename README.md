@@ -32,3 +32,4 @@
 7. [Map & WeakMap](https://github.com/wonieeVicky/TIL/blob/main/EcmaScript6/7-map-and-weak-map.md)
 8. [Template](https://github.com/wonieeVicky/TIL/blob/main/EcmaScript6/8-template.md)
 9. [Function](https://github.com/wonieeVicky/TIL/blob/main/EcmaScript6/9-function.md)
+10. [Module](https://github.com/wonieeVicky/TIL/blob/main/EcmaScript6/10-module.md)
