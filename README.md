@@ -35,3 +35,4 @@
 10. [object-2](https://github.com/wonieeVicky/TIL/blob/main/EcmaScript6/10-object-2.md)
 11. [Module](https://github.com/wonieeVicky/TIL/blob/main/EcmaScript6/11-module.md)
 12. [Proxy](https://github.com/wonieeVicky/TIL/blob/main/EcmaScript6/12-proxy.md)
+13. [Mini Project](https://github.com/wonieeVicky/TIL/blob/main/EcmaScript6/13-mini-project.md)
