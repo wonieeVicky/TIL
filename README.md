@@ -1,7 +1,7 @@
 # Today I Learned
 
--   오늘 내가 배운 것 중 코드로 남겨야하는 기록들을 commit 한다.
--   이론에 기초하거나 텍스트 위주의 내용은 [Notion](https://www.notion.so/fongfing/Vicky-s-FE-Engineering-Wiki-d7e660205c0047118a78d664b07418fd)에 포스팅한다.
+- 오늘 내가 배운 것 중 코드로 남겨야하는 기록들을 commit 한다.
+- 이론에 기초하거나 텍스트 위주의 내용은 [Notion](https://www.notion.so/fongfing/Vicky-s-FE-Engineering-Wiki-d7e660205c0047118a78d664b07418fd)에 포스팅한다.
 
 ### TypeScript
 
@@ -37,4 +37,4 @@
 
 ### TDD
 
-1. [TDD - jasmine을 활용해 견고한 소프트웨어 만들기](https://github.com/wonieeVicky/TIL/blob/main/TDD/tdd.md)
+1. [TDD 이론 및 패턴 소개](https://github.com/wonieeVicky/TIL/blob/main/TDD/1-tdd-basic.md)
