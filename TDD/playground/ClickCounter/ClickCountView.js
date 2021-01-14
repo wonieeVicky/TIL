@@ -1,15 +1,28 @@
 var App = App || {};
 
-App.ClickCountView = (clickCounter, updateEl) => {
-  if (!clickCounter) {
-    throw Error("clickCounter");
-  }
-  if (!updateEl) {
-    throw Error("updateEl");
-  }
-  return {
+App.ClickCountView = (clickCounter, options) => {
+  if (!clickCounter) throw new Error(App.ClickCountView.messages.noClickCounter);
+  if (!options.updateEl) throw new Error(App.ClickCountView.messages.noUpdateEl);
+
+  const view = {
     updateView() {
-      updateEl.innerHTML = clickCounter.getValue();
+      options.updateEl.innerHTML = clickCounter.getValue();
+    },
+
+    increaseAndUpdateView() {
+      clickCounter.increase();
+      this.updateView();
     },
   };
+
+  options.triggerEl.addEventListener("click", () => {
+    view.increaseAndUpdateView();
+  });
+
+  return view;
+};
+
+App.ClickCountView.messages = {
+  noClickCounter: "clickCount를 주입해야 합니다",
+  noUpdateEl: "updateEl를 주입해야 합니다",
 };

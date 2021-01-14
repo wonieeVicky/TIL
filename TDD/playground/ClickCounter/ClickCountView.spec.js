@@ -1,33 +1,53 @@
-describe("App.ClickCountView", () => {
-  let updateEl, clickCounter, view;
+describe("App.ClickCountView 모듈", () => {
+  let udpateEl, triggerEl, clickCounter, view;
+
   beforeEach(() => {
-    // ClickCounter 객체 생성
-    clickCounter = App.ClickCounter();
     updateEl = document.createElement("span");
-    view = App.ClickCountView(clickCounter, updateEl);
+    triggerEl = document.createElement("button");
+    clickCounter = App.ClickCounter();
+    view = App.ClickCountView(clickCounter, { updateEl, triggerEl });
   });
 
-  it("clickCounter를 주입하지 않으면 에러를 던진다", () => {
-    const clickCounter = null;
-    const updateEl = document.createElement("span");
-    // App.ClickCountView(clickCounter, updateEl);
-    const actual = () => App.ClickCountView(clickCounter, updateEl);
-    expect(actual).toThrowError();
-  });
+  describe("네거티브 테스트", () => {
+    it("ClickCounter를 주입하지 않으면 에러를 던진다", () => {
+      const actual = () => App.ClickCountView(null, { updateEl });
+      expect(actual).toThrowError(App.ClickCountView.messages.noClickCounter);
+    });
 
-  it("updateEl을 주입하지 않으면 에러를 던진다", () => {
-    const clickCounter = App.ClickCounter();
-    const updateEl = null;
-
-    const actual = () => App.ClickCountView(clickCounter, updateEl);
-    expect(actual).toThrowError();
+    it("updateEl를 주입하지 않으면 에러를 던진다", () => {
+      const actual = () => App.ClickCountView(clickCounter, { triggerEl });
+      expect(actual).toThrowError(App.ClickCountView.messages.noUpdateEl);
+    });
   });
 
   describe("updateView()", () => {
-    it("ClickCounter의 getValue() 값을 출력한다", () => {
+    it("ClickCounter의 getValue() 실행결과를 출력한다", () => {
       const counterValue = clickCounter.getValue();
       view.updateView();
       expect(updateEl.innerHTML).toBe(counterValue.toString());
     });
+  });
+
+  describe("increaseAndUpdateView()는", () => {
+    it("ClickCounter의 increase 를 실행한다", () => {
+      spyOn(clickCounter, "increase");
+      view.increaseAndUpdateView();
+      expect(clickCounter.increase).toHaveBeenCalled();
+    });
+
+    it("updateView를 실행한다", () => {
+      spyOn(view, "updateView");
+      view.increaseAndUpdateView();
+      expect(view.updateView).toHaveBeenCalled();
+    });
+  });
+
+  it("클릭 이벤트가 발생하면 increaseAndUpdateView 실행한다", () => {
+    // increaseAndUpdateView 실행 검증을 위해 spyOn 함수 사용
+    spyOn(view, "increaseAndUpdateView");
+    // 클릭 이벤트 발생
+    triggerEl.click();
+    // increaseAndUpdateView 실행되었는지 검증한다.
+    expect(view.increaseAndUpdateView).toHaveBeenCalled();
   });
 });
