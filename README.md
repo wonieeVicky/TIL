@@ -38,4 +38,5 @@
 ### TDD
 
 1. [TDD 이론 및 패턴 소개](https://github.com/wonieeVicky/TIL/blob/main/TDD/1-tdd-basic.md)
-1. [모듈패턴으로 기존 코드 개선하기](https://github.com/wonieeVicky/TIL/blob/main/TDD/2-tdd-module-pattern.md)
+2. [모듈패턴으로 기존 코드 개선하기](https://github.com/wonieeVicky/TIL/blob/main/TDD/2-tdd-module-pattern.md)
+3. [모듈을 이용해서 화면 만들기](https://github.com/wonieeVicky/TIL/blob/main/TDD/3-tdd-draw-layout.md)
