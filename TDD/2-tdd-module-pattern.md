@@ -211,3 +211,191 @@
      };
    };
    ```
+
+2. 두번째 스펙: **ClickCountView 모듈의 increaseAndUpdateView()는 카운트 값을 증가하고 그 값을 출력한다.**
+
+   `git checkout ClickCountView-spec-2`
+
+   increaseAndUpdateView()가 해야하는 일은 크게 두가지이다.
+   이에 단일 책임 원칙에 따라 할 일 두가지를 나누어 아래의 구조와 같이 수행하도록 한다.
+
+   1. ClickCounter의 increase 함수를 실행한다
+   2. updateView 함수를 실행한다
+
+   ```jsx
+   describe("increaseAndUpdateView()는", () => {
+     it("ClickCounter의 increase 를 실행한다", () => {
+       // todo
+     });
+
+     it("updateView를 실행한다", () => {
+       // todo
+     });
+   });
+   ```
+
+   - 잠깐, 만일 위 코드에서 'ClickCounter의 increase를 실행한다'를 어떻게 검증할 수 있을까?
+
+   위에서 배운 내용을 가지고 실제 테스트 코드를 구현해보도록 하자
+
+   - ClickCounter의 increase 함수를 실행한다
+
+     ```jsx
+     // ClickCountView.spec.js
+     describe("App.ClickCountView 모듈", () => {
+       // ...
+       describe("increaseAndUpdateView()는", () => {
+         it("ClickCounter의 increase 를 실행한다", () => {
+           spyOn(clickCounter, "increase");
+           view.increaseAndUpdateView();
+           expect(clickCounter.increase).toHaveBeenCalled();
+         });
+
+         it("updateView를 실행한다", () => {
+           // code
+         });
+       });
+     });
+     ```
+
+     ```jsx
+     // ClickCountView.js
+     var App = App || {};
+
+     App.ClickCountView = (clickCounter, updateEl) => {
+       if (!clickCounter) throw new Error(App.ClickCountView.messages.noClickCounter);
+       if (!updateEl) throw new Error(App.ClickCountView.messages.noUpdateEl);
+
+       return {
+         updateView() {
+           updateEl.innerHTML = clickCounter.getValue();
+         },
+         increaseAndUpdateView() {
+           clickCounter.increase();
+         },
+       };
+     };
+
+     App.ClickCountView.messages = {
+       noClickCounter: "clickCount를 주입해야 합니다",
+       noUpdateEl: "updateEl를 주입해야 합니다",
+     };
+     ```
+
+   - updateView 함수를 실행한다
+
+     ```jsx
+     // ClickCountView.spec.js
+     describe("increaseAndUpdateView()는", () => {
+       it("ClickCounter의 increase 를 실행한다", () => {
+         // code
+       });
+
+       it("updateView를 실행한다", () => {
+         spyOn(view, "updateView");
+         view.increaseAndUpdateView();
+         expect(view.updateView).toHaveBeenCalled();
+       });
+     });
+     ```
+
+     ```jsx
+     // ClickCountView.js
+     var App = App || {};
+
+     App.ClickCountView = (clickCounter, updateEl) => {
+       if (!clickCounter) throw new Error(App.ClickCountView.messages.noClickCounter);
+       if (!updateEl) throw new Error(App.ClickCountView.messages.noUpdateEl);
+
+       return {
+         updateView() {
+           updateEl.innerHTML = clickCounter.getValue();
+         },
+         increaseAndUpdateView() {
+           clickCounter.increase();
+           this.updateView();
+         },
+       };
+     };
+
+     App.ClickCountView.messages = {
+       noClickCounter: "clickCount를 주입해야 합니다",
+       noUpdateEl: "updateEl를 주입해야 합니다",
+     };
+     ```
+
+3. 세번째 스펙: **클릭 이벤트가 발생하면 increaseAndUpdateView()를 실행한다.**
+
+   `git checkout ClickCountView-spec-3`
+
+   (카운터 값을 출력할 돔 엘리먼트(updateEl)를 주입했듯이) **클릭 이벤트 핸들러(increaseAndUpdateVieew)를 바인딩할 돔 엘리먼트(triggerEl)를 주입**받아야 한다.
+
+   ```jsx
+   // ClickCountView.spec.js
+   describe("App.ClickCountView 모듈", () => {
+     let udpateEl, clickCounter, view;
+
+     beforeEach(() => {
+       updateEl = document.createElement("span");
+       triggerEl = document.createElement("button"); // 추가!
+       clickCounter = App.ClickCounter();
+       view = App.ClickCountView(clickCounter, { updateEl, triggerEl }); // 변경
+     });
+
+     describe("네거티브 테스트", () => {
+       it("ClickCounter를 주입하지 않으면 에러를 던진다", () => {
+         const actual = () => App.ClickCountView(null, { updateEl }); // 변경
+         expect(actual).toThrowError(App.ClickCountView.messages.noClickCounter);
+       });
+
+       it("updateEl를 주입하지 않으면 에러를 던진다", () => {
+         const actual = () => App.ClickCountView(clickCounter, { triggerEl }); // 변경
+         expect(actual).toThrowError(App.ClickCountView.messages.noUpdateEl);
+       });
+     });
+
+     it("클릭 이벤트가 발생하면 increaseAndUpdateView 실행한다", () => {
+       // increaseAndUpdateView 실행 검증을 위해 spyOn 함수 사용
+       spyOn(view, "increaseAndUpdateView");
+       // 클릭 이벤트 발생
+       triggerEl.click();
+       // increaseAndUpdateView 실행되었는지 검증한다.
+       expect(view.increaseAndUpdateView).toHaveBeenCalled();
+     });
+   });
+   ```
+
+   ```jsx
+   // ClickCountView.js
+   var App = App || {};
+
+   // 두번째 인자 값 전달 방식 변경으로 options로 수정
+   App.ClickCountView = (clickCounter, options) => {
+     if (!clickCounter) throw new Error(App.ClickCountView.messages.noClickCounter);
+     if (!options.updateEl) throw new Error(App.ClickCountView.messages.noUpdateEl);
+
+     // 하위 triggerEl의 click이벤트에 increaseAndUpdateView()를 실행시키기 위해 상단으로 위치 이동
+     const view = {
+       updateView() {
+         options.updateEl.innerHTML = clickCounter.getValue();
+       },
+
+       increaseAndUpdateView() {
+         clickCounter.increase();
+         this.updateView();
+       },
+     };
+
+     // 버튼 이벤트 생성
+     options.triggerEl.addEventListener("click", () => {
+       view.increaseAndUpdateView();
+     });
+
+     return view;
+   };
+
+   App.ClickCountView.messages = {
+     noClickCounter: "clickCount를 주입해야 합니다",
+     noUpdateEl: "updateEl를 주입해야 합니다",
+   };
+   ```
