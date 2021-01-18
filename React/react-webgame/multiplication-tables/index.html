@@ -22,11 +22,13 @@
         onSubmit = (e) => {
           e.preventDefault();
           if (parseInt(this.state.value) === this.state.first * this.state.second) {
-            this.setState({
-              result: `${this.state.value} 정답!`,
-              first: Math.ceil(Math.random() * 9),
-              second: Math.ceil(Math.random() * 9),
-              value: "",
+            this.setState((prevState) => {
+              return {
+                result: `${prevState.value} 정답!`,
+                first: Math.ceil(Math.random() * 9),
+                second: Math.ceil(Math.random() * 9),
+                value: "",
+              };
             });
           } else {
             this.setState({
@@ -34,18 +36,25 @@
               value: "",
             });
           }
+          this.input.focus();
         };
 
         onChange = (e) => this.setState({ value: e.target.value });
 
+        onRefInput = (c) => {
+          this.input = c;
+        };
+
         render() {
+          // setState를 할때에는 render 함수가 재실행된다. 너무 잦은 setState는 지나치게 많은 재실행이 발생하여 사이트가 느려질 수 있다.
+          // console.log("렌더링");
           return (
             <>
               <div>
                 {this.state.first}곱하기 {this.state.second}는?
               </div>
               <form onSubmit={this.onSubmit}>
-                <input type="number" value={this.state.value} onChange={this.onChange} />
+                <input ref={this.onRefInput} type="number" value={this.state.value} onChange={this.onChange} />
                 <button type="submit">입력!</button>
               </form>
               <div>{this.state.result}</div>

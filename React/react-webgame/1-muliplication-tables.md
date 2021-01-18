@@ -428,3 +428,147 @@ ReactDOM 내부에 GuGuDan 컴포넌트를 렌더링 한뒤 해당 컴포넌트�
    안되는 경우 `<React.Fragment>{/* code .. */}</React.Fragment>`로 작성할 수도 있다.
 4. 만약 form 태그 없이 input submit을 해야할 경우 button에 onClick 이벤트를 사용해 구현한다.
    `<button type="submit" onClick={onSubmit}>입력!</button>`
+
+## 1-9. 함수형 setState
+
+우리는 예전값으로 새로운 state를 만들 때에는 반드시 return 함수를 사용해야 한다.
+setState시 함수형으로 return 하여 setState 하는 방법이 있는데 아래 `onSubmit` 이벤트의 setState 동작 부분 예시를 보자. 기존 코드와 다른 점은 prevState(예전 값)를 받아 return 시 바뀔 상태값을 넣어주는 구조로 변형된 점이다.
+
+```jsx
+onSubmit = (e) => {
+  e.preventDefault();
+  if (parseInt(this.state.value) === this.state.first * this.state.second) {
+    // prevState란 예전 상태값, return에는 바뀔 상태값이 담긴다.
+    this.setState((prevState) => {
+      return {
+        result: `${prevState.value} 정답!`,
+        first: Math.ceil(Math.random() * 9),
+        second: Math.ceil(Math.random() * 9),
+        value: "",
+      };
+    });
+  } else {
+    this.setState({
+      result: "땡",
+      value: "",
+    });
+  }
+};
+```
+
+왜 이렇게 해야할까?
+
+아래와 같이 숫자를 세는 counter 이벤트가 있다고 치자. 우리는 새로운 value가 기존 value + 3이 되기를 원하며 아래와 같이 코드를 작성하지만, 이는 +3이 될 수도 있고, + 1이 될 수도 있다. 왜냐면 **setState는 비동기**이기 때문이다.
+
+```jsx
+onChange = (e) => {
+  e.preventDefault();
+  this.setState({
+    value: this.state.value + 1,
+  });
+  this.setState({
+    value: this.state.value + 1,
+  });
+  this.setState({
+    value: this.state.value + 1,
+  });
+};
+```
+
+따라서 예전값(prevState)로 새로운 state를 만들 때엔 반드시 return 함수를 사용하도록 한다.
+
+```jsx
+onChange = (e) => {
+	  e.preventDefault();
+    this.setState((prevState)=>{
+      value: prevState.value + 1,
+    })
+};
+```
+
+## 1-10. ref
+
+React는 상태의 변경사항에 따라 화면을 리렌더링하는 마법을 부린다. 만약 값을 입력할 때마다 input에 focus를 하고 싶다면 어떻게 해야할까? document.querySelector('input').focus()라는 방법을 쓰기보다는 리액트가 화면을 컨트롤 할 수 있도록 해주는 것이 좋다. 화면은 리액트가 핸들링하고 우리는 데이터만 바꿔주는 것이다.
+
+이렇게 돔에 직접 접근하고 싶을 때는 ref 메서드를 사용한다.
+
+```jsx
+<html>
+  <head>
+    <script crossorigin src="https://unpkg.com/react@17/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@17/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  </head>
+  <body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+      class GuGuDan extends React.Component {
+        constructor(props) {
+          super(props);
+          this.state = {
+            first: Math.ceil(Math.random() * 9),
+            second: Math.ceil(Math.random() * 9),
+            value: "",
+            result: "",
+          };
+        }
+
+        onSubmit = (e) => {
+          e.preventDefault();
+          if (parseInt(this.state.value) === this.state.first * this.state.second) {
+            this.setState((prevState) => {
+              return {
+                result: `${prevState.value} 정답!`,
+                first: Math.ceil(Math.random() * 9),
+                second: Math.ceil(Math.random() * 9),
+                value: "",
+              };
+            });
+          } else {
+            this.setState({
+              result: "땡",
+              value: "",
+            });
+          }
+					// 2. ref 동작
+          this.input.focus();
+        };
+
+        onChange = (e) => this.setState({ value: e.target.value });
+
+				// 1. ref 이벤트 생성
+        onRefInput = (c) => { this.input = c; };
+
+        render() {
+          // 3. console.log("렌더링");
+          return (
+            <>
+              <div>
+                {this.state.first}곱하기 {this.state.second}는?
+              </div>
+              <form onSubmit={this.onSubmit}>
+                <input ref={this.onRefInput} type="number" value={this.state.value} onChange={this.onChange} />
+                <button type="submit">입력!</button>
+              </form>
+              <div>{this.state.result}</div>
+            </>
+          );
+        }
+      }
+    </script>
+    <script type="text/babel">
+      ReactDOM.render(
+        <>
+          <GuGuDan />
+        </>,
+        document.querySelector("#root")
+      );
+    </script>
+  </body>
+</html>
+```
+
+1. ref 이벤트 또한 onSubmit, onChange 이벤트처럼 별도로 이벤트를 생성해준다. 인자값은 아무거나 적어도 상관없다. ref 메서드는 reference의 줄임말로 해당 엘리먼트를 참조하겠다는 의미이다.
+2. 생성해놓은 ref인 this.input은 필요한 구간에서 동작시키면 된다. `this.input.focus();`
+3. 해당 영역에 콘솔을 찍고 기능을 구동해보면 setState가 동작할 때마다 render함수가 재실행되는 것을 확인할 수 있다. 때문에 너무 잦은 setState는 render 함수를 지나치게 많이 재실행하여 사이트 동작이 느려질 수 있다.
