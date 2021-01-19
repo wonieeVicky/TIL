@@ -572,3 +572,71 @@ React는 상태의 변경사항에 따라 화면을 리렌더링하는 마법을
 1. ref 이벤트 또한 onSubmit, onChange 이벤트처럼 별도로 이벤트를 생성해준다. 인자값은 아무거나 적어도 상관없다. ref 메서드는 reference의 줄임말로 해당 엘리먼트를 참조하겠다는 의미이다.
 2. 생성해놓은 ref인 this.input은 필요한 구간에서 동작시키면 된다. `this.input.focus();`
 3. 해당 영역에 콘솔을 찍고 기능을 구동해보면 setState가 동작할 때마다 render함수가 재실행되는 것을 확인할 수 있다. 때문에 너무 잦은 setState는 render 함수를 지나치게 많이 재실행하여 사이트 동작이 느려질 수 있다.
+
+## 1-11. React Hooks 사용하기
+
+- Hooks는 함수형 컴포넌트에서 사용한다.
+  - 기존에는 상태를 변경하는 동작(setState 등)이 없을 경우 함수형 컴포넌트를 썻으나, 리액트가 함수형 컴포넌트에도 상태 변경 메서드를 지원하면서 요즘 주로 함수형으로 개발한다.
+  - 함수형 컴포넌트에서 상태 변화를 할 수 있도록 하는 메서드가 바로 Hooks이다.
+- Hooks 는 보통 앞에 `use-`가 붙는다. useState. useEffect, useRef..
+  - 함수형 컴포넌트와 훅스를 이용하면 기존 클래스컴포넌트보다 훨씬 간결하게 만들 수 있다.
+- 구구단 컴포넌트를 Hooks로 변경해보자.(index-functional.html 참고)
+
+  ```jsx
+  const Gugudan = () => {
+    // 1. setState 생성
+    const [first, setFirst] = React.useState(Math.ceil(Math.random() * 9));
+    const [second, setSecond] = React.useState(Math.ceil(Math.random() * 9));
+    const [value, setValue] = React.useState("");
+    const [result, setResult] = React.useState("");
+    // 2. useRef 생성
+    const inputRef = React.useRef();
+
+    const onChangeInput = (e) => setValue(e.target.value);
+    const onSumbmitForm = (e) => {
+      e.preventDefault();
+      if (parseInt(value) === first * second) {
+        // 3. 이전 값이 필요할 경우
+        setResult((prevResult) => `${prevResult} 정답!`);
+        setFirst(Math.ceil(Math.random() * 9));
+        setSecond(Math.ceil(Math.random() * 9));
+        setValue("");
+      } else {
+        setResult("땡");
+        setValue("");
+      }
+      inputRef.current.focus();
+    };
+
+    return (
+      <>
+        <div>
+          {first} 곱하기 {second} sms?
+        </div>
+        <form>
+          <input ref={inputRef} onChange={onChangeInput} value={value} />
+          <button>입력</button>
+        </form>
+        <div id="result" onSubmit={}>
+          {result}
+        </div>
+      </>
+    );
+  };
+  ```
+
+1. Hooks는 반드시 컴포넌트 안에 넣어주어야 한다.
+
+   구조분해 할당으로 초기값과, 상태변경 메서드가 선언되며, useState()안에 초기값을 넣는다.
+
+   - 상태를 React.useState 안에 객체로 묶어 값을 넣어주면 안될까?
+
+2. ref의 경우 `useRef`라는 메서드를 이용해 생성해준다.
+3. 이전 값이 필요할 경우 클래스 컴포넌트와 비슷하게 return 형태로 이전 값을 인자로 받아올 수 있다.
+
+## 1-12. Class와 Hooks 비교하기
+
+- state 선언방식이 다르다. this.setState({}) ↔ setValue()
+- 함수형 컴포넌트에서 Hooks로 State 변경할 때마다 컴포넌트 전체가 재실행되므로 조금 느릴 수 있다.
+  - 다만 Hooks setState시 React는 비동기로 상태변화를 실행시키므로 setState를 한번에 여러번 한다고 해도 렌더링은 한번만 일어난다.
+  - Class 컴포넌트는 Render 영역만 재렌더링
