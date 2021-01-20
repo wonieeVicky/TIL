@@ -100,3 +100,152 @@ Module.exports = {
 ```
 
 ## 2-3. 웹팩으로 빌드하기
+
+웹팩으로 실행할 수 있는 방법은 크게 2가지있다.
+
+1. package.json에 설정
+
+   ```json
+   {
+     "name": "word-relay",
+     "version": "1.0.0",
+     "description": "",
+     "main": "index.js",
+     "scripts": {
+       "dev": "webpack" // 설정 후 터미널에 npm run dev
+     },
+     "author": "Vicky",
+     "license": "MIT",
+     "dependencies": {
+       "react": "^17.0.1",
+       "react-dom": "^17.0.1"
+     },
+     "devDependencies": {
+       "webpack": "^5.15.0",
+       "webpack-cli": "^4.4.0"
+     }
+   }
+   ```
+
+2. 터미널에 npx로 webpack 실행
+
+```bash
+$ npx webpack
+```
+
+webpack 실행 전 jsx문법 해석을 위해 바벨을 설치 후 사용 설정을 해준다.
+
+1. 바벨 설치
+
+   ```bash
+   $ npm i -D @babel/core @babel/preset-env @babel/preset-react @babel-loader @babel/plugin-proposal-class-properties
+   ```
+
+   - @babel/core : 기본 바벨 기능
+   - @babel/preset-env : 최신 문법을 사용환경에 맞게 구버전으로 traspile
+
+   - @babel/preset-react : 리액트 문법을 js로 transpile
+   - babel-loader: babel과 webpack을 연결해준다.
+
+2. webpack.config.js 설정
+
+```jsx
+const webpack = require("webpack");
+const path = require("path");
+
+module.exports = {
+  name: "wordrelay-setting",
+  mode: "development",
+  devtool: "eval",
+  resolve: {
+    extensions: [".js", ".jsx"],
+  },
+
+  // 입력
+  entry: {
+    app: ["./client"],
+  },
+
+  module: {
+    // 여러 규칙을 정할 수 있으므로 배열이다
+    rules: [
+      {
+        test: /\.jsx?/,
+        loader: "babel-loader",
+        options: {
+          presets: ["@babel/preset-env", "@babel/preset-react"],
+          plugins: ["@babel/plugin-proposal-class-properties"],
+        },
+      },
+    ],
+  },
+
+  //출력
+  output: {
+    path: path.join(__dirname, "dist"),
+    filename: "app.js",
+  },
+};
+```
+
+위 설정 후 `$ npm run dev`를 통해 webpack을 실행시키면 `./dist/app.js`가 잘 생성되어 노출된다.
+
+## 2-4. 구구단 웹팩으로 빌드하기
+
+[여기](https://github.com/wonieeVicky/TIL/blob/main/React/react-webgame/multiplication-tables)에서 웹팩 설정 및 빌드 파일 확인해보자 😇
+
+## 2-5. @babel/preset-env와 plugins
+
+- presets는 plugin들의 모임이다.
+- @babel/preset-env 는 지원 브라우저 등을 상세하게 설정할 수 있다.
+
+  특히 지원브라우저의 경우 한국에서 사용률이 5%이상인 브라우저 등 다양한 옵션으로 설정 가능하다.  
+   ([browserslist](https://github.com/browserslist/browserslist)에서 자세한 내용 확인할 수 있다)
+
+  ```jsx
+  const webpack = require("webpack");
+  const path = require("path");
+
+  module.exports = {
+    // settings..
+    module: {
+      rules: [
+        {
+          test: /\.jsx?$/,
+          loader: "babel-loader",
+          options: {
+            presets: [
+              [
+                "@babel/preset-env",
+                {
+                  targets: {
+                    browsers: ["> 5% in KR", "last 2 chrome versions"], // 1. 브라우저별 설정
+                  },
+                  debug: true,
+                },
+              ],
+              "@babel/preset-react",
+            ],
+            plugins: ["@babel/plugin-proposal-class-properties"],
+          },
+        },
+      ],
+    },
+    // settings..
+  };
+  ```
+
+- babel-loader 내부의 모듈이 아닌 webpack 자체의 plugins도 설정할 수 있다.
+
+  ```jsx
+  const webpack = require("webpack");
+  const path = require("path");
+
+  module.exports = {
+    // settings...
+
+    plugins: [new webpack.LoaderOptionsPlugin({ debug: true })],
+
+    // settings...
+  };
+  ```
