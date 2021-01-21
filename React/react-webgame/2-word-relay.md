@@ -437,7 +437,7 @@ const WordRelay = () => {
 
 module.exports = WordRelay;
 ```
-
+----
 ![](../img/210121-1.png)
 ![](../img/201213-1.png)
 
