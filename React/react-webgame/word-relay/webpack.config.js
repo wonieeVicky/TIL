@@ -1,5 +1,5 @@
-const webpack = require("webpack");
 const path = require("path"); // node에서 경로 조작하는 기능
+const RefreshWebpackPlugin = require("@pmmmwh/react-refresh-webpack-plugin");
 
 module.exports = {
   name: "wordrelay-setting", // webpack 설정 이름
@@ -15,22 +15,40 @@ module.exports = {
   },
 
   module: {
-    // 여러 규칙을 정할 수 있으므로 배열이다
     rules: [
       {
-        test: /\.jsx?/,
+        test: /\.jsx?$/,
         loader: "babel-loader",
         options: {
-          presets: ["@babel/preset-env", "@babel/preset-react"],
-          plugins: ["@babel/plugin-proposal-class-properties"],
+          presets: [
+            [
+              "@babel/preset-env",
+              {
+                targets: {
+                  browsers: ["> 5% in KR"], // 브라우저별 설정이 가능하다. (참조 //github.com/browserslist/browserslist)
+                },
+                debug: true,
+              },
+            ],
+            "@babel/preset-react",
+          ],
+          plugins: ["@babel/plugin-proposal-class-properties", "react-refresh/babel"],
         },
       },
     ],
   },
 
+  plugins: [new RefreshWebpackPlugin()],
+
   //출력
   output: {
-    path: path.join(__dirname, "dist"), // C:\users\vicky\TIL\.. 이런거 안적어도 된다.
+    path: path.join(__dirname, "dist"), // 실제 경로
+    publicPath: "/dist/", // 가상 경로 app.use("/dist", express.static)
     filename: "app.js",
+  },
+
+  devServer: {
+    publicPath: "/dist/",
+    hot: true,
   },
 };
