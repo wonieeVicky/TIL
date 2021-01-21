@@ -1,4 +1,6 @@
 # 끝말잇기 만들기
+![](../img/210121-1.png)
+![](../img/201213-1.png)
 
 ## 2-1. Webpack 설치하기
 
@@ -437,9 +439,6 @@ const WordRelay = () => {
 
 module.exports = WordRelay;
 ```
-----
-![](../img/210121-1.png)
-![](../img/201213-1.png)
 
 [HMR]: Hot Module Reload
 
