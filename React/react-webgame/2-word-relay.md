@@ -438,6 +438,8 @@ const WordRelay = () => {
 module.exports = WordRelay;
 ```
 
+![](../img/210121-1.png)
+
 [HMR]: Hot Module Reload
 
 어떤 곳에서 변경이 발생해서, 어떤 컴포넌트가 수정되는지 알려준다.
@@ -445,5 +447,3 @@ module.exports = WordRelay;
 [WDS]: Webpack Dev Server
 
 devServer 동작로그 업데이트를 알려준다.
-
-![](../img/img/210121-1.png)
