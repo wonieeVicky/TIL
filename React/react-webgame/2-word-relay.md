@@ -103,7 +103,7 @@ Module.exports = {
 
 웹팩으로 실행할 수 있는 방법은 크게 2가지있다.
 
-1. package.json에 설정
+1. package.json에 설정 > 설정 후 커멘드라인에서 npm run dev
 
    ```json
    {
@@ -112,7 +112,7 @@ Module.exports = {
      "description": "",
      "main": "index.js",
      "scripts": {
-       "dev": "webpack" // 설정 후 터미널에 npm run dev
+       "dev": "webpack"
      },
      "author": "Vicky",
      "license": "MIT",
@@ -337,13 +337,9 @@ module.exports = WordRelay;
 
   ```json
   {
-    // ..
-
     "scripts": {
       "dev": "webpack serve --env development"
     }
-
-    // ..
   }
   ```
 
@@ -374,10 +370,7 @@ module.exports = WordRelay;
               ],
               "@babel/preset-react",
             ],
-            plugins: [
-  						"@babel/plugin-proposal-class-properties",
-  						"react-refresh/babel" // 추가!
-  					],
+            plugins: ["@babel/plugin-proposal-class-properties", "react-refresh/babel"], // 추가!
           },
         },
       ],
@@ -445,7 +438,7 @@ const WordRelay = () => {
 module.exports = WordRelay;
 ```
 
-![https://s3-us-west-2.amazonaws.com/secure.notion-static.com/85f0b5bc-a230-4551-bbaa-ac70a95248e0/_2021-01-21__11.05.41.png](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/85f0b5bc-a230-4551-bbaa-ac70a95248e0/_2021-01-21__11.05.41.png)
+![](../img/210121-1.png)
 
 [HMR]: Hot Module Reload
 
