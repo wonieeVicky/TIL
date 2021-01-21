@@ -249,3 +249,208 @@ module.exports = {
     // settings...
   };
   ```
+
+## 2-6. 끝말잇기 Class 만들기
+
+구구단과 비슷한 형태로 Class형 컴포넌트로 끝말잇기를 구현해보자
+
+WordRelay.jsx
+
+1. onChange와 value를 사용하지 않으려면 defaultValue 프로퍼티 꼭 적어주자
+
+```jsx
+const React = require("react");
+const { Component } = React;
+
+class WordRelay extends Component {
+  state = {
+    word: "비키",
+    value: "",
+    result: "",
+  };
+
+  onSubmitForm = (e) => {
+    e.preventDefault();
+    if (this.state.word[this.state.word.length - 1] === this.state.value[0]) {
+      this.setState({
+        result: "딩동댕",
+        word: this.state.value,
+        value: "",
+      });
+      this.input.focus();
+    } else {
+      this.setState({
+        result: "땡",
+        value: "",
+      });
+      this.input.focus();
+    }
+  };
+
+  onChange = (e) => {
+    this.setState({ value: e.currentTarget.value });
+  };
+
+  onRefInput = (c) => {
+    this.input = c;
+  };
+
+  render() {
+    return (
+      <>
+        <div>{this.state.word}</div>
+        <form onSubmit={this.onSubmitForm}>
+          {/* 1 */}
+          <input ref={this.onRefInput} onChange={this.onChange} value={this.state.value} />
+          <button>입력</button>
+        </form>
+        <div>{this.state.result}</div>
+      </>
+    );
+  }
+}
+
+module.exports = WordRelay;
+```
+
+변경사항 확인은 `npm run dev` ! 변경할 때 마다 빌드치는 것 번거로우니 2-7에서 해결해보자 !
+
+## 2-7. 웹팩 데브 서버와 핫 리로딩
+
+- webpack-dev-server는 무엇을 하나?
+
+  개발 시 서버를 띄우고, 소스코드의 변경점을 감지해서 저장했던 결과물을 자동으로 수정해주는 기능을 담당
+  또한 페이지 새로고침 시 기존 데이터를 유지한 상태에서 새로고침을 해준다. (데이터 모두 리셋되지 않는다)
+
+- 어떻게 사용하나?
+
+  1. 필요한 패키지 설치
+
+  ```bash
+  $ npm i react-refresh @pmmmwh/react-refresh-webpack-plugin -D
+  $ npm i -D webpack-dev-server
+  ```
+
+  2. package.json 값 변경
+
+  `webpack-dev-server —hot` → `webpack serve --env development` 요렇게 바뀌었다.
+
+  ```json
+  {
+    // ..
+
+    "scripts": {
+      "dev": "webpack serve --env development"
+    }
+
+    // ..
+  }
+  ```
+
+  3. webpack.config.js
+
+  ```jsx
+  const path = require("path"); // node에서 경로 조작하는 기능
+  const RefreshWebpackPlugin = require("@pmmmwh/react-refresh-webpack-plugin");
+
+  module.exports = {
+    // settings...
+
+    module: {
+      rules: [
+        {
+          test: /\.jsx?$/,
+          loader: "babel-loader",
+          options: {
+            presets: [
+              [
+                "@babel/preset-env",
+                {
+                  targets: {
+                    browsers: ["> 5% in KR"],
+                  },
+                  debug: true,
+                },
+              ],
+              "@babel/preset-react",
+            ],
+            plugins: [
+  						"@babel/plugin-proposal-class-properties",
+  						"react-refresh/babel" // 추가!
+  					],
+          },
+        },
+      ],
+    },
+
+    plugins: [new RefreshWebpackPlugin()], // 추가
+
+    output: { ... },
+
+  	// 하단 추가
+    devServer: {
+      publicPath: "/dist/",
+      hot: true,
+    },
+  };
+  ```
+
+  4. `npm run dev` 입력! 데브 서버가 실행되면서, [localhost:8080](http://localhost:8080/dl) 으로의 접속이 가능해진다.
+
+## 2-8. 끝말잇기 Hooks로 전환하기
+
+WordRelay.jsx
+
+```jsx
+const React = require("react");
+const { useState, useRef } = React;
+
+const WordRelay = () => {
+  const [word, setWord] = useState("비키");
+  const [value, setValue] = useState("");
+  const [result, setResult] = useState("");
+
+  const inputRef = useRef(null);
+
+  const onSubmitForm = (e) => {
+    e.preventDefault();
+    if (word[word.length - 1] === value[0]) {
+      setResult("딩동댕!");
+      setWord(value);
+      setValue("");
+    } else {
+      setResult("땡!");
+      setValue("");
+    }
+    inputRef.current.focus();
+  };
+
+  const onChange = (e) => {
+    setValue(e.currentTarget.value);
+  };
+
+  return (
+    <>
+      <div>{word}</div>
+      <form onSubmit={onSubmitForm}>
+        <label htmlFor="wordInput">글자를 입력하세요.</label>
+        <input ref={inputRef} onChange={onChange} value={value} />
+        <button>입력</button>
+      </form>
+      <div>{result}</div>
+    </>
+  );
+};
+
+module.exports = WordRelay;
+```
+
+![https://s3-us-west-2.amazonaws.com/secure.notion-static.com/85f0b5bc-a230-4551-bbaa-ac70a95248e0/_2021-01-21__11.05.41.png](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/85f0b5bc-a230-4551-bbaa-ac70a95248e0/_2021-01-21__11.05.41.png)
+
+[HMR]: Hot Module Reload
+
+어떤 곳에서 변경이 발생해서, 어떤 컴포넌트가 수정되는지 알려준다.
+
+[WDS]: Webpack Dev Server
+
+devServer 동작로그 업데이트를 알려준다.
