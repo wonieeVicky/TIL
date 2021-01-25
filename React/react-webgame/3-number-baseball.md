@@ -171,3 +171,212 @@ class ExampleKey extends Component {
 
 export default ExampleKey;
 ```
+
+## 3-5. 주석과 메서드 바인딩
+
+1.  리액트의 JSX 주석은 `{/* */}` 이렇게 사용한다.
+2.  이벤트 함수에 화살표 함수를 사용하지 않으면 함수 내부에서 this.state 사용이 안된다.
+    this를 찾을 수 없게 된다. (this = undefined)
+
+        ```jsx
+        import React, { Component } from "react";
+
+        class Test extends Component {
+        	state = {
+        		result: "",
+        		value: "",
+        		answer: getNumbers(),
+        		tries: []
+        	}
+
+          // const onChangeInput = () => {}
+        	onChangeInput(e){
+        		this.setState({
+        			value: e.target.value // cannot read property 'setState' of undefined!
+        		});
+        	}
+
+        	render() { // ... }
+        }
+        ```
+
+        사용할 수 있는 방법이 없는 것은 아니다. constructor super 선언 및 이벤트 함수에 this 바인드해주면 가능
+
+        ```jsx
+        import React, { Component } from "react";
+
+        class Test extends Component {
+        	constructor(props){
+        		super(props);
+        		this.state = {
+        			result: "",
+        			value: "",
+        			answer: getNumbers(),
+        			tries: []
+        		}
+        		this.onSubmitForm = this.onSubmitForm.bind(this);
+            this.onChangeInput = this.onChangeInput.bind(this);
+        	}
+
+        	onSubmitForm(e) {
+            e.preventDefault();
+            console.log(this.state.value);
+          }
+
+          onChangeInput(e) {
+            this.setState({
+              value: e.target.value
+            });
+          }
+
+        	render() { // ... }
+        }
+        ```
+
+        위와 같이 복잡한 코드로 구현하는 방법을 대신하여 arrow function을 통해 this를 자동으로 binding해주면 더욱 간결하게 표현할 수 있다.
+
+        그렇다면 render()도 arrow function으로 바인딩해줘야하지 않을까?
+        안해도 된다. 위 extends된 Component가 render를 자동으로 바인딩해주기 때문이다.
+
+## 3-6. 숫자야구 만들기
+
+- React의 불변성
+
+React는 배열 메서드에 값을 추가하는 `push` 메서드를 사용하면 안된다.
+React의 컴포넌트가 렌더링하는 기준: 기존 state와 현재 state가 다를 때 리렌더링
+
+만약 아래와 같이 push 메서드를 이용해 직접 array에 값을 변경하면 React는 변경을 감지를 하지 못하므로 원하는 방향으로 동작하지 않는다. 따라서 array2라는 배열을 새롭게 만들어 값을 복사하고 추가해주어야 변경사항을 감지하고 리렌더링을 시작한다. (참조가 바뀌므로)
+
+```jsx
+const array = [];
+array.push(1); // React가 변경사항에 대한 감지를 못한다.
+
+const array2 = [...array, 1]; // 복사해서 새로운 배열을 만들어줘야 변경사항을 감지할 수 있다.
+```
+
+- 숫자야구 만들기
+
+Numberbaseball.jsx
+
+```jsx
+import React, { Component } from "react";
+import Try from "./Try";
+
+// 숫자 네 개를 겹치지 않고 랜덤하게 리턴하는 함수
+const getNumbers = () => {
+  const candidate = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+  const array = [];
+  for (let i = 0; i < 4; i += 1) {
+    const chosen = candidate.splice(Math.floor(Math.random() * (9 - i)), 1)[0];
+    array.push(chosen);
+  }
+  return array;
+};
+
+class NumberBaseball extends Component {
+  state = {
+    result: "",
+    value: "",
+    answer: getNumbers(), // ex. [1,3,5,7]
+    tries: [] // push 쓰면 안된다.
+  };
+
+  onSubmitForm = (e) => {
+    const { value, tries, answer } = this.state;
+    e.preventDefault();
+    if (value === answer.join("")) {
+      this.setState({
+        result: "홈런!",
+        tries: [...tries, { try: value, result: "홈런!" }]
+      });
+      alert("게임을 다시 시작합니다.");
+      this.setState({
+        value: "",
+        answer: getNumbers(),
+        tries: []
+      });
+    } else {
+      const answerArray = value.split("").map((v) => parseInt(v));
+      let strike = 0;
+      let ball = 0;
+
+      // 10번 이상 틀렸을 때
+      if (tries.length >= 9) {
+        this.setState({
+          result: `10번 넘게 틀려서 실패! 답은 ${answer.join(",")} 였습니다!`
+        });
+        alert("게임을 다시 시작합니다.");
+        this.setState({
+          value: "",
+          answer: getNumbers(),
+          tries: []
+        });
+      } else {
+        for (let i = 0; i < 4; i++) {
+          if (answerArray[i] === answer[i]) {
+            strike++;
+          } else if (answer.includes(answerArray[i])) {
+            ball++;
+          }
+        }
+        this.setState({
+          tries: [...tries, { try: value, result: `${strike} 스트라이크, ${ball} 볼입니다` }],
+          value: ""
+        });
+      }
+    }
+  };
+
+  onChangeInput = (e) => {
+    this.setState({
+      value: e.target.value
+    });
+  };
+
+  render() {
+    const { result, value, tries } = this.state; // 구조분해로 값 간단히 만들기
+    return (
+      <>
+        <h1>{result}</h1>
+        <form onSubmit={this.onSubmitForm}>
+          <input maxLength={4} value={value} onChange={this.onChangeInput} />
+        </form>
+        <div>시도: {tries.length}</div>
+        <ul>
+          {tries.map((v, i) => (
+            <Try key={`${i + 1}차 시도 :`} tryInfo={v} index={i} />
+          ))}
+        </ul>
+      </>
+    );
+  }
+}
+
+export default NumberBaseball;
+```
+
+Try.jsx
+
+```jsx
+import React, { Component } from "react";
+
+class Try extends Component {
+  render() {
+    const { tryInfo } = this.props;
+    return (
+      <li>
+        <div>{tryInfo.try}</div>
+        <div>{tryInfo.result}</div>
+      </li>
+    );
+  }
+}
+
+export default Try;
+```
+
+## 3-7. Q&A
+
+- `getNumbers()`를 바깥으로 뺀 이유?
+
+this를 사용하지 않는 경우 바깥으로 분리하는게 일반화. 보통 별도 분리된 함수의 경우 다른 위치에서 재사용이 가능하므로 분리하며, 분리된 자체만으로 this에 의존적이지 않다는 것을 알 수 있다.
