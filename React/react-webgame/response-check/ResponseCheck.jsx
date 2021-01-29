@@ -12,7 +12,8 @@ class ResponseCheck extends PureComponent {
   endTime;
 
   onClickScreen = () => {
-    const { state, message, result } = this.state;
+    const { state } = this.state;
+
     if (state === "waiting") {
       // 파란색
       this.setState({
@@ -46,9 +47,19 @@ class ResponseCheck extends PureComponent {
     }
   };
 
+  onReset = () =>
+    this.setState({
+      result: [],
+    });
+
   renderAverage = () => {
     const { result } = this.state;
-    return result.length === 0 ? null : <div>평균 시간: {result.reduce((a, b) => a + b) / result.length}ms</div>;
+    return result.length === 0 ? null : (
+      <>
+        <div>평균 시간: {result.reduce((a, b) => a + b) / result.length}ms</div>
+        <button onClick={this.onReset}>취소</button>
+      </>
+    );
   };
 
   render() {
