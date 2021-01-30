@@ -1,43 +1,12 @@
-<html>
+<!DOCTYPE html>
+<html lang="en">
   <head>
-    <script crossorigin src="https://unpkg.com/react@17/umd/react.development.js"></script>
-    <script crossorigin src="https://unpkg.com/react-dom@17/umd/react-dom.development.js"></script>
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>lecture</title>
   </head>
   <body>
     <div id="root"></div>
-
-    <script type="text/babel">
-      class LikeButton extends React.Component {
-        constructor(props) {
-          super(props);
-          this.state = {
-            liked: false,
-          };
-        }
-
-        render() {
-          // JSX 문법 (JS + XML): createElement로 React가 알아서 변환해준다.
-          return (
-            <button
-              type="submit"
-              onClick={() => {
-                this.setState({ liked: true });
-              }}
-            >
-              {this.state.liked === true ? "Liked" : "Like"}
-            </button>
-          );
-        }
-      }
-    </script>
-    <script type="text/babel">
-      ReactDOM.render(
-        <>
-          <LikeButton />
-        </>,
-        document.querySelector("#root")
-      );
-    </script>
+    <script src="./dist/app.js"></script>
   </body>
 </html>
