@@ -27,24 +27,33 @@ class Lotto extends Component {
 
   timeouts = [];
 
-  componentDidMount() {
+  runTimeouts = () => {
+    const { winNumbers } = this.state;
     // let을 사용하면 클로저 문제가 발생하지 않는다.
-    for (let i = 0; i < this.state.winNumbers.length - 1; i++) {
-      this.timeouts[i] = setTimeout(() => {
-        this.setState((prevState) => {
-          return {
-            winBalls: [...prevState.winBalls, winNumbers[i]],
-          };
-        });
-      }, (i + 1) * 1000);
+    for (let i = 0; i < winNumbers.length - 1; i++) {
+      this.timeouts[i] = setTimeout(
+        () =>
+          this.setState((prevState) => {
+            return {
+              winBalls: [...prevState.winBalls, winNumbers[i]],
+            };
+          }),
+        (i + 1) * 1000
+      );
     }
     // bonus 점수 노출
-    setTimeout(() => {
-      this.timeouts[6] = this.setState({
-        bonus: winNumbers[6],
-        redo: true,
-      });
-    }, 7000);
+    this.timeouts[6] = setTimeout(
+      () =>
+        this.setState({
+          bonus: winNumbers[6],
+          redo: true,
+        }),
+      7000
+    );
+  };
+
+  componentDidMount() {
+    this.runTimeouts();
   }
 
   componentWillUnmount() {
@@ -52,7 +61,23 @@ class Lotto extends Component {
     this.timeouts.forEach((t) => clearTimeout(t));
   }
 
-  onClickRedo = () => {};
+  componentDidUpdate(prevProps, prevState) {
+    // 혹은 !this.state.bonus or !this.state.redo
+    if (!this.state.winBalls.length) {
+      this.runTimeouts();
+    }
+  }
+
+  onClickRedo = () => {
+    // 초기화 시켜준다.
+    this.setState({
+      winNumbers: getWinNumbers(), // 당첨 숫자
+      winBalls: [],
+      bonus: null, // 보너스 공
+      redo: false,
+    });
+    this.timeouts = [];
+  };
 
   render() {
     const { winBalls, bonus, redo } = this.state;
@@ -66,7 +91,7 @@ class Lotto extends Component {
         </div>
         <div>보너스!</div>
         {bonus && <Ball number={bonus} />}
-        <button onClick={redo ? this.onClickRedo : () => {}}>한번 더!</button>
+        {redo && <button onClick={this.onClickRedo}>한번 더!</button>}
       </>
     );
   }
