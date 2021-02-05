@@ -231,3 +231,164 @@ export default Td;
 ```
 
 위와 같이 TicTacToe → Table → Tr → Td로 컴포넌트에 dispatch 함수 등을 상속시켜주었다. 굉장히 귀찮고 복잡한 일인데 , 이 부분은 contextAPI를 사용하면 개선이 가능하다.
+
+## 7-4. 틱택토 구현하기
+
+우선 틱택토 게임의 onClick 이벤트는 useReducer를 활용해 구현을 했다. 이제 남은 것은 onClick이 중복되지 않도록 하는 것과 승자 혹은 무승부를 가려내는 일을 하면 된다.
+
+먼저 onClick이 중복되지 않게 하기 위해서는 아래와 같이 분기를 해주면된다.
+
+```jsx
+// Td.jsx
+import React, { useCallback } from "react";
+import { CLICK_CELL } from "./TicTacToe";
+
+const Td = ({ rowIndex, cellIndex, cellData, dispatch }) => {
+  const onClickTd = useCallback(() => {
+    // cellData가 있을 때에는 dispatch하지 않는다.
+    if (cellData) {
+      return;
+    }
+    dispatch({ type: CLICK_CELL, row: rowIndex, cell: cellIndex });
+  }, [cellData]);
+  return <td onClick={onClickTd}>{cellData}</td>;
+};
+
+export default Td;
+```
+
+승자를 가려내는 것은 어디에 해당 코드를 위치시킬지 먼저 고려해보자.
+우선 Redux 동기적으로 State가 바뀌는 반면 useReducer는 State가 비동기적으로 바뀐다. (React에서도 State는 비동기적으로 바뀐다.) 따라서 Redux에 익숙하다면 조금 익숙하지 않게 느껴질 수도 있다.
+예를 들어 상단의 onClickTd 이벤트에서 `dispatch({ type: CHANGE_TURN });` 하단에 state.turn을 찍어보면 바뀌기 전의 state.turn 값이 나온다. 이 또한 비동기적으로 action이 처리되기 때문이다.
+이와 같이 비동기적으로 State가 처리되는 가운데 state를 가지고 어떤 작업을 하기 위해서는 반드시 useEffect를 사용해야 한다.
+
+```jsx
+// TicTacToe.jsx
+import React, { useReducer, useCallback, useEffect } from "react";
+import Table from "./Table";
+
+const initialState = {
+  winner: "",
+  turn: "O",
+  tableData: [
+    ["", "", ""],
+    ["", "", ""],
+    ["", "", ""],
+  ],
+  recentCell: [-1, -1],
+};
+
+export const SET_WINNER = "SET_WINNER";
+export const CLICK_CELL = "CLICK_CELL";
+export const CHANGE_TURN = "CHANGE_TURN";
+export const RESET_GAME = "RESET_GAME";
+
+const reducer = (state, action) => {
+  switch (action.type) {
+    case SET_WINNER:
+      return {
+        ...state,
+        winner: action.winner,
+      };
+    case CLICK_CELL: {
+      const tableData = [...state.tableData];
+      tableData[action.row] = [...tableData[action.row]];
+      tableData[action.row][action.cell] = state.turn;
+      return {
+        ...state,
+        tableData,
+        recentCell: [action.row, action.cell], // 최근에 클릭한 Cell
+      };
+    }
+    case CHANGE_TURN: {
+      return {
+        ...state,
+        turn: state.turn === "O" ? "X" : "O",
+      };
+    }
+    case RESET_GAME: {
+      return {
+        ...state,
+        turn: "O",
+        tableData: [
+          ["", "", ""],
+          ["", "", ""],
+          ["", "", ""],
+        ],
+        recentCell: [-1, -1],
+      };
+    }
+    default:
+      return state;
+  }
+};
+
+const TicTacToe = () => {
+  const [state, dispatch] = useReducer(reducer, initialState);
+  const { winner, turn, tableData, recentCell } = state;
+
+  const onClickTable = useCallback(() => {
+    dispatch({ type: SET_WINNER, winner: "o" });
+  }, []);
+
+  // useEffect에서 승부를 따진다.
+  useEffect(() => {
+    const [row, cell] = recentCell;
+    // 초기 돔 렌더링 시 실행되지 않도록 함!
+    if (row < 0) {
+      return;
+    }
+    let win = false;
+    // 행
+    if (tableData[row][0] === turn && tableData[row][1] === turn && tableData[row][2] === turn) {
+      win = true;
+    }
+    // 열
+    if (tableData[0][cell] === turn && tableData[1][cell] === turn && tableData[2][cell] === turn) {
+      win = true;
+    }
+    // 대각선 오른쪽방향
+    if (tableData[0][0] === turn && tableData[1][1] === turn && tableData[2][2] === turn) {
+      win = true;
+    }
+    // 대각선 왼쪽방향
+    if (tableData[0][2] === turn && tableData[1][1] === turn && tableData[2][0] === turn) {
+      win = true;
+    }
+    if (win) {
+      // 승자 산출
+      dispatch({ type: SET_WINNER, winner: turn });
+      // 게임 리셋
+      dispatch({ type: RESET_GAME });
+    } else {
+      // 무승부 검사
+      let all = true; // all이 true면 무승부이다.
+
+      tableData.forEach((row) => {
+        row.forEach((cell) => {
+          if (!cell) {
+            all = false; // 3X3 중에 하나라도 cell이 없으면 무승부가 아니다
+          }
+        });
+      });
+
+      if (all) {
+        // 무승부라면 게임 리셋
+        dispatch({ type: RESET_GAME });
+      } else {
+        // 이긴게 아니면 다음 차례
+        dispatch({ type: CHANGE_TURN }); // 비동기 처리의 이슈로 인해 Td컴포넌트에서 이동
+      }
+    }
+  }, [recentCell]);
+
+  return (
+    <>
+      <Table tableData={state.tableData} dispatch={dispatch} />
+      {state.winner && <div>{state.winner} 님의 승리!</div>}
+    </>
+  );
+};
+
+export default TicTacToe;
+```
