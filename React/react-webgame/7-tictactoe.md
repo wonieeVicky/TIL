@@ -236,7 +236,7 @@ export default Td;
 
 우선 틱택토 게임의 onClick 이벤트는 useReducer를 활용해 구현을 했다. 이제 남은 것은 onClick이 중복되지 않도록 하는 것과 승자 혹은 무승부를 가려내는 일을 하면 된다.
 
-먼저 onClick이 중복되지 않게 하기 위해서는 아래와 같이 분기를 해주면된다.
+먼저 onClick이 중복되지 않게 하기 위해서는 아래와 같이 분기를 해주면 된다.
 
 ```jsx
 // Td.jsx
@@ -258,9 +258,9 @@ export default Td;
 ```
 
 승자를 가려내는 것은 어디에 해당 코드를 위치시킬지 먼저 고려해보자.
-우선 Redux 동기적으로 State가 바뀌는 반면 useReducer는 State가 비동기적으로 바뀐다. (React에서도 State는 비동기적으로 바뀐다.) 따라서 Redux에 익숙하다면 조금 익숙하지 않게 느껴질 수도 있다.
+진행하기 앞서 Redux 동기적으로 State가 바뀌는 반면 useReducer는 State가 비동기적으로 바뀐다. (React에서도 State는 비동기적으로 바뀐다.) 따라서 Redux에 익숙하다면 조금 익숙하지 않게 느껴질 수도 있다.
 예를 들어 상단의 onClickTd 이벤트에서 `dispatch({ type: CHANGE_TURN });` 하단에 state.turn을 찍어보면 바뀌기 전의 state.turn 값이 나온다. 이 또한 비동기적으로 action이 처리되기 때문이다.
-이와 같이 비동기적으로 State가 처리되는 가운데 state를 가지고 어떤 작업을 하기 위해서는 반드시 useEffect를 사용해야 한다.
+이와 같이 비동기적으로 State가 처리되는 가운데 state를 가지고 어떤 작업을 하기 위해서는 반드시 `useEffect`를 사용해야 한다.
 
 ```jsx
 // TicTacToe.jsx
@@ -392,3 +392,117 @@ const TicTacToe = () => {
 
 export default TicTacToe;
 ```
+
+## 7-5. 테이블 최적화하기
+
+성능 최적화를 위해 크롬 콘솔 디버그 창에서 React - Component - Highlight updates when components render 모드를 활성화한다!! 그리고 useRef와 useEffect를 활용해 무엇인 state 변경에 영향을 주는지 확인해보면 된다. 성능 최적화를 위해 사용하는 방법이니 참고하자~!
+
+```jsx
+// Td.jsx
+import React, { useCallback, useEffect, useRef } from "react";
+import { CLICK_CELL } from "./TicTacToe";
+
+const Td = ({ rowIndex, cellIndex, cellData, dispatch }) => {
+  // 1. useRef 생성
+  const ref = useRef([]);
+  // 2. useEffect로 변경 데이터 트래킹
+  useEffect(() => {
+    // 4. 데이터 변경 지점 디버깅
+    console.log(
+      rowIndex === ref.current[0],
+      cellIndex === ref.current[1],
+      dispatch === ref.current[2],
+      cellData === ref.current[3]
+    );
+    // 3. ref 변수에 감지할 데이터를 넣어준다.
+    ref.current = [rowIndex, cellIndex, dispatch, cellData];
+  }, [rowIndex, cellIndex, dispatch, cellData]);
+
+  const onClickTd = useCallback(() => {
+    if (cellData) {
+      return;
+    }
+    dispatch({ type: CLICK_CELL, row: rowIndex, cell: cellIndex });
+  }, [cellData]);
+
+  return <td onClick={onClickTd}>{cellData}</td>;
+};
+
+export default Td;
+```
+
+1. 값 변경을 감지하기 위한 참조변수 useRef 생성
+2. useEffect를 활용하여 값 변경 감지 → 두번째 인자에 체크할 데이터를 넣는다.
+3. ref 변수에 감지할 데이터를 추가해준다.
+4. ref에 부여한 값과 실제 데이터의 차이가 변경이 발생하는 곳을 console.log를 이용해 찾는다.
+   (어떤게 바뀌고, 어떤게 바뀌지 않는지 확인하는 방법)
+
+위와 같은 방법으로 Tr에서도 성능 최적화를 위한 디버깅을 아래와 같이 실행해준다.
+
+```jsx
+// TR.jsx
+
+import React, { useRef, useEffect, memo } from "react";
+import Td from "./Td";
+
+const Tr = memo(({ rowData, rowIndex, dispatch }) => {
+  // 성능 최적화
+  const ref = useRef([]);
+  useEffect(() => {
+    console.log(rowData === ref.current[0], rowIndex === ref.current[1], dispatch === ref.current[2]);
+    ref.current = [rowData, rowIndex, dispatch];
+  }, [rowData, rowIndex, dispatch]);
+
+  return (
+    <tr>
+      {Array(rowData.length)
+        .fill()
+        .map((td, i) => (
+          <Td rowIndex={rowIndex} cellIndex={i} dispatch={dispatch} cellData={rowData[i]} key={Math.random() + i}>
+            {""}
+          </Td>
+        ))}
+    </tr>
+  );
+});
+
+export default Tr;
+```
+
+위와 같이 불필요한 리렌더링을 발생시키는 인자들을 찾아내고 최적화 한 뒤 어려운 경우 memo 를 적용하여 컴포넌트 최적화를 진행해주면 된다. 그런데 만약 이렇게 해도 불필요한 리렌더링을 막을 수 없을 때에는 어떻게할까?
+바로 최후의 수단인 `useMemo`를 리턴 함수에 적용하는 방법이 있다. 아래 예시 코드를 보자
+
+```jsx
+import React, { useRef, useEffect, useMemo, memo } from "react";
+import Td from "./Td";
+
+const Tr = memo(({ rowData, rowIndex, dispatch }) => {
+  const ref = useRef([]);
+  useEffect(() => {
+    console.log(rowData === ref.current[0], rowIndex === ref.current[1], dispatch === ref.current[2]);
+    ref.current = [rowData, rowIndex, dispatch];
+  }, [rowData, rowIndex, dispatch]);
+
+  return (
+    <tr>
+      {Array(rowData.length)
+        .fill()
+        .map((td, i) =>
+					{/* useMemo로 성능최적화 ! */}
+          useMemo(
+            () => (
+              <Td rowIndex={rowIndex} cellIndex={i} dispatch={dispatch} cellData={rowData[i]} key={Math.random() + i}>
+                {""}
+              </Td>
+            ),
+            [rowData[i]]
+          )
+        )}
+    </tr>
+  );
+});
+
+export default Tr;
+```
+
+앞서 말한 memo, useMemo 그리고 useEffect를 활용한 디버깅을 통해 성능 최적화를 해주면 된다.
