@@ -571,3 +571,287 @@ const reducer = (state, action) => {
 ```
 
 ## 8-6. 빈 칸들 한 번에 열기
+
+이제 누른 칸 주변을 한 번에 여는 동작을 구현해볼 차례이다. 이 부분은 재귀함수를 이용해서 구현하는데, 잘못하면 콜스택이 터지는 경우가 발생할 수 있으니 유의해서 개발해야 한다. (maximum callstack exceeded)
+
+```jsx
+const reducer = (state, action) => {
+	case OPEN_CELL: {
+      const tableData = [...state.tableData];
+      // 1. 모든 칸들을 다 새로운 객체로 만든다.
+      tableData.forEach((row, i) => {
+        tableData[i] = [...row];
+      });
+      // 2. 한번 검사한 칸은 다시 검사하지 않는다.
+      const checked = [];
+      // 3. 내 기준으로 주변 칸을 검사하는 함수
+      const checkAround = (row, cell) => {
+        // 상하좌우 칸이 아닌 경우 (unefined)필터링
+        if (row < 0 || row >= tableData.length || cell < 0 || cell >= tableData[0].length) {
+          return;
+        }
+        // 이미 열었거나, 깃발, 물음표가 있는 경우 필터링
+        if (
+          [CODE.OPENED, CODE.FLAG, CODE.FLAG_MINE, CODE.QUESTION_MINE, CODE.QUESTION].includes(tableData[row][cell])
+        ) {
+          return;
+        }
+        // 닫힌 칸만 열기
+        if (checked.includes(row + "/" + cell)) {
+          return;
+        } else {
+          // 검사안한 칸이면 checked 배열에 값 push
+          checked.push(row + "/" + cell);
+        }
+
+        // 지뢰개수 알려주기
+        // 상황에 따라 5칸 ~8칸이 될 수 있다.
+
+        // 클릭한 위치에 양 옆 칸 검사 field 2개 추가
+        let around = [tableData[row][cell - 1], tableData[row][cell + 1]];
+        // 클릭한 위치에 윗줄이 있으면 around에 검사 field 3개 추가
+        if (tableData[row - 1]) {
+          around = around.concat([
+            tableData[row - 1][cell - 1],
+            tableData[row - 1][cell],
+            tableData[row - 1][cell + 1],
+          ]);
+        }
+        // 클릭한 위치에 아랫줄이 있으면 around에 검사 field 3개 추가
+        if (tableData[row + 1]) {
+          around = around.concat([
+            tableData[row + 1][cell - 1],
+            tableData[row + 1][cell],
+            tableData[row + 1][cell + 1],
+          ]);
+        }
+
+        // 주변의 지뢰 갯수
+        const count = around.filter((v) => [CODE.MINE, CODE.FLAG_MINE, CODE.QUESTION_MINE].includes(v)).length;
+
+        // 내가 빈칸이면 주변 8 칸을 검사
+        if (count === 0) {
+          // 주변칸 오픈
+          if (row > -1) {
+            const near = [];
+            // 제일 윗 칸을 선택한 경우
+            if (row - 1 > -1) {
+              near.push([row - 1, cell - 1]);
+              near.push([row - 1, cell]);
+              near.push([row - 1, cell + 1]);
+            }
+            // 양 옆 칸
+            near.push([row, cell - 1]);
+            near.push([row, cell + 1]);
+            // 제일 아랫 칸을 선택한 경우
+            if (row + 1 < tableData.length) {
+              near.push([row + 1, cell - 1]);
+              near.push([row + 1, cell]);
+              near.push([row + 1, cell + 1]);
+            }
+            near.forEach((n) => {
+              if (tableData[n[0]][n[1]] !== CODE.OPENED) {
+                checkAround(n[0], n[1]);
+              }
+            });
+          }
+        }
+        tableData[row][cell] = count;
+      };
+      // checkAround 함수 실행
+      checkAround(action.row, action.cell);
+
+      return {
+        ...state,
+        tableData,
+      };
+    }
+}
+```
+
+## 8-7. 승리 조건 체크와 타이머
+
+마지막으로 승리 조건과 타이머를 만들어보자
+
+승리 조건 알고리즘은 아래와 같다.
+만약 5\*5의 테이블에 지뢰갯수가 10개라고 설정했다면 `25 - 10 = 15`로 계산하여 총 15개의 일반칸이 있다고 계산한다. 따라서, 펑!이 되기 전에 15개가 클릭되면 우승한 것으로 체크하는 로직이다.
+
+또한 타이머는 시작과 동시에 halted의 값이 false가 되면 시작하며, 해당 값이 true가 되었을 때 timer가 clearInterval되어야한다!
+
+```jsx
+import React, { useReducer, createContext, useMemo, useEffect } from "react";
+import Table from "./Table";
+import Form from "./Form";
+
+const initialState = {
+  tableData: [],
+	// 1-1. 승리조건을 계산하기 위한 data 초기값 세팅
+  data: {
+    row: 0,
+    cell: 0,
+    mine: 0,
+  },
+  timer: 0,
+  result: "",
+  halted: true,
+  openedCount: 0,
+};
+
+// 2-1. 타이머 변수 생성
+export const INCREMENT_TIMER = "INCREMENT_TIMER";
+
+const reducer = (state, action) => {
+  switch (action.type) {
+    case START_GAME:
+      return {
+        ...state,
+        data: {
+          // 1-2. data 셋팅: 총 가로, 세로, 지뢰 갯수
+          row: action.row,
+          cell: action.cell,
+          mine: action.mine,
+        },
+        openedCount: 0,
+        result: "",
+        tableData: plantMine(action.row, action.cell, action.mine),
+        halted: false,
+				// 2-2. timer 셋팅
+        timer: 0,
+      };
+    case OPEN_CELL: {
+      const tableData = [...state.tableData];
+      tableData.forEach((row, i) => {
+        tableData[i] = [...row];
+      });
+      const checked = [];
+
+      // 1-3. 총 오픈한 칸 갯수 변수 선언
+      let openedCount = 0;
+
+      const checkAround = (row, cell) => {
+        if (row < 0 || row >= tableData.length || cell < 0 || cell >= tableData[0].length) {
+          return;
+        }
+        if ([CODE.OPENED, CODE.FLAG, CODE.FLAG_MINE, CODE.QUESTION_MINE, CODE.QUESTION].includes(tableData[row][cell])) {
+          return;
+        }
+        if (checked.includes(row + "/" + cell)) {
+          return;
+        } else {
+          checked.push(row + "/" + cell);
+        }
+
+        let around = [tableData[row][cell - 1], tableData[row][cell + 1]];
+        if (tableData[row - 1]) {
+          around = around.concat([
+            tableData[row - 1][cell - 1],
+            tableData[row - 1][cell],
+            tableData[row - 1][cell + 1],
+          ]);
+        }
+        if (tableData[row + 1]) {
+          around = around.concat([
+            tableData[row + 1][cell - 1],
+            tableData[row + 1][cell],
+            tableData[row + 1][cell + 1],
+          ]);
+        }
+
+        const count = around.filter((v) => [CODE.MINE, CODE.FLAG_MINE, CODE.QUESTION_MINE].includes(v)).length;
+
+        if (count === 0) {
+          if (row > -1) {
+            const near = [];
+            if (row - 1 > -1) {
+              near.push([row - 1, cell - 1]);
+              near.push([row - 1, cell]);
+              near.push([row - 1, cell + 1]);
+            }
+            near.push([row, cell - 1]);
+            near.push([row, cell + 1]);
+            if (row + 1 < tableData.length) {
+              near.push([row + 1, cell - 1]);
+              near.push([row + 1, cell]);
+              near.push([row + 1, cell + 1]);
+            }
+            near.forEach((n) => {
+              if (tableData[n[0]][n[1]] !== CODE.OPENED) {
+                checkAround(n[0], n[1]);
+              }
+            });
+          }
+        }
+				// 1-4. 일반 칸일 경우에만 openedCount 카운트
+        if (tableData[row][cell] === CODE.NORMAL) {
+          openedCount += 1;
+        }
+        tableData[row][cell] = count;
+      };
+
+      checkAround(action.row, action.cell);
+
+			// 1-5. 승리 조건 체크
+      let halted = false;
+      let result = "";
+      if (state.data.row * state.data.cell - state.data.mine === state.openedCount + openedCount) {
+        halted = true;
+        result = `${state.timer}초 만에 승리했습니다!`;
+      }
+
+      return {
+        ...state,
+        tableData,
+        openedCount: state.openedCount + openedCount, // 1-6. 카운트 갯수 반환
+        halted, // 1-7. 게임 완료 staus 반환
+        result, // 1-8. 결과 text 반환
+      };
+    }
+  }
+};
+
+const MineSearch = () => {
+  const [state, dispatch] = useReducer(reducer, initialState);
+  const { tableData, halted, timer, result } = state;
+  const value = useMemo(() => ({ tableData, halted, dispatch }), [tableData, halted]);
+
+  // 2-3. timer 동작: halted가 false일 때만!
+  useEffect(() => {
+    if (!halted) {
+      const timer = setInterval(() => dispatch({ type: INCREMENT_TIMER }), 1000);
+      return () => clearInterval(timer);
+    }
+  }, [halted]);
+
+  return ( ... );
+};
+
+export default MineSearch;
+```
+
+## 8-8. Context api 최적화
+
+1.  먼저 Context api의 value 값을 넣어줄 때 반드시 `useMemo`로 값을 기억해줘야 한다.
+    이유는 state가 변경될 때마다 하위 모든 값들이 매번 새로 리렌더링 되기 때문이다.
+
+        ```jsx
+        const value = useMemo(() => ({ tableData, halted, dispatch }), [tableData, halted]);
+        ```
+
+2.  자식 컴포넌트들에 모두 `memo` 를 넣어준다.(Form, Table, Tr, Td.jsx)
+3.  `useContext`를 쓰면 기본적으로 함수 자체가 리렌더링되므로, 실제 return 영역에서 불필요한 리렌더링이 발생하지 않는지를 콘솔 디버깅으로 확인하고, 만약 return 함수에 `useMemo`를 사용하는 것이 싫다면 별도의 함수로 빼서 `memo`를 적용시키는 것도 좋은 방법이다.
+
+    ```jsx
+    // Td.jsx
+    const Td = () => {
+    	return <RealTd onClickTd={onClickTd} onRightClickTd={onRightClickTd} data={tableData[rowIndex][cellIndex]} />;
+    });
+
+    const RealTd = memo(({ onClickTd, onRightClickTd, data }) => {
+      console.log("real td rendered");
+      return (
+        <td style={getTdStyle(data)} onClick={onClickTd} onContextMenu={onRightClickTd}>
+          {getTdText(data)}
+        </td>
+      );
+    });
+    ```
