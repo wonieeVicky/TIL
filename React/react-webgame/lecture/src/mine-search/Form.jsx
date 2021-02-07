@@ -1,10 +1,10 @@
-﻿import React, { useState, useCallback, useContext } from "react";
+﻿import React, { useState, useCallback, useContext, memo } from "react";
 import { TableContext, START_GAME } from "./MineSearch";
 
-const Form = () => {
-  const [row, setRow] = useState(10);
-  const [cell, setCell] = useState(10);
-  const [mine, setMine] = useState(20);
+const Form = memo(() => {
+  const [row, setRow] = useState(5);
+  const [cell, setCell] = useState(5);
+  const [mine, setMine] = useState(5);
   // dispatch에 접근하는 방법!
   const { dispatch } = useContext(TableContext);
 
@@ -22,6 +22,6 @@ const Form = () => {
       <button onClick={onClickBtn}>시작</button>
     </div>
   );
-};
+});
 
 export default Form;
