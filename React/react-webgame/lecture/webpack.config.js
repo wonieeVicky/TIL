@@ -48,6 +48,7 @@ module.exports = {
   },
 
   devServer: {
+    historyApiFallback: true, // GET 등의 오류 방어 설정
     publicPath: "/dist/",
     hot: true,
   },

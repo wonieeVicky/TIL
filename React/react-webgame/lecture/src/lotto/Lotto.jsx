@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef, useMemo, useCallback } from "react";
-import Ball from "../../Ball";
+import Ball from "./Ball";
 
 function getWinNumbers() {
   const candidate = Array(45)
