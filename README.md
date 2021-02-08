@@ -61,5 +61,6 @@
 
 1. 노드 시작하기
 
-- [노드의 정의](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/1-intro-node-js.md)
-- [노드의 특성](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/2-property-of-node.md)
+- [노드의 정의](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/1-1-intro-node-js.md)
+- [노드의 특성](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/1-2-property-of-node.md)
+- [서버로서의 노드](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/1-3-node-as-server.md)
