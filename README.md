@@ -57,6 +57,8 @@
 - [지뢰찾기 만들기](https://github.com/wonieeVicky/TIL/blob/main/React/react-webgame/8-mine-search.md)
 - [리액트 라우터 설정](https://github.com/wonieeVicky/TIL/blob/main/React/react-webgame/9-react-router.md)
 
+2. React + Next.js로 React NodeBird SNS 구현하기
+
 ### Node.js
 
 1. 노드 시작하기
@@ -64,3 +66,9 @@
 - [노드의 정의](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/1-1-intro-node-js.md)
 - [노드의 특성](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/1-2-property-of-node.md)
 - [서버로서의 노드](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/1-3-node-as-server.md)
+
+2. 자바스크립트 기본 개념 짚고가기
+
+- [호출 스택](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/2-1-call-stack-in-js.md)
+- [이벤트루프](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/2-2-event-loop-in-js.md)
+- [스코프](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/2-3-scope-in-js.md)
