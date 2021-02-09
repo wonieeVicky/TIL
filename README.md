@@ -59,6 +59,8 @@
 
 2. React + Next.js로 React NodeBird SNS 구현하기
 
+- [Next.js 역할 소개](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/1-role-of-next-js.md)
+
 ### Node.js
 
 1. 노드 시작하기
