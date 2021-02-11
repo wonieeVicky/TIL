@@ -80,3 +80,4 @@
 - [화살표 함수](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/2-5-arrow-function-in-js.md)
 - [구조분해 할당](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/2-6-destructuring-assignment-in-js.md)
 - [클래스](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/2-7-class-and-prototype-in-js.md)
+- [Promise, async/await](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/2-8-promise-async-await-in-js.md)
