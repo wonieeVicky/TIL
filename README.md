@@ -81,3 +81,4 @@
 - [구조분해 할당](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/2-6-destructuring-assignment-in-js.md)
 - [클래스](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/2-7-class-and-prototype-in-js.md)
 - [Promise, async/await](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/2-8-promise-async-await-in-js.md)
+- [프론트엔드 자바스크립트](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/2-9-front-end-in-js.md)
