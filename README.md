@@ -64,17 +64,21 @@
 - [Next.js: Page & Layout](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/3-page-and-layout.md)
 - [Next.js: Link & eslint](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/4-link-and-eslint.md)
 
-- [View: antd와 styled-components ](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/5-antd-and-styled-components.md)
-- [View: \_app.js와 Head ](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/6-_app-js-and-head.md)
-- [View: 반응형 그리드 사용 ](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/7-responsive-grid-in-antd.md)
-- [View: 로그인 폼 생성 ](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/8-login-form.md)
-- [View: 리렌더링 이해하기 ](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/9-rerendering.md)
-- [View: 더미 데이터로 로그인 구현 ](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/10-login-with-dummy-data.md)
-- [View: 프로필 페이지 구현 ](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/11-profile-page.md)
-- [View: 커스텀 훅을 이용한 회원가입 페이지 구현 ](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/12-sign-up-page.md)
+- [View: antd와 styled-components](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/5-antd-and-styled-components.md)
+- [View: \_app.js와 Head](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/6-_app-js-and-head.md)
+- [View: 반응형 그리드 사용](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/7-responsive-grid-in-antd.md)
+- [View: 로그인 폼 생성](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/8-login-form.md)
+- [View: 리렌더링 이해하기](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/9-rerendering.md)
+- [View: 더미 데이터로 로그인 구현](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/10-login-with-dummy-data.md)
+- [View: 프로필 페이지 구현](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/11-profile-page.md)
+- [View: 커스텀 훅을 이용한 회원가입 페이지 구현](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/12-sign-up-page.md)
 
-- [Redux: 리덕스 설치와 필요성 ](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/13-install-next-redux.md)
-- [Redux: 리덕스 원리와 불변성 ](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/14-principle-and-immutality-of-redux.md)
+- [Redux: 리덕스 설치와 필요성](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/13-install-next-redux.md)
+- [Redux: 리덕스 원리와 불변성](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/14-principle-and-immutality-of-redux.md)
+- [Redux: 리덕스 구현](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/15-implement-redux.md)
+- [Redux: 미들웨어와 리덕스 데브툴즈](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/16-middleware-and-redux-devtools.md)
+- [Redux: 리듀서 쪼개기](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/17-divide-reducers.md)
+- [Redux: 더미데이터와 포스트폼 구현](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/18-dummy-data-and-post-form.md)
 
 ### Node.js
 
