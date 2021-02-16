@@ -79,6 +79,10 @@
 - [Redux: 미들웨어와 리덕스 데브툴즈](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/16-middleware-and-redux-devtools.md)
 - [Redux: 리듀서 쪼개기](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/17-divide-reducers.md)
 - [Redux: 더미데이터와 포스트폼 구현](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/18-dummy-data-and-post-form.md)
+- [Redux: 게시글 구현](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/19-implement-post-card.md)
+- [Redux: 댓글, 이미지 구현](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/20-implement-comment-form-and-post-image.md)
+- [Redux: 이미지 Carousel 구현](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/21-implement-image-carousel.md)
+- [Redux: createGlobalStyle, 컴포넌트 폴더 구조](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/22-global-style-and-components-directory-structure.md)
 
 ### Node.js
 
