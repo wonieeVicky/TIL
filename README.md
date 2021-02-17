@@ -83,6 +83,9 @@
 - [Redux: 댓글, 이미지 구현](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/20-implement-comment-form-and-post-image.md)
 - [Redux: 이미지 Carousel 구현](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/21-implement-image-carousel.md)
 - [Redux: createGlobalStyle, 컴포넌트 폴더 구조](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/22-global-style-and-components-directory-structure.md)
+- [Redux: 게시글 해시태그 링크로 만들기](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/23-implement-hash-tag-link-in-post.md)
+
+- [Redux-saga: redux-thunk 이해하기](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/24-principle-of-redux-thunk.md)
 
 ### Node.js
 
