@@ -86,6 +86,9 @@
 - [Redux: 게시글 해시태그 링크로 만들기](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/23-implement-hash-tag-link-in-post.md)
 
 - [Redux-saga: redux-thunk 이해하기](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/24-principle-of-redux-thunk.md)
+- [Redux-saga: saga 설치, generator 이해하기](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/25-install-saga-and-priciple-of-redux-saga.md)
+- [Redux-saga: saga 이펙트 알아보기](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/26-learn-saga-effect.md)
+- [Redux-saga: take 시리즈와 throttle 알아보기](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/27-take-take-series-throttle-debouce.md)
 
 ### Node.js
 
