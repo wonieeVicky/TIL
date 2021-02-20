@@ -89,6 +89,8 @@
 - [Redux-saga: saga 설치, generator 이해하기](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/25-install-saga-and-priciple-of-redux-saga.md)
 - [Redux-saga: saga 이펙트 알아보기](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/26-learn-saga-effect.md)
 - [Redux-saga: take 시리즈와 throttle 알아보기](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/27-take-take-series-throttle-debouce.md)
+- [Redux-saga: saga 분리와 reducer 연결](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/28-divide-saga-and-connect-reducer.md)
+- [Redux-saga: 액션과 상태 정리하기](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/29-clean-up-actions-and-statues.md)
 
 ### Node.js
 
