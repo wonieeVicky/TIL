@@ -93,7 +93,10 @@
 - [Redux-saga: 액션과 상태 정리하기](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/29-clean-up-actions-and-statues.md)
 - [Redux-saga: 바뀐 상태 컴포넌트 적용, eslint 점검](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/30-apply-changed-state-and-check-eslint.md)
 - [Redux-saga: 게시글, 댓글 saga 구현](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/31-postCard-and-postComment-in-saga.md)
-- [Redux-saga: 게시글 삭제 saga 구현](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/32-applay-remove-post.md)
+- [Redux-saga: 게시글 삭제 saga 구현](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/32-apply-remove-post.md)
+- [Redux-saga: reducer에 Immer, faker 더미데이터 적용](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/33-implement-immer-and-faker-data-to-reducer.md)
+- [Redux-saga: 인피니트 스크롤링 적용](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/34-implement-infinite-scroll.md)
+- [Redux-saga: 팔로우, 언팔로우 구현](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/35-follow-and-unfollow-in-saga.md)
 
 ### Node.js
 
