@@ -75,7 +75,6 @@ const reducer = (state = initialState, action) =>
         draft.unfollowLoading = false;
         draft.unfollowDone = true;
         draft.me.Followings = draft.me.Followings.filter((v) => v.id !== action.data);
-        draft.me = dummyUser(action.data);
         break;
       case UNFOLLOW_FAILURE:
         draft.unfollowLoading = false;

@@ -37,5 +37,5 @@ export default wrapper;
 - 만약 dev 작업 시 포트번호를 변경하고 싶다면?
 
 이후 npm run dev로 실행시켜 redux-devtool로 화면을 확인하면 액션에 따른 Reducer 동작이 모두 기록으로 남겨져있다. 이렇게 모든 dispatch 과정을 히스토리로 남기기 때문에 state값들은 불변성을 유지해야 한다!
-!
+
 ![](../../img/210215-1.png)
