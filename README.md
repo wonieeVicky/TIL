@@ -97,6 +97,8 @@
 - [Node: 노드로 서버 구동하기](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/36-run-node-server.md)
 - [Node: 익스프레스로 라우팅 및 라우터 분리하기](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/37-routing-to-express.md)
 - [Node: MySQL과 시퀄라이즈 연결](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/38-connect-mysql-and-sequelize.md)
+- [Node: 시퀄라이즈 모델 생성](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/39-create-sequelize-models.md)
+- [Node: 시퀄라이즈 관계 설정](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/40-set-up-sequelize-relationship.md)
 
 ### Node.js
 
