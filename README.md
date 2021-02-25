@@ -100,7 +100,9 @@
 - [Node: 시퀄라이즈 모델 생성](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/39-create-sequelize-models.md)
 - [Node: 시퀄라이즈 관계 설정](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/40-set-up-sequelize-relationship.md)
 - [Node: 시퀄라이즈 sync와 nodemon](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/41-sequelize-sync-and-nodemon.md)
-- [Node: 회원가입 API 구현](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/41-sequelize-sync-and-nodemon.md)
+- [Node: 회원가입 API 구현](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/42-implement-join-api.md)
+- [Node: CORS 문제 개선](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/43-troubleshooting-cors.md)
+- [Node: passport 로그인 구현](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/44-login-by-passport.md)
 
 ### Node.js
 
