@@ -7,7 +7,7 @@
 
 ```jsx
 const express = require("express");
-const app = express(); // 처음에 함수 실행!
+const app = express(); // 처음 express 서버 실행! 이후 app.use 메서드로 express 서버에 미들웨어를 장착한다.
 
 // url path '/'에 보내는 get 메서드
 app.get("/", (req, res) => {

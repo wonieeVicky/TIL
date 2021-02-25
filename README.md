@@ -99,6 +99,8 @@
 - [Node: MySQL과 시퀄라이즈 연결](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/38-connect-mysql-and-sequelize.md)
 - [Node: 시퀄라이즈 모델 생성](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/39-create-sequelize-models.md)
 - [Node: 시퀄라이즈 관계 설정](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/40-set-up-sequelize-relationship.md)
+- [Node: 시퀄라이즈 sync와 nodemon](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/41-sequelize-sync-and-nodemon.md)
+- [Node: 회원가입 API 구현](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/41-sequelize-sync-and-nodemon.md)
 
 ### Node.js
 
