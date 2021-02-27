@@ -1,0 +1,1085 @@
+﻿[
+  {
+    "parentCode": "",
+    "depth": 1,
+    "code": "001",
+    "name": "건강",
+    "subCategories": [
+      {
+        "parentCode": "001",
+        "depth": 2,
+        "code": "0001",
+        "name": "병원",
+        "subCategories": [
+          { "parentCode": "0001", "depth": 3, "code": "0001", "name": "종합병원" },
+          { "parentCode": "0001", "depth": 3, "code": "0002", "name": "피부과" },
+          { "parentCode": "0001", "depth": 3, "code": "0003", "name": "성형외과" },
+          { "parentCode": "0001", "depth": 3, "code": "0004", "name": "안과" },
+          { "parentCode": "0001", "depth": 3, "code": "0005", "name": "이비인후과" },
+          { "parentCode": "0001", "depth": 3, "code": "0006", "name": "정형외과" },
+          { "parentCode": "0001", "depth": 3, "code": "0007", "name": "치과" },
+          { "parentCode": "0001", "depth": 3, "code": "0008", "name": "비뇨기과" },
+          { "parentCode": "0001", "depth": 3, "code": "0009", "name": "대장항문과" },
+          { "parentCode": "0001", "depth": 3, "code": "0010", "name": "산부인과" },
+          { "parentCode": "0001", "depth": 3, "code": "0011", "name": "소아과" },
+          { "parentCode": "0001", "depth": 3, "code": "0012", "name": "내과" },
+          { "parentCode": "0001", "depth": 3, "code": "0013", "name": "외과" },
+          { "parentCode": "0001", "depth": 3, "code": "0014", "name": "신경정신과" },
+          { "parentCode": "0001", "depth": 3, "code": "0015", "name": "물리치료과" },
+          { "parentCode": "0001", "depth": 3, "code": "0016", "name": "재활의학과" },
+          { "parentCode": "0001", "depth": 3, "code": "0017", "name": "한의원" },
+          { "parentCode": "0001", "depth": 3, "code": "0018", "name": "정신병원" },
+          { "parentCode": "0001", "depth": 3, "code": "0019", "name": "노인병원" },
+          { "parentCode": "0001", "depth": 3, "code": "0020", "name": "요양병원" },
+          { "parentCode": "0001", "depth": 3, "code": "0021", "name": "동물병원" },
+          { "parentCode": "0001", "depth": 3, "code": "0022", "name": "기타병원" }
+        ]
+      },
+      {
+        "parentCode": "001",
+        "depth": 2,
+        "code": "0002",
+        "name": "약국",
+        "subCategories": [{ "parentCode": "0002", "depth": 3, "code": "0001", "name": "약국" }]
+      },
+      {
+        "parentCode": "001",
+        "depth": 2,
+        "code": "0003",
+        "name": "의료기기/의약품",
+        "subCategories": [
+          { "parentCode": "0003", "depth": 3, "code": "0001", "name": "의료기기/의약품" }
+        ]
+      },
+      {
+        "parentCode": "001",
+        "depth": 2,
+        "code": "0004",
+        "name": "건강식품/건강정보",
+        "subCategories": [
+          { "parentCode": "0004", "depth": 3, "code": "0001", "name": "건강식품/건강정보" }
+        ]
+      },
+      {
+        "parentCode": "001",
+        "depth": 2,
+        "code": "0005",
+        "name": "심리치료/명상/기타대체의학",
+        "subCategories": [
+          { "parentCode": "0005", "depth": 3, "code": "0001", "name": "심리치료/명상/기타대체의학" }
+        ]
+      }
+    ]
+  },
+  {
+    "parentCode": "",
+    "depth": 1,
+    "code": "002",
+    "name": "교육",
+    "subCategories": [
+      {
+        "parentCode": "002",
+        "depth": 2,
+        "code": "0001",
+        "name": "학교",
+        "subCategories": [
+          { "parentCode": "0001", "depth": 3, "code": "0001", "name": "유치원" },
+          { "parentCode": "0001", "depth": 3, "code": "0002", "name": "초등학교" },
+          { "parentCode": "0001", "depth": 3, "code": "0003", "name": "중학교" },
+          { "parentCode": "0001", "depth": 3, "code": "0004", "name": "고등학교" },
+          { "parentCode": "0001", "depth": 3, "code": "0005", "name": "대학" },
+          { "parentCode": "0001", "depth": 3, "code": "0006", "name": "대학교" },
+          { "parentCode": "0001", "depth": 3, "code": "0007", "name": "대학원" },
+          { "parentCode": "0001", "depth": 3, "code": "0008", "name": "대안학교/작업학교" }
+        ]
+      },
+      {
+        "parentCode": "002",
+        "depth": 2,
+        "code": "0002",
+        "name": "학원",
+        "subCategories": [
+          { "parentCode": "0002", "depth": 3, "code": "0001", "name": "오프라인학원" },
+          { "parentCode": "0002", "depth": 3, "code": "0002", "name": "온라인학원" }
+        ]
+      },
+      {
+        "parentCode": "002",
+        "depth": 2,
+        "code": "0003",
+        "name": "교육원",
+        "subCategories": [
+          {
+            "parentCode": "0003",
+            "depth": 3,
+            "code": "0001",
+            "name": "어린이집/평생교육원/문화센터"
+          }
+        ]
+      },
+      {
+        "parentCode": "002",
+        "depth": 2,
+        "code": "0004",
+        "name": "학습지",
+        "subCategories": [{ "parentCode": "0004", "depth": 3, "code": "0001", "name": "학습지" }]
+      },
+      {
+        "parentCode": "002",
+        "depth": 2,
+        "code": "0005",
+        "name": "교육정보/접수대행/자격증",
+        "subCategories": [
+          { "parentCode": "0005", "depth": 3, "code": "0001", "name": "교육정보/접수대행/자격증" }
+        ]
+      },
+      {
+        "parentCode": "002",
+        "depth": 2,
+        "code": "0006",
+        "name": "기타교육서비스",
+        "subCategories": [
+          { "parentCode": "0006", "depth": 3, "code": "0001", "name": "기타교육서비스" }
+        ]
+      }
+    ]
+  },
+  {
+    "parentCode": "",
+    "depth": 1,
+    "code": "003",
+    "name": "교통/운송서비스",
+    "subCategories": [
+      {
+        "parentCode": "003",
+        "depth": 2,
+        "code": "0001",
+        "name": "운송서비스",
+        "subCategories": [
+          { "parentCode": "0001", "depth": 3, "code": "0001", "name": "이사" },
+          { "parentCode": "0001", "depth": 3, "code": "0002", "name": "택배" },
+          { "parentCode": "0001", "depth": 3, "code": "0003", "name": "물류/창고/컨테이너" }
+        ]
+      },
+      {
+        "parentCode": "003",
+        "depth": 2,
+        "code": "0002",
+        "name": "항공/철도",
+        "subCategories": [{ "parentCode": "0002", "depth": 3, "code": "0001", "name": "항공/철도" }]
+      },
+      {
+        "parentCode": "003",
+        "depth": 2,
+        "code": "0003",
+        "name": "택시/대리운전",
+        "subCategories": [
+          { "parentCode": "0003", "depth": 3, "code": "0001", "name": "대리운전" },
+          { "parentCode": "0003", "depth": 3, "code": "0002", "name": "콜택시" }
+        ]
+      },
+      {
+        "parentCode": "003",
+        "depth": 2,
+        "code": "0004",
+        "name": "기타교통/운송서비스",
+        "subCategories": [
+          { "parentCode": "0004", "depth": 3, "code": "0001", "name": "기타교통/운송서비스" }
+        ]
+      }
+    ]
+  },
+  {
+    "parentCode": "",
+    "depth": 1,
+    "code": "004",
+    "name": "금융",
+    "subCategories": [
+      {
+        "parentCode": "004",
+        "depth": 2,
+        "code": "0001",
+        "name": "은행",
+        "subCategories": [
+          { "parentCode": "0001", "depth": 3, "code": "0001", "name": "1금융권" },
+          { "parentCode": "0001", "depth": 3, "code": "0002", "name": "2금융 은행권" }
+        ]
+      },
+      {
+        "parentCode": "004",
+        "depth": 2,
+        "code": "0002",
+        "name": "신용",
+        "subCategories": [
+          { "parentCode": "0002", "depth": 3, "code": "0001", "name": "신용카드" },
+          { "parentCode": "0002", "depth": 3, "code": "0002", "name": "신용정보/신용조사/채권추심" }
+        ]
+      },
+      {
+        "parentCode": "004",
+        "depth": 2,
+        "code": "0003",
+        "name": "보험",
+        "subCategories": [{ "parentCode": "0003", "depth": 3, "code": "0001", "name": "보험" }]
+      },
+      {
+        "parentCode": "004",
+        "depth": 2,
+        "code": "0004",
+        "name": "대출",
+        "subCategories": [
+          { "parentCode": "0004", "depth": 3, "code": "0001", "name": "2금융 캐피탈" },
+          { "parentCode": "0004", "depth": 3, "code": "0002", "name": "기타대출" }
+        ]
+      },
+      {
+        "parentCode": "004",
+        "depth": 2,
+        "code": "0005",
+        "name": "재테크",
+        "subCategories": [
+          { "parentCode": "0005", "depth": 3, "code": "0001", "name": "투자/증권" },
+          { "parentCode": "0005", "depth": 3, "code": "0002", "name": "가상화폐" }
+        ]
+      },
+      {
+        "parentCode": "004",
+        "depth": 2,
+        "code": "0006",
+        "name": "부동산",
+        "subCategories": [{ "parentCode": "0006", "depth": 3, "code": "0001", "name": "부동산" }]
+      },
+      {
+        "parentCode": "004",
+        "depth": 2,
+        "code": "0007",
+        "name": "기타금융서비스",
+        "subCategories": [
+          { "parentCode": "0007", "depth": 3, "code": "0001", "name": "기타금융서비스" }
+        ]
+      }
+    ]
+  },
+  {
+    "parentCode": "",
+    "depth": 1,
+    "code": "005",
+    "name": "미용",
+    "subCategories": [
+      {
+        "parentCode": "005",
+        "depth": 2,
+        "code": "0001",
+        "name": "미용",
+        "subCategories": [
+          { "parentCode": "0001", "depth": 3, "code": "0001", "name": "헤어샵" },
+          { "parentCode": "0001", "depth": 3, "code": "0002", "name": "뷰티케어샵/체형클리닉" },
+          { "parentCode": "0001", "depth": 3, "code": "0003", "name": "미용용품/기기" },
+          { "parentCode": "0001", "depth": 3, "code": "0004", "name": "뷰티/화장품" },
+          { "parentCode": "0001", "depth": 3, "code": "0005", "name": "기타미용" }
+        ]
+      }
+    ]
+  },
+  {
+    "parentCode": "",
+    "depth": 1,
+    "code": "006",
+    "name": "소매(쇼핑몰)",
+    "subCategories": [
+      {
+        "parentCode": "006",
+        "depth": 2,
+        "code": "0001",
+        "name": "가구/인테리어",
+        "subCategories": [
+          { "parentCode": "0001", "depth": 3, "code": "0001", "name": "가구/인테리어" }
+        ]
+      },
+      {
+        "parentCode": "006",
+        "depth": 2,
+        "code": "0002",
+        "name": "전자",
+        "subCategories": [{ "parentCode": "0002", "depth": 3, "code": "0001", "name": "전자" }]
+      },
+      {
+        "parentCode": "006",
+        "depth": 2,
+        "code": "0003",
+        "name": "생활/주방/문구",
+        "subCategories": [
+          { "parentCode": "0003", "depth": 3, "code": "0001", "name": "생활/주방/문구" }
+        ]
+      },
+      {
+        "parentCode": "006",
+        "depth": 2,
+        "code": "0004",
+        "name": "식품",
+        "subCategories": [{ "parentCode": "0004", "depth": 3, "code": "0001", "name": "식품" }]
+      },
+      {
+        "parentCode": "006",
+        "depth": 2,
+        "code": "0005",
+        "name": "의류",
+        "subCategories": [{ "parentCode": "0005", "depth": 3, "code": "0001", "name": "의류" }]
+      },
+      {
+        "parentCode": "006",
+        "depth": 2,
+        "code": "0006",
+        "name": "패션잡화",
+        "subCategories": [{ "parentCode": "0006", "depth": 3, "code": "0001", "name": "패션잡화" }]
+      },
+      {
+        "parentCode": "006",
+        "depth": 2,
+        "code": "0007",
+        "name": "꽃배달/선물",
+        "subCategories": [
+          { "parentCode": "0007", "depth": 3, "code": "0001", "name": "꽃배달/선물" }
+        ]
+      },
+      {
+        "parentCode": "006",
+        "depth": 2,
+        "code": "0008",
+        "name": "취미",
+        "subCategories": [{ "parentCode": "0008", "depth": 3, "code": "0001", "name": "취미" }]
+      },
+      {
+        "parentCode": "006",
+        "depth": 2,
+        "code": "0009",
+        "name": "종합쇼핑몰/백화점",
+        "subCategories": [
+          { "parentCode": "0009", "depth": 3, "code": "0001", "name": "종합쇼핑몰/백화점" }
+        ]
+      },
+      {
+        "parentCode": "006",
+        "depth": 2,
+        "code": "0010",
+        "name": "홈쇼핑",
+        "subCategories": [{ "parentCode": "0010", "depth": 3, "code": "0001", "name": "홈쇼핑" }]
+      },
+      {
+        "parentCode": "006",
+        "depth": 2,
+        "code": "0011",
+        "name": "소셜커머스",
+        "subCategories": [
+          { "parentCode": "0011", "depth": 3, "code": "0001", "name": "소셜커머스" }
+        ]
+      },
+      {
+        "parentCode": "006",
+        "depth": 2,
+        "code": "0012",
+        "name": "네트워크마케팅쇼핑몰",
+        "subCategories": [
+          { "parentCode": "0012", "depth": 3, "code": "0001", "name": "네트워크마케팅쇼핑몰" }
+        ]
+      },
+      {
+        "parentCode": "006",
+        "depth": 2,
+        "code": "0013",
+        "name": "구매대행",
+        "subCategories": [{ "parentCode": "0013", "depth": 3, "code": "0001", "name": "구매대행" }]
+      },
+      {
+        "parentCode": "006",
+        "depth": 2,
+        "code": "0014",
+        "name": "기타소매",
+        "subCategories": [{ "parentCode": "0014", "depth": 3, "code": "0001", "name": "기타소매" }]
+      }
+    ]
+  },
+  {
+    "parentCode": "",
+    "depth": 1,
+    "code": "007",
+    "name": "엔터테인먼트",
+    "subCategories": [
+      {
+        "parentCode": "007",
+        "depth": 2,
+        "code": "0001",
+        "name": "공연/전시",
+        "subCategories": [{ "parentCode": "0001", "depth": 3, "code": "0001", "name": "공연/전시" }]
+      },
+      {
+        "parentCode": "007",
+        "depth": 2,
+        "code": "0002",
+        "name": "티켓예매",
+        "subCategories": [{ "parentCode": "0002", "depth": 3, "code": "0001", "name": "티켓예매" }]
+      },
+      {
+        "parentCode": "007",
+        "depth": 2,
+        "code": "0003",
+        "name": "영화",
+        "subCategories": [{ "parentCode": "0003", "depth": 3, "code": "0001", "name": "영화" }]
+      },
+      {
+        "parentCode": "007",
+        "depth": 2,
+        "code": "0004",
+        "name": "도서/만화",
+        "subCategories": [{ "parentCode": "0004", "depth": 3, "code": "0001", "name": "도서/만화" }]
+      },
+      {
+        "parentCode": "007",
+        "depth": 2,
+        "code": "0005",
+        "name": "복권",
+        "subCategories": [{ "parentCode": "0005", "depth": 3, "code": "0001", "name": "복권" }]
+      },
+      {
+        "parentCode": "007",
+        "depth": 2,
+        "code": "0006",
+        "name": "다운로드서비스",
+        "subCategories": [
+          { "parentCode": "0006", "depth": 3, "code": "0001", "name": "웹하드/p2p" }
+        ]
+      },
+      {
+        "parentCode": "007",
+        "depth": 2,
+        "code": "0007",
+        "name": "스트리밍서비스",
+        "subCategories": [
+          { "parentCode": "0007", "depth": 3, "code": "0001", "name": "음원/영상스트리밍" }
+        ]
+      },
+      {
+        "parentCode": "007",
+        "depth": 2,
+        "code": "0008",
+        "name": "운세서비스",
+        "subCategories": [
+          { "parentCode": "0008", "depth": 3, "code": "0001", "name": "운세서비스" }
+        ]
+      },
+      {
+        "parentCode": "007",
+        "depth": 2,
+        "code": "0009",
+        "name": "제작서비스",
+        "subCategories": [
+          { "parentCode": "0009", "depth": 3, "code": "0001", "name": "음원/영상제작" }
+        ]
+      },
+      {
+        "parentCode": "007",
+        "depth": 2,
+        "code": "0010",
+        "name": "이벤트",
+        "subCategories": [
+          { "parentCode": "0010", "depth": 3, "code": "0001", "name": "이벤트대행/용품" }
+        ]
+      },
+      {
+        "parentCode": "007",
+        "depth": 2,
+        "code": "0011",
+        "name": "기획사",
+        "subCategories": [{ "parentCode": "0011", "depth": 3, "code": "0001", "name": "기획사" }]
+      },
+      {
+        "parentCode": "007",
+        "depth": 2,
+        "code": "0012",
+        "name": "기타엔터테인먼트",
+        "subCategories": [
+          { "parentCode": "0012", "depth": 3, "code": "0001", "name": "기타엔터테인먼트" }
+        ]
+      }
+    ]
+  },
+  {
+    "parentCode": "",
+    "depth": 1,
+    "code": "008",
+    "name": "여가",
+    "subCategories": [
+      {
+        "parentCode": "008",
+        "depth": 2,
+        "code": "0001",
+        "name": "국내숙박",
+        "subCategories": [{ "parentCode": "0001", "depth": 3, "code": "0001", "name": "국내숙박" }]
+      },
+      {
+        "parentCode": "008",
+        "depth": 2,
+        "code": "0002",
+        "name": "국내여행",
+        "subCategories": [{ "parentCode": "0002", "depth": 3, "code": "0001", "name": "국내여행" }]
+      },
+      {
+        "parentCode": "008",
+        "depth": 2,
+        "code": "0003",
+        "name": "해외숙박",
+        "subCategories": [{ "parentCode": "0003", "depth": 3, "code": "0001", "name": "해외숙박" }]
+      },
+      {
+        "parentCode": "008",
+        "depth": 2,
+        "code": "0004",
+        "name": "해외여행",
+        "subCategories": [{ "parentCode": "0004", "depth": 3, "code": "0001", "name": "해외여행" }]
+      },
+      {
+        "parentCode": "008",
+        "depth": 2,
+        "code": "0005",
+        "name": "종합여행사/여행정보",
+        "subCategories": [
+          { "parentCode": "0005", "depth": 3, "code": "0001", "name": "종합여행사/여행정보" }
+        ]
+      },
+      {
+        "parentCode": "008",
+        "depth": 2,
+        "code": "0006",
+        "name": "항공권",
+        "subCategories": [{ "parentCode": "0006", "depth": 3, "code": "0001", "name": "항공권" }]
+      },
+      {
+        "parentCode": "008",
+        "depth": 2,
+        "code": "0007",
+        "name": "여권/비자",
+        "subCategories": [{ "parentCode": "0007", "depth": 3, "code": "0001", "name": "여권/비자" }]
+      },
+      {
+        "parentCode": "008",
+        "depth": 2,
+        "code": "0008",
+        "name": "스포츠/레포츠",
+        "subCategories": [
+          { "parentCode": "0008", "depth": 3, "code": "0001", "name": "스포츠/레포츠" }
+        ]
+      },
+      {
+        "parentCode": "008",
+        "depth": 2,
+        "code": "0009",
+        "name": "스포츠/레포츠용품",
+        "subCategories": [
+          { "parentCode": "0009", "depth": 3, "code": "0001", "name": "스포츠/레포츠용품" }
+        ]
+      },
+      {
+        "parentCode": "008",
+        "depth": 2,
+        "code": "0010",
+        "name": "기타여가서비스",
+        "subCategories": [
+          { "parentCode": "0010", "depth": 3, "code": "0001", "name": "기타여가서비스" }
+        ]
+      }
+    ]
+  },
+  {
+    "parentCode": "",
+    "depth": 1,
+    "code": "009",
+    "name": "게임",
+    "subCategories": [
+      {
+        "parentCode": "009",
+        "depth": 2,
+        "code": "0001",
+        "name": "모바일게임",
+        "subCategories": [
+          { "parentCode": "0001", "depth": 3, "code": "0001", "name": "모바일게임" }
+        ]
+      },
+      {
+        "parentCode": "009",
+        "depth": 2,
+        "code": "0002",
+        "name": "PC게임",
+        "subCategories": [{ "parentCode": "0002", "depth": 3, "code": "0001", "name": "PC게임" }]
+      }
+    ]
+  },
+  {
+    "parentCode": "",
+    "depth": 1,
+    "code": "010",
+    "name": "출산/육아",
+    "subCategories": [
+      {
+        "parentCode": "010",
+        "depth": 2,
+        "code": "0001",
+        "name": "육아",
+        "subCategories": [
+          {
+            "parentCode": "0001",
+            "depth": 3,
+            "code": "0001",
+            "name": "돌/유아동용품/유아동복/육아정보"
+          }
+        ]
+      },
+      {
+        "parentCode": "010",
+        "depth": 2,
+        "code": "0002",
+        "name": "출산",
+        "subCategories": [
+          { "parentCode": "0002", "depth": 3, "code": "0001", "name": "임부복/산후조리원/출산정보" }
+        ]
+      }
+    ]
+  },
+  {
+    "parentCode": "",
+    "depth": 1,
+    "code": "011",
+    "name": "음식점",
+    "subCategories": [
+      {
+        "parentCode": "011",
+        "depth": 2,
+        "code": "0001",
+        "name": "음식점",
+        "subCategories": [{ "parentCode": "0001", "depth": 3, "code": "0001", "name": "음식점" }]
+      },
+      {
+        "parentCode": "011",
+        "depth": 2,
+        "code": "0002",
+        "name": "제과/제빵",
+        "subCategories": [{ "parentCode": "0002", "depth": 3, "code": "0001", "name": "제과/제빵" }]
+      },
+      {
+        "parentCode": "011",
+        "depth": 2,
+        "code": "0003",
+        "name": "유흥",
+        "subCategories": [{ "parentCode": "0003", "depth": 3, "code": "0001", "name": "유흥" }]
+      },
+      {
+        "parentCode": "011",
+        "depth": 2,
+        "code": "0004",
+        "name": "카페",
+        "subCategories": [{ "parentCode": "0004", "depth": 3, "code": "0001", "name": "카페" }]
+      },
+      {
+        "parentCode": "011",
+        "depth": 2,
+        "code": "0005",
+        "name": "프랜차이즈",
+        "subCategories": [
+          { "parentCode": "0005", "depth": 3, "code": "0001", "name": "프랜차이즈" }
+        ]
+      }
+    ]
+  },
+  {
+    "parentCode": "",
+    "depth": 1,
+    "code": "012",
+    "name": "자동차",
+    "subCategories": [
+      {
+        "parentCode": "012",
+        "depth": 2,
+        "code": "0001",
+        "name": "렌트/차량공유",
+        "subCategories": [
+          { "parentCode": "0001", "depth": 3, "code": "0001", "name": "렌트/차량공유" }
+        ]
+      },
+      {
+        "parentCode": "012",
+        "depth": 2,
+        "code": "0002",
+        "name": "신차판매",
+        "subCategories": [{ "parentCode": "0002", "depth": 3, "code": "0001", "name": "신차판매" }]
+      },
+      {
+        "parentCode": "012",
+        "depth": 2,
+        "code": "0003",
+        "name": "자동차관리",
+        "subCategories": [
+          { "parentCode": "0003", "depth": 3, "code": "0001", "name": "자동차관리" }
+        ]
+      },
+      {
+        "parentCode": "012",
+        "depth": 2,
+        "code": "0004",
+        "name": "자동차용품",
+        "subCategories": [
+          { "parentCode": "0004", "depth": 3, "code": "0001", "name": "자동차용품" }
+        ]
+      },
+      {
+        "parentCode": "012",
+        "depth": 2,
+        "code": "0005",
+        "name": "주차장",
+        "subCategories": [{ "parentCode": "0005", "depth": 3, "code": "0001", "name": "주차장" }]
+      },
+      {
+        "parentCode": "012",
+        "depth": 2,
+        "code": "0006",
+        "name": "중고차",
+        "subCategories": [{ "parentCode": "0006", "depth": 3, "code": "0001", "name": "중고차" }]
+      },
+      {
+        "parentCode": "012",
+        "depth": 2,
+        "code": "0007",
+        "name": "폐차장",
+        "subCategories": [{ "parentCode": "0007", "depth": 3, "code": "0001", "name": "폐차장" }]
+      }
+    ]
+  },
+  {
+    "parentCode": "",
+    "depth": 1,
+    "code": "013",
+    "name": "컴퓨터",
+    "subCategories": [
+      {
+        "parentCode": "013",
+        "depth": 2,
+        "code": "0001",
+        "name": "소프트웨어/솔루션",
+        "subCategories": [
+          { "parentCode": "0001", "depth": 3, "code": "0001", "name": "소프트웨어/솔루션" }
+        ]
+      },
+      {
+        "parentCode": "013",
+        "depth": 2,
+        "code": "0002",
+        "name": "컴퓨터수리/보수",
+        "subCategories": [
+          { "parentCode": "0002", "depth": 3, "code": "0001", "name": "컴퓨터수리/보수" }
+        ]
+      }
+    ]
+  },
+  {
+    "parentCode": "",
+    "depth": 1,
+    "code": "014",
+    "name": "산업",
+    "subCategories": [
+      {
+        "parentCode": "014",
+        "depth": 2,
+        "code": "0001",
+        "name": "공구/산업용품",
+        "subCategories": [
+          { "parentCode": "0001", "depth": 3, "code": "0001", "name": "공구/산업용품" }
+        ]
+      }
+    ]
+  },
+  {
+    "parentCode": "",
+    "depth": 1,
+    "code": "015",
+    "name": "기관/단체",
+    "subCategories": [
+      {
+        "parentCode": "015",
+        "depth": 2,
+        "code": "0001",
+        "name": "공공기관",
+        "subCategories": [{ "parentCode": "0001", "depth": 3, "code": "0001", "name": "공공기관" }]
+      },
+      {
+        "parentCode": "015",
+        "depth": 2,
+        "code": "0002",
+        "name": "일반단체",
+        "subCategories": [{ "parentCode": "0002", "depth": 3, "code": "0001", "name": "일반단체" }]
+      },
+      {
+        "parentCode": "015",
+        "depth": 2,
+        "code": "0003",
+        "name": "주거시설",
+        "subCategories": [
+          { "parentCode": "0003", "depth": 3, "code": "0001", "name": "아파트/상가" }
+        ]
+      },
+      {
+        "parentCode": "015",
+        "depth": 2,
+        "code": "0004",
+        "name": "정치",
+        "subCategories": [
+          { "parentCode": "0004", "depth": 3, "code": "0001", "name": "정당/정치후보자" }
+        ]
+      },
+      {
+        "parentCode": "015",
+        "depth": 2,
+        "code": "0005",
+        "name": "종교",
+        "subCategories": [{ "parentCode": "0005", "depth": 3, "code": "0001", "name": "종교" }]
+      }
+    ]
+  },
+  {
+    "parentCode": "",
+    "depth": 1,
+    "code": "016",
+    "name": "광고",
+    "subCategories": [
+      {
+        "parentCode": "016",
+        "depth": 2,
+        "code": "0001",
+        "name": "광고물",
+        "subCategories": [
+          {
+            "parentCode": "0001",
+            "depth": 3,
+            "code": "0001",
+            "name": "판촉물/광고컨설팅/기타광고서비스"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "parentCode": "",
+    "depth": 1,
+    "code": "017",
+    "name": "방송사/출판",
+    "subCategories": [
+      {
+        "parentCode": "017",
+        "depth": 2,
+        "code": "0001",
+        "name": "방송/신문",
+        "subCategories": [{ "parentCode": "0001", "depth": 3, "code": "0001", "name": "방송/신문" }]
+      },
+      {
+        "parentCode": "017",
+        "depth": 2,
+        "code": "0002",
+        "name": "출판",
+        "subCategories": [
+          { "parentCode": "0002", "depth": 3, "code": "0001", "name": "잡지/서적/출판사" }
+        ]
+      }
+    ]
+  },
+  {
+    "parentCode": "",
+    "depth": 1,
+    "code": "018",
+    "name": "인터넷/통신",
+    "subCategories": [
+      {
+        "parentCode": "018",
+        "depth": 2,
+        "code": "0001",
+        "name": "웹서비스",
+        "subCategories": [
+          {
+            "parentCode": "0001",
+            "depth": 3,
+            "code": "0001",
+            "name": "웹호스팅/도메인/기타웹서비스"
+          }
+        ]
+      },
+      {
+        "parentCode": "018",
+        "depth": 2,
+        "code": "0002",
+        "name": "전용선/방송",
+        "subCategories": [
+          { "parentCode": "0002", "depth": 3, "code": "0001", "name": "전용선/방송" }
+        ]
+      },
+      {
+        "parentCode": "018",
+        "depth": 2,
+        "code": "0003",
+        "name": "통신서비스",
+        "subCategories": [
+          { "parentCode": "0003", "depth": 3, "code": "0001", "name": "통신서비스" }
+        ]
+      },
+      {
+        "parentCode": "018",
+        "depth": 2,
+        "code": "0004",
+        "name": "포털서비스",
+        "subCategories": [
+          { "parentCode": "0004", "depth": 3, "code": "0001", "name": "포털서비스" }
+        ]
+      }
+    ]
+  },
+  {
+    "parentCode": "",
+    "depth": 1,
+    "code": "019",
+    "name": "일반서비스",
+    "subCategories": [
+      {
+        "parentCode": "019",
+        "depth": 2,
+        "code": "0001",
+        "name": "결혼/소개팅",
+        "subCategories": [
+          { "parentCode": "0001", "depth": 3, "code": "0001", "name": "결혼/소개팅" }
+        ]
+      },
+      {
+        "parentCode": "019",
+        "depth": 2,
+        "code": "0002",
+        "name": "보안서비스",
+        "subCategories": [
+          { "parentCode": "0002", "depth": 3, "code": "0001", "name": "보안서비스" }
+        ]
+      },
+      {
+        "parentCode": "019",
+        "depth": 2,
+        "code": "0003",
+        "name": "생활서비스",
+        "subCategories": [
+          {
+            "parentCode": "0003",
+            "depth": 3,
+            "code": "0001",
+            "name": "조경/청소/사진/심부름서비스"
+          },
+          { "parentCode": "0003", "depth": 3, "code": "0002", "name": "정수기/가전렌탈" },
+          { "parentCode": "0003", "depth": 3, "code": "0003", "name": "보일러/냉방" },
+          { "parentCode": "0003", "depth": 3, "code": "0004", "name": "정유/가스" },
+          { "parentCode": "0003", "depth": 3, "code": "0005", "name": "배달/맛집정보" },
+          { "parentCode": "0003", "depth": 3, "code": "0006", "name": "상조" }
+        ]
+      },
+      {
+        "parentCode": "019",
+        "depth": 2,
+        "code": "0004",
+        "name": "취업",
+        "subCategories": [
+          { "parentCode": "0004", "depth": 3, "code": "0001", "name": "취업/아르바이트" }
+        ]
+      },
+      {
+        "parentCode": "019",
+        "depth": 2,
+        "code": "0005",
+        "name": "인력파견",
+        "subCategories": [{ "parentCode": "0005", "depth": 3, "code": "0001", "name": "인력파견" }]
+      },
+      {
+        "parentCode": "019",
+        "depth": 2,
+        "code": "0006",
+        "name": "기타일반서비스",
+        "subCategories": [
+          { "parentCode": "0006", "depth": 3, "code": "0001", "name": "기타일반서비스" }
+        ]
+      }
+    ]
+  },
+  {
+    "parentCode": "",
+    "depth": 1,
+    "code": "020",
+    "name": "전문서비스",
+    "subCategories": [
+      {
+        "parentCode": "020",
+        "depth": 2,
+        "code": "0001",
+        "name": "건축",
+        "subCategories": [
+          { "parentCode": "0001", "depth": 3, "code": "0001", "name": "건축/설비/자재" }
+        ]
+      },
+      {
+        "parentCode": "020",
+        "depth": 2,
+        "code": "0002",
+        "name": "법률서비스",
+        "subCategories": [
+          { "parentCode": "0002", "depth": 3, "code": "0001", "name": "법률서비스" }
+        ]
+      },
+      {
+        "parentCode": "020",
+        "depth": 2,
+        "code": "0003",
+        "name": "세무/회계/금융서비스",
+        "subCategories": [
+          { "parentCode": "0003", "depth": 3, "code": "0001", "name": "세무/회계/금융서비스" }
+        ]
+      },
+      {
+        "parentCode": "020",
+        "depth": 2,
+        "code": "0004",
+        "name": "통/번역",
+        "subCategories": [{ "parentCode": "0004", "depth": 3, "code": "0001", "name": "통/번역" }]
+      },
+      {
+        "parentCode": "020",
+        "depth": 2,
+        "code": "0005",
+        "name": "기타전문서비스",
+        "subCategories": [
+          { "parentCode": "0005", "depth": 3, "code": "0001", "name": "기타전문서비스" }
+        ]
+      }
+    ]
+  },
+  {
+    "parentCode": "",
+    "depth": 1,
+    "code": "021",
+    "name": "기타서비스",
+    "subCategories": [
+      {
+        "parentCode": "021",
+        "depth": 2,
+        "code": "0001",
+        "name": "맴버십/포인트",
+        "subCategories": [
+          { "parentCode": "0001", "depth": 3, "code": "0001", "name": "맴버십/포인트" }
+        ]
+      },
+      {
+        "parentCode": "021",
+        "depth": 2,
+        "code": "0002",
+        "name": "업무알림",
+        "subCategories": [{ "parentCode": "0002", "depth": 3, "code": "0001", "name": "업무알림" }]
+      }
+    ]
+  }
+]

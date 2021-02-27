@@ -104,6 +104,8 @@
 - [Node: CORS 문제 개선](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/43-troubleshooting-cors.md)
 - [Node: passport 로그인 구현](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/44-login-by-passport.md)
 - [Node: 쿠키,세션과 전체 로그인 Flow](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/45-cookies-and-sessions-and-login-flow.md)
+- [Node: 로그인 디버깅](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/46-troubleshooting-login-issues.md)
+- [Node: 미들웨어로 라우팅 검사하기](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/47-check-routing-with-middleware.md)
 
 ### Node.js
 
