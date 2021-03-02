@@ -108,6 +108,7 @@
 - [Node: 미들웨어로 라우팅 검사하기](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/47-check-routing-with-middleware.md)
 - [Node: 게시글과 댓글 작성하기](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/48-create-post-and-comment.md)
 - [Node: credential로 쿠키 공유 처리](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/49-share-cookie-with-credentials.md)
+- [Node: 로그인 정보 매번 불러오기](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/50-load-my-info-every-time.md)
 
 ### Node.js
 
