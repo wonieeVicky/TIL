@@ -110,6 +110,7 @@
 - [Node: credential로 쿠키 공유 처리](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/49-share-cookie-with-credentials.md)
 - [Node: 로그인 정보 매번 불러오기](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/50-load-my-info-every-time.md)
 - [Node: 게시글, 코멘트 불러오기](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/51-load-posts-and-comments.md)
+- [Node: 게시글 좋아요 구현](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/52-implement-like-unlike-post.md)
 
 ### Node.js
 
@@ -130,3 +131,9 @@
 - [클래스](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/2-7-class-and-prototype-in-js.md)
 - [Promise, async/await](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/2-8-promise-async-await-in-js.md)
 - [프론트엔드 자바스크립트](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/2-9-front-end-in-js.md)
+
+3. 노드 기능
+
+- [REPL과 JS 파일 실행](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/3-1.REPL-and-run-js-file-in-node.md)
+- [노드 모듈 만들기](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/3-2.create-module.md)
+- [global과 콘솔, 타이머](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/3-3.global-console-timer.md)
