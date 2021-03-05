@@ -111,6 +111,7 @@
 - [Node: 로그인 정보 매번 불러오기](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/50-load-my-info-every-time.md)
 - [Node: 게시글, 코멘트 불러오기](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/51-load-posts-and-comments.md)
 - [Node: 게시글 좋아요 구현](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/52-implement-like-unlike-post.md)
+- [Node: 게시글 제거, 닉네임 변경](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/53-delete-post-and-change-nickname.md)
 
 ### Node.js
 
@@ -137,3 +138,4 @@
 - [REPL과 JS 파일 실행](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/3-1.REPL-and-run-js-file-in-node.md)
 - [노드 모듈 만들기](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/3-2.create-module.md)
 - [global과 콘솔, 타이머](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/3-3.global-console-timer.md)
+- [exports와 this](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/3-4.exports-and-this.md)
