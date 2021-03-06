@@ -113,6 +113,7 @@
 - [Node: 게시글 좋아요 구현](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/52-implement-like-unlike-post.md)
 - [Node: 게시글 제거, 닉네임 변경](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/53-delete-post-and-change-nickname.md)
 - [Node: 팔로우, 언팔로우](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/54-follow-and-unfollow.md)
+- [Node: 이미지 업로드 구현(multer)](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/55-multer-for-image-uploads.md)
 
 ### Node.js
 
