@@ -136,7 +136,9 @@
 
 3. 노드 기능
 
-- [REPL과 JS 파일 실행](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/3-1.REPL-and-run-js-file-in-node.md)
-- [노드 모듈 만들기](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/3-2.create-module.md)
-- [global과 콘솔, 타이머](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/3-3.global-console-timer.md)
-- [exports와 this](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/3-4.exports-and-this.md)
+- [REPL과 JS 파일 실행](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/3-1-REPL-and-run-js-file-in-node.md)
+- [노드 모듈 만들기](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/3-2-create-module.md)
+- [global과 콘솔, 타이머](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/3-3-global-console-timer.md)
+- [exports와 this](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/3-4-exports-and-this.md)
+- [모듈 심화와 순환 참조](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/3-5-module-require-and-circulation-reference.md)
+- [process](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/3-6-process.md)
