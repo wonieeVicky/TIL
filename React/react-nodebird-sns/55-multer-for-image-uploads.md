@@ -42,7 +42,7 @@ const upload = multer({
       const ext = path.extname(file.originalname); // .png
       const basename = path.basename(file.originalname, ext); // 비키
 
-      done(null, basename + new Date().getTime() + ext); // 비키12390123912.png
+      done(null, basename + "_" + new Date().getTime() + ext); // 비키_12390123912.png
     },
   }),
   // 4. 파일 저장 용량 제한
