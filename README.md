@@ -144,3 +144,5 @@
 - [exports와 this](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/3-4-exports-and-this.md)
 - [모듈 심화와 순환 참조](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/3-5-module-require-and-circulation-reference.md)
 - [process](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/3-6-process.md)
+- [os와 path](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/3-7-os-and-path.md)
+- [url과 querystring](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/3-8-url-and-querystring.md)
