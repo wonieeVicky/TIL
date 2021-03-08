@@ -59,10 +59,15 @@
 
 2. React + Next.js로 React NodeBird SNS 구현하기
 
-- [Next.js 역할](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/1-role-of-next-js.md)
-- [Next.js 실행 해보기](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/2-run-next-js.md)
+2-1. Next.js
+
+- [Next.js: 역할](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/1-role-of-next-js.md)
+- [Next.js: 실행 해보기](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/2-run-next-js.md)
 - [Next.js: Page & Layout](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/3-page-and-layout.md)
 - [Next.js: Link & eslint](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/4-link-and-eslint.md)
+
+2-2. antd 이용한 SNS 뷰 구축
+
 - [View: antd와 styled-components](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/5-antd-and-styled-components.md)
 - [View: \_app.js와 Head](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/6-_app-js-and-head.md)
 - [View: 반응형 그리드 사용](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/7-responsive-grid-in-antd.md)
@@ -71,6 +76,9 @@
 - [View: 더미 데이터로 로그인 구현](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/10-login-with-dummy-data.md)
 - [View: 프로필 페이지 구현](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/11-profile-page.md)
 - [View: 커스텀 훅을 이용한 회원가입 페이지 구현](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/12-sign-up-page.md)
+
+2-3. Redux 연동
+
 - [Redux: 리덕스 설치와 필요성](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/13-install-next-redux.md)
 - [Redux: 리덕스 원리와 불변성](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/14-principle-and-immutality-of-redux.md)
 - [Redux: 리덕스 구현](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/15-implement-redux.md)
@@ -82,6 +90,9 @@
 - [Redux: 이미지 Carousel 구현](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/21-implement-image-carousel.md)
 - [Redux: createGlobalStyle, 컴포넌트 폴더 구조](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/22-global-style-and-components-directory-structure.md)
 - [Redux: 게시글 해시태그 링크로 만들기](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/23-implement-hash-tag-link-in-post.md)
+
+2-4. Redux-saga 연동
+
 - [Redux-saga: redux-thunk 이해하기](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/24-principle-of-redux-thunk.md)
 - [Redux-saga: saga 설치, generator 이해하기](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/25-install-saga-and-priciple-of-redux-saga.md)
 - [Redux-saga: saga 이펙트 알아보기](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/26-learn-saga-effect.md)
@@ -94,6 +105,9 @@
 - [Redux-saga: reducer에 Immer, faker 더미데이터 적용](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/33-implement-immer-and-faker-data-to-reducer.md)
 - [Redux-saga: 인피니트 스크롤링 적용](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/34-implement-infinite-scroll.md)
 - [Redux-saga: 팔로우, 언팔로우 구현](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/35-follow-and-unfollow-in-saga.md)
+
+2-5. 백엔드 Node 서버 구축
+
 - [Node: 노드로 서버 구동하기](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/36-run-node-server.md)
 - [Node: 익스프레스로 라우팅 및 라우터 분리하기](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/37-routing-to-express.md)
 - [Node: MySQL과 시퀄라이즈 연결](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/38-connect-mysql-and-sequelize.md)
@@ -118,6 +132,10 @@
 - [Node: 해시태그 등록](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/57-register-hashtags.md)
 - [Node: 리트윗 구현](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/58-retweet.md)
 - [Node: 쿼리스트링과 lastId 방식](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/59-querystring-and-lastId.md)
+
+2-6. Next.js 서버사이드렌더링(SSR) 구현
+
+- [Next SSR: 서버사이드렌더링 준비](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/60-ready-to-server-side-rendering.md)
 
 ### Node.js
 
