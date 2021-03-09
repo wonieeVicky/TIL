@@ -168,3 +168,4 @@
 - [os와 path](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/3-7-os-and-path.md)
 - [url과 querystring](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/3-8-url-and-querystring.md)
 - [crypto와 util](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/3-9-crypto-and-util.md)
+- [worker_threads](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/3-10-worker-threads.md)
