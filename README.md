@@ -136,6 +136,7 @@
 2-6. Next.js 서버사이드렌더링(SSR) 구현
 
 - [Next SSR: 서버사이드렌더링 준비](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/60-ready-to-server-side-rendering.md)
+- [Next SSR: SSR시 쿠키 공유 구현](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/61-share-cookie-in-ssr.md)
 
 ### Node.js
 
@@ -168,4 +169,4 @@
 - [os와 path](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/3-7-os-and-path.md)
 - [url과 querystring](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/3-8-url-and-querystring.md)
 - [crypto와 util](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/3-9-crypto-and-util.md)
-- [worker_threads](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/3-10-worker-threads.md)
+- [worker_threads, child_process](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/3-10-worker-threads-and-child-process.md)

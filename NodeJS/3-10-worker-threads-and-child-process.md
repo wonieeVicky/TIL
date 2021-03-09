@@ -1,4 +1,6 @@
-﻿# 10. worker_threads
+﻿# 10. worker_threads & child process
+
+## 10-1. worker_threads
 
 노드에서 멀티 스레드 방식으로 작업할 수 있다. (하지만 잘 사용하진 않는다.)
 
@@ -174,3 +176,40 @@ prime: 7.925s
 ```
 
 싱글스레드보다 10초 앞당겨졌다! 기존에 16초인 것보다 약 6-7초 가량 앞당겨졌는데 8개의 워커를 두고 왜 이렇게 밖에 줄지 않았을까? 워커스레드를 많이 늘린다고 해서 시간이 비례해서 줄어들지는 않는다. 워커스레드를 만들고, 데이터를 보내는 과정에서도 시간이 걸리기 때문이다. 또한 컴퓨터 사양에 따라 코어가 적을 경우 순차적으로 실행되므로 실행환경에 따라 가장 최선의 방법을 선택하는 것이 좋다.
+
+## 10-2. child_process
+
+노드에서 여러 개의 멀티쓰레드를 운영하는 것이 코드가 복잡하므로 노드 안에서 다른 언어를 활용하여 구현하는 방법도 있다. 노드는 다른 언어에게 '이것 좀 실행해줘'라고 요청만 할 수 있다. 노드 안에서 파이썬 코드를 싱행시켜보자
+
+```jsx
+// test.js
+const spawn = require("child_process").spawn;
+var process = spawn("python", ["test.py"]);
+
+process.stdout.on("data", function (data) {
+  console.log(data.toString());
+});
+
+process.stderr.on("data", function (data) {
+  console.error(data.toString());
+});
+```
+
+```python
+// test.py
+print('hello python')
+```
+
+위와 같이 설정 후 노드를 실행시켜보면 정상적으로 `hello python`이 실행된 후 해당 정보가 노드 스크립트 안에 잘 반환되고 있다. 파이썬이나 C 등으로 멀티스레드를 구현하는 것이 비교적 더 효율적이므로 해당 방법을 사용해서 구현해보면 좋다.
+
+## 10-3. 기타 노드 내장 모듈들
+
+- assert: 값을 비교하여 프로그램이 제대로 동작하는지 테스트하는 데 사용
+- dns: 도메인 이름에 대한 IP 주소를 얻어내는 데 사용
+- net: HTTP보다 로우 레벨인 TCP나 IPC 통신을 할 떄 사용
+- string_decoder: 버퍼 데이터를 문자열로 바꾸는 데 사용
+- tls: TLS와 SSL에 관련된 작업을 할 떄 사용
+- tty: 터미널과 관련된 작업을 할 떄 사용
+- dgram: UDP와 관련된 작업을 할 때 사용
+- v8: v8 엔진에 직접 접근할 떄 사용
+- vm: 가상 머신에 직접 접근할 떄 사용
