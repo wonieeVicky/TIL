@@ -140,6 +140,7 @@
 - [Next SSR: getStaticProps 적용](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/62-implement-getstaticprops.md)
 - [Next SSR: 다이나믹 라우팅 구현](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/63-dynamic-routing.md)
 - [Next SSR: CSS SSR 구현](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/64-css-ssr.md)
+- [Next SSR: 특정 사용자 게시글, 해시태그 게시글 구현](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/65-user-posts-and-hashtag-posts.md)
 
 ### Node.js
 
