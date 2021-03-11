@@ -172,3 +172,6 @@
 - [url과 querystring](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/3-8-url-and-querystring.md)
 - [crypto와 util](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/3-9-crypto-and-util.md)
 - [worker_threads, child_process](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/3-10-worker-threads-and-child-process.md)
+- [filesystem 사용하기](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/3-11-use-fs.md)
+- [버퍼와 스트림 이해하기](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/3-12-buffer-and-stream)
+- [pipe와 스트림 메모리 효율 확인](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/3-13-pipe-and-stream-memory-efficiency.md)
