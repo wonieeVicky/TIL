@@ -139,6 +139,7 @@
 - [Next SSR: SSR시 쿠키 공유 구현](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/61-share-cookie-in-ssr.md)
 - [Next SSR: getStaticProps 적용](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/62-implement-getstaticprops.md)
 - [Next SSR: 다이나믹 라우팅 구현](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/63-dynamic-routing.md)
+- [Next SSR: CSS SSR 구현](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/64-css-ssr.md)
 
 ### Node.js
 
