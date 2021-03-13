@@ -1,8 +1,7 @@
 # Today I Learned
 
-##### 오늘 내가 배운 것 중 코드로 남겨야하는 기록들을 commit 한다.
-
-##### 이론에 기초하거나 텍스트 위주의 내용은 [Notion](https://www.notion.so/fongfingVicky-s-FE-Engineering-Wiki-d7e660205c0047118a78d664b07418fd)에 포스팅한다.
+- 오늘 내가 배운 것 중 코드로 남겨야하는 기록들을 commit 한다.
+- 이론에 기초하거나 텍스트 위주의 내용은 [Notion](https://www.notion.so/fongfingVicky-s-FE-Engineering-Wiki-d7e660205c0047118a78d664b07418fd)에 포스팅한다.
 
 <br/>
 
@@ -64,86 +63,88 @@
 
    2-1. Next.js
 
-   - [Next.js: 역할](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/1-role-of-next-js.md)
-   - [Next.js: 실행 해보기](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/2-run-next-js.md)
-   - [Next.js: Page & Layout](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/3-page-and-layout.md)
-   - [Next.js: Link & eslint](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/4-link-and-eslint.md)
+   - [Next 역할](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/1-role-of-next-js.md)
+   - [Next 실행 해보기](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/2-run-next-js.md)
+   - [Next Page & Layout](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/3-page-and-layout.md)
+   - [Next Link & eslint](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/4-link-and-eslint.md)
 
    2-2. antd 이용한 SNS 뷰 구축
 
-   - [View: antd와 styled-components](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/5-antd-and-styled-components.md)
-   - [View: \_app.js와 Head](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/6-_app-js-and-head.md)
-   - [View: 반응형 그리드 사용](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/7-responsive-grid-in-antd.md)
-   - [View: 로그인 폼 생성](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/8-login-form.md)
-   - [View: 리렌더링 이해하기](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/9-rerendering.md)
-   - [View: 더미 데이터로 로그인 구현](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/10-login-with-dummy-data.md)
-   - [View: 프로필 페이지 구현](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/11-profile-page.md)
-   - [View: 커스텀 훅을 이용한 회원가입 페이지 구현](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/12-sign-up-page.md)
+   - [antd와 styled-components](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/5-antd-and-styled-components.md)
+   - [\_app.js와 Head](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/6-_app-js-and-head.md)
+   - [반응형 그리드 사용](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/7-responsive-grid-in-antd.md)
+   - [로그인 폼 생성](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/8-login-form.md)
+   - [리렌더링 이해하기](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/9-rerendering.md)
+   - [더미 데이터로 로그인 구현](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/10-login-with-dummy-data.md)
+   - [프로필 페이지 구현](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/11-profile-page.md)
+   - [커스텀 훅을 이용한 회원가입 페이지 구현](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/12-sign-up-page.md)
 
    2-3. Redux 연동
 
-   - [Redux: 리덕스 설치와 필요성](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/13-install-next-redux.md)
-   - [Redux: 리덕스 원리와 불변성](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/14-principle-and-immutality-of-redux.md)
-   - [Redux: 리덕스 구현](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/15-implement-redux.md)
-   - [Redux: 미들웨어와 리덕스 데브툴즈](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/16-middleware-and-redux-devtools.md)
-   - [Redux: 리듀서 쪼개기](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/17-divide-reducers.md)
-   - [Redux: 더미데이터와 포스트폼 구현](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/18-dummy-data-and-post-form.md)
-   - [Redux: 게시글 구현](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/19-implement-post-card.md)
-   - [Redux: 댓글, 이미지 구현](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/20-implement-comment-form-and-post-image.md)
-   - [Redux: 이미지 Carousel 구현](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/21-implement-image-carousel.md)
-   - [Redux: createGlobalStyle, 컴포넌트 폴더 구조](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/22-global-style-and-components-directory-structure.md)
-   - [Redux: 게시글 해시태그 링크로 만들기](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/23-implement-hash-tag-link-in-post.md)
+   - [리덕스 설치와 필요성](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/13-install-next-redux.md)
+   - [리덕스 원리와 불변성](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/14-principle-and-immutality-of-redux.md)
+   - [리덕스 구현](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/15-implement-redux.md)
+   - [미들웨어와 리덕스 데브툴즈](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/16-middleware-and-redux-devtools.md)
+   - [리듀서 쪼개기](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/17-divide-reducers.md)
+   - [더미데이터와 포스트폼 구현](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/18-dummy-data-and-post-form.md)
+   - [게시글 구현](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/19-implement-post-card.md)
+   - [댓글, 이미지 구현](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/20-implement-comment-form-and-post-image.md)
+   - [이미지 Carousel 구현](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/21-implement-image-carousel.md)
+   - [createGlobalStyle, 컴포넌트 폴더 구조](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/22-global-style-and-components-directory-structure.md)
+   - [게시글 해시태그 링크로 만들기](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/23-implement-hash-tag-link-in-post.md)
 
    2-4. Redux-saga 연동
 
-   - [Redux-saga: redux-thunk 이해하기](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/24-principle-of-redux-thunk.md)
-   - [Redux-saga: saga 설치, generator 이해하기](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/25-install-saga-and-priciple-of-redux-saga.md)
-   - [Redux-saga: saga 이펙트 알아보기](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/26-learn-saga-effect.md)
-   - [Redux-saga: take 시리즈와 throttle 알아보기](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/27-take-take-series-throttle-debouce.md)
-   - [Redux-saga: saga 분리와 reducer 연결](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/28-divide-saga-and-connect-reducer.md)
-   - [Redux-saga: 액션과 상태 정리하기](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/29-clean-up-actions-and-statues.md)
-   - [Redux-saga: 바뀐 상태 컴포넌트 적용, eslint 점검](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/30-apply-changed-state-and-check-eslint.md)
-   - [Redux-saga: 게시글, 댓글 saga 구현](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/31-postCard-and-postComment-in-saga.md)
-   - [Redux-saga: 게시글 삭제 saga 구현](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/32-apply-remove-post.md)
-   - [Redux-saga: reducer에 Immer, faker 더미데이터 적용](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/33-implement-immer-and-faker-data-to-reducer.md)
-   - [Redux-saga: 인피니트 스크롤링 적용](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/34-implement-infinite-scroll.md)
-   - [Redux-saga: 팔로우, 언팔로우 구현](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/35-follow-and-unfollow-in-saga.md)
+   - [redux-thunk 이해하기](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/24-principle-of-redux-thunk.md)
+   - [saga 설치, generator 이해하기](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/25-install-saga-and-priciple-of-redux-saga.md)
+   - [saga 이펙트 알아보기](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/26-learn-saga-effect.md)
+   - [take 시리즈와 throttle 알아보기](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/27-take-take-series-throttle-debouce.md)
+   - [saga 분리와 reducer 연결](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/28-divide-saga-and-connect-reducer.md)
+   - [액션과 상태 정리하기](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/29-clean-up-actions-and-statues.md)
+   - [바뀐 상태 컴포넌트 적용, eslint 점검](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/30-apply-changed-state-and-check-eslint.md)
+   - [게시글, 댓글 saga 구현](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/31-postCard-and-postComment-in-saga.md)
+   - [게시글 삭제 saga 구현](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/32-apply-remove-post.md)
+   - [reducer에 Immer, faker 더미데이터 적용](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/33-implement-immer-and-faker-data-to-reducer.md)
+   - [인피니트 스크롤링 적용](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/34-implement-infinite-scroll.md)
+   - [팔로우, 언팔로우 구현](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/35-follow-and-unfollow-in-saga.md)
 
    2-5. 백엔드 Node 서버 구축
 
-   - [Node: 노드로 서버 구동하기](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/36-run-node-server.md)
-   - [Node: 익스프레스로 라우팅 및 라우터 분리하기](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/37-routing-to-express.md)
-   - [Node: MySQL과 시퀄라이즈 연결](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/38-connect-mysql-and-sequelize.md)
-   - [Node: 시퀄라이즈 모델 생성](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/39-create-sequelize-models.md)
-   - [Node: 시퀄라이즈 관계 설정](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/40-set-up-sequelize-relationship.md)
-   - [Node: 시퀄라이즈 sync와 nodemon](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/41-sequelize-sync-and-nodemon.md)
-   - [Node: 회원가입 API 구현](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/42-implement-join-api.md)
-   - [Node: CORS 문제 개선](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/43-troubleshooting-cors.md)
-   - [Node: passport 로그인 구현](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/44-login-by-passport.md)
-   - [Node: 쿠키,세션과 전체 로그인 Flow](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/45-cookies-and-sessions-and-login-flow.md)
-   - [Node: 로그인 디버깅](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/46-troubleshooting-login-issues.md)
-   - [Node: 미들웨어로 라우팅 검사하기](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/47-check-routing-with-middleware.md)
-   - [Node: 게시글과 댓글 작성하기](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/48-create-post-and-comment.md)
-   - [Node: credential로 쿠키 공유 처리](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/49-share-cookie-with-credentials.md)
-   - [Node: 로그인 정보 매번 불러오기](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/50-load-my-info-every-time.md)
-   - [Node: 게시글, 코멘트 불러오기](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/51-load-posts-and-comments.md)
-   - [Node: 게시글 좋아요 구현](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/52-implement-like-unlike-post.md)
-   - [Node: 게시글 제거, 닉네임 변경](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/53-delete-post-and-change-nickname.md)
-   - [Node: 팔로우, 언팔로우](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/54-follow-and-unfollow.md)
-   - [Node: 이미지 업로드 구현(multer)](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/55-multer-for-image-uploads.md)
-   - [Node: express.static 미들웨어](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/56-express-static-middleware.md)
-   - [Node: 해시태그 등록](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/57-register-hashtags.md)
-   - [Node: 리트윗 구현](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/58-retweet.md)
-   - [Node: 쿼리스트링과 lastId 방식](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/59-querystring-and-lastId.md)
+   - [노드로 서버 구동하기](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/36-run-node-server.md)
+   - [익스프레스로 라우팅 및 라우터 분리하기](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/37-routing-to-express.md)
+   - [MySQL과 시퀄라이즈 연결](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/38-connect-mysql-and-sequelize.md)
+   - [시퀄라이즈 모델 생성](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/39-create-sequelize-models.md)
+   - [시퀄라이즈 관계 설정](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/40-set-up-sequelize-relationship.md)
+   - [시퀄라이즈 sync와 nodemon](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/41-sequelize-sync-and-nodemon.md)
+   - [회원가입 API 구현](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/42-implement-join-api.md)
+   - [CORS 문제 개선](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/43-troubleshooting-cors.md)
+   - [passport 로그인 구현](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/44-login-by-passport.md)
+   - [쿠키,세션과 전체 로그인 Flow](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/45-cookies-and-sessions-and-login-flow.md)
+   - [로그인 디버깅](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/46-troubleshooting-login-issues.md)
+   - [미들웨어로 라우팅 검사하기](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/47-check-routing-with-middleware.md)
+   - [게시글과 댓글 작성하기](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/48-create-post-and-comment.md)
+   - [credential로 쿠키 공유 처리](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/49-share-cookie-with-credentials.md)
+   - [로그인 정보 매번 불러오기](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/50-load-my-info-every-time.md)
+   - [게시글, 코멘트 불러오기](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/51-load-posts-and-comments.md)
+   - [게시글 좋아요 구현](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/52-implement-like-unlike-post.md)
+   - [게시글 제거, 닉네임 변경](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/53-delete-post-and-change-nickname.md)
+   - [팔로우, 언팔로우](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/54-follow-and-unfollow.md)
+   - [이미지 업로드 구현(multer)](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/55-multer-for-image-uploads.md)
+   - [express.static 미들웨어](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/56-express-static-middleware.md)
+   - [해시태그 등록](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/57-register-hashtags.md)
+   - [리트윗 구현](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/58-retweet.md)
+   - [쿼리스트링과 lastId 방식](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/59-querystring-and-lastId.md)
 
    2-6. Next.js 서버사이드렌더링(SSR) 구현
 
-   - [Next SSR: 서버사이드렌더링 준비](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/60-ready-to-server-side-rendering.md)
-   - [Next SSR: SSR시 쿠키 공유 구현](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/61-share-cookie-in-ssr.md)
-   - [Next SSR: getStaticProps 적용](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/62-implement-getstaticprops.md)
-   - [Next SSR: 다이나믹 라우팅 구현](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/63-dynamic-routing.md)
-   - [Next SSR: CSS SSR 구현](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/64-css-ssr.md)
-   - [Next SSR: 특정 사용자 게시글, 해시태그 게시글 구현](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/65-user-posts-and-hashtag-posts.md)
+   - [서버사이드렌더링 준비](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/60-ready-to-server-side-rendering.md)
+   - [SSR시 쿠키 공유 구현](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/61-share-cookie-in-ssr.md)
+   - [getStaticProps 적용](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/62-implement-getstaticprops.md)
+   - [다이나믹 라우팅 구현](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/63-dynamic-routing.md)
+   - [CSS SSR 구현](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/64-css-ssr.md)
+   - [특정 사용자 게시글, 해시태그 게시글 구현](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/65-user-posts-and-hashtag-posts.md)
+   - [getStaticPaths](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/66-getStaticPaths.md)
+   - [swr 적용](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/67-useswr-hook.md)
 
 ## Node.js
 
