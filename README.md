@@ -145,6 +145,7 @@
    - [특정 사용자 게시글, 해시태그 게시글 구현](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/65-user-posts-and-hashtag-posts.md)
    - [getStaticPaths](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/66-getStaticPaths.md)
    - [swr 적용](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/67-useswr-hook.md)
+   - [다이나믹 라우팅 페이지로 연결(Link, Router)](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/68-add-link-using-next-link.md)
 
 ## Node.js
 
@@ -180,3 +181,7 @@
    - [pipe와 스트림 메모리 효율 확인](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/3-13-pipe-and-stream-memory-efficiency.md)
    - [스레드풀, 커스텀 이벤트](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/3-14-threadpool-custom-event.md)
    - [예외 처리](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/3-15-exception-error.md)
+
+3. http 모듈로 서버 만들기
+
+   - [HTTP 서버 만들기](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/4-1-create-http-server.md)
