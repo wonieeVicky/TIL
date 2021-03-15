@@ -1,4 +1,4 @@
-﻿#1. HTTP 서버 만들기
+﻿# 1. HTTP 서버 만들기
 
 노드는 자바스크립트 실행기이지 서버가 아니다. 하지만 자바스크립트로 서버를 돌릴 수 있는 코드를 작성해놓으면 노드가 그 서버를 실행을 해준다.
 
@@ -23,7 +23,7 @@
 `createServer.js`
 
 ```jsx
-const http = require("http");
+const http = require('http');
 http.createServer((req, res) => {
   // 여기에 어떻게 응답할지 적는다.
 });
@@ -37,17 +37,17 @@ http.createServer((req, res) => {
 - listen(포트) 메서드로 특정 포트에 연결
 
 ```jsx
-const http = require("http");
+const http = require('http');
 
 http
   .createServer((req, res) => {
-    res.writeHead(200, { "Content-Type": "text/html/; charset=utf-8" });
-    res.write("<h1>Hello Node!</h1>");
-    res.end("<p>Hello Server</p>");
+    res.writeHead(200, { 'Content-Type': 'text/html/; charset=utf-8' });
+    res.write('<h1>Hello Node!</h1>');
+    res.end('<p>Hello Server</p>');
   })
   .listen(8080, () => {
     // 서버연결
-    console.log("8080번 포트에서 서버 대기중입니다!");
+    console.log('8080번 포트에서 서버 대기중입니다!');
   });
 ```
 

@@ -185,3 +185,4 @@
 3. http 모듈로 서버 만들기
 
    - [HTTP 서버 만들기](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/4-1-create-http-server.md)
+   - [fs로 HTML 읽어 제공하기](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/4-2-read-and-provide-html-with-fs.md)
