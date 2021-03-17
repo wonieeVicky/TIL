@@ -21,6 +21,10 @@ http
         } else if (req.url === '/users') {
           res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8' });
           return res.end(JSON.stringify(users));
+        } else if (req.url === '/community') {
+          const data = await fs.readFile('./community.html');
+          res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
+          return res.end(data);
         }
         // /도 /about도 /users도 아니면
         try {
