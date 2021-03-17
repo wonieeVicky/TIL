@@ -147,6 +147,7 @@
    - [swr 적용](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/67-useswr-hook.md)
    - [다이나믹 라우팅 페이지로 연결(Link, Router)](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/68-add-link-using-next-link.md)
    - [moment와 next build](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/69-moment-and-next-build.md)
+   - [커스텀웹팩, bundle-analyzer](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/70-custom-webpack-bundle-analyzer.md)
 
 ## Node.js
 
