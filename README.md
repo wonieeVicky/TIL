@@ -148,6 +148,11 @@
    - [다이나믹 라우팅 페이지로 연결(Link, Router)](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/68-add-link-using-next-link.md)
    - [moment와 next build](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/69-moment-and-next-build.md)
    - [커스텀웹팩, bundle-analyzer](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/70-custom-webpack-bundle-analyzer.md)
+   - [배포 전 리팩토링](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/71-refactoring-before-deploy.md)
+
+   2-7. AWS 배포
+
+   - [EC2 인스턴스 생성](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/72-create-ec2-instance.md)
 
 ## Node.js
 
