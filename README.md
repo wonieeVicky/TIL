@@ -155,6 +155,7 @@
    - [EC2 인스턴스 생성](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/72-create-ec2-instance.md)
    - [우분투 내 노드 설치](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/73-install-nodejs-in-ubuntu.md)
    - [우분투 내 MySQL 설치](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/74-install-mysql-in-ubuntu.md)
+   - [pm2 사용하기](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/75-use-pm2.md)
 
 ## Node.js
 
