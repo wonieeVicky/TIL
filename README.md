@@ -147,7 +147,7 @@
    - [swr 적용](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/67-useswr-hook.md)
    - [다이나믹 라우팅 페이지로 연결(Link, Router)](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/68-add-link-using-next-link.md)
    - [moment와 next build](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/69-moment-and-next-build.md)
-   - [커스텀웹팩, bundle-analyzer](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/70-custom-webpack-bundle-analyzer.md)
+   - [커스텀웹팩, bundle-analyzer](https://github.com/wonieeVicky/TIL/blob/main/**React**/react-nodebird-sns/70-custom-webpack-bundle-analyzer.md)
    - [배포 전 리팩토링](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/71-refactoring-before-deploy.md)
 
    2-7. AWS 배포
@@ -158,6 +158,9 @@
    - [pm2 사용하기](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/75-use-pm2.md)
    - [프론트 서버 배포](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/76-deploy-front-server.md)
    - [도메인 연결](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/77-connect-domain.md)
+   - [이미지 업로드 S3 연결](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/78-connect-s3.md)
+   - [Lambda로 이미지 리사이징 구현](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/79-resizing-images-with-lambda.md)
+   - [nginx + https 적용](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/80-nginx-https.md)
 
 ## Node.js
 
