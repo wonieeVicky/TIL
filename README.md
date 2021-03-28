@@ -134,6 +134,8 @@
    - [해시태그 등록](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/57-register-hashtags.md)
    - [리트윗 구현](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/58-retweet.md)
    - [쿼리스트링과 lastId 방식](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/59-querystring-and-lastId.md)
+   - [게시글 수정 구현](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/83-implement-post-update.md)
+   - [팔로잉한 게시글만 가져오기](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/85-get-related-posts.md)
 
    2-6. Next.js 서버사이드렌더링(SSR) 구현
 
@@ -161,6 +163,9 @@
    - [이미지 업로드 S3 연결](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/78-connect-s3.md)
    - [Lambda로 이미지 리사이징 구현](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/79-resizing-images-with-lambda.md)
    - [nginx + https 적용](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/80-nginx-https.md)
+   - [백엔드에 https 적용, CORS 개선](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/81-https-to-the-backend.md)
+   - [nginx, 콘솔 에러 개선](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/82-improve-nginx-and-console-error.md)
+   - [forest-admin을 활용한 어드민 페이지 구현](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/84-create-admin.md)
 
 ## Node.js
 
