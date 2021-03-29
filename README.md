@@ -7,19 +7,27 @@
 
 ## TypeScript
 
-1. [prepare environment for using typescript](https://github.com/wonieeVicky/TIL/blob/main/Typescript/1-prepare-environment-for-using-typescript.md)
-2. [assign type & type error](https://github.com/wonieeVicky/TIL/blob/main/Typescript/2-assign-type-and-type-error.md)
-3. [declaration type](https://github.com/wonieeVicky/TIL/blob/main/Typescript/3-declaration-type.md)
-4. [type Inference & type Assertions](https://github.com/wonieeVicky/TIL/blob/main/Typescript/4-type-Inference-and-type-assertions.md)
-5. [type Guards](https://github.com/wonieeVicky/TIL/blob/main/Typescript/5-type-guards.md)
-6. [interface](https://github.com/wonieeVicky/TIL/blob/main/Typescript/6-interface.md)
-7. [type Aliases](https://github.com/wonieeVicky/TIL/blob/main/Typescript/7-type-aliases.md)
-8. [generic](https://github.com/wonieeVicky/TIL/blob/main/Typescript/8-generic.md)
-9. [function](https://github.com/wonieeVicky/TIL/blob/main/Typescript/9-function.md)
-10. [class](https://github.com/wonieeVicky/TIL/blob/main/Typescript/10-class.md)
-11. [optional](https://github.com/wonieeVicky/TIL/blob/main/Typescript/11-optional.md)
-12. [module](https://github.com/wonieeVicky/TIL/blob/main/Typescript/12-module.md)
-13. [utlity type](https://github.com/wonieeVicky/TIL/blob/main/Typescript/13-utility-type.md)
+1.  TypeScript 이론 정리
+
+    - [prepare environment for using typescript](https://github.com/wonieeVicky/TIL/blob/main/Typescript/1-prepare-environment-for-using-typescript.md)
+    - [assign type & type error](https://github.com/wonieeVicky/TIL/blob/main/Typescript/2-assign-type-and-type-error.md)
+    - [declaration type](https://github.com/wonieeVicky/TIL/blob/main/Typescript/3-declaration-type.md)
+    - [type Inference & type Assertions](https://github.com/wonieeVicky/TIL/blob/main/Typescript/4-type-Inference-and-type-assertions.md)
+    - [type Guards](https://github.com/wonieeVicky/TIL/blob/main/Typescript/5-type-guards.md)
+    - [interface](https://github.com/wonieeVicky/TIL/blob/main/Typescript/6-interface.md)
+    - [type Aliases](https://github.com/wonieeVicky/TIL/blob/main/Typescript/7-type-aliases.md)
+    - [generic](https://github.com/wonieeVicky/TIL/blob/main/Typescript/8-generic.md)
+    - [function](https://github.com/wonieeVicky/TIL/blob/main/Typescript/9-function.md)
+    - [class](https://github.com/wonieeVicky/TIL/blob/main/Typescript/10-class.md)
+    - [optional](https://github.com/wonieeVicky/TIL/blob/main/Typescript/11-optional.md)
+    - [module](https://github.com/wonieeVicky/TIL/blob/main/Typescript/12-module.md)
+    - [utlity type](https://github.com/wonieeVicky/TIL/blob/main/Typescript/13-utility-type.md)
+
+2.  TypeScript 개념 정리 + 실적 적용
+
+    - [타입스크립트의 필요성, JS에서 타입 체크하기](https://github.com/wonieeVicky/TIL/blob/main/Typescript/2-1-need-to-ts-and-chec-type-in-js.md)
+
+<br />
 
 ## EcmaScript6
 
@@ -37,6 +45,8 @@
 12. [Proxy](https://github.com/wonieeVicky/TIL/blob/main/EcmaScript6/12-proxy.md)
 13. [Mini Project](https://github.com/wonieeVicky/TIL/blob/main/EcmaScript6/13-mini-project.md)
 
+<br />
+
 ## TDD
 
 1. [TDD 이론 및 패턴 소개](https://github.com/wonieeVicky/TIL/blob/main/TDD/1-tdd-basic.md)
@@ -44,6 +54,8 @@
 3. [화면 만들기와 개선된 사항 정리](https://github.com/wonieeVicky/TIL/blob/main/TDD/3-tdd-draw-layout.md)
 4. [추가 요구사항도 쉽게 만들 수 있도록 리팩토링](https://github.com/wonieeVicky/TIL/blob/main/TDD/4-tdd-refactoring-for-addtional-requirements.md)
 5. [변경사항 화면 업데이트 및 최종 정리](https://github.com/wonieeVicky/TIL/blob/main/TDD/5-tdd-update-layout-and-final.md)
+
+<br />
 
 ## React
 
@@ -166,6 +178,8 @@
    - [백엔드에 https 적용, CORS 개선](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/81-https-to-the-backend.md)
    - [nginx, 콘솔 에러 개선](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/82-improve-nginx-and-console-error.md)
    - [forest-admin을 활용한 어드민 페이지 구현](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/84-create-admin.md)
+
+<br />
 
 ## Node.js
 
