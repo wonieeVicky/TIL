@@ -1,0 +1,7 @@
+﻿{
+  "compilerOptions": {
+    "allowJs": true,
+    "checkJs": true, // @ ts-check
+    "noImplicitAny": true // 모든 타입에 최소 any는 넣어준다
+  }
+}
