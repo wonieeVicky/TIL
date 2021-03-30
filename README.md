@@ -60,6 +60,7 @@
 ## Redux & MobX
 
 1. [Redux](https://github.com/wonieeVicky/TIL/blob/main/Redux&MobX/1-redux.md)
+2. [React-redux](https://github.com/wonieeVicky/TIL/blob/main/Redux&MobX/2-react-redux.md)
 
 <br />
 
