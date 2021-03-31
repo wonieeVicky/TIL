@@ -9,23 +9,24 @@
 
 1.  TypeScript 이론 정리
 
-    - [prepare environment for using typescript](https://github.com/wonieeVicky/TIL/blob/main/Typescript/1-prepare-environment-for-using-typescript.md)
-    - [assign type & type error](https://github.com/wonieeVicky/TIL/blob/main/Typescript/2-assign-type-and-type-error.md)
-    - [declaration type](https://github.com/wonieeVicky/TIL/blob/main/Typescript/3-declaration-type.md)
-    - [type Inference & type Assertions](https://github.com/wonieeVicky/TIL/blob/main/Typescript/4-type-Inference-and-type-assertions.md)
-    - [type Guards](https://github.com/wonieeVicky/TIL/blob/main/Typescript/5-type-guards.md)
-    - [interface](https://github.com/wonieeVicky/TIL/blob/main/Typescript/6-interface.md)
-    - [type Aliases](https://github.com/wonieeVicky/TIL/blob/main/Typescript/7-type-aliases.md)
-    - [generic](https://github.com/wonieeVicky/TIL/blob/main/Typescript/8-generic.md)
-    - [function](https://github.com/wonieeVicky/TIL/blob/main/Typescript/9-function.md)
-    - [class](https://github.com/wonieeVicky/TIL/blob/main/Typescript/10-class.md)
-    - [optional](https://github.com/wonieeVicky/TIL/blob/main/Typescript/11-optional.md)
-    - [module](https://github.com/wonieeVicky/TIL/blob/main/Typescript/12-module.md)
-    - [utlity type](https://github.com/wonieeVicky/TIL/blob/main/Typescript/13-utility-type.md)
+    - [prepare environment for using typescript](https://github.com/wonieeVicky/TIL/blob/main/Typescript/1-1-prepare-environment-for-using-typescript.md)
+    - [assign type & type error](https://github.com/wonieeVicky/TIL/blob/main/Typescript/1-2-assign-type-and-type-error.md)
+    - [declaration type](https://github.com/wonieeVicky/TIL/blob/main/Typescript/1-3-declaration-type.md)
+    - [type Inference & type Assertions](https://github.com/wonieeVicky/TIL/blob/main/Typescript/1-4-type-Inference-and-type-assertions.md)
+    - [type Guards](https://github.com/wonieeVicky/TIL/blob/main/Typescript/1-5-type-guards.md)
+    - [interface](https://github.com/wonieeVicky/TIL/blob/main/Typescript/1-6-interface.md)
+    - [type Aliases](https://github.com/wonieeVicky/TIL/blob/main/Typescript/1-7-type-aliases.md)
+    - [generic](https://github.com/wonieeVicky/TIL/blob/main/Typescript/1-8-generic.md)
+    - [function](https://github.com/wonieeVicky/TIL/blob/main/Typescript/1-9-function.md)
+    - [class](https://github.com/wonieeVicky/TIL/blob/main/Typescript/1-10-class.md)
+    - [optional](https://github.com/wonieeVicky/TIL/blob/main/Typescript/1-11-optional.md)
+    - [module](https://github.com/wonieeVicky/TIL/blob/main/Typescript/1-12-module.md)
+    - [utlity type](https://github.com/wonieeVicky/TIL/blob/main/Typescript/1-13-utility-type.md)
 
 2.  TypeScript 개념 정리 + 실적 적용
 
     - [타입스크립트의 필요성, JS에서 타입 체크하기](https://github.com/wonieeVicky/TIL/blob/main/Typescript/2-1-need-to-ts-and-chec-type-in-js.md)
+    - [변수, 함수타입 정의](https://github.com/wonieeVicky/TIL/blob/main/Typescript/2-2-define-variable-and-functions-type.md)
 
 <br />
 
