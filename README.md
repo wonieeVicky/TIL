@@ -27,6 +27,9 @@
 
     - [타입스크립트의 필요성, JS에서 타입 체크하기](https://github.com/wonieeVicky/TIL/blob/main/Typescript/2-1-need-to-ts-and-chec-type-in-js.md)
     - [변수, 함수타입 정의](https://github.com/wonieeVicky/TIL/blob/main/Typescript/2-2-define-variable-and-functions-type.md)
+    - [Todo App 간단 타이핑](https://github.com/wonieeVicky/TIL/blob/main/Typescript/2-3-todo-app-typing.md)
+    - [인터페이스](https://github.com/wonieeVicky/TIL/blob/main/Typescript/2-4-interface.md)
+    - [타입 별칭](https://github.com/wonieeVicky/TIL/blob/main/Typescript/2-5-type-alias.md)
 
 <br />
 
@@ -62,6 +65,8 @@
 
 1. [Redux](https://github.com/wonieeVicky/TIL/blob/main/Redux&MobX/1-redux.md)
 2. [React-redux](https://github.com/wonieeVicky/TIL/blob/main/Redux&MobX/2-react-redux.md)
+3. [Redux-toolkit](https://github.com/wonieeVicky/TIL/blob/main/Redux&MobX/3-redux-toolkit.md)
+4. [MobX](https://github.com/wonieeVicky/TIL/blob/main/Redux&MobX/4-mobx.md)
 
 <br />
 
