@@ -30,6 +30,8 @@
     - [Todo App 간단 타이핑](https://github.com/wonieeVicky/TIL/blob/main/Typescript/2-3-todo-app-typing.md)
     - [인터페이스](https://github.com/wonieeVicky/TIL/blob/main/Typescript/2-4-interface.md)
     - [타입 별칭](https://github.com/wonieeVicky/TIL/blob/main/Typescript/2-5-type-alias.md)
+    - [union, intersection](https://github.com/wonieeVicky/TIL/blob/main/Typescript/2-6-union-intesection.md)
+    - [enum](https://github.com/wonieeVicky/TIL/blob/main/Typescript/2-7-enum.md)
 
 <br />
 
