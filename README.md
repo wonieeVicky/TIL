@@ -32,6 +32,7 @@
     - [타입 별칭](https://github.com/wonieeVicky/TIL/blob/main/Typescript/2-5-type-alias.md)
     - [union, intersection](https://github.com/wonieeVicky/TIL/blob/main/Typescript/2-6-union-intesection.md)
     - [enum](https://github.com/wonieeVicky/TIL/blob/main/Typescript/2-7-enum.md)
+    - [class](https://github.com/wonieeVicky/TIL/blob/main/Typescript/2-8-class.md)
 
 <br />
 
