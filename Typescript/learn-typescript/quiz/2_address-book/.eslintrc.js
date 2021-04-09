@@ -5,14 +5,11 @@ module.exports = {
     node: true,
     jest: true,
   },
-  extends: [
-    'plugin:@typescript-eslint/eslint-recommended',
-    'plugin:@typescript-eslint/recommended',
-  ],
-  plugins: ['prettier', '@typescript-eslint'],
+  extends: ["plugin:@typescript-eslint/eslint-recommended", "plugin:@typescript-eslint/recommended"],
+  plugins: ["prettier", "@typescript-eslint"],
   rules: {
-    'prettier/prettier': [
-      'error',
+    "prettier/prettier": [
+      "error",
       {
         singleQuote: true,
         semi: true,
@@ -20,14 +17,14 @@ module.exports = {
         tabWidth: 2,
         printWidth: 80,
         bracketSpacing: true,
-        arrowParens: 'avoid',
+        arrowParens: "avoid",
       },
     ],
-    '@typescript-eslint/no-explicit-any': 'off',
-    "@typescript-eslint/explicit-function-return-type": 'off',
-    'prefer-const': 'off',
+    // '@typescript-eslint/no-explicit-any': 'off',
+    // "@typescript-eslint/explicit-function-return-type": 'off',
+    "prefer-const": "off",
   },
   parserOptions: {
-    parser: '@typescript-eslint/parser',
+    parser: "@typescript-eslint/parser",
   },
 };
