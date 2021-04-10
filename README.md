@@ -34,6 +34,7 @@
     - [enum](https://github.com/wonieeVicky/TIL/blob/main/Typescript/2-7-enum.md)
     - [class](https://github.com/wonieeVicky/TIL/blob/main/Typescript/2-8-class.md)
     - [generic](https://github.com/wonieeVicky/TIL/blob/main/Typescript/2-9-generic.md)
+    - [AddressBook App 타이핑](https://github.com/wonieeVicky/TIL/blob/main/Typescript/2-10-adress-book-app-typing.md)
 
 <br />
 
