@@ -35,6 +35,7 @@
     - [class](https://github.com/wonieeVicky/TIL/blob/main/Typescript/2-8-class.md)
     - [generic](https://github.com/wonieeVicky/TIL/blob/main/Typescript/2-9-generic.md)
     - [AddressBook App 타이핑](https://github.com/wonieeVicky/TIL/blob/main/Typescript/2-10-adress-book-app-typing.md)
+    - [타입 추론과 Typescript Language Server 이해](https://github.com/wonieeVicky/TIL/blob/main/Typescript/2-11-type-interface.md)
 
 <br />
 
