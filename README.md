@@ -246,3 +246,4 @@
    - [REST API 서버 구현](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/4-3-create-rest-api-server.md)
    - [POST, PUT, DELETE](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/4-4-request-post-put-delete.md)
    - [쿠키 이해하기](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/4-5-use-cookie.md)
+   - [세션 사용하기](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/4-6-use-session.md)

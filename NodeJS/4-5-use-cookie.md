@@ -120,9 +120,7 @@ http
       expires.setMinutes(expires.getMinutes() + 5);
       res.writeHead(302, {
         Location: "/",
-        "Set-Cookie": `name=${encodeURIComponent(
-          name
-        )}; Expires=${expires.toGMTString()}; HttpOnly; Path=/`,
+        "Set-Cookie": `name=${encodeURIComponent(name)}; Expires=${expires.toGMTString()}; HttpOnly; Path=/`,
       });
       res.end();
       // name이라는 쿠키가 있는 경우
@@ -152,4 +150,22 @@ http
 2. 이후 반환 시 내 이름을 다시 encodeURIComponent로 변환하여 Set-Cookie에 저장시킨다. 이때 쿠키의 유효시간을 정할 수도 있다. 쿠키의 만료기간을 넣지 않으면 브라우저가 끄는 순간에 쿠키가 사라지므로 직접 만료시간을 적어준다. 만약 **해당 유효기간이 지나버리면 브라우저에서 알아서 해당 쿠키를 전송에 포함시키지 않는다.** `HttpOnly;`라는 메서드는 자바스크립트에서 쿠키로 접근하지 못하도록 처리한다. (로그인 쿠키의 경우 필수이다.) 자바스크립트로 접근이 가능하도록 하면 보안상 문제가 되기 때문이다. `Path=/`의 의미는 path `/`이하로는 모두 해당 쿠키를 받는다는 의미이다.
 3. 돌려줄 때에는 302 status code를 주는데 리다이렉트 처리를 의미한다. /login으로 요청 → /로 리다이렉트
 
----
+### 5-6. 쿠키 옵션
+
+- Set-Cookie 시 다양한 옵션이 있음
+  - 쿠키명 = 쿠키값
+    - 기본적인 쿠키의 값. mycookie=test 또는 name=vicky 같이 설정한다.
+  - Expires = 날짜
+    - 만료기한. 이 기한이 지나면 쿠키가 제거된다. 기본값은 클라이언트가 종료될 때까지이다.
+  - Max-age = 초
+    - Expires와 비슷하지만 날짜 대신 초를 입력할 수 있다.  
+      해당 초가 지나면 쿠키가 제거된다. Expires보다 우선한다.
+  - Domain = 도메인명
+    - 쿠키가 전송될 도메인을 특정할 수 있다. 기본값은 현재 도메인이다.
+  - Path = URL
+    - 쿠키가 전송될 URL을 특정할 수 있다.
+      기본값은 "/"이고 이 경우 모든 URL에서 쿠키를 전송할 수 있다.
+  - Secure
+    - HTTPS일 경우에만 쿠키가 전송된다.
+  - HttpOnly
+    - 설정 시 자바스크립트에서 쿠키에 접근할 수 없다. 쿠키 조작을 방지하기 위해 설정하는 것이 좋다.
