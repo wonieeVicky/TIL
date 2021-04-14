@@ -202,6 +202,12 @@
    - [nginx, 콘솔 에러 개선](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/82-improve-nginx-and-console-error.md)
    - [forest-admin을 활용한 어드민 페이지 구현](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/84-create-admin.md)
 
+3. React + TypeScript webgame
+
+   (1) 구구단, 끝말잇기
+
+   - [구구단 만들기](https://github.com/wonieeVicky/TIL/blob/main/React/react-typescript-webgame/1-ts-project-setting.md)
+
 <br />
 
 ## Node.js
