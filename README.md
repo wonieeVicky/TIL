@@ -206,7 +206,8 @@
 
    (1) 구구단, 끝말잇기
 
-   - [구구단 만들기](https://github.com/wonieeVicky/TIL/blob/main/React/react-typescript-webgame/1-ts-project-setting.md)
+   - [TS 프로젝트 세팅](https://github.com/wonieeVicky/TIL/blob/main/React/react-typescript-webgame/1-1-ts-project-setting.md)
+   - [이벤트 핸들러, useRef 타이핑](https://github.com/wonieeVicky/TIL/blob/main/React/react-typescript-webgame/1-2-event-handler-and-useref-typing.md)
 
 <br />
 
