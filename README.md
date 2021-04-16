@@ -256,3 +256,8 @@
    - [세션 사용하기](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/4-6-use-session.md)
    - [https, http2](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/4-7-https-http2.md)
    - [cluster](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/4-8-cluster.md)
+
+4. package manager
+
+   - [package.json](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/5-1-package-json.md)
+   - [node_modules, npx, SemVer](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/5-2-node-modules-npx-server.md)
