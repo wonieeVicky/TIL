@@ -262,3 +262,4 @@
 
    - [package.json](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/5-1-package-json.md)
    - [node_modules, npx, SemVer](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/5-2-node-modules-npx-server.md)
+   - [자주 쓰는 npm 명령어, npm 배포하기](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/5-3-npm-cli-command-and-publish.md)
