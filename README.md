@@ -94,16 +94,25 @@
    - [지뢰찾기 만들기](https://github.com/wonieeVicky/TIL/blob/main/React/react-webgame/8-mine-search.md)
    - [리액트 라우터 설정](https://github.com/wonieeVicky/TIL/blob/main/React/react-webgame/9-react-router.md)
 
-2. React + Next.js로 React NodeBird SNS 구현하기
+2. React + TypeScript webgame
 
-   2-1. Next.js
+   2-1. 구구단, 끝말잇기
+
+   - [TS 프로젝트 세팅](https://github.com/wonieeVicky/TIL/blob/main/React/react-typescript-webgame/1-1-ts-project-setting.md)
+   - [이벤트 핸들러, useRef Typing](https://github.com/wonieeVicky/TIL/blob/main/React/react-typescript-webgame/1-2-event-handler-and-useref-typing.md)
+   - [Class Component State Typing](https://github.com/wonieeVicky/TIL/blob/main/React/react-typescript-webgame/1-3-class-state-typing.md)
+   - [useCallback Typing](https://github.com/wonieeVicky/TIL/blob/main/React/react-typescript-webgame/1-4-usecallback-typing.md)
+
+3. React + Next.js로 React NodeBird SNS 구현하기
+
+   3-1. Next.js
 
    - [Next 역할](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/1-role-of-next-js.md)
    - [Next 실행 해보기](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/2-run-next-js.md)
    - [Next Page & Layout](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/3-page-and-layout.md)
    - [Next Link & eslint](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/4-link-and-eslint.md)
 
-   2-2. antd 이용한 SNS 뷰 구축
+   3-2. antd 이용한 SNS 뷰 구축
 
    - [antd와 styled-components](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/5-antd-and-styled-components.md)
    - [\_app.js와 Head](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/6-_app-js-and-head.md)
@@ -114,7 +123,7 @@
    - [프로필 페이지 구현](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/11-profile-page.md)
    - [커스텀 훅을 이용한 회원가입 페이지 구현](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/12-sign-up-page.md)
 
-   2-3. Redux 연동
+   3-3. Redux 연동
 
    - [리덕스 설치와 필요성](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/13-install-next-redux.md)
    - [리덕스 원리와 불변성](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/14-principle-and-immutality-of-redux.md)
@@ -128,7 +137,7 @@
    - [createGlobalStyle, 컴포넌트 폴더 구조](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/22-global-style-and-components-directory-structure.md)
    - [게시글 해시태그 링크로 만들기](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/23-implement-hash-tag-link-in-post.md)
 
-   2-4. Redux-saga 연동
+   3-4. Redux-saga 연동
 
    - [redux-thunk 이해하기](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/24-principle-of-redux-thunk.md)
    - [saga 설치, generator 이해하기](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/25-install-saga-and-priciple-of-redux-saga.md)
@@ -143,7 +152,7 @@
    - [인피니트 스크롤링 적용](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/34-implement-infinite-scroll.md)
    - [팔로우, 언팔로우 구현](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/35-follow-and-unfollow-in-saga.md)
 
-   2-5. 백엔드 Node 서버 구축
+   3-5. 백엔드 Node 서버 구축
 
    - [노드로 서버 구동하기](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/36-run-node-server.md)
    - [익스프레스로 라우팅 및 라우터 분리하기](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/37-routing-to-express.md)
@@ -172,7 +181,7 @@
    - [게시글 수정 구현](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/83-implement-post-update.md)
    - [팔로잉한 게시글만 가져오기](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/85-get-related-posts.md)
 
-   2-6. Next.js 서버사이드렌더링(SSR) 구현
+   3-6. Next.js 서버사이드렌더링(SSR) 구현
 
    - [서버사이드렌더링 준비](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/60-ready-to-server-side-rendering.md)
    - [SSR시 쿠키 공유 구현](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/61-share-cookie-in-ssr.md)
@@ -187,7 +196,7 @@
    - [커스텀웹팩, bundle-analyzer](https://github.com/wonieeVicky/TIL/blob/main/**React**/react-nodebird-sns/70-custom-webpack-bundle-analyzer.md)
    - [배포 전 리팩토링](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/71-refactoring-before-deploy.md)
 
-   2-7. AWS 배포
+   3-7. AWS 배포
 
    - [EC2 인스턴스 생성](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/72-create-ec2-instance.md)
    - [우분투 내 노드 설치](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/73-install-nodejs-in-ubuntu.md)
@@ -201,14 +210,6 @@
    - [백엔드에 https 적용, CORS 개선](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/81-https-to-the-backend.md)
    - [nginx, 콘솔 에러 개선](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/82-improve-nginx-and-console-error.md)
    - [forest-admin을 활용한 어드민 페이지 구현](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/84-create-admin.md)
-
-3. React + TypeScript webgame
-
-   (1) 구구단, 끝말잇기
-
-   - [TS 프로젝트 세팅](https://github.com/wonieeVicky/TIL/blob/main/React/react-typescript-webgame/1-1-ts-project-setting.md)
-   - [이벤트 핸들러, useRef Typing](https://github.com/wonieeVicky/TIL/blob/main/React/react-typescript-webgame/1-2-event-handler-and-useref-typing.md)
-   - [Class Component State Typing](https://github.com/wonieeVicky/TIL/blob/main/React/react-typescript-webgame/1-3-class-state-typing.md)
 
 <br />
 
