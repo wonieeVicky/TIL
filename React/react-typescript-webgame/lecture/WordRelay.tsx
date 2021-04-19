@@ -26,7 +26,7 @@ const WordRelay = () => {
         input.focus();
       }
     },
-    [value]
+    [word, value]
   );
 
   // useCallback에 타입추론하는 방법 1
