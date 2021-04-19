@@ -1,4 +1,4 @@
-﻿# useCallback 타이핑
+﻿# useCallback 타이핑과 createRef을 이용한 타이핑
 
 ### 끝말잇기 컴포넌트 내 useCallback 타이핑
 
@@ -71,3 +71,71 @@ export default WordRelay;
    함수의 매개변수에 제네릭 타입으로 타이핑하는 것은 코드 가독성에는 무지 안좋은 것 같다..
 
 2. useRef에 대한 타입 에러처리, 이전 컴포넌트와 중복되는 개념이지만 한번 더 인지하고 넘어간다 !
+
+### 끝말잇기 Class형 타이핑 및 createRef를 사용한 타입 추론
+
+끝말잇기를 Class 컴포넌트로 만들어보면서 React의 `createRef`를 이용해 ref 타입추론을 해본다.
+
+`WordRelayClass.tsx`
+
+```tsx
+import * as React from "react";
+import { Component, createRef } from "react";
+
+interface State {
+  word: string;
+  value: string;
+  result: string;
+}
+
+class wordRelay extends Component<{}, State> {
+  state = {
+    word: "비키",
+    value: "",
+    result: "",
+  };
+
+  onSubmitForm = (e: React.FormEvent<Element>) => {
+    e.preventDefault();
+    // createRef로 설정한 input의 current를 변수로 지정
+    const input = this.onRefInput.current;
+    if (this.state.word[this.state.word.length - 1] === this.state.value[0]) {
+      this.setState({
+        result: "딩동댕",
+        word: this.state.value,
+        value: "",
+      });
+    } else {
+      this.setState({
+        result: "땡",
+        value: "",
+      });
+    }
+    if (input) {
+      input.focus();
+    }
+  };
+
+  onChangeInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+    this.setState({ value: e.currentTarget.value });
+  };
+
+  // React의 createRef를 통해 타입추론을 해준다.
+  onRefInput = createRef<HTMLInputElement>();
+
+  render() {
+    return (
+      <>
+        <div>{this.state.word}</div>
+        <form onSubmit={this.onSubmitForm}>
+          <input ref={this.onRefInput} value={this.state.value} onChange={this.onChangeInput} />
+          <button>클릭!!</button>
+        </form>
+        <div>{this.state.result}</div>
+      </>
+    );
+  }
+}
+
+export default wordRelay;
+```
