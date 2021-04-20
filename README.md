@@ -267,4 +267,6 @@
 
 5. express web server
 
-   - [express 서버 사용해보기](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/6-1-intro-express.md)
+   - [express intro](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/6-1-intro-express.md)
+   - [html serving](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/6-2-html-serving-with-express.md)
+   - [미들웨어 및 라우트 매개변수](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/6-3-use-middleware.md)
