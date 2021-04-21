@@ -4,37 +4,31 @@ const app = express();
 
 app.set("port", process.env.PORT || 3000);
 
-// 1. app.use를 통한 전 라우터 코드 실행 처리
 app.use((req, res, next) => {
-  console.log("모든 요청에 실행하고 싶다!");
-  next(); // 반드시 next를 넣어준다.
+  console.log("언제나 실행하는 코드");
+  next();
 });
 
 app.get("/", (req, res) => {
+  // 1. 한 라우터 안에 여러 개의 응답 코드를 넣었을 때 에러가 발생한다.
   res.sendFile(path.join(__dirname, "index.html"));
-});
-
-// 2. 라우터 매개변수를 이용한 라우터
-app.get("/category/:name", (req, res) => {
-  res.send(`hello ${req.params.name}`);
-});
-
-// 3. 정적 라우트 코드가 아래에 있으면 안된다.
-app.get("/category/javascript", (req, res) => {
-  res.send(`hello Test!`);
-});
-
-app.get("/", (req, res) => {
-  res.send("hello express!");
+  res.send("hello?");
+  res.setHeader("Content-Type", "text/html"); // 응답 보낸 뒤에 Head를 쓰는 건 불가
 });
 
 app.get("/about", (req, res) => {
   res.send("about Express!");
 });
 
-// 4. 특히 모든 요청에 처리해야하는 라우터(*)의 경우 최하단에 위치시켜줘야한다.
-app.get("*", (req, res) => {
-  res.send("about global!");
+// 2. 404 middleware
+app.use((req, res, next) => {
+  res.status(404).send("404지롱");
+});
+
+// 3. Error middleware (에러는 인자 4개를 반드시 다 적어야한다.)
+app.use((err, req, res, next) => {
+  console.error(err);
+  res.status(500).send("에러났어요 근데 안알려줄거임");
 });
 
 app.listen(app.get("port"), () => {
