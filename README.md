@@ -270,3 +270,4 @@
    - [express intro](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/6-1-intro-express.md)
    - [html serving](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/6-2-html-serving-with-express.md)
    - [미들웨어 및 라우트 매개변수](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/6-3-use-middleware.md)
+   - [미들웨어 특성](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/6-4-middleware-properties.md)
