@@ -103,6 +103,10 @@
    - [Class Component State Typing](https://github.com/wonieeVicky/TIL/blob/main/React/react-typescript-webgame/1-3-class-state-typing.md)
    - [useCallback & createRef Typing](https://github.com/wonieeVicky/TIL/blob/main/React/react-typescript-webgame/1-4-usecallback-typing-and-createref.md)
 
+   2-2. 숫자야구, 반응속도 체크
+
+   - [Props Typing](https://github.com/wonieeVicky/TIL/blob/main/React/react-typescript-webgame/2-1-props-typing.md)
+
 3. React + Next.js로 React NodeBird SNS 구현하기
 
    3-1. Next.js
