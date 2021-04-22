@@ -1,4 +1,5 @@
 ﻿const express = require("express");
+const { get } = require("http");
 const path = require("path");
 const app = express();
 
@@ -9,11 +10,19 @@ app.use((req, res, next) => {
   next();
 });
 
-app.get("/", (req, res) => {
-  // 1. 한 라우터 안에 여러 개의 응답 코드를 넣었을 때 에러가 발생한다.
-  res.sendFile(path.join(__dirname, "index.html"));
-  res.send("hello?");
-  res.setHeader("Content-Type", "text/html"); // 응답 보낸 뒤에 Head를 쓰는 건 불가
+app.get(
+  "/",
+  (req, res, next) => {
+    res.sendFile(path.join(__dirname, "index.html"));
+    next("route");
+  },
+  (req, res) => {
+    console.log("??");
+  }
+);
+
+app.get("/", (req, res, next) => {
+  console.log("!");
 });
 
 app.get("/about", (req, res) => {

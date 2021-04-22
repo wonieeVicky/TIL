@@ -106,6 +106,7 @@
    2-2. 숫자야구, 반응속도 체크
 
    - [Props Typing](https://github.com/wonieeVicky/TIL/blob/main/React/react-typescript-webgame/2-1-props-typing.md)
+   - [setTimeout, useRef Typing](https://github.com/wonieeVicky/TIL/blob/main/React/react-typescript-webgame/2-2-settimeout-useref-typing.md)
 
 3. React + Next.js로 React NodeBird SNS 구현하기
 
@@ -275,3 +276,4 @@
    - [html serving](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/6-2-html-serving-with-express.md)
    - [미들웨어 및 라우트 매개변수](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/6-3-use-middleware.md)
    - [미들웨어 특성](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/6-4-middleware-properties.md)
+   - [next 활용](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/6-5-middleware-next.md)
