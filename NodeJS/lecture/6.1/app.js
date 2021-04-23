@@ -1,25 +1,35 @@
 ﻿const express = require("express");
-const { get } = require("http");
 const path = require("path");
 const app = express();
+const morgan = require("morgan");
+const cookieParser = require("cookie-parser");
 
 app.set("port", process.env.PORT || 3000);
 
-app.use((req, res, next) => {
-  console.log("언제나 실행하는 코드");
-  next();
-});
+app.use(morgan("dev"));
+app.use(cookieParser("vickyPassword"));
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(bodyParser.raw()); // binary data
+app.use(bodyParser.text()); // 문자열
 
-app.get(
-  "/",
-  (req, res, next) => {
-    res.sendFile(path.join(__dirname, "index.html"));
-    next("route");
-  },
-  (req, res) => {
-    console.log("??");
-  }
-);
+app.get("/", (req, res, next) => {
+  req.body.name;
+  req.cookies; // { mycookie: 'vicky'}
+  req.signedCookies; // 쿠키를 암호화할 수 있다.
+  // Set cookie
+  res.cookie("name", encodeURIComponent(name), {
+    expires: new Date(),
+    httpOnly: true,
+    path: "/",
+  });
+  // Delete cookie
+  res.clearCookie("name", encodeURIComponent(name), {
+    httpOnly: true,
+    path: "/",
+  });
+  res.sendFile(path.join(__dirname, "index.html"));
+});
 
 app.get("/", (req, res, next) => {
   console.log("!");
