@@ -277,3 +277,4 @@
    - [미들웨어 및 라우트 매개변수](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/6-3-use-middleware.md)
    - [미들웨어 특성](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/6-4-middleware-properties.md)
    - [next 활용](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/6-5-middleware-next.md)
+   - [morgan, bodyParser, cookieParser](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/6-6-morgan-bodyparser-cookieparser.md)
