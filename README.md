@@ -107,6 +107,7 @@
 
    - [Props Typing](https://github.com/wonieeVicky/TIL/blob/main/React/react-typescript-webgame/2-1-props-typing.md)
    - [setTimeout, useRef Typing](https://github.com/wonieeVicky/TIL/blob/main/React/react-typescript-webgame/2-2-settimeout-useref-typing.md)
+   - [Class component State 사용 시 주의점](https://github.com/wonieeVicky/TIL/blob/main/React/react-typescript-webgame/2-3-class-component-state.md)
 
 3. React + Next.js로 React NodeBird SNS 구현하기
 
@@ -278,3 +279,4 @@
    - [미들웨어 특성](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/6-4-middleware-properties.md)
    - [next 활용](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/6-5-middleware-next.md)
    - [morgan, bodyParser, cookieParser](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/6-6-morgan-bodyparser-cookieparser.md)
+   - [static middleware](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/6-7-static.md)
