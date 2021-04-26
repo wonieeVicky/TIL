@@ -280,3 +280,4 @@
    - [next 활용](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/6-5-middleware-next.md)
    - [morgan, bodyParser, cookieParser](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/6-6-morgan-bodyparser-cookieparser.md)
    - [static middleware](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/6-7-static.md)
+   - [express-session과 미들웨어 확장](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/6-8-express-session-and-expand-middleware.md)
