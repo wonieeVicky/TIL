@@ -48,3 +48,22 @@ app.use(
   next("route"); // 다음 라우터로
   next(error); // 에러 핸들러로
   ```
+
+  ### 미들웨어간 데이터 전달하기
+
+  - req나 res 객체 안에 값을 넣어 데이터 전달 가능
+    - app.set과의 차이점: app.set은 서버 내내 유지, req, res는 요청 하나 동안만 유지
+    - req.body나 req.cookie와 같은 미들웨어의 데이터와 겹치지 않게 조심
+
+  ```jsx
+  app.use(
+    (req, res, next) => {
+      req.data = "데이터 넣기";
+      next();
+    },
+    (req, res, next) => {
+      console.log(req.data); // 데이터 받기
+      next();
+    }
+  );
+  ```

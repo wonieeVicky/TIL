@@ -1,6 +1,12 @@
 ﻿# static middleware
 
-static 미들웨어는 기존 http에서 fs로 readFile메서드를 간단히 구현해준다.
+### 정적인 파일들을 제공하는 미들웨어이다.
+
+- static 미들웨어는 기존 http에서 fs로 readFile메서드를 간단히 구현해준다.
+- 인수로 정적 파일의 경로를 제공
+- 파일이 있을 때 fs.readFile로 직접 읽을 필요 없음
+- 요청하는 파일이 없으면 알아서 next를 호출해 다음 미들웨어로 넘어간다.
+- 파일을 발견했다면 다음 미들웨어는 실행되지 않는다.
 
 ```jsx
 // 기존 HTTP에서는 아래와 같이 처리했었다.
@@ -13,6 +19,12 @@ try {
 ```
 
 사용은 `express.static(path.join(__dirname, 'public')))` 포맷으로 한다.
+
+### 컨텐츠 요청 주소와 실제 컨텐츠의 경로를 다르게 만들 수 있다.
+
+- 요청주소: localhost:3000/stylesheets/style.css
+- 실제 컨텐츠 경로: /public/stylesheets/style.css
+- 서버의 구조를 파악하기 어려워져서 보안에 도움이 된다.
 
 `app.js`
 
