@@ -13,26 +13,23 @@ app.use(morgan("dev"));
 // cookieParser, json(), urlencoded() 상단에 위치하면 실행이 안되므로 리소스 누수가 방지할 수 있다.
 app.use("/", express.static(path.join(__dirname, "public")));
 app.use(cookieParser("vickyPassword"));
+app.use(
+  session({
+    resave: false,
+    saveUninitialized: false,
+    secret: "vickyPassword",
+    cookie: {
+      httpOnly: true,
+    },
+    name: "connect.sid", // default value
+  })
+); // 이걸 넣으면 req.session 사용 가능
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(session());
 app.use(multer().array());
 
 app.get("/", (req, res, next) => {
-  req.body.name;
-  req.cookies; // { mycookie: 'vicky'}
-  req.signedCookies; // 쿠키를 암호화할 수 있다.
-  // Set cookie
-  res.cookie("name", encodeURIComponent(name), {
-    expires: new Date(),
-    httpOnly: true,
-    path: "/",
-  });
-  // Delete cookie
-  res.clearCookie("name", encodeURIComponent(name), {
-    httpOnly: true,
-    path: "/",
-  });
+  req.session.id = "hello"; // req.session으로 개인의 사용자에 대한 고유한 세션이 된다.
   res.sendFile(path.join(__dirname, "index.html"));
 });
 
