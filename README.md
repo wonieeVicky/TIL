@@ -99,15 +99,19 @@
    2-1. 구구단, 끝말잇기
 
    - [TS 프로젝트 세팅](https://github.com/wonieeVicky/TIL/blob/main/React/react-typescript-webgame/1-1-ts-project-setting.md)
-   - [이벤트 핸들러, useRef Typing](https://github.com/wonieeVicky/TIL/blob/main/React/react-typescript-webgame/1-2-event-handler-and-useref-typing.md)
-   - [Class Component State Typing](https://github.com/wonieeVicky/TIL/blob/main/React/react-typescript-webgame/1-3-class-state-typing.md)
-   - [useCallback & createRef Typing](https://github.com/wonieeVicky/TIL/blob/main/React/react-typescript-webgame/1-4-usecallback-typing-and-createref.md)
+   - [이벤트 핸들러, useRef typing](https://github.com/wonieeVicky/TIL/blob/main/React/react-typescript-webgame/1-2-event-handler-and-useref-typing.md)
+   - [Class Component State typing](https://github.com/wonieeVicky/TIL/blob/main/React/react-typescript-webgame/1-3-class-state-typing.md)
+   - [useCallback & createRef typing](https://github.com/wonieeVicky/TIL/blob/main/React/react-typescript-webgame/1-4-usecallback-typing-and-createref.md)
 
    2-2. 숫자야구, 반응속도 체크
 
-   - [Props Typing](https://github.com/wonieeVicky/TIL/blob/main/React/react-typescript-webgame/2-1-props-typing.md)
-   - [setTimeout, useRef Typing](https://github.com/wonieeVicky/TIL/blob/main/React/react-typescript-webgame/2-2-settimeout-useref-typing.md)
+   - [Props typing](https://github.com/wonieeVicky/TIL/blob/main/React/react-typescript-webgame/2-1-props-typing.md)
+   - [setTimeout, useRef typing](https://github.com/wonieeVicky/TIL/blob/main/React/react-typescript-webgame/2-2-settimeout-useref-typing.md)
    - [Class component State 사용 시 주의점](https://github.com/wonieeVicky/TIL/blob/main/React/react-typescript-webgame/2-3-class-component-state.md)
+
+   2-3. 가위바위보, 로또추첨기
+
+   - [keyof, typeof, 고차함수 typing](https://github.com/wonieeVicky/TIL/blob/main/React/react-typescript-webgame/3-1-keyof-typeof-hof.md)
 
 3. React + Next.js로 React NodeBird SNS 구현하기
 
@@ -281,3 +285,4 @@
    - [morgan, bodyParser, cookieParser](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/6-6-morgan-bodyparser-cookieparser.md)
    - [static middleware](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/6-7-static.md)
    - [express-session과 미들웨어 확장](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/6-8-express-session-and-expand-middleware.md)
+   - [multer](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/6-9-multer.md)
