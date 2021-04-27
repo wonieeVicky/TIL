@@ -1,55 +1,94 @@
 ﻿const express = require("express");
-const path = require("path");
-const app = express();
 const morgan = require("morgan");
 const cookieParser = require("cookie-parser");
 const session = require("express-session");
-const multer = require("multer");
+const dotenv = require("dotenv");
+const path = require("path");
 
+dotenv.config();
+const app = express();
 app.set("port", process.env.PORT || 3000);
 
 app.use(morgan("dev"));
-// static은 순서가 중요하다. 왜냐하면 해당 파일을 찾으면 Next를 호출하지 않기 때문,
-// cookieParser, json(), urlencoded() 상단에 위치하면 실행이 안되므로 리소스 누수가 방지할 수 있다.
 app.use("/", express.static(path.join(__dirname, "public")));
-app.use(cookieParser("vickyPassword"));
+app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
+app.use(cookieParser(process.env.COOKIE_SECRET));
 app.use(
   session({
     resave: false,
     saveUninitialized: false,
-    secret: "vickyPassword",
+    secret: process.env.COOKIE_SECRET,
     cookie: {
       httpOnly: true,
+      secure: false,
     },
-    name: "connect.sid", // default value
+    name: "session-cookie",
   })
-); // 이걸 넣으면 req.session 사용 가능
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-app.use(multer().array());
+);
 
-app.get("/", (req, res, next) => {
-  req.session.id = "hello"; // req.session으로 개인의 사용자에 대한 고유한 세션이 된다.
-  res.sendFile(path.join(__dirname, "index.html"));
+// multer 호출
+const multer = require("multer");
+const fs = require("fs");
+
+// multer 시 uploads 폴더 생성
+try {
+  fs.readdirSync("uploads");
+} catch (error) {
+  console.error("uploads 폴더가 없어 uploads 폴더를 생성합니다.");
+  fs.mkdirSync("uploads");
+}
+
+// multer 설정 - diskStorage에 저장
+// 어디에 어떻게 어떤 이름으로 저장할 것인지에 대한 설정을 upload객체를 생성 해준다.
+const upload = multer({
+  storage: multer.diskStorage({
+    destination(req, file, done) {
+      done(null, "uploads/");
+    },
+    filename(req, file, done) {
+      const ext = path.extname(file.originalname); // 확장자 추출
+      done(null, path.basename(file.originalname, ext) + Date.now() + ext);
+    },
+  }),
+  limits: { fileSize: 5 * 1024 * 1024 },
+});
+app.get("/upload", (req, res) => {
+  res.sendFile(path.join(__dirname, "multipart.html"));
+});
+// upload 객체 장착 - 주로 특정 라우터에 지정하는 방식으로 사용한다.
+// upload.single() : 한 개의 파일만 업로드 할 때 사용한다.
+app.post("/upload", upload.single("image"), (req, res) => {
+  console.log(req.file);
+  res.send("ok");
+});
+app.post("/upload", upload.none(), (req, res) => {
+  console.log(req.body);
+  res.send("ok");
 });
 
-app.get("/", (req, res, next) => {
-  console.log("!");
+app.post("/upload", upload.array("many"), (req, res) => {
+  console.log(req.files, req.body);
+  res.send("ok");
+});
+app.post("/upload", upload.fields([{ name: "image1" }, { name: "image2" }]), (req, res) => {
+  console.log(req.files, req.body);
+  res.send("ok");
 });
 
-app.get("/about", (req, res) => {
-  res.send("about Express!");
-});
-
-// 2. 404 middleware
-app.use((req, res, next) => {
-  res.status(404).send("404지롱");
-});
-
-// 3. Error middleware (에러는 인자 4개를 반드시 다 적어야한다.)
+app.get(
+  "/",
+  (req, res, next) => {
+    console.log("GET / 요청에서만 실행됩니다.");
+    next();
+  },
+  (req, res) => {
+    throw new Error("에러는 에러 처리 미들웨어로 갑니다.");
+  }
+);
 app.use((err, req, res, next) => {
   console.error(err);
-  res.status(500).send("에러났어요 근데 안알려줄거임");
+  res.status(500).send(err.message);
 });
 
 app.listen(app.get("port"), () => {
