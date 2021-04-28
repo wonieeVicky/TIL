@@ -12,6 +12,9 @@ $ npm i dotenv
 
 `.env`
 
+해당 파일은 git에 올라가지 않도록 .gitignore 처리해서 관리한다.
+관리자의 직급별로 차등된 정보를 공유하는 것이 좋음
+
 ```jsx
 COOKIE_SECRET = vickypassword;
 DB_PASSWORD = vickydbpassword;
