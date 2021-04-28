@@ -1,11 +1,11 @@
-﻿const express = require("express");
+﻿const dotenv = require("dotenv");
+const express = require("express");
 const morgan = require("morgan");
 const cookieParser = require("cookie-parser");
 const session = require("express-session");
-const dotenv = require("dotenv");
 const path = require("path");
 
-dotenv.config();
+dotenv.config(); // 최대한 위에서 dotenv에 대한 값을 가져오는 것이 좋다.
 const app = express();
 app.set("port", process.env.PORT || 3000);
 
