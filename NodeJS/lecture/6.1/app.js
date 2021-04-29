@@ -6,6 +6,9 @@ const session = require("express-session");
 const path = require("path");
 
 dotenv.config(); // 최대한 위에서 dotenv에 대한 값을 가져오는 것이 좋다.
+const indexRouter = require("./routes");
+const userRouter = require("./routes/user");
+
 const app = express();
 app.set("port", process.env.PORT || 3000);
 
@@ -26,6 +29,9 @@ app.use(
     name: "session-cookie",
   })
 );
+
+app.use("/", indexRouter);
+app.use("/user", userRouter);
 
 // multer 호출
 const multer = require("multer");
