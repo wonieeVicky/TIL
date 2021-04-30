@@ -113,6 +113,7 @@
 
    - [keyof, typeof, 고차함수 typing](https://github.com/wonieeVicky/TIL/blob/main/React/react-typescript-webgame/3-1-keyof-typeof-hof.md)
    - [FC, useMemo typing](https://github.com/wonieeVicky/TIL/blob/main/React/react-typescript-webgame/3-2-fc-use-memo.md)
+   - [useReducer, Dispatch, children typing](https://github.com/wonieeVicky/TIL/blob/main/React/react-typescript-webgame/3-3-use-reducer-typing.md)
 
 3. React + Next.js로 React NodeBird SNS 구현하기
 
