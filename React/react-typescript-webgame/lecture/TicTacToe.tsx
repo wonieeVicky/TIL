@@ -96,11 +96,57 @@ const reducer = (state: ReducerState, action: ReducerActions): ReducerState => {
 const TicTacToe = () => {
   const [state, dispatch] = useReducer(reducer, initialState);
   const { tableData, turn, winner, recentCell } = state;
+
+  // 승자를 가리는 effect
+  useEffect(() => {
+    const [row, cell] = recentCell;
+    // 초기 돔 렌더링 시 실행되지 않도록 함!
+    if (row < 0) {
+      return;
+    }
+    let win = false;
+    // 행
+    if (tableData[row][0] === turn && tableData[row][1] === turn && tableData[row][2] === turn) {
+      win = true;
+    }
+    // 열
+    if (tableData[0][cell] === turn && tableData[1][cell] === turn && tableData[2][cell] === turn) {
+      win = true;
+    }
+    // 대각선 오른쪽방향
+    if (tableData[0][0] === turn && tableData[1][1] === turn && tableData[2][2] === turn) {
+      win = true;
+    }
+    // 대각선 왼쪽방향
+    if (tableData[0][2] === turn && tableData[1][1] === turn && tableData[2][0] === turn) {
+      win = true;
+    }
+    if (win) {
+      dispatch({ type: SET_WINNER, winner: turn });
+      dispatch({ type: RESET_GAME });
+    } else {
+      // 무승부 검사
+      let all = true; // all이 true면 무승부이다.
+      tableData.forEach((row) => {
+        row.forEach((cell) => {
+          if (!cell) {
+            all = false; // 3X3 중에 하나라도 cell이 없으면 무승부가 아니다
+          }
+        });
+      });
+      if (all) {
+        dispatch({ type: RESET_GAME });
+      } else {
+        dispatch({ type: CHANGE_TURN }); // 이긴게 아니면 CHANGE_TURN
+      }
+    }
+  }, [recentCell]);
+
   const onClickTable = useCallback(() => dispatch(setWinner("O")), []);
 
   return (
     <>
-      <Table onCLick={onClickTable} tableData={tableData} dispatch={dispatch} />
+      <Table onClick={onClickTable} tableData={tableData} dispatch={dispatch} />
       {winner && <div>{winner} 님의 승리!</div>}
     </>
   );
