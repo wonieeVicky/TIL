@@ -290,3 +290,4 @@
    - [multer](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/6-9-multer.md)
    - [dotenv](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/6-10-dotenv.md)
    - [router 분리](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/6-11-divide-router.md)
+   - [template engine: Pug](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/6-12-pug-template-engine.md)
