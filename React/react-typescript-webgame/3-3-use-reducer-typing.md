@@ -69,7 +69,11 @@ const reducer = (state: ReducerState, action: ReducerActions): ReducerState => {
 };
 
 const TicTacToe = () => {
-  const [state, dispatch] = useReducer(reducer, initialState);
+  // 만약 useRedcuer가 타입 추론이 안될 경우 직접 제네릭으로 타이핑을 해준다.
+  // React.Reducer는 react에서 제공하는 타입 객체이다. 제네릭이 두 번 쓰인다.
+  const [state, dispatch] = useReducer<React.Reducer<ReducerState, ReducerActions>>(reducer, initialState);
+  // 혹은 아래와 같이 적을 수도 있음
+  // const [state, dispatch] = useReducer<(state: ReducerState, action: ReducerActions) => ReducerState>(reducer, initialState);
   const { tableData, turn, winner, recentCell } = state;
   const onClickTable = useCallback(() => dispatch(setWinner("O")), []);
 
