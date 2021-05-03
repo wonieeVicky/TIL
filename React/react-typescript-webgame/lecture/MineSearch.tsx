@@ -1,5 +1,5 @@
 ﻿import * as React from "react";
-import { useEffect, useReducer, useMemo, Dispatch } from "react";
+import { useEffect, useReducer, createContext, useMemo, Dispatch } from "react";
 
 export const CODE = {
   OPENED: 0, // 0 이상이면 다 Opened : 정상적으로 연 칸
@@ -11,6 +11,18 @@ export const CODE = {
   CLICKED_MINE: -6, // 지뢰를 눌렀을 때
   MINE: -7, // 지뢰
 } as const; // as const를 넣으면 readonly 프로퍼티로 만들어준다.
+
+export interface Context {
+  tableData: number[][];
+  halted: boolean;
+  dispatch: Dispatch<ReducerActions>;
+}
+
+export const TableContext = createContext<Context>({
+  tableData: [],
+  halted: true,
+  dispatch: () => {},
+});
 
 interface ReducerState {
   tableData: number[][];
@@ -318,7 +330,27 @@ const reducer = (state = initialState, action: ReducerActions): ReducerState => 
 };
 
 const MineSearch = () => {
-  return null;
+  const [state, dispatch] = useReducer(reducer, initialState);
+  const { tableData, halted, timer, result } = state;
+  const value = useMemo(() => ({ tableData, halted, dispatch }), [tableData, halted]);
+
+  useEffect(() => {
+    let timer: number;
+    if (halted === false) {
+      timer = window.setInterval(() => dispatch({ type: INCREMENT_TIMER }), 1000);
+    }
+
+    return () => clearInterval(timer);
+  }, [halted]);
+
+  return (
+    <TableContext.Provider value={value}>
+      <Form />
+      <div>{timer}</div>
+      <Table />
+      <div>{result}</div>
+    </TableContext.Provider>
+  );
 };
 
 export default MineSearch;
