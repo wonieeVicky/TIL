@@ -122,6 +122,10 @@
    - [FC, useMemo typing](https://github.com/wonieeVicky/TIL/blob/main/React/react-typescript-webgame/3-2-fc-use-memo.md)
    - [useReducer, Dispatch, children typing](https://github.com/wonieeVicky/TIL/blob/main/React/react-typescript-webgame/3-3-use-reducer-typing.md)
 
+   2-4. 지뢰찾기
+
+   - [reducer, context API typing](https://github.com/wonieeVicky/TIL/blob/main/React/react-typescript-webgame/4-1-reducer-and-context-api.md)
+
 3. React + Next.js로 React NodeBird SNS 구현하기
 
    3-1. Next.js
@@ -298,3 +302,4 @@
    - [dotenv](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/6-10-dotenv.md)
    - [router 분리](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/6-11-divide-router.md)
    - [template engine: Pug](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/6-12-pug-template-engine.md)
+   - [template engine: Nunjucks, error handling](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/6-13-nunjucks-template-engine-error-middleware.md)
