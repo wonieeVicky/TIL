@@ -1,5 +1,16 @@
 ﻿import * as React from "react";
 import { useEffect, useReducer, createContext, useMemo, Dispatch } from "react";
+import Form from "./Form";
+import {
+  ReducerActions,
+  START_GAME,
+  OPEN_CELL,
+  CLICK_MINE,
+  FLAG_CELL,
+  QUESTION_CELL,
+  NORMALIZE_CELL,
+  INCREMENT_TIMER,
+} from "./action";
 
 export const CODE = {
   OPENED: 0, // 0 이상이면 다 Opened : 정상적으로 연 칸
@@ -12,8 +23,9 @@ export const CODE = {
   MINE: -7, // 지뢰
 } as const; // as const를 넣으면 readonly 프로퍼티로 만들어준다.
 
+type Codes = typeof CODE[keyof typeof CODE];
 export interface Context {
-  tableData: number[][];
+  tableData: Codes[][];
   halted: boolean;
   dispatch: Dispatch<ReducerActions>;
 }
@@ -25,7 +37,7 @@ export const TableContext = createContext<Context>({
 });
 
 interface ReducerState {
-  tableData: number[][];
+  tableData: Codes[][];
   data: {
     row: number;
     cell: number;
@@ -50,7 +62,7 @@ const initialState: ReducerState = {
   openedCount: 0,
 };
 
-const plantMine = (row: number, cell: number, mine: number) => {
+const plantMine = (row: number, cell: number, mine: number): Codes[][] => {
   // 지정한 row * cell만큼의 기본 배열(0 ~ (row*cell - 1))을 만들어준다.
   const candidate = Array(row * cell)
     .fill(undefined)
@@ -66,9 +78,9 @@ const plantMine = (row: number, cell: number, mine: number) => {
   }
 
   // 모든 칸에 닫힌 칸을 만든다.
-  const data = [];
+  const data: Codes[][] = [];
   for (let i = 0; i < row; i++) {
-    const rowData: number[] = [];
+    const rowData: Codes[] = [];
     data.push(rowData);
     for (let j = 0; j < cell; j++) {
       rowData.push(CODE.NORMAL);
@@ -83,71 +95,6 @@ const plantMine = (row: number, cell: number, mine: number) => {
 
   return data; // tableData return
 };
-
-export const START_GAME = "START_GAME" as const;
-export const OPEN_CELL = "OPEN_CELL" as const;
-export const CLICK_MINE = "CLICK_MINE" as const;
-export const FLAG_CELL = "FLAG_CELL" as const;
-export const QUESTION_CELL = "QUESTION_CELL" as const;
-export const NORMALIZE_CELL = "NORMALIZE_CELL" as const;
-export const INCREMENT_TIMER = "INCREMENT_TIMER" as const;
-
-interface StartGameAction {
-  type: typeof START_GAME;
-  row: number;
-  cell: number;
-  mine: number;
-}
-const startGame = (row: number, cell: number, mine: number): StartGameAction => ({ type: START_GAME, row, cell, mine });
-
-interface OpenCellAction {
-  type: typeof OPEN_CELL;
-  row: number;
-  cell: number;
-}
-const openCell = (row: number, cell: number): OpenCellAction => ({ type: OPEN_CELL, row, cell });
-
-interface ClickMineAction {
-  type: typeof CLICK_MINE;
-  row: number;
-  cell: number;
-}
-const clickMine = (row: number, cell: number): ClickMineAction => ({ type: CLICK_MINE, row, cell });
-
-interface FlagMineAction {
-  type: typeof FLAG_CELL;
-  row: number;
-  cell: number;
-}
-const flagMine = (row: number, cell: number): FlagMineAction => ({ type: FLAG_CELL, row, cell });
-
-interface QuestionCellAction {
-  type: typeof QUESTION_CELL;
-  row: number;
-  cell: number;
-}
-const questionCell = (row: number, cell: number): QuestionCellAction => ({ type: QUESTION_CELL, row, cell });
-
-interface NormalizeCellAction {
-  type: typeof NORMALIZE_CELL;
-  row: number;
-  cell: number;
-}
-const normalizeCell = (row: number, cell: number): NormalizeCellAction => ({ type: NORMALIZE_CELL, row, cell });
-
-interface IncrementTimerAction {
-  type: typeof INCREMENT_TIMER;
-}
-const incrementTimer = (): IncrementTimerAction => ({ type: INCREMENT_TIMER });
-
-type ReducerActions =
-  | StartGameAction
-  | OpenCellAction
-  | ClickMineAction
-  | FlagMineAction
-  | QuestionCellAction
-  | NormalizeCellAction
-  | IncrementTimerAction;
 
 const reducer = (state = initialState, action: ReducerActions): ReducerState => {
   switch (action.type) {
@@ -169,11 +116,9 @@ const reducer = (state = initialState, action: ReducerActions): ReducerState => 
     case OPEN_CELL: {
       const tableData = [...state.tableData];
       // 1. 모든 칸들을 다 새로운 객체로 만든다.
-      tableData.forEach((row, i) => {
-        tableData[i] = [...row];
-      });
+      tableData.forEach((row, i) => (tableData[i] = [...row]));
       // 2. 한번 검사한 칸은 다시 검사하지 않는다.
-      const checked: number[] = [];
+      const checked: string[] = [];
       // 총 오픈한 칸의 갯수
       let openedCount = 0;
       // 3. 내 기준으로 주변 칸을 검사하는 함수
@@ -184,7 +129,9 @@ const reducer = (state = initialState, action: ReducerActions): ReducerState => 
         }
         // 이미 열었거나, 깃발, 물음표가 있는 경우 필터링
         if (
-          [CODE.OPENED, CODE.FLAG, CODE.FLAG_MINE, CODE.QUESTION_MINE, CODE.QUESTION].includes(tableData[row][cell])
+          ([CODE.OPENED, CODE.FLAG, CODE.FLAG_MINE, CODE.QUESTION_MINE, CODE.QUESTION] as Codes[]).includes(
+            tableData[row][cell]
+          )
         ) {
           return;
         }
@@ -217,7 +164,8 @@ const reducer = (state = initialState, action: ReducerActions): ReducerState => 
         }
 
         // 주변의 지뢰 갯수
-        const count = around.filter((v) => [CODE.MINE, CODE.FLAG_MINE, CODE.QUESTION_MINE].includes(v)).length;
+        const count = around.filter((v) => ([CODE.MINE, CODE.FLAG_MINE, CODE.QUESTION_MINE] as Codes[]).includes(v))
+          .length as Codes;
 
         // 내가 빈칸이면 주변 8 칸을 검사
         if (count === 0) {
