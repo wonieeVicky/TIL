@@ -304,3 +304,7 @@
    - [router 분리](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/6-11-divide-router.md)
    - [template engine: Pug](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/6-12-pug-template-engine.md)
    - [template engine: Nunjucks, error handling](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/6-13-nunjucks-template-engine-error-middleware.md)
+
+6. MySQL
+
+   - [Database Intro & create MySQL table](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/7-1-database-and-create-mysql-table.md)
