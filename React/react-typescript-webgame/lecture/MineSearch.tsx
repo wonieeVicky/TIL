@@ -1,6 +1,7 @@
 ﻿import * as React from "react";
 import { useEffect, useReducer, createContext, useMemo, Dispatch } from "react";
 import Form from "./Form";
+import Table from "./Table";
 import {
   ReducerActions,
   START_GAME,
@@ -23,7 +24,7 @@ export const CODE = {
   MINE: -7, // 지뢰
 } as const; // as const를 넣으면 readonly 프로퍼티로 만들어준다.
 
-type Codes = typeof CODE[keyof typeof CODE];
+export type Codes = typeof CODE[keyof typeof CODE];
 export interface Context {
   tableData: Codes[][];
   halted: boolean;
