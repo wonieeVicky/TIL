@@ -15,7 +15,7 @@ const Form = () => {
   const onChangeCell = useCallback((e: React.ChangeEvent<HTMLInputElement>) => setCell(Number(e.target.value)), []);
   const onChangeMine = useCallback((e: React.ChangeEvent<HTMLInputElement>) => setMine(Number(e.target.value)), []);
 
-  const onClickBtn = useCallback(() => startGame(row, cell, mine), [row, cell, mine]);
+  const onClickBtn = useCallback(() => dispatch(startGame(row, cell, mine)), [row, cell, mine]);
 
   return (
     <div>
