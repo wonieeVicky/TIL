@@ -308,3 +308,4 @@
 6. MySQL
 
    - [Database Intro & create MySQL table](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/7-1-database-and-create-mysql-table.md)
+   - [Column options](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/7-2-columns-options.md)
