@@ -1,9 +1,9 @@
 ﻿import * as React from "react";
 import { TableContext } from "./MineSearch";
 import { useContext } from "react";
-import Tr from "./Tr";
+import MineTr from "./MineTr";
 
-const Table = () => {
+const MineTable = () => {
   const { tableData } = useContext(TableContext);
   return (
     <table>
@@ -11,11 +11,11 @@ const Table = () => {
         {Array(tableData.length)
           .fill(null)
           .map((tr, i) => (
-            <Tr key={i} rowIndex={i} />
+            <MineTr key={i} rowIndex={i} />
           ))}
       </tbody>
     </table>
   );
 };
 
-export default Table;
+export default MineTable;

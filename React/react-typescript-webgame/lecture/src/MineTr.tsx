@@ -1,13 +1,13 @@
 ﻿import * as React from "react";
 import { memo, FC, useContext } from "react";
 import { TableContext } from "./MineSearch";
-import Td from "./Td";
+import MineTd from "./MineTd";
 
 interface Props {
   rowIndex: number;
 }
 
-const Tr: FC<Props> = memo(({ rowIndex }) => {
+const MineTr: FC<Props> = memo(({ rowIndex }) => {
   const { tableData } = useContext(TableContext);
 
   return (
@@ -15,9 +15,9 @@ const Tr: FC<Props> = memo(({ rowIndex }) => {
       {tableData[0] &&
         Array(tableData[0].length)
           .fill(null)
-          .map((td, i) => <Td key={rowIndex + i} rowIndex={rowIndex} cellIndex={i} />)}
+          .map((td, i) => <MineTd key={rowIndex + i} rowIndex={rowIndex} cellIndex={i} />)}
     </tr>
   );
 });
 
-export default Tr;
+export default MineTr;

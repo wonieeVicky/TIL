@@ -1,7 +1,7 @@
 ﻿import * as React from "react";
 import { useEffect, useReducer, createContext, useMemo, Dispatch } from "react";
 import Form from "./Form";
-import Table from "./Table";
+import MineTable from "./MineTable";
 import {
   ReducerActions,
   START_GAME,
@@ -296,7 +296,7 @@ const MineSearch = () => {
     <TableContext.Provider value={value}>
       <Form />
       <div>{timer}</div>
-      <Table />
+      <MineTable />
       <div>{result}</div>
     </TableContext.Provider>
   );

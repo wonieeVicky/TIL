@@ -55,7 +55,7 @@ interface Props {
   cellIndex: number;
 }
 
-const Td: FC<Props> = ({ rowIndex, cellIndex }) => {
+const MineTd: FC<Props> = ({ rowIndex, cellIndex }) => {
   const { tableData, dispatch, halted } = useContext(TableContext);
 
   const onClickTd = useCallback(() => {
@@ -123,4 +123,4 @@ const RealTd: FC<RealTdProps> = memo(({ onClickTd, onRightClickTd, data }) => {
   );
 });
 
-export default memo(Td);
+export default memo(MineTd);
