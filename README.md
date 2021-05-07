@@ -127,6 +127,10 @@
    - [reducer, context API typing](https://github.com/wonieeVicky/TIL/blob/main/React/react-typescript-webgame/4-1-reducer-and-context-api.md)
    - [useContext typing](https://github.com/wonieeVicky/TIL/blob/main/React/react-typescript-webgame/4-2-use-context-typing.md)
 
+   2-5. React-router
+
+   - [React-router typing 사전 준비](https://github.com/wonieeVicky/TIL/blob/main/React/react-typescript-webgame/5-1-ready-for-react-router-typing.md)
+
 3. React + Next.js로 React NodeBird SNS 구현하기
 
    3-1. Next.js
