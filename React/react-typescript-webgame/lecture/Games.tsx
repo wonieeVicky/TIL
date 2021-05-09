@@ -1,12 +1,12 @@
 ﻿import * as React from "react";
 import { Switch, BrowserRouter, Link, Route } from "react-router-dom";
-import GameMatcher from "./GameMatcher";
+import GameMatcher from "./GameMatcherClass";
 
 const Games = () => {
   return (
     <BrowserRouter>
       <div>
-        <Link to="/game/number-baseball">숫자야구</Link>
+        <Link to="/game/number-baseball?limit=10&page=5">숫자야구</Link>
         &nbsp;
         <Link to="/game/rock-scissors-paper">가위바위보</Link>
         &nbsp;
