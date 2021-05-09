@@ -16,9 +16,9 @@ const Games = () => {
       </div>
       <div>
         <Switch>
-          <Route exact path="/" render={(props) => <GameMatcher {...props} />} />
-          <Route path="/game/:name" render={(props) => <GameMatcher {...props} />} />
-          {/* this.props.match.params.name으로 각 path가 걸러진다. */}
+          {/* Props로 Route의 속성들을 내려줄 필요가 없다. */}
+          <Route exact path="/" component={GameMatcher} />
+          <Route path="/game/:name" component={GameMatcher} />
         </Switch>
       </div>
     </BrowserRouter>
