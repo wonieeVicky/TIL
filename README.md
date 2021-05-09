@@ -130,6 +130,8 @@
    2-5. React-router
 
    - [React-router typing 사전 준비](https://github.com/wonieeVicky/TIL/blob/main/React/react-typescript-webgame/5-1-ready-for-react-router-typing.md)
+   - [match, history, location & withRouter Typing](https://github.com/wonieeVicky/TIL/blob/main/React/react-typescript-webgame/5-2-match-location-history-with-router.md)
+   - [React-router Hooks Typing](https://github.com/wonieeVicky/TIL/blob/main/React/react-typescript-webgame/5-3-react-router-hooks.md)
 
 3. React + Next.js로 React NodeBird SNS 구현하기
 
