@@ -130,8 +130,14 @@
    2-5. React-router
 
    - [React-router typing 사전 준비](https://github.com/wonieeVicky/TIL/blob/main/React/react-typescript-webgame/5-1-ready-for-react-router-typing.md)
-   - [match, history, location & withRouter Typing](https://github.com/wonieeVicky/TIL/blob/main/React/react-typescript-webgame/5-2-match-location-history-with-router.md)
-   - [React-router Hooks Typing](https://github.com/wonieeVicky/TIL/blob/main/React/react-typescript-webgame/5-3-react-router-hooks.md)
+   - [match, history, location & withRouter typing](https://github.com/wonieeVicky/TIL/blob/main/React/react-typescript-webgame/5-2-match-location-history-with-router.md)
+   - [React-router Hooks typing](https://github.com/wonieeVicky/TIL/blob/main/React/react-typescript-webgame/5-3-react-router-hooks.md)
+
+   2-6. Redux
+
+   - [Redux 구조 잡기](https://github.com/wonieeVicky/TIL/blob/main/React/react-typescript-webgame/6-1-ready-for-redux-typing.md)
+   - [action, reducer typing](https://github.com/wonieeVicky/TIL/blob/main/React/react-typescript-webgame/6-2-action-reducer-typing.md)
+   - [redux component typing](https://github.com/wonieeVicky/TIL/blob/main/React/react-typescript-webgame/6-3-redux-component-typing.md)
 
 3. React + Next.js로 React NodeBird SNS 구현하기
 
