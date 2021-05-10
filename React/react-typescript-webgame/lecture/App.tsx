@@ -1,9 +1,23 @@
 ﻿import * as React from "react";
 import { Component } from "react";
+import { Dispatch } from "redux";
 import { connect } from "react-redux";
 import { logIn, logOut } from "./actions/user";
+import { RootState } from "./reducers";
+import { UserState } from "./reducers/user";
 
-class App extends Component {
+// Props Typing - 분리하여 관리
+interface StateToProps {
+  user: UserState;
+}
+
+interface DispatchToProps {
+  dispatchLogIn: ({ id, password }: { id: string; password: string }) => void;
+  dispatchLogOut: () => void;
+}
+
+// Props를 &로 merge
+class App extends Component<StateToProps & DispatchToProps> {
   onClick = () => {
     this.props.dispatchLogIn({
       id: "vicky",
@@ -19,7 +33,7 @@ class App extends Component {
     const { user } = this.props;
     return (
       <div>
-        {user.isLoggignIn ? <div>로그인 중</div> : user.data ? <div>{user.data.nickname}</div> : "로그인 해주세요."}
+        {user.isLoggingIn ? <div>로그인 중</div> : user.data ? <div>{user.data.nickname}</div> : "로그인 해주세요."}
         {!user.data ? (
           <button onClick={this.onClick}>로그인</button>
         ) : (
@@ -30,13 +44,14 @@ class App extends Component {
   }
 }
 
-const mapStateToProps = (state) => ({
+// state는 reducer의 combineReducers 이다. -> RootState로 가져온다.
+const mapStateToProps = (state: RootState) => ({
   user: state.user,
   posts: state.posts,
 }); // reselect
 
-const mapDispatchToProps = (dispatch) => ({
-  dispatchLogin: (data: { id; password }) => dispatch(logIn(data)),
+const mapDispatchToProps = (dispatch: Dispatch) => ({
+  dispatchLogin: (data: { id: string; password: string }) => dispatch(logIn(data)),
   dispatchLogOut: () => dispatch(logOut()),
 });
 
