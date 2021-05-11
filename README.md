@@ -138,6 +138,8 @@
    - [Redux 구조 잡기](https://github.com/wonieeVicky/TIL/blob/main/React/react-typescript-webgame/6-1-ready-for-redux-typing.md)
    - [action, reducer typing](https://github.com/wonieeVicky/TIL/blob/main/React/react-typescript-webgame/6-2-action-reducer-typing.md)
    - [redux component typing](https://github.com/wonieeVicky/TIL/blob/main/React/react-typescript-webgame/6-3-redux-component-typing.md)
+   - [redux-thunk typing](https://github.com/wonieeVicky/TIL/blob/main/React/react-typescript-webgame/6-4-redux-thunk-typing.md)
+   - [ThunkDispatch, immer, Hooks typing](https://github.com/wonieeVicky/TIL/blob/main/React/react-typescript-webgame/6-5-thunkdispatch-and-immer-hooks-typing.md)
 
 3. React + Next.js로 React NodeBird SNS 구현하기
 
