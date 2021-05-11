@@ -1,5 +1,4 @@
-﻿import { AnyAction } from "redux";
-import { addPost } from "./post";
+﻿import { addPost } from "./post";
 
 export const LOG_IN_REQUEST = "LOG_IN_REQUEST" as const;
 export const LOG_IN_SUCCESS = "LOG_IN_SUCCESS" as const;
@@ -44,7 +43,7 @@ export const logInFailure = (error: Error): LogInFailureAction => {
 };
 
 // TypeScript에서는 상호참조에 대한 타이핑도 지원한다 ThunkAction - ThunkDispatch
-interface ThunkDispatch {
+export interface ThunkDispatch {
   (thunkAction: ThunkAction): void; // thunkAction인 경우 - 리턴값 없음
   <A>(action: A): A; // 임의의 액션인 경우 - 리턴값 있음
   <TAction>(action: TAction | ThunkAction): TAction; // 또는 thunkAction이거나 임의의 액션인 경우
