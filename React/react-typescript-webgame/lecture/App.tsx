@@ -1,51 +1,30 @@
 ﻿import * as React from "react";
-import { Component } from "react";
-import { connect } from "react-redux";
-import { logIn, logOut, ThunkDispatch } from "./actions/user";
+import { FC } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { logIn, logOut } from "./actions/user";
 import { RootState } from "./reducers";
 import { UserState } from "./reducers/user";
 
-interface Props {
-  dispatchLogIn: ({ id, password }: { id: string; password: string }) => void;
-  dispatchLogOut: () => void;
-  user: UserState;
-}
+const App: FC = () => {
+  const { isLoggingIn, data } = useSelector<RootState, UserState>((state) => state.user);
+  const dispatch = useDispatch();
 
-class App extends Component<Props> {
-  onClick = () => {
-    this.props.dispatchLogIn({
-      id: "zerocho",
-      password: "비밀번호",
-    });
-  };
-
-  onLogout = () => {
-    this.props.dispatchLogOut();
-  };
-
-  render() {
-    const { user } = this.props;
-    return (
-      <div>
-        {user.isLoggingIn ? <div>로그인 중</div> : user.data ? <div>{user.data.nickname}</div> : "로그인 해주세요."}
-        {!user.data ? (
-          <button onClick={this.onClick}>로그인</button>
-        ) : (
-          <button onClick={this.onLogout}>로그아웃</button>
-        )}
-      </div>
+  const onClick = () =>
+    dispatch(
+      logIn({
+        id: "vicky",
+        password: "비밀번호",
+      })
     );
-  }
-}
 
-const mapStateToProps = (state: RootState) => ({
-  user: state.user,
-  posts: state.posts,
-}); // reselect
+  const onLogout = () => dispatch(logOut());
 
-const mapDispatchToProps = (dispatch: ThunkDispatch) => ({
-  dispatchLogIn: (data: { id: string; password: string }) => dispatch(logIn(data)),
-  dispatchLogOut: () => dispatch(logOut()),
-});
+  return (
+    <div>
+      {isLoggingIn ? <div>로그인 중</div> : data ? <div>{data.nickname}</div> : "로그인 해주세요."}
+      {!data ? <button onClick={onClick}>로그인</button> : <button onClick={onLogout}>로그아웃</button>}
+    </div>
+  );
+};
 
-export default connect(mapStateToProps, mapDispatchToProps)(App);
+export default App;
