@@ -141,6 +141,11 @@
    - [redux-thunk typing](https://github.com/wonieeVicky/TIL/blob/main/React/react-typescript-webgame/6-4-redux-thunk-typing.md)
    - [ThunkDispatch, immer, Hooks typing](https://github.com/wonieeVicky/TIL/blob/main/React/react-typescript-webgame/6-5-thunkdispatch-and-immer-hooks-typing.md)
 
+   2-7. MobX
+
+   - [MobX 구조 잡기](https://github.com/wonieeVicky/TIL/blob/main/React/react-typescript-webgame/7-1-ready-for-mobx-typing.md)
+   - [MobX typing](https://github.com/wonieeVicky/TIL/blob/main/React/react-typescript-webgame/7-2-mobx-typing.md)
+
 3. React + Next.js로 React NodeBird SNS 구현하기
 
    3-1. Next.js
