@@ -2,7 +2,8 @@
   "compilerOptions": {
     "strict": true,
     "lib": ["ES5", "ES2015", "ES2016", "ES2017", "DOM"],
-    "jsx": "react"
+    "jsx": "react",
+    "esModuleInterop": true // * as 를 빼도된다.
   },
   "exclude": ["node_modules"]
 }
