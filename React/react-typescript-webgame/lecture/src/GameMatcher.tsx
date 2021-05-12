@@ -1,7 +1,7 @@
 ﻿import * as React from "react";
-import NumberBaseball from "./src/NumberBaseballClass";
-import RSP from "./src/RSPClass";
-import Lotto from "./src/LottoClass";
+import NumberBaseball from "./NumberBaseballClass";
+import RSP from "./RSPClass";
+import Lotto from "./LottoClass";
 import { useHistory, useRouteMatch, useLocation } from "react-router";
 
 const GameMatcher = () => {
