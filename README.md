@@ -40,6 +40,10 @@
     - [타입 호환](https://github.com/wonieeVicky/TIL/blob/main/Typescript/2-13-type-compatibility.md)
     - [타입 모듈화](https://github.com/wonieeVicky/TIL/blob/main/Typescript/2-14-type-module.md)
 
+3.  실전 프로젝트로 배우는 타입스크립트
+
+    - [유틸리티 타입](https://github.com/wonieeVicky/TIL/blob/main/Typescript/3-1-utility-type.md)
+
 <br />
 
 ## EcmaScript6
