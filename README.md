@@ -330,3 +330,4 @@
    - [Column options](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/7-2-columns-options.md)
    - [Basic CRUD](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/7-3-crud.md)
    - [use Sequelize](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/7-4-use-sequelize.md)
+   - [Sequelize 모델 생성](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/7-5-create-sequelize-model.md)
