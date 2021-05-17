@@ -335,3 +335,4 @@
    - [Basic CRUD](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/7-3-crud.md)
    - [use Sequelize](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/7-4-use-sequelize.md)
    - [Sequelize 모델 생성](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/7-5-create-sequelize-model.md)
+   - [테이블 관계(1:1, 1대다, 다대다)](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/7-6-learn-table-relationshops.md)
