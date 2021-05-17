@@ -44,6 +44,7 @@ module.exports = class User extends Sequelize.Model {
   }
 
   static associate(db) {
+    // User가 여러 개의 Comment를 가지며, User의 id를 Comment 테이블의 commenter 컬럼이 참조하고 있다.
     db.User.hasMany(db.Comment, { foreignKey: "commenter", sourceKey: "id" });
   }
 };
