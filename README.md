@@ -42,7 +42,7 @@
 
 3.  실전 프로젝트로 배우는 타입스크립트
 
-    - [유틸리티 타입](https://github.com/wonieeVicky/TIL/blob/main/Typescript/3-1-utility-type.md)
+    - [유틸리티 타입(Partial, Pick, Omit)](https://github.com/wonieeVicky/TIL/blob/main/Typescript/3-1-utility-type-partial-pick-omit.md)
 
 <br />
 
@@ -336,3 +336,4 @@
    - [use Sequelize](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/7-4-use-sequelize.md)
    - [Sequelize 모델 생성](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/7-5-create-sequelize-model.md)
    - [테이블 관계(1:1, 1대다, 다대다)](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/7-6-learn-table-relationshops.md)
+   - [시퀄라이즈 쿼리](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/7-7-learn-sequelize-query.md)
