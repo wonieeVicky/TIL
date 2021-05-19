@@ -43,6 +43,7 @@
 3.  실전 프로젝트로 배우는 타입스크립트
 
     - [유틸리티 타입(Partial, Pick, Omit)](https://github.com/wonieeVicky/TIL/blob/main/Typescript/3-1-utility-type-partial-pick-omit.md)
+    - [유틸리티 타입 구현(Partial)](https://github.com/wonieeVicky/TIL/blob/main/Typescript/3-2-implement-utility-type-partial.md)
 
 <br />
 
