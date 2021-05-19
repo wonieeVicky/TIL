@@ -338,3 +338,4 @@
    - [Sequelize 모델 생성](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/7-5-create-sequelize-model.md)
    - [테이블 관계(1:1, 1대다, 다대다)](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/7-6-learn-table-relationshops.md)
    - [시퀄라이즈 쿼리](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/7-7-learn-sequelize-query.md)
+   - [관계 쿼리](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/7-8-queries-with-related-table-data.md)
