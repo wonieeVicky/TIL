@@ -340,3 +340,7 @@
    - [시퀄라이즈 쿼리](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/7-7-learn-sequelize-query.md)
    - [관계 쿼리](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/7-8-queries-with-related-table-data.md)
    - [sequelize 실습](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/7-9-sequelize-practice.md)
+
+7. mongoDB
+
+   - [mongoDB 설치](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/8-1-install-mongodb.md)
