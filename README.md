@@ -344,3 +344,4 @@
 7. mongoDB
 
    - [mongoDB 설치](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/8-1-install-mongodb.md)
+   - [데이터베이스 만들기](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/8-2-create-database.md)
