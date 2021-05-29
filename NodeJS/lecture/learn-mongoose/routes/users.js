@@ -23,6 +23,13 @@ router
         married: req.body.married,
       });
       console.log(user);
+      // create 생성하는 다른 방법
+      /* const user = new User({
+        name: req.body.name,
+        age: req.body.age,
+        married: req.body.married,
+      });
+      await user.save(); */
       res.status(201).json(user);
     } catch (err) {
       console.error(err);
