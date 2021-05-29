@@ -4,11 +4,12 @@ const { Schema } = mongoose;
 const {
   Types: { ObjectId },
 } = Schema;
+
 const commentSchema = new Schema({
   commenter: {
     type: ObjectId,
     required: true,
-    ref: "User",
+    ref: "User", // User 스키마의 _id를 가리킨다.
   },
   comment: {
     type: String,
