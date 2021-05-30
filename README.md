@@ -348,3 +348,7 @@
    - [mongoDB CRUD](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/8-3-crud.md)
    - [몽구스 ODM, Schema 정의](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/8-4-use-mongoose.md)
    - [몽구스 프로젝트 실행](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/8-5-run-mongoose.md)
+
+8. express로 SNS 서비스 구축
+
+   - [nodeBird 프로젝트 setting](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/9-1-project-init.md)
