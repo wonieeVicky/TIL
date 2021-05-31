@@ -44,6 +44,7 @@
 
     - [유틸리티 타입(Partial, Pick, Omit)](https://github.com/wonieeVicky/TIL/blob/main/Typescript/3-1-utility-type-partial-pick-omit.md)
     - [유틸리티 타입 구현(Partial)](https://github.com/wonieeVicky/TIL/blob/main/Typescript/3-2-implement-utility-type-partial.md)
+    - [맵드 타입(Mapped Type)에 대하여](https://github.com/wonieeVicky/TIL/blob/main/Typescript/3-3-mapped-type.md)
 
 <br />
 
