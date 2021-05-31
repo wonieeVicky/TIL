@@ -352,3 +352,4 @@
 8. express로 SNS 서비스 구축
 
    - [nodeBird 프로젝트 setting](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/9-1-project-init.md)
+   - [database 구조 설계](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/9-2-set-db-structure.md)
