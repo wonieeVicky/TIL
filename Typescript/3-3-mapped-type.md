@@ -52,3 +52,33 @@ console.log(result); // ['함수', '변수', '인자']
 { readonly [ P in K ] : T }
 { readonly [ P in K ] ? : T }
 ```
+
+### 맵드 타입 예제
+
+맵트 타입은 반복되는 타입을 유틸리티 형식으로 커스텀하여 만들 수 있는 문법이다.
+맵드 타입을 이해하기 위해서는 `for-in` 반복문을 이해하는 것이 필요하다.
+
+```jsx
+var arr = ["A", "B", "C"];
+for (var key in arr) {
+  console.log(arr[key]);
+}
+// A
+// B
+// C
+```
+
+위 형식을 Mapped Type이 비슷한 구조로 가진다고 할 때 아래 예시를 보자
+
+```tsx
+type Wonnies = "Vicky" | "Wonny" | "Fongfing";
+type WonnyAges = { [K in Wonnies]: number }; // Vikcy: number, Wonny: number, Fongfing: number
+
+const ages: WonnyAges = {
+  Vicky: 32,
+  Wonny: 31,
+  Fongfing: 32,
+};
+```
+
+만약 `ages` 변수에 number가 아닌 string 값이 들어갈 경우 Mapped Type에서 정의한 타입과 부합되지 않으므로 에러가 발생한다!
