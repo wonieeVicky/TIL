@@ -355,3 +355,4 @@
    - [nodeBird 프로젝트 setting](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/9-1-project-init.md)
    - [database 구조 설계](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/9-2-set-db-structure.md)
    - [테이블 관계 정의](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/9-3-define-table-associate.md)
+   - [passport 설정](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/9-4-set-passport.md)
