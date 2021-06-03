@@ -46,6 +46,7 @@ app.use(
     },
   })
 );
+// passport 설정 express-session보다 뒤에, 페이지라우터보다 앞에 위치해야 한다.
 app.use(passport.initialize());
 app.use(passport.session());
 

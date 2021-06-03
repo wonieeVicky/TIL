@@ -10,7 +10,7 @@ module.exports = () => {
   // {id: 3, connect.sid: 1231ad9adkfaldfka }
   passport.deserializeUser((id, done) => {
     User.findOne({ where: { id } })
-      .then((user) => done(null, user))
+      .then((user) => done(null, user)) // req.user, req.isAuthenticated()
       .catch((err) => done(err));
   });
   local();
