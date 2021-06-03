@@ -6,8 +6,8 @@ const User = require("../models/user");
 
 const router = express.Router();
 
-// 회원가입(join)
-router.post("/join", async (req, res, next) => {
+// 회원가입(join) : 로그인을 안 한 상태여야 하므로 isNotLoggedIn
+router.post("/join", isNotLoggedIn, async (req, res, next) => {
   const { email, nick, password } = req.body;
   try {
     const exUser = await User.findOne({ where: { email } });
@@ -27,8 +27,9 @@ router.post("/join", async (req, res, next) => {
   }
 });
 
-// 로그인(login)
-router.post("/login", (req, res, next) => {
+// 로그인(login) : 로그인을 안 한 상태여야 하므로 isNotLoggedIn
+router.post("/login", isNotLoggedIn, (req, res, next) => {
+  // req.user : 사용자 정보가 없음
   passport.authenticate("local", (authError, user, info) => {
     if (authError) {
       console.error(authError);
@@ -49,7 +50,9 @@ router.post("/login", (req, res, next) => {
   })(req, res, next); // 미들웨어 내의 미들웨어에는 (req, res, next)를 붙인다.
 });
 
+// 로그인 한 사람만 로그아웃 해야 하므로 isLoggedIn
 router.get("/logout", isLoggedIn, (req, res) => {
+  // req.user : 사용자 정보가 있음
   req.logout();
   req.session.destroy;
   res.redirect("/");
