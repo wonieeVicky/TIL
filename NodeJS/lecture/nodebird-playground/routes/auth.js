@@ -58,4 +58,16 @@ router.get("/logout", isLoggedIn, (req, res) => {
   res.redirect("/");
 });
 
+// 카카오로그인하기 눌렀을 때
+router.get("/kakao", passport.authenticate("kakao")); // 카카오 가서 회원가입 해야 한다.
+router.get(
+  "/kakao/callback",
+  passport.authenticate("kakao", {
+    failureRedirect: "/",
+  }),
+  (req, res) => {
+    res.redirect("/");
+  }
+);
+
 module.exports = router;
