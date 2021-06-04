@@ -22,6 +22,7 @@ router.get("/", (req, res, next) => {
   res.render("main", {
     title: "NodeBird",
     twits,
+    user: req.user,
   });
 });
 
