@@ -358,3 +358,4 @@
    - [passport 설정](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/9-4-set-passport.md)
    - [로컬 로그인 구현](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/9-5-set-local-strategy.md)
    - [카카오 로그인 구현](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/9-6-set-kakao-strategy.md)
+   - [이미지 업로드(multer) 구현](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/9-7-set-multer.md)
