@@ -359,3 +359,4 @@
    - [로컬 로그인 구현](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/9-5-set-local-strategy.md)
    - [카카오 로그인 구현](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/9-6-set-kakao-strategy.md)
    - [이미지 업로드(multer) 구현](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/9-7-set-multer.md)
+   - [팔로잉, 팔로워 구현](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/9-8-set-following-follower.md)
