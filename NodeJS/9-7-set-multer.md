@@ -89,6 +89,7 @@
         img: req.body.url,
         UserId: req.user.id,
       });
+      // 게시글 등록 code..
       res.redirect("/");
     } catch (err) {
       console.error(err);
@@ -103,10 +104,50 @@
 
   ```
 
+### 게시글 등록
+
+- `upload2.none()`은 `multipart/formdata` 타입의 요청이지만 이미지는 없을 때 사용
+  - 게시글 등록 시 아까 받은 이미지 경로 저장
+  - 게시글에서 해시태그를 찾아서 게시글과 연결(post.addHashtags)
+  - findOrCreate는 기존에 해시태그가 존재하면 그걸 사용하고, 없다면 생성하는 시퀄라이즈 메서드
+- `routes/page.js`
+
+  ```jsx
+  // ..
+  // POST /post - img upload 하지 않음
+  router.post("/", isLoggedIn, upload.none(), async (req, res, next) => {
+    try {
+      const post = await Post.create({
+        content: req.body.content,
+        img: req.body.url,
+        UserId: req.user.id,
+      });
+      const hashtags = req.body.content.match(/#[^\s#]*/g);
+      // [#비키 #노드] > [비키 노드] >
+      // [findOrCreate(비키), findOrCreate(노드)] : 중복 저장 방지(저장되어 있으면 조회, 저장되어있지 않으면 생성)
+      // [[해시태그, true], [해시태그, true]]
+      if (hashtags) {
+        const result = await Promise.all(
+          hashtags.map((tag) =>
+            Hashtag.findOrCreate({
+              where: { title: tag.slice(1).toLowerCase() },
+            })
+          ) // Hashtag.upsert 도 있다.
+        );
+        await post.addHashtags(result.map((r) => r[0]));
+      }
+      res.redirect("/");
+    } catch (err) {
+      console.error(err);
+      next(err);
+    }
+  });
+  ```
+
 ### 메인 페이지에 게시글 보여주기
 
 - 메인페이지(/) 요청 시 게시글을 먼저 조회한 후 템플릿 엔진 렌더링
-  - include로 관계가 잇는 모델을 합쳐서 가져올 수 있음
+  - include로 관계가 있는 모델을 합쳐서 가져올 수 있음
   - Post와 User는 관계가 있음(1대다)
   - 게시글을 가져올 때 게시글 작성자까지 같이 가져오는 것
 - `routes/page.js`
