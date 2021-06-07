@@ -43,6 +43,20 @@ router.post("/", isLoggedIn, upload.none(), async (req, res, next) => {
       img: req.body.url,
       UserId: req.user.id,
     });
+    const hashtags = req.body.content.match(/#[^\s#]*/g);
+    // [#비키 #노드] > [비키 노드] >
+    // [findOrCreate(비키), findOrCreate(노드)] : 중복 저장 방지(저장되어 있으면 조회, 저장되어있지 않으면 생성)
+    // [[해시태그, true], [해시태그, true]]
+    if (hashtags) {
+      const result = await Promise.all(
+        hashtags.map((tag) =>
+          Hashtag.findOrCreate({
+            where: { title: tag.slice(1).toLowerCase() },
+          })
+        ) // Hashtag.upsert 도 있다.
+      );
+      await post.addHashtags(result.map((r) => r[0]));
+    }
     res.redirect("/");
   } catch (err) {
     console.error(err);
