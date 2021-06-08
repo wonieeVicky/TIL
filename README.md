@@ -362,3 +362,7 @@
    - [이미지 업로드(multer) 구현](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/9-7-set-multer.md)
    - [팔로잉, 팔로워 구현](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/9-8-set-following-follower.md)
    - [해시태그 검색](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/9-9-search-hashtag.md)
+
+9. 웹 API 서버 만들기
+
+   - [API 서버 이해하기](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/10-1-intro-api-server.md)
