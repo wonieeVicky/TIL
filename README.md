@@ -365,4 +365,4 @@
 
 9. 웹 API 서버 만들기
 
-   - [API 서버 이해하기](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/10-1-intro-api-server.md)
+   - [API 서버 구조 갖추기](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/10-1-set-api-server.md)
