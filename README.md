@@ -366,3 +366,4 @@
 9. 웹 API 서버 만들기
 
    - [API 서버 구조 갖추기](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/10-1-set-api-server.md)
+   - [JWT 토큰 적용](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/10-2-use-jwt-token.md)
