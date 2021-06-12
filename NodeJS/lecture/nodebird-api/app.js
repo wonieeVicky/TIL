@@ -10,6 +10,7 @@ const dotenv = require("dotenv");
 dotenv.config();
 const authRouter = require("./routes/auth");
 const indexRouter = require("./routes");
+const v1 = require("./routes/v1");
 const { sequelize } = require("./models");
 const passportConfig = require("./passport");
 
@@ -19,7 +20,7 @@ app.set("port", process.env.PORT || 8002);
 app.set("view engine", "html");
 nunjucks.configure("views", {
   express: app,
-  watch: true,
+  watch: true
 });
 sequelize
   .sync({ force: false })
@@ -42,8 +43,8 @@ app.use(
     secret: process.env.COOKIE_SECRET,
     cookie: {
       httpOnly: true,
-      secure: false,
-    },
+      secure: false
+    }
   })
 );
 app.use(passport.initialize());
@@ -51,6 +52,7 @@ app.use(passport.session());
 
 app.use("/auth", authRouter);
 app.use("/", indexRouter);
+app.use("/v1", v1);
 
 app.use((req, res, next) => {
   const error = new Error(`${req.method} ${req.url} 라우터가 없습니다.`);

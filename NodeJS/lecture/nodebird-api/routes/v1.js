@@ -9,7 +9,7 @@ const router = express.Router();
 router.post("/token", async (req, res) => {
   const { clientSecret } = req.body;
   try {
-    const domain = await Domain.find({
+    const domain = await Domain.findOne({
       where: { clientSecret },
       include: {
         model: User,
@@ -24,13 +24,13 @@ router.post("/token", async (req, res) => {
     }
     const token = jwt.sign(
       {
-        id: domain.user.id,
-        nick: domain.user.nick
+        id: domain.User.id,
+        nick: domain.User.nick
       },
       process.env.JWT_SECRET,
       {
-        expiresIn: "1m", // 1분
-        issuer: "nodebird"
+        expiresIn: "1m", // 토큰 유효기간 설정: 1분
+        issuer: "nodebird" // 발급 주체 도장
       }
     );
     return res.json({
