@@ -1,14 +1,12 @@
 ﻿const express = require("express");
 const jwt = require("jsonwebtoken");
-const { verifyToken, deprecated } = require("./middlewares");
+const { verifyToken, apiLimiter } = require("./middlewares");
 const { Domain, User, Post, Hashtag } = require("../models");
 
 const router = express.Router();
 
-router.use(deprecated);
-
 // 토큰 발급
-router.post("/token", async (req, res) => {
+router.post("/token", apiLimiter, async (req, res) => {
   const { clientSecret } = req.body;
   try {
     const domain = await Domain.findOne({
@@ -50,11 +48,11 @@ router.post("/token", async (req, res) => {
 });
 
 // 토큰 발급 테스트
-router.get("/test", verifyToken, (req, res) => {
+router.get("/test", verifyToken, apiLimiter, (req, res) => {
   res.json(req.decoded);
 });
 
-router.get("/posts/my", verifyToken, (req, res) => {
+router.get("/posts/my", verifyToken, apiLimiter, (req, res) => {
   Post.findAll({ where: { userId: req.decoded.id } })
     .then((posts) => {
       res.json({
@@ -72,7 +70,7 @@ router.get("/posts/my", verifyToken, (req, res) => {
 });
 
 // 해시태그로 검색하는 라우터
-router.get("/posts/hashtag/:title", verifyToken, async (req, res) => {
+router.get("/posts/hashtag/:title", verifyToken, apiLimiter, async (req, res) => {
   try {
     const hashtag = await Hashtag.findOne({
       where: {
