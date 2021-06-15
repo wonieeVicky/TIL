@@ -370,3 +370,4 @@
    - [클라이언트 호출 서버(nodecat)구조 갖추기](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/10-3-set-client-server.md)
    - [NodeBird API 호출하기](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/10-4-call-nodebird-api.md)
    - [API 사용량 제한 구현](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/10-5-use-express-slow-down.md)
+   - [CORS 적용](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/10-6-use-cors.md.md)
