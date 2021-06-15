@@ -56,4 +56,8 @@ router.get("/search/:hashtag", async (req, res, next) => {
   }
 });
 
+router.get("/", (req, res) => {
+  res.render("main", { key: process.env.CLIENT_SECRET }); // 서버 키와 프론트 키를 분리해야한다.
+});
+
 module.exports = router;
