@@ -371,3 +371,7 @@
    - [NodeBird API 호출하기](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/10-4-call-nodebird-api.md)
    - [API 사용량 제한 구현](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/10-5-use-express-slow-down.md)
    - [CORS 적용](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/10-6-use-cors.md.md)
+
+10. 노드 서비스 테스트 구현
+
+- [테스트를 하는 이유](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/11-1-need-for-test.md.md)
