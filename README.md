@@ -374,4 +374,5 @@
 
 10. 노드 서비스 테스트 구현
 
-- [테스트를 하는 이유](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/11-1-need-for-test.md.md)
+- [테스트를 하는 이유](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/11-1-need-for-test.md)
+- [Unit 테스트](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/11-2-unit-test.md)
