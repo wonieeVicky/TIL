@@ -16,7 +16,7 @@ describe("POST /join", () => {
         password: "1234"
       })
       .expect("Location", "/")
-      .expect(302, done);
+      .expect(302, done); // Promise - then구문 사용 시 반드시 마지막에 done을 넣어줘야 테스트가 완료된다.
   });
 });
 

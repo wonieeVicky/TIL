@@ -1,4 +1,4 @@
-﻿# supertest를 사용하여 request 응답 구현
+﻿# supertest 사용 및 통합테스트 구현
 
 ### supertest 설치
 
@@ -79,6 +79,8 @@ Database nodejs-nodebrid-test created.
 
 ### auth routes 테스트 코드 작성
 
+auth routes에서 실행될 수 있는 다양한 시나리오에 대해 테스트 코드를 작성한다.
+
 ```jsx
 const request = require("supertest");
 const { sequelize } = require("../models");
@@ -89,6 +91,7 @@ beforeAll(async () => {
   await sequelize.sync();
 });
 
+// 로그인 안했으면 가입 테스트
 describe("POST /join", () => {
   test("로그인 안 했으면 가입", (done) => {
     request(app)
@@ -99,11 +102,60 @@ describe("POST /join", () => {
         password: "1234"
       })
       .expect("Location", "/")
+      .expect(302, done); // Promise - then구문 사용 시 반드시 마지막에 done을 넣어줘야 테스트가 완료된다.
+  });
+});
+
+// 이미 로그인 한 뒤 로그인 or 가입 시도 테스트
+describe("POST /login", () => {
+  const agent = request.agent(app);
+  beforeEach((done) => {
+    agent
+      .post("/auth/login")
+      .send({
+        email: "fongfing@gmail.com",
+        password: "1234"
+      })
+      .end(done);
+  });
+
+  test("이미 로그인한 뒤 가입하면 redirect /에러", (done) => {
+    const message = encodeURIComponent("로그인한 상태입니다.");
+    agent
+      .post("/auth/join")
+      .send({
+        email: "fongfing@gmail.com",
+        nick: "zerocho",
+        password: "1234"
+      })
+      .expect("Location", `/?error=${message}`)
+      .expect(302, done);
+  });
+
+  test("이미 로그인했는데 다시 로그인하면 redirect /에러", (done) => {
+    const message = encodeURIComponent("로그인한 상태입니다.");
+    agent
+      .post("/auth/login")
+      .send({ email: "fongfing@gmail.com", password: "1234" })
+      .expect("Location", `/?error=${message}`)
       .expect(302, done);
   });
 });
 
+// 가입되지 않은 유저 로그인, 일반로그인, 비밀번호 틀린 유저 로그인 테스트
 describe("POST /login", () => {
+  test("가입되지 않은 회원", async (done) => {
+    const message = encodeURIComponent("가입되지 않은 회원입니다.");
+    request(app)
+      .post("/auth/login")
+      .send({
+        email: "zerohch1@gmail.com",
+        password: "1234"
+      })
+      .expect("Location", `/?loginError=${message}`)
+      .expect(302, done);
+  });
+
   test("로그인 수행", async (done) => {
     request(app)
       .post("/auth/login")
@@ -112,11 +164,43 @@ describe("POST /login", () => {
         password: "1234"
       })
       .expect("Location", "/")
-      .expect(302, done); // Promise - then구문 사용 시 반드시 마지막에 done을 넣어줘야 테스트가 완료된다.
+      .expect(302, done);
+  });
+
+  test("비밀번호 틀림", async (done) => {
+    const message = encodeURIComponent("비밀번호가 일치하지 않습니다.");
+    request(app)
+      .post("/auth/login")
+      .send({
+        email: "fongfing@gmail.com",
+        password: "wrong"
+      })
+      .expect("Location", `/?loginError=${message}`)
+      .expect(302, done);
   });
 });
 
-// describe("POST /logout", () => {});
+// 로그아웃 테스트
+describe("GET /logout", () => {
+  test("로그인 되어있지 않으면 403", async (done) => {
+    request(app).get("/auth/logout").expect(403, done);
+  });
+
+  const agent = request.agent(app);
+  beforeEach((done) => {
+    agent
+      .post("/auth/login")
+      .send({
+        email: "fongfing@gmail.com",
+        password: "1234"
+      })
+      .end(done);
+  });
+
+  test("로그아웃 수행", async (done) => {
+    agent.get("/auth/logout").expect("Location", `/`).expect(302, done);
+  });
+});
 
 // 테스트가 완료 된 후 DB 초기화
 afterAll(async () => {
@@ -140,17 +224,27 @@ $ npm run test
 
  PASS  models/user.test.js
  PASS  routes/middlewares.test.js
-POST /auth/join 302 337.245 ms - 23
-POST /auth/login 302 309.600 ms - 23
- PASS  routes/auth.test.js (5.27s)
+POST /auth/join 302 346.686 ms - 23
+POST /auth/login 302 375.481 ms - 23
+POST /auth/join 302 13.183 ms - 115
+POST /auth/login 302 6.255 ms - 115
+POST /auth/login 302 7.065 ms - 115
+POST /auth/login 302 3.596 ms - 141
+POST /auth/login 302 291.016 ms - 23
+POST /auth/login 302 356.319 ms - 159
+POST /auth/login 302 288.191 ms - 23
+GET /auth/logout 403 4.509 ms - 16
+POST /auth/login 302 5.311 ms - 115
+GET /auth/logout 302 5.460 ms - 23
+ PASS  routes/auth.test.js (5.712s)
   ● Console
 
     console.log app.js:29
       데이터베이스 연결 성공
 
 Test Suites: 4 passed, 4 total
-Tests:       11 passed, 11 total
+Tests:       17 passed, 17 total
 Snapshots:   0 total
-Time:        8.142s
+Time:        8.974s
 Ran all test suites.
 ```
