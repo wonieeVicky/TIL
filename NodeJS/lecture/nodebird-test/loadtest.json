@@ -1,0 +1,36 @@
+﻿{
+  "config": {
+    "target": "http://localhost:8001",
+    "phases": [
+      {
+        "duration": 60,
+        "arrivalRate": 10
+      }
+    ]
+  },
+  "scenarios": [
+    {
+      "flow": [
+        {
+          "get": {
+            "url": "/"
+          }
+        },
+        {
+          "post": {
+            "url": "/auth/login",
+            "json": {
+              "email": "fongfing@gmail.com",
+              "password": "1234"
+            }
+          }
+        },
+        {
+          "post": {
+            "url": "/hashtag?hashtag=nodebird"
+          }
+        }
+      ]
+    }
+  ]
+}
