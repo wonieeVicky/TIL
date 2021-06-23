@@ -1,0 +1,22 @@
+﻿<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <title>GIF 채팅방</title>
+  </head>
+  <body>
+    <div>F12를 눌러 console 탭과 network 탭을 확인하세요.</div>
+    <script>
+      // WebSocket이라는 객체를 브라우저에서 모두 제공해준다.
+      // WebSocket 연결시도 - socket.js에서 연결에 대한 준비 필요
+      const webSocket = new WebSocket("ws://localhost:8005");
+      webSocket.onopen = function () {
+        console.log("서버와 웹 소켓 연결 성공!");
+      };
+      webSocket.onmessage = function (event) {
+        console.log(event.data);
+        webSocket.send("클라이언트에서 서버로 답장을 보냅니다.");
+      };
+    </script>
+  </body>
+</html>
