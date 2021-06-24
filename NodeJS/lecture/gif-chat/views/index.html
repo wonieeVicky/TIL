@@ -6,17 +6,20 @@
   </head>
   <body>
     <div>F12를 눌러 console 탭과 network 탭을 확인하세요.</div>
+    <script src="/socket.io/socket.io.js"></script>
     <script>
-      // WebSocket이라는 객체를 브라우저에서 모두 제공해준다.
-      // WebSocket 연결시도 - socket.js에서 연결에 대한 준비 필요
-      const webSocket = new WebSocket("ws://localhost:8005");
-      webSocket.onopen = function () {
-        console.log("서버와 웹 소켓 연결 성공!");
-      };
-      webSocket.onmessage = function (event) {
-        console.log(event.data);
-        webSocket.send("클라이언트에서 서버로 답장을 보냅니다.");
-      };
+      const socket = io.connect("http://localhost:8005", {
+        path: "/socket.io",
+        transports: ["websocket"] // 해당 조건이 없으면 polling 먼저 해보고 websocket이 가능하면 websocket 시작 - 싫으면 이 조건을 넣으면 된다.
+      });
+      socket.on("news", function (data) {
+        console.log(data);
+        socket.emit("reply", "Hello Node.JS");
+      });
+      socket.on("vicky", function (data) {
+        console.log(data);
+        socket.emit("reply", "Hello Vicky");
+      });
     </script>
   </body>
 </html>
