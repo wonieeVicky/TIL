@@ -375,8 +375,6 @@
 
 10. 노드 서비스 테스트 구현
 
----
-
     - [테스트를 하는 이유](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/11-1-need-for-test.md)
     - [Unit 테스트](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/11-2-unit-test.md)
     - [Controller 분리 및 테스트](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/11-3-controller-test.md)
@@ -386,4 +384,5 @@
 
 11. 웹 소켓으로 실시간 데이터 전송하기
 
-    - [웹소켓 사용해보기](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/12-1-use-web-socket.md.md)
+    - [웹소켓 사용해보기](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/12-1-use-web-socket.md)
+    - [Socket.IO 사용해보기](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/12-2-use-socket-io.md)
