@@ -1,0 +1,9 @@
+﻿{
+  "compilerOptions": {
+    "allowJs": true,
+    "target": "ES5",
+    "outDir": "./built",
+    "moduleResolution": "Node"
+  },
+  "include": ["./src/**/*"] // src 이하 모든 파일을 타입스크립트 체크를 하겠다.
+}
