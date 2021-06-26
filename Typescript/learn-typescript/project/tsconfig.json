@@ -1,5 +1,6 @@
 ﻿{
   "compilerOptions": {
+    "lib": ["ES2015", "DOM", "DOM.Iterable"],
     "allowJs": true,
     "target": "ES5",
     "outDir": "./built",
