@@ -47,6 +47,7 @@
     - [맵드 타입(Mapped Type)에 대하여](https://github.com/wonieeVicky/TIL/blob/main/Typescript/3-3-mapped-type.md)
     - [JS to TS 프로젝트 사전 준비](https://github.com/wonieeVicky/TIL/blob/main/Typescript/3-4-precautions-for-apply-ts-to-js-project.md)
     - [JSDoc을 이용한 타입시스템의 점진적 적용](https://github.com/wonieeVicky/TIL/blob/main/Typescript/3-5-apply-gradual-type-system-with-JSDoc.md)
+    - [TS 프로젝트 구성 및 기본 설정 추가](https://github.com/wonieeVicky/TIL/blob/main/Typescript/3-6-set-ts-project-and-add-basic-options.md)
 
 <br />
 
