@@ -386,3 +386,4 @@
 
     - [웹소켓 사용해보기](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/12-1-use-web-socket.md)
     - [Socket.IO 사용해보기](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/12-2-use-socket-io.md)
+    - [실시간 채팅방 구조 잡기](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/12-3-structure-gif-chat.md)
