@@ -1,5 +1,5 @@
 ﻿<!DOCTYPE html>
-<html lang="ko">
+<html>
   <head>
     <meta charset="UTF-8" />
     <title>GIF 채팅방</title>
@@ -10,15 +10,11 @@
     <script>
       const socket = io.connect("http://localhost:8005", {
         path: "/socket.io",
-        transports: ["websocket"] // 해당 조건이 없으면 polling 먼저 해보고 websocket이 가능하면 websocket 시작 - 싫으면 이 조건을 넣으면 된다.
+        transports: ["websocket"]
       });
       socket.on("news", function (data) {
         console.log(data);
         socket.emit("reply", "Hello Node.JS");
-      });
-      socket.on("vicky", function (data) {
-        console.log(data);
-        socket.emit("reply", "Hello Vicky");
       });
     </script>
   </body>
