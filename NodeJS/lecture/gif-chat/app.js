@@ -7,6 +7,7 @@ const nunjucks = require("nunjucks");
 const dotenv = require("dotenv");
 
 dotenv.config();
+const connect = require("./schemas");
 const webSocket = require("./socket");
 const indexRouter = require("./routes");
 
@@ -17,6 +18,7 @@ nunjucks.configure("views", {
   express: app,
   watch: true
 });
+connect();
 
 app.use(morgan("dev"));
 app.use(express.static(path.join(__dirname, "public")));
