@@ -34,7 +34,8 @@
 <script>
   const socket = io.connect("http://localhost:8005/room", {
     // 네임스페이스
-    path: "/socket.io"
+    path: "/socket.io",
+    transports: ["websocket"]
   });
 
   socket.on("newRoom", function (data) {
