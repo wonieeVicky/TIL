@@ -1,10 +1,35 @@
 ﻿const SocketIO = require("socket.io");
 
-module.exports = (server) => {
+module.exports = (server, app) => {
   // 서버와 연결
   const io = SocketIO(server, { path: "/socket.io" });
+  app.set("io", io); // req.app.get('io') 라우터에서 socket.io를 호출해서 사용할 수 있다.
+  const room = io.of("/room"); // namespace
+  const chat = io.of("/chat"); // namespace
 
-  // 웹소켓 연결 시
+  room.on("connection", (socket) => {
+    console.log("room 네임스페이스에 접속");
+    socket.on("disconnect", () => {
+      console.log("room 네임스페이스 접속 해제");
+    });
+  });
+
+  chat.on("connection", (socket) => {
+    console.log("chat 네임스페이스에 접속");
+    const req = socekt.request;
+    const {
+      headers: { referer }
+    } = req;
+    const roomId = referer.split("/")[referer.split("/").length - 1].replace(/\?.+/, "");
+    socket.join(roomId); // 방
+
+    socket.on("disconnect", () => {
+      console.log("chat 네임스페이스 접속 해제");
+      socket.leave(roomId);
+    });
+  });
+
+  /* // 웹소켓 연결 시
   io.on("connection", (socket) => {
     const req = socket.request;
     const ip = req.headers["x-forwarded-for"] || req.connection.remoteAddress;
@@ -26,5 +51,5 @@ module.exports = (server) => {
     socket.interval = setInterval(() => {
       socket.emit("news", "Hello Socket.IO");
     }, 3000);
-  });
+  }); */
 };
