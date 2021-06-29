@@ -1,10 +1,11 @@
 ﻿{
   "compilerOptions": {
-    "lib": ["ES2015", "DOM", "DOM.Iterable"],
     "allowJs": true,
     "target": "ES5",
     "outDir": "./built",
-    "moduleResolution": "Node"
+    "moduleResolution": "Node",
+    "lib": ["ES2015", "DOM", "DOM.Iterable"]
   },
-  "include": ["./src/**/*"] // src 이하 모든 파일을 타입스크립트 체크를 하겠다.
+  "include": ["./src/**/*"], // src 이하 모든 파일을 타입스크립트 체크를 하겠다.
+  "exclude": ["node_modules", "dist"]
 }
