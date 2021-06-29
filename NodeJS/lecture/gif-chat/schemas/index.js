@@ -11,7 +11,8 @@ const connect = () => {
     {
       dbName: "gifchat",
       useNewUrlParser: true,
-      useCreateIndex: true
+      useCreateIndex: true,
+      useUnifiedTopology: true
     },
     (error) => {
       if (error) {

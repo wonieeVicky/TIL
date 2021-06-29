@@ -389,3 +389,4 @@
     - [Socket.IO 사용해보기](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/12-2-use-socket-io.md)
     - [실시간 채팅방 구조 잡기](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/12-3-structure-gif-chat.md)
     - [네임스페이스와 방 구조](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/12-4-namespace-and-room.md)
+    - [웹 소켓 미들웨어 적용](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/12-5-apply-web-socket-middleware.md)
