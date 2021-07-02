@@ -391,3 +391,7 @@
     - [네임스페이스와 방 구조](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/12-4-namespace-and-room.md)
     - [웹 소켓 미들웨어 적용](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/12-5-apply-web-socket-middleware.md)
     - [채팅 및 GIF 파일 주고 받기](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/12-6-chat-and-share-gif.md)
+
+12. 실시간 경매 시스템 만들기
+
+    - [경매시스템 프로젝트 구조 만들기](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/13-1-structure-of-node-auction.md)
