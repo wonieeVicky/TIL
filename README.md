@@ -395,3 +395,4 @@
 12. 실시간 경매 시스템 만들기
 
     - [경매시스템 프로젝트 구조 만들기](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/13-1-structure-of-node-auction.md)
+    - [서버센트 이벤트(SSE) 사용하기](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/13-2-use-sse-event.md)
