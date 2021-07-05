@@ -5,13 +5,13 @@ module.exports = (server, app) => {
   app.set("io", io);
   // 웹 소켓 연결 시
   io.on("connection", (socket) => {
-    const req = socekt.request;
+    const req = socket.request;
     const {
       headers: { referer },
     } = req;
     const roomId = referer.split("/")[referer.split("/").length - 1]; // roomId는 Good 테이블의 row ID가 된다.
     socket.join(roomId);
-    socekt.on("disconnect", () => {
+    socket.on("disconnect", () => {
       socket.leave(roomId);
     });
   });
