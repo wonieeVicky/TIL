@@ -2,8 +2,9 @@
 const multer = require("multer");
 const path = require("path");
 const fs = require("fs");
+const schedule = require("node-schedule");
 
-const { Good, Auction, User } = require("../models");
+const { Good, Auction, User, sequelize } = require("../models");
 const { isLoggedIn, isNotLoggedIn } = require("./middlewares");
 
 const router = express.Router();
@@ -64,6 +65,37 @@ router.post("/good", isLoggedIn, upload.single("img"), async (req, res, next) =>
       name,
       img: req.file.filename,
       price,
+    });
+    const end = new DATE();
+    end.setDate(end.getDate() + 1);
+    schedule.scheduleJob(end, async () => {
+      // 끝날 때 어떻게 할지 적어준다.
+      // sequelize transaction으로 묶어준다. (세가지 z액션 중 하나라도 실패하면 전체 실패, 성공하면 전체 성공으로 처리)
+      const t = await sequelize.transaction();
+      try {
+        const success = await Auction.findOne({
+          where: { GoodId: good.id },
+          order: [["bid", "DESC"]],
+          transaction: t,
+        });
+        await Good.update(
+          { SoldId: success.UserId },
+          {
+            where: { id: good.id },
+            transaction: t,
+          }
+        );
+        await User.update(
+          {
+            money: sequelize.literal(`money-${success.bid}`), // sequelize 문법으로 넣어준다.
+          },
+          { where: { id: success.UserId }, transaction: t }
+        );
+        await t.commit();
+        // UPDATE Users SET money = money - success.bid WHERE id = 1;
+      } catch (error) {
+        await t.rollback();
+      }
     });
     res.redirect("/");
   } catch (error) {
