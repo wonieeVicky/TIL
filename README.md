@@ -398,3 +398,4 @@
     - [서버센트 이벤트(SSE) 사용하기](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/13-2-use-sse-event.md)
     - [경매 진행하기](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/13-3-run-auction.md)
     - [낙찰자 스케줄링](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/13-4-scheduling.md)
+    - [스케줄링 복구 및 낙찰내역 조회](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/13-5-restore-schduling-and-end-project.md)
