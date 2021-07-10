@@ -81,6 +81,10 @@
     Hello CLI
     ```
 
+    - cli 시 `#!/usr/bin/env : No such file or directory`라고 에러날 경우
+
+      파일인코딩이 `UTF8 with BOM` 으로 설정되어있을 경우 #!에서부터 인식하지 못해 에러가 발생한다. shebang 코드가 UTF8 with BOM을 지원하지 않는 것 같다.. (~~3일동안 못풀어서 고생함..~~) 파일 인코딩을 UTF8로 고쳐서 실행하면 정상 실행된다 😇
+
 ### 명령어에 옵션 붙이기
 
 - process.argv로 명령어에 어떤 옵션이 주어졌는지 확인 가능
@@ -97,13 +101,12 @@
 - 배열의 첫 요소는 노드의 경로, 두 번째 요소는 cli 명령어의 경로, 나머지는 옵션
 
   ```bash
-  $ cli one two three four
+  $ cli one two three
   Hello CLI [
-  	'/usr/local/Cellar/node/16.2.0/bin/node',
-  	'/Users/uneedcomms/.npm-global/bin',
-  	'one',
-  	'two',
-  	'three',
-  	'four'
+    '/usr/local/bin/node',
+    '/Users/uneedcomms/.npm-global/bin/cli',
+    'one',
+    'two',
+    'three'
   ]
   ```
