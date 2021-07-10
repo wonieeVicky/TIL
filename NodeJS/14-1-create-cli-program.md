@@ -77,13 +77,21 @@
   - 전역 설치한 것이기 때문에 현재 패키지 폴더에 node_modules가 생기지 않는다.
 
     ```bash
-    $ cli
+    $ **cli**
     Hello CLI
     ```
 
     - cli 시 `#!/usr/bin/env : No such file or directory`라고 에러날 경우
 
       파일인코딩이 `UTF8 with BOM` 으로 설정되어있을 경우 #!에서부터 인식하지 못해 에러가 발생한다. shebang 코드가 UTF8 with BOM을 지원하지 않는 것 같다.. (~~3일동안 못풀어서 고생함..~~) 파일 인코딩을 UTF8로 고쳐서 실행하면 정상 실행된다 😇
+
+    - cli 시 zsh: permission denied: cli 실행시
+
+      `sudo cli`로 실행해준다.
+
+    - cli 시 cli: command not found 시
+
+      index.js에 쓰기 권한이 필요한 것이므로 `chmod +x ./index.js` 로 권한을 준다.
 
 ### 명령어에 옵션 붙이기
 
