@@ -6,6 +6,6 @@
   "author": "Vicky",
   "license": "ISC",
   "bin": {
-    "cli": "./index.js"
+    "cli": "./template.js"
   }
 }
