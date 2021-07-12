@@ -406,3 +406,7 @@
     - [readline 사용하기](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/14-2-use-readline.md)
     - [commander 적용](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/14-3-use-commander.md)
     - [inquirer 적용](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/14-4-use-inquirer.md)
+
+14. AWS 배포하기
+
+    - [배포를 위한 패키지 설정](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/15-1-pacakge-settings-for-deployment.md)
