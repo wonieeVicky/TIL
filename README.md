@@ -404,3 +404,5 @@
 
     - [CLI 프로그램 기본구조 갖추기](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/14-1-create-cli-program.md)
     - [readline 사용하기](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/14-2-use-readline.md)
+    - [commander 적용](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/14-3-use-commander.md)
+    - [inquirer 적용](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/14-4-use-inquirer.md)
