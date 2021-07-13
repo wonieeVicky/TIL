@@ -410,3 +410,4 @@
 14. AWS 배포하기
 
     - [배포를 위한 패키지 설정](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/15-1-pacakge-settings-for-deployment.md)
+    - [pm2 사용하기](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/15-2-use-pm2.md)
