@@ -64,6 +64,8 @@ const sessionOption = {
     httpOnly: true,
     secure: false, // https 적용한 경우 true
   },
+  // 서버의 메모리에 저장하지 않고, redis라는 메모리에 저장한다.
+  // 클러스터링(멀티 프로세싱) 시에도 모든 서버에서 로그인 데이터를 공유받을 수 있음
   store: new RedisStore({ client: redisClient }),
 };
 
