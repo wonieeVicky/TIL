@@ -9,6 +9,8 @@ const logger = createLogger({
   ],
 });
 
+// 개발용일 때는 Console로 노출
+// Console, File, DB 등에 넣을 수 있다.
 if (process.env.NODE_ENV !== 'production') {
   logger.add(new transports.Console({ format: format.simple() }));
 }
