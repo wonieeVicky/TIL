@@ -422,3 +422,4 @@
     - [S3 이미지 업로드](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/16-2-upload-image-to-s3.md)
     - [람다 함수 만들기](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/16-3-create-lambda-func.md)
     - [람다 배포하기](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/16-4-deploy-lambda.md)
+    - [람다 설정하기](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/16-5-set-lambda.md)
