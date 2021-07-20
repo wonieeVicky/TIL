@@ -52,3 +52,31 @@
     ```
 
 - 테스트 코드가 통과하는지 확인한다.
+
+### 화살표 any 함수에 타입 추가하기
+
+`src/app.ts`
+
+아래와 같이 화살표 함수 내 파라미터에도 any 타입을 추가한다.
+
+```tsx
+// ...
+function setDeathsList(data: any) {
+  const sorted = data.sort((a: any, b: any) => getUnixTimestamp(b.Date) - getUnixTimestamp(a.Date));
+  sorted.forEach((value: any) => {
+    // ..
+  });
+}
+```
+
+덧붙여, innterText 영역에도 에러가 발생하여 DOM 변수 호출 단계에서 명시적 형변환을 해주었다.
+
+```tsx
+// ..
+// DOM
+const confirmedTotal = $(".confirmed-total") as HTMLElement;
+const deathsTotal = $(".deaths") as HTMLElement;
+const recoveredTotal = $(".recovered") as HTMLElement;
+const lastUpdatedTime = $(".last-updated-time") as HTMLElement;
+//..
+```
