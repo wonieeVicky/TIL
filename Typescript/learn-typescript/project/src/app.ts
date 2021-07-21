@@ -2,25 +2,28 @@
 function $(selector: string) {
   return document.querySelector(selector);
 }
-function getUnixTimestamp(date: any) {
+function getUnixTimestamp(date: Date) {
   return new Date(date).getTime();
 }
 
 // DOM
-const confirmedTotal = $(".confirmed-total") as HTMLElement;
-const deathsTotal = $(".deaths") as HTMLElement;
-const recoveredTotal = $(".recovered") as HTMLElement;
-const lastUpdatedTime = $(".last-updated-time") as HTMLElement;
+const confirmedTotal = $(".confirmed-total") as HTMLSpanElement;
+const deathsTotal = $(".deaths") as HTMLParagraphElement;
+const recoveredTotal = $(".recovered") as HTMLParagraphElement;
+const lastUpdatedTime = $(".last-updated-time") as HTMLParagraphElement;
 const rankList = $(".rank-list");
 const deathsList = $(".deaths-list");
 const recoveredList = $(".recovered-list");
 const deathSpinner = createSpinnerElement("deaths-spinner");
 const recoveredSpinner = createSpinnerElement("recovered-spinner");
 
-function createSpinnerElement(id: any) {
+function createSpinnerElement(id: string) {
   const wrapperDiv = document.createElement("div");
   wrapperDiv.setAttribute("id", id);
-  wrapperDiv.setAttribute("class", "spinner-wrapper flex justify-center align-center");
+  wrapperDiv.setAttribute(
+    "class",
+    "spinner-wrapper flex justify-center align-center"
+  );
   const spinnerDiv = document.createElement("div");
   spinnerDiv.setAttribute("class", "ripple-spinner");
   spinnerDiv.appendChild(document.createElement("div"));
@@ -38,8 +41,15 @@ function fetchCovidSummary() {
   return axios.get(url);
 }
 
-function fetchCountryInfo(countryCode: any, status: any) {
-  // params: confirmed, recovered, deaths
+// enum 타입 정의
+enum CovidStatue {
+  Confirmed = "confirmed",
+  Recovered = "recovered",
+  Deaths = "deaths",
+}
+
+function fetchCountryInfo(countryCode: string, status: CovidStatue) {
+  // status params: confirmed, recovered, deaths
   const url = `https://api.covid19api.com/country/${countryCode}/status/${status}`;
   return axios.get(url);
 }
@@ -57,7 +67,10 @@ function initEvents() {
 
 async function handleListClick(event: any) {
   let selectedId;
-  if (event.target instanceof HTMLParagraphElement || event.target instanceof HTMLSpanElement) {
+  if (
+    event.target instanceof HTMLParagraphElement ||
+    event.target instanceof HTMLSpanElement
+  ) {
     selectedId = event.target.parentElement.id;
   }
   if (event.target instanceof HTMLLIElement) {
@@ -70,9 +83,18 @@ async function handleListClick(event: any) {
   clearRecoveredList();
   startLoadingAnimation();
   isDeathLoading = true;
-  const { data: deathResponse } = await fetchCountryInfo(selectedId, "deaths");
-  const { data: recoveredResponse } = await fetchCountryInfo(selectedId, "recovered");
-  const { data: confirmedResponse } = await fetchCountryInfo(selectedId, "confirmed");
+  const { data: deathResponse } = await fetchCountryInfo(
+    selectedId,
+    CovidStatue.Deaths
+  );
+  const { data: recoveredResponse } = await fetchCountryInfo(
+    selectedId,
+    CovidStatue.Recovered
+  );
+  const { data: confirmedResponse } = await fetchCountryInfo(
+    selectedId,
+    CovidStatue.Confirmed
+  );
   endLoadingAnimation();
   setDeathsList(deathResponse);
   setTotalDeathsByCountry(deathResponse);
@@ -83,7 +105,9 @@ async function handleListClick(event: any) {
 }
 
 function setDeathsList(data: any) {
-  const sorted = data.sort((a: any, b: any) => getUnixTimestamp(b.Date) - getUnixTimestamp(a.Date));
+  const sorted = data.sort(
+    (a: any, b: any) => getUnixTimestamp(b.Date) - getUnixTimestamp(a.Date)
+  );
   sorted.forEach((value: any) => {
     const li = document.createElement("li");
     li.setAttribute("class", "list-item-b flex align-center");
@@ -107,7 +131,9 @@ function setTotalDeathsByCountry(data: any) {
 }
 
 function setRecoveredList(data: any) {
-  const sorted = data.sort((a: any, b: any) => getUnixTimestamp(b.Date) - getUnixTimestamp(a.Date));
+  const sorted = data.sort(
+    (a: any, b: any) => getUnixTimestamp(b.Date) - getUnixTimestamp(a.Date)
+  );
   sorted.forEach((value: any) => {
     const li = document.createElement("li");
     li.setAttribute("class", "list-item-b flex align-center");
@@ -172,24 +198,39 @@ function renderChart(data: any, labels: any) {
 
 function setChartData(data: any) {
   const chartData = data.slice(-14).map((value: any) => value.Cases);
-  const chartLabel = data.slice(-14).map((value: any) => new Date(value.Date).toLocaleDateString().slice(5, -1));
+  const chartLabel = data
+    .slice(-14)
+    .map((value: any) =>
+      new Date(value.Date).toLocaleDateString().slice(5, -1)
+    );
   renderChart(chartData, chartLabel);
 }
 
 function setTotalConfirmedNumber(data: any) {
-  confirmedTotal.innerText = data.Countries.reduce((total: any, current: any) => (total += current.TotalConfirmed), 0);
+  confirmedTotal.innerText = data.Countries.reduce(
+    (total: any, current: any) => (total += current.TotalConfirmed),
+    0
+  );
 }
 
 function setTotalDeathsByWorld(data: any) {
-  deathsTotal.innerText = data.Countries.reduce((total: any, current: any) => (total += current.TotalDeaths), 0);
+  deathsTotal.innerText = data.Countries.reduce(
+    (total: any, current: any) => (total += current.TotalDeaths),
+    0
+  );
 }
 
 function setTotalRecoveredByWorld(data: any) {
-  recoveredTotal.innerText = data.Countries.reduce((total: any, current: any) => (total += current.TotalRecovered), 0);
+  recoveredTotal.innerText = data.Countries.reduce(
+    (total: any, current: any) => (total += current.TotalRecovered),
+    0
+  );
 }
 
 function setCountryRanksByConfirmedCases(data: any) {
-  const sorted = data.Countries.sort((a: any, b: any) => b.TotalConfirmed - a.TotalConfirmed);
+  const sorted = data.Countries.sort(
+    (a: any, b: any) => b.TotalConfirmed - a.TotalConfirmed
+  );
   sorted.forEach((value: any) => {
     const li = document.createElement("li");
     li.setAttribute("class", "list-item flex align-center");
