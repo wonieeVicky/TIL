@@ -49,6 +49,7 @@
     - [JSDoc을 이용한 타입시스템의 점진적 적용](https://github.com/wonieeVicky/TIL/blob/main/Typescript/3-5-apply-gradual-type-system-with-JSDoc.md)
     - [TS 프로젝트 구성 및 기본 설정 추가](https://github.com/wonieeVicky/TIL/blob/main/Typescript/3-6-set-ts-project-and-add-basic-options.md)
     - [명시적인 any 선언 및 정의](https://github.com/wonieeVicky/TIL/blob/main/Typescript/3-7-declare-any.md)
+    - [DOM 관련 및 API 함수 타입 구체화](https://github.com/wonieeVicky/TIL/blob/main/Typescript/3-8-type-specifications.md)
 
 <br />
 
