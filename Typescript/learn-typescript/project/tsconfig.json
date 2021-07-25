@@ -5,7 +5,8 @@
     "outDir": "./built",
     "moduleResolution": "Node",
     "lib": ["ES2015", "DOM", "DOM.Iterable"],
-    "noImplicitAny": true
+    "noImplicitAny": true,
+    "typeRoots": ["./node_modules/@types", "./types"]
   },
   "include": ["./src/**/*"], // src 이하 모든 파일을 타입스크립트 체크를 하겠다.
   "exclude": ["node_modules", "dist"]
