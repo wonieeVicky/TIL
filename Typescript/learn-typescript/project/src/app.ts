@@ -1,7 +1,11 @@
 import axios, { AxiosResponse } from 'axios';
 import { Chart } from 'chart.js';
 // 타입 모듈
-import { CovidSummaryReponse } from './covid/index';
+import {
+  CovidStatue,
+  CountrySummaryResponse,
+  CovidSummaryReponse,
+} from './covid/index';
 
 // utils
 function $(selector: string) {
@@ -46,14 +50,10 @@ function fetchCovidSummary(): Promise<AxiosResponse<CovidSummaryReponse>> {
   return axios.get(url);
 }
 
-// enum 타입 정의
-enum CovidStatue {
-  Confirmed = 'confirmed',
-  Recovered = 'recovered',
-  Deaths = 'deaths',
-}
-
-function fetchCountryInfo(countryCode: string, status: CovidStatue) {
+function fetchCountryInfo(
+  countryCode: string,
+  status: CovidStatue
+): Promise<AxiosResponse<CountrySummaryResponse>> {
   // status params: confirmed, recovered, deaths
   const url = `https://api.covid19api.com/country/${countryCode}/status/${status}`;
   return axios.get(url);
