@@ -52,6 +52,7 @@
     - [DOM 관련 및 API 함수 타입 구체화](https://github.com/wonieeVicky/TIL/blob/main/Typescript/3-8-type-specifications.md)
     - [점진적 타입 적용을 위한 환경 구성](https://github.com/wonieeVicky/TIL/blob/main/Typescript/3-9-project-setting-for-typing.md)
     - [외부 라이브러리 모듈화](https://github.com/wonieeVicky/TIL/blob/main/Typescript/3-10-modularize-external-libraries.md)
+    - [API 함수 타입 정의](https://github.com/wonieeVicky/TIL/blob/main/Typescript/3-11-define-for-fetch.md)
 
 <br />
 
