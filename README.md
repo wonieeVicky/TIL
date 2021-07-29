@@ -53,6 +53,7 @@
     - [점진적 타입 적용을 위한 환경 구성](https://github.com/wonieeVicky/TIL/blob/main/Typescript/3-9-project-setting-for-typing.md)
     - [외부 라이브러리 모듈화](https://github.com/wonieeVicky/TIL/blob/main/Typescript/3-10-modularize-external-libraries.md)
     - [API 함수 타입 정의](https://github.com/wonieeVicky/TIL/blob/main/Typescript/3-11-define-for-fetch.md)
+    - [차트 관련 타입 오류 해결 및 tree-shaking을 위한 enum 타입 개선](https://github.com/wonieeVicky/TIL/blob/main/Typescript/3-12-error-fix-for-chartjs.md)
 
 <br />
 
