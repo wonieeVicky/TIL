@@ -2,9 +2,8 @@ import axios, { AxiosResponse } from 'axios';
 import { Chart } from 'chart.js';
 // 타입 모듈
 import {
-  CovidStatue,
   CountrySummaryResponse,
-  CovidSummaryReponse,
+  CovidSummaryResponse,
   Country,
   CountrySummaryInfo,
 } from './covid/index';
@@ -45,16 +44,21 @@ function createSpinnerElement(id: string) {
 
 // state
 let isDeathLoading = false;
-const isRecoveredLoading = false;
 
-function fetchCovidSummary(): Promise<AxiosResponse<CovidSummaryReponse>> {
+function fetchCovidSummary(): Promise<AxiosResponse<CovidSummaryResponse>> {
   const url = 'https://api.covid19api.com/summary';
   return axios.get(url);
 }
 
+enum CovidStatus {
+  Confirmed = 'confirmed',
+  Recovered = 'recovered',
+  Deaths = 'deaths',
+}
+
 function fetchCountryInfo(
   countryName: string,
-  status: CovidStatue
+  status: CovidStatus
 ): Promise<AxiosResponse<CountrySummaryResponse>> {
   // status params: confirmed, recovered, deaths
   const url = `https://api.covid19api.com/country/${countryName}/status/${status}`;
@@ -92,15 +96,15 @@ async function handleListClick(event: MouseEvent) {
   isDeathLoading = true;
   const { data: deathResponse } = await fetchCountryInfo(
     selectedId,
-    CovidStatue.Deaths
+    CovidStatus.Deaths
   );
   const { data: recoveredResponse } = await fetchCountryInfo(
     selectedId,
-    CovidStatue.Recovered
+    CovidStatus.Recovered
   );
   const { data: confirmedResponse } = await fetchCountryInfo(
     selectedId,
-    CovidStatue.Confirmed
+    CovidStatus.Confirmed
   );
   endLoadingAnimation();
   setDeathsList(deathResponse);
@@ -184,11 +188,12 @@ async function setupData() {
   setLastUpdatedTimestamp(data);
 }
 
-function renderChart(data: any, labels: any) {
+function renderChart(data: number[], labels: string[]) {
   const chartEl = $('#lineChart') as HTMLCanvasElement;
   const ctx = chartEl.getContext('2d');
-  Chart.defaults.global.defaultFontColor = '#f5eaea';
-  Chart.defaults.global.defaultFontFamily = 'Exo 2';
+  // const ctx = ($('#lineChart') as HTMLCanvasElement).getContext('2d'); // 이렇게 적어도 된다.
+  Chart.defaults.color = '#f5eaea';
+  Chart.defaults.font.family = 'Exo 2';
   new Chart(ctx, {
     type: 'line',
     data: {
@@ -218,28 +223,28 @@ function setChartData(data: CountrySummaryResponse) {
   renderChart(chartData, chartLabel);
 }
 
-function setTotalConfirmedNumber(data: CovidSummaryReponse) {
+function setTotalConfirmedNumber(data: CovidSummaryResponse) {
   confirmedTotal.innerText = data.Countries.reduce(
     (total: number, current: Country) => (total += current.TotalConfirmed),
     0
   ).toString();
 }
 
-function setTotalDeathsByWorld(data: CovidSummaryReponse) {
+function setTotalDeathsByWorld(data: CovidSummaryResponse) {
   deathsTotal.innerText = data.Countries.reduce(
     (total: number, current: Country) => (total += current.TotalDeaths),
     0
   ).toString();
 }
 
-function setTotalRecoveredByWorld(data: CovidSummaryReponse) {
+function setTotalRecoveredByWorld(data: CovidSummaryResponse) {
   recoveredTotal.innerText = data.Countries.reduce(
     (total: number, current: Country) => (total += current.TotalRecovered),
     0
   ).toString();
 }
 
-function setCountryRanksByConfirmedCases(data: CovidSummaryReponse) {
+function setCountryRanksByConfirmedCases(data: CovidSummaryResponse) {
   const sorted = data.Countries.sort(
     (a: Country, b: Country) => b.TotalConfirmed - a.TotalConfirmed
   );
@@ -259,7 +264,7 @@ function setCountryRanksByConfirmedCases(data: CovidSummaryReponse) {
   });
 }
 
-function setLastUpdatedTimestamp(data: CovidSummaryReponse) {
+function setLastUpdatedTimestamp(data: CovidSummaryResponse) {
   lastUpdatedTime.innerText = new Date(data.Date).toLocaleString();
 }
 
