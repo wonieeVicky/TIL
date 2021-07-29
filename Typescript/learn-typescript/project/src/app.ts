@@ -55,8 +55,7 @@ const CovidStatus = {
   Recovered: 'recovered',
   Deaths: 'deaths',
 } as const;
-
-export type CovidStatus = typeof CovidStatus[keyof typeof CovidStatus];
+type CovidStatus = typeof CovidStatus[keyof typeof CovidStatus];
 
 function fetchCountryInfo(
   countryName: string,
