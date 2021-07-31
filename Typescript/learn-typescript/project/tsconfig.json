@@ -7,8 +7,12 @@
     "lib": ["ES2015", "DOM", "DOM.Iterable"],
     "noImplicitAny": true,
     "esModuleInterop": true,
-    "typeRoots": ["./node_modules/@types", "./types"]
+    "typeRoots": ["./node_modules/@types", "./types"],
+    "strict": true,
+    "strictNullChecks": true,
+    "strictFunctionTypes": true,
+    "strictBindCallApply": true
   },
   "include": ["./src/**/*"], // src 이하 모든 파일을 타입스크립트 체크를 하겠다.
-  "exclude": ["node_modules", "dist"]
+  "exclude": ["node_modules", "dist"],
 }
