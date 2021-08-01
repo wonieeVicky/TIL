@@ -54,6 +54,7 @@
     - [외부 라이브러리 모듈화](https://github.com/wonieeVicky/TIL/blob/main/Typescript/3-10-modularize-external-libraries.md)
     - [API 함수 타입 정의](https://github.com/wonieeVicky/TIL/blob/main/Typescript/3-11-define-for-fetch.md)
     - [차트 관련 타입 오류 해결 및 tree-shaking을 위한 enum 타입 개선](https://github.com/wonieeVicky/TIL/blob/main/Typescript/3-12-error-fix-for-chartjs.md)
+    - [엄격한 타입 적용](https://github.com/wonieeVicky/TIL/blob/main/Typescript/3-13-apply-tight-type.md)
 
 <br />
 
