@@ -22,7 +22,6 @@
     - [optional](https://github.com/wonieeVicky/TIL/blob/main/Typescript/1-11-optional.md)
     - [module](https://github.com/wonieeVicky/TIL/blob/main/Typescript/1-12-module.md)
     - [utlity type](https://github.com/wonieeVicky/TIL/blob/main/Typescript/1-13-utility-type.md)
-      <br />
 
 2.  TypeScript 개념 정리 + 실적 적용
 
@@ -40,7 +39,6 @@
     - [타입 단언과 타입 가드](https://github.com/wonieeVicky/TIL/blob/main/Typescript/2-12-type-assersion-and-type-guard.md)
     - [타입 호환](https://github.com/wonieeVicky/TIL/blob/main/Typescript/2-13-type-compatibility.md)
     - [타입 모듈화](https://github.com/wonieeVicky/TIL/blob/main/Typescript/2-14-type-module.md)
-      <br />
 
 3.  실전 프로젝트로 배우는 타입스크립트
 
@@ -62,25 +60,24 @@
 
 - EcmaScript6
 
-  1. [scope](https://github.com/wonieeVicky/TIL/blob/main/EcmaScript6/1-scope.md)
-  2. [string](https://github.com/wonieeVicky/TIL/blob/main/EcmaScript6/2-string.md)
-  3. [array](https://github.com/wonieeVicky/TIL/blob/main/EcmaScript6/3-array.md)
-  4. [object-1](https://github.com/wonieeVicky/TIL/blob/main/EcmaScript6/4-object-1.md)
-  5. [destructuring](https://github.com/wonieeVicky/TIL/blob/main/EcmaScript6/5-destructuring.md)
-  6. [set & weakSet](https://github.com/wonieeVicky/TIL/blob/main/EcmaScript6/6-set-and-weak-set.md)
-  7. [Map & WeakMap](https://github.com/wonieeVicky/TIL/blob/main/EcmaScript6/7-map-and-weak-map.md)
-  8. [Template](https://github.com/wonieeVicky/TIL/blob/main/EcmaScript6/8-template.md)
-  9. [Function](https://github.com/wonieeVicky/TIL/blob/main/EcmaScript6/9-function.md)
-  10. [object-2](https://github.com/wonieeVicky/TIL/blob/main/EcmaScript6/10-object-2.md)
-  11. [Module](https://github.com/wonieeVicky/TIL/blob/main/EcmaScript6/11-module.md)
-  12. [Proxy](https://github.com/wonieeVicky/TIL/blob/main/EcmaScript6/12-proxy.md)
-  13. [Mini Project](https://github.com/wonieeVicky/TIL/blob/main/EcmaScript6/13-mini-project.md)
-
-   <br />
+  1. [scope](https://github.com/wonieeVicky/TIL/blob/main/JavaScript/EcmaScript6/1-scope.md)
+  2. [string](https://github.com/wonieeVicky/TIL/blob/main/JavaScript/EcmaScript6/2-string.md)
+  3. [array](https://github.com/wonieeVicky/TIL/blob/main/JavaScript/EcmaScript6/3-array.md)
+  4. [object-1](https://github.com/wonieeVicky/TIL/blob/main/JavaScript/EcmaScript6/4-object-1.md)
+  5. [destructuring](https://github.com/wonieeVicky/TIL/blob/main/JavaScript/EcmaScript6/5-destructuring.md)
+  6. [set & weakSet](https://github.com/wonieeVicky/TIL/blob/main/JavaScript/EcmaScript6/6-set-and-weak-set.md)
+  7. [Map & WeakMap](https://github.com/wonieeVicky/TIL/blob/main/JavaScript/EcmaScript6/7-map-and-weak-map.md)
+  8. [Template](https://github.com/wonieeVicky/TIL/blob/main/JavaScript/EcmaScript6/8-template.md)
+  9. [Function](https://github.com/wonieeVicky/TIL/blob/main/JavaScript/EcmaScript6/9-function.md)
+  10. [object-2](https://github.com/wonieeVicky/TIL/blob/main/JavaScript/EcmaScript6/10-object-2.md)
+  11. [Module](https://github.com/wonieeVicky/TIL/blob/main/JavaScript/EcmaScript6/11-module.md)
+  12. [Proxy](https://github.com/wonieeVicky/TIL/blob/main/JavaScript/EcmaScript6/12-proxy.md)
+  13. [Mini Project](https://github.com/wonieeVicky/TIL/blob/main/JavaScript/EcmaScript6/13-mini-project.md)
 
 - Functional Programming
 
-  1. [함수형 자바스크립트 기본기](https://github.com/wonieeVicky/TIL/blob/main/EcmaScript6/1-basic-for-functional-programming.md)
+  1. [함수형 자바스크립트 기본기](https://github.com/wonieeVicky/TIL/blob/main/JavaScript/Functional-programming/1-basic-for-functional-programming.md)
+  2. [ES6에서의 순회와 이터러블/이터레이터 프로토콜](https://github.com/wonieeVicky/TIL/blob/main/JavaScript/Functional-programming/2-iterable-iterator-protocol.md)
 
 ## TDD
 
@@ -92,12 +89,12 @@
   4. [추가 요구사항도 쉽게 만들 수 있도록 리팩토링](https://github.com/wonieeVicky/TIL/blob/main/TDD/4-tdd-refactoring-for-addtional-requirements.md)
   5. [변경사항 화면 업데이트 및 최종 정리](https://github.com/wonieeVicky/TIL/blob/main/TDD/5-tdd-update-layout-and-final.md)
 
-<br />
-
 - Jest
 
   1. [Jest 개요](https://github.com/wonieeVicky/TIL/blob/main/TDD/2-1-jest-basic.md)
   2. [Matcher](https://github.com/wonieeVicky/TIL/blob/main/TDD/2-2-jest-matchers.md)
+
+<br />
 
 ## Redux & MobX
 
@@ -106,6 +103,8 @@
 3. [Redux-toolkit](https://github.com/wonieeVicky/TIL/blob/main/Redux&MobX/3-redux-toolkit.md)
 4. [MobX](https://github.com/wonieeVicky/TIL/blob/main/Redux&MobX/4-mobx.md)
 5. [Mobx-react](https://github.com/wonieeVicky/TIL/blob/main/Redux&MobX/5-mobx-react.md)
+
+<br />
 
 ## React
 
@@ -120,8 +119,6 @@
    - [틱택토 만들기](https://github.com/wonieeVicky/TIL/blob/main/React/react-webgame/7-tictactoe.md)
    - [지뢰찾기 만들기](https://github.com/wonieeVicky/TIL/blob/main/React/react-webgame/8-mine-search.md)
    - [리액트 라우터 설정](https://github.com/wonieeVicky/TIL/blob/main/React/react-webgame/9-react-router.md)
-
-<br />
 
 2. React + TypeScript webgame
 
@@ -167,8 +164,6 @@
 
    - [MobX 구조 잡기](https://github.com/wonieeVicky/TIL/blob/main/React/react-typescript-webgame/7-1-ready-for-mobx-typing.md)
    - [MobX typing](https://github.com/wonieeVicky/TIL/blob/main/React/react-typescript-webgame/7-2-mobx-typing.md)
-
-   <br />
 
 3. React + Next.js로 React NodeBird SNS 구현하기
 
