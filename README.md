@@ -79,6 +79,7 @@
   1. [함수형 자바스크립트 기본기](https://github.com/wonieeVicky/TIL/blob/main/JavaScript/Functional-programming/1-basic-for-functional-programming.md)
   2. [ES6에서의 순회와 이터러블/이터레이터 프로토콜](https://github.com/wonieeVicky/TIL/blob/main/JavaScript/Functional-programming/2-iterable-iterator-protocol.md)
   3. [제너레이터와 이터레이터](https://github.com/wonieeVicky/TIL/blob/main/JavaScript/Functional-programming/3-generator-and-iterator.md)
+  4. [map, filter, reduce](https://github.com/wonieeVicky/TIL/blob/main/JavaScript/Functional-programming/4-map-filter-reduce.md)
 
 ## TDD
 
