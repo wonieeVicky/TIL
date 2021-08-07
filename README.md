@@ -80,6 +80,7 @@
   2. [ES6에서의 순회와 이터러블/이터레이터 프로토콜](https://github.com/wonieeVicky/TIL/blob/main/JavaScript/Functional-programming/2-iterable-iterator-protocol.md)
   3. [제너레이터와 이터레이터](https://github.com/wonieeVicky/TIL/blob/main/JavaScript/Functional-programming/3-generator-and-iterator.md)
   4. [map, filter, reduce](https://github.com/wonieeVicky/TIL/blob/main/JavaScript/Functional-programming/4-map-filter-reduce.md)
+  5. [코드를 값으로 다루어 표현력 높이기](https://github.com/wonieeVicky/TIL/blob/main/JavaScript/Functional-programming/5-treat-code-as-a-value.md)
 
 ## TDD
 
