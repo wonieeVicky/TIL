@@ -81,6 +81,7 @@
   3. [제너레이터와 이터레이터](https://github.com/wonieeVicky/TIL/blob/main/JavaScript/Functional-programming/3-generator-and-iterator.md)
   4. [map, filter, reduce](https://github.com/wonieeVicky/TIL/blob/main/JavaScript/Functional-programming/4-map-filter-reduce.md)
   5. [코드를 값으로 다루어 표현력 높이기](https://github.com/wonieeVicky/TIL/blob/main/JavaScript/Functional-programming/5-treat-code-as-a-value.md)
+  6. [장바구니 예제](https://github.com/wonieeVicky/TIL/blob/main/JavaScript/Functional-programming/6-example-cart.md)
 
 ## TDD
 
