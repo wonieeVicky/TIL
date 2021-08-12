@@ -240,8 +240,97 @@ go(
   log
 );
 console.timeEnd("");
+// (10) [11, 13, 15, 17, 19, 21, 23, 25, 27, 29]
+// : 67.73486328125 ms
 ```
 
 ![](../../img/210811-1.png)
 
 해당 함수값이 어떻게 변경되는지 보기 위해 디버그 콘솔 내 Sources에서 breakpoint를 걸어서 확인해본다.
+
+즉시 평가되는 위 코드의 경우 breakpoint로 보면 전달받은 배열을 모두 순회하며 iterator로 만들고 반복을 하면서 각 조건에 맞게 연산을 처리한다. (실행순서: range → map → filter → take → reduce)
+
+그렇다면 아래 제너레이터로 만들어진 L.range, L.map. L.filter 함수는 어떻게 연산이 될까?
+
+### L.range, L.map, L.filter, take, reduce 중첩 사용
+
+```jsx
+L.range = function* (l) {
+  let i = -1;
+  while (++i < l) {
+    yield i;
+  }
+};
+
+L.map = curry(function* (f, iter) {
+  iter = iter[Symbol.iterator]();
+  let cur;
+  while (!(cur = iter.next()).done) {
+    const a = cur.value;
+    yield f(a);
+  }
+});
+
+L.filter = curry(function* (f, iter) {
+  iter = iter[Symbol.iterator]();
+  let cur;
+  while (!(cur = iter.next()).done) {
+    const a = cur.value;
+    if (f(a)) {
+      yield a;
+    }
+  }
+});
+
+console.time("L");
+go(
+  L.range(Infinity),
+  L.map((n) => n + 10),
+  L.filter((n) => n % 2),
+  take(10),
+  log
+);
+console.timeEnd("L");
+// (10) [11, 13, 15, 17, 19, 21, 23, 25, 27, 29]
+// L: 11.751220703125 ms
+```
+
+지연평가되는 위 코드의 경우 즉시평가되는 코드와 다른 순서로 함수가 처리된다. 실행순서는 take → L.filter → L.map → L.range 순이다. 이렇게 처리되는 이유는 L.range, L.map, L.filter에서 평가되기를 미뤄둔 이터레이터를 바로 리턴하기 때문이다. 즉 값이 지연처리되는 경향으로 순서가 거꾸로 진행되는 것처럼 보이는 것이다.
+
+즉 즉시평가되는 앞선 코드에서는 range함수를 통해 10000짜리 배열을 만들어, 모두 순회하여 연산하고 확인하는 과정을 거치는 반면, 지연평가가 되는 코드는 값이 필요할 때 해당 함수를 호출하는 방식으로 처리된다.
+
+```jsx
+// 즉시평가
+// [0, 1, 2, 3, 4, 5, 6, 7, 8...]
+// [10, 11, 12, ...]
+// [11, 13, 15 ..]
+// [11, 13]
+
+// 지연평가
+// [0    [1
+// 10     11
+// false]  true]
+//
+```
+
+### 엄격한 계산과 느긋한 계산의 효율성 비교
+
+앞서 확인한 연산과 가장 큰 차이는 값을 모두 연산하지 않는 점이다. (breakpoint로 map, filter 영역을 모니터링하면 그 차이를 알 수 있다.) 따라서 그 수의 범위가 위와 같이 Infinity로 설정되어 있어도 모든 값을 순회하지 않고 필요한 값만 연산하므로 성능상에 문제가 없고, 연산의 효율성이 높다고 볼 수 있는 것이다!
+
+실제 연산 시간으로만 봐도 11ms 와 67ms로 극명하게 차이점을 확인할 수 있다. 👍🏼
+
+### map, filter 계열 함수들이 가지는 결합 법칙
+
+map, filter의 함수의 경우 특정한 방식으로 다르게 평가 순서를 바꿔도 같은 결과값을 반환한다는 결합법칙을 가지고 있다!
+
+- 사용하는 데이터가 무엇이든지
+- 사용하는 보조 함수가 순수 함수라면 무엇이든지
+- 아래와 같이 겷합한다면 둘 다 결과가 같다.
+
+```
+[[mapping, mapping], [filtering, filtering], [mapping, mapping]] - 가로형(즉시평가)
+				===== 위/ 아래 연산 결과가 같다. (결합법칙) =====
+[[mapping, filtering, mapping], [mapping, filtering, mapping]] - 세로형(지연평가)
+```
+
+기존에는 지연 평가를 직접 개발자가 코드로 구현해야했지만, 이제 자바스크립트의 공식 규약을 통해 지연성을 구현하고 안전하게 합성할 수 있게 되었다.
