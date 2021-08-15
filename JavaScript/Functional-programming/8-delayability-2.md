@@ -146,3 +146,100 @@ go(
   log
 ); // 28
 ```
+
+### L.map, L.filter로 map과 filter 만들기
+
+기존 `map`을 활용한 아래와 같은 함수가 있다고 하자.
+
+```jsx
+const map = curry((f, iter) => {
+  let res = [];
+  iter = iter[Symbol.iterator]();
+  let cur;
+  while (!(cur = iter.next()).done) {
+    const a = cur.value;
+    res.push(f(a));
+  }
+  return res;
+});
+
+log(map((a) => a + 10, range(4))); // [10, 11, 12, 13]
+// map 함수가 이터러블 객체를 이터레이터로 만들어사용하기 때문에 L.range 사용 가능
+log(map((a) => a + 10, L.range(4))); // [10, 11, 12, 13]
+```
+
+위 `map` 함수를 `L.map` 을 적용하여 더욱 간결하게 만들 수 있다.
+
+```jsx
+const map = curry(
+  pipe(
+    L.map, // 앞에서 만들어진 map이 length가 어떻게 되든
+    take(Infinity) // 만들어진 값만 반환한다
+  )
+);
+
+log(map((a) => a + 10, L.range(4))); // [10, 11, 12, 13]
+```
+
+기존 filter도 마찬가지로 동일하게 `L.filter`를 활용하여 더욱 간결하게 만들 수 있는데, 기존 filter 함수로 구현한 코드가 아래와 같다면..
+
+```jsx
+L.filter = curry(function* (f, iter) {
+  iter = iter[Symbol.iterator]();
+  let cur;
+  while (!(cur = iter.next()).done) {
+    const a = cur.value;
+    if (f(a)) {
+      yield a;
+    }
+  }
+});
+
+const filter = curry((f, iter) => {
+  let res = [];
+  iter = iter[Symbol.iterator]();
+  let cur;
+  while (!(cur = iter.next()).done) {
+    const a = cur.value;
+    if (f(a)) res.push(a);
+  }
+  return res;
+});
+
+log(filter((a) => a % 2, L.range(4))); // [1, 3]
+```
+
+아래처럼 코드를 간소화시킬 수 있다.
+
+```jsx
+const filter = curry(pipe(L.filter, take(Infinity)));
+
+log(filter((a) => a % 2, L.range(4))); // [1, 3]
+```
+
+또한 `take(Infinity)`가 계속 반복되므로 `const takeAll = take(Infinity);` 별도로 빼줘도 좋다.
+
+```jsx
+const takeAll = take(Infinity);
+
+const map = curry(pipe(L.map, take
+
+All));
+const filter = curry(pipe(L.filter, take(Infinity)));
+```
+
+또한 `L.map`과 `L.filter`를 좀 더 간소화하여 표현하자면 아래와 같다.
+
+```jsx
+L.map = curry(function* (f, iter) {
+  for (const a of iter) {
+    yield f(a);
+  }
+});
+
+L.filter = curry(function* (f, iter) {
+  for (const a of iter) {
+    if (f(a)) yield a;
+  }
+});
+```
