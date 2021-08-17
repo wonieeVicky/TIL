@@ -243,3 +243,42 @@ L.filter = curry(function* (f, iter) {
   }
 });
 ```
+### L.flatten, flatten
+
+다수의 배열을 하나의 배열로 펼쳐서 반환하면서 지연성까지 갖춘 L.flatten 함수를 만들어보려고 한다.
+
+```jsx
+log([...[1, 2], 3, 4, ...[5, 6], ...[7, 8, 9]]);
+```
+
+예를 들면 위 다수의 배열을 `[1, 2, 3, 4, 5, 6, 7, 8, 9]`로 반환해주는 함수를 만들고자 하는 것이다.
+
+```jsx
+// a값이 있고, a가 Symbol.iterator를 가졌는지 체크한다.
+const isIterable = (a) => a && a[Symbol.iterator];
+
+L.flatten = function* (iter) {
+  for (const a of iter) {
+    if (isIterable(a)) for (const b of a) yield b;
+    else yield a;
+  }
+};
+
+var it = L.flatten([[1, 2], 3, 4, [5, 6], [7, 8, 9]]);
+log(it.next()); // { value: 1, done: false }, 지연적으로 동작한다.
+log(it.next()); // { value: 2, done: false }, 지연적으로 동작한다.
+log([...it]); // [1, 2, 3, 4, 5, 6, 7, 8, 9]
+```
+
+`L.flatten` 함수는 위와 같이 구현이 가능하다. 즉시평가하는 flatten 함수도 만들 수 있다.
+
+```jsx
+const flatten = pipe(L.flatten, takeAll);
+log(flatten([[1, 2], 3, 4, [5, 6], [7, 8, 9]])); // [1, 2, 3, 4, 5, 6, 7, 8, 9]
+```
+
+혹은 필요한 갯수만큼만 전개하여 반환하는 함수도 쉽게 만들 수 있다.
+
+```jsx
+log(take(3, L.flatten([[1, 2], 3, 4, [5, 6], [7, 8, 9]]))); // [1, 2, 3]
+```
