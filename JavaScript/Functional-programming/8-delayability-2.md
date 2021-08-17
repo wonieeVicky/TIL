@@ -243,6 +243,7 @@ L.filter = curry(function* (f, iter) {
   }
 });
 ```
+
 ### L.flatten, flatten
 
 다수의 배열을 하나의 배열로 펼쳐서 반환하면서 지연성까지 갖춘 L.flatten 함수를 만들어보려고 한다.
@@ -281,4 +282,134 @@ log(flatten([[1, 2], 3, 4, [5, 6], [7, 8, 9]])); // [1, 2, 3, 4, 5, 6, 7, 8, 9]
 
 ```jsx
 log(take(3, L.flatten([[1, 2], 3, 4, [5, 6], [7, 8, 9]]))); // [1, 2, 3]
+```
+
+### yield \*를 활용한 L.flatten 리팩토링, L.deepFlat
+
+`yield *`를 활용하면 위 `L.flatten` 함수를 아래와 같이 변경할 수 있다. `yield *iterable`은 `for(const val of iterable) yield val;`과 같다.
+
+```jsx
+L.flatten = function* (iter) {
+  for (const a of iter) {
+    if (isIterable(a)) yield* a;
+    else yield a;
+  }
+};
+```
+
+만약 다중배열 혹은 깊은 `Iterable`을 모두 펼치고 싶다면 아래와 같이 `L.deepFlat` 함수로 구현할 수 있다. `L.deepFlat`은 깊은 `Iterable`을 펼쳐준다.
+
+```jsx
+L.deepFlat = function* f(iter) {
+  for (const a of iter) {
+    if (isIterable(a)) yield* f(a);
+    else yield a;
+  }
+};
+log([...L.deepFlat([1, [2, [3, 4], [[5]]]])]); // [1, 2, 3, 4, 5];
+```
+
+### L.flatMap, flatMap
+
+flatMap 함수는 map과 flatten을 동시에 하는 역할을 담당하는 함수이다. 자바스크립트 기본 문법으로 제공되는 flatMap의 사용법은 아래와 같으며, flatMap 안에 들어가는 함수를 통해 다양한 값에 대한 조작이 가능하다.
+
+```jsx
+log(
+  [
+    [1, 2],
+    [3, 4],
+    [5, 6, 7],
+  ].flatMap((a) => a)
+); // [1, 2, 3, 4, 5, 6, 7]
+log(
+  [
+    [1, 2],
+    [3, 4],
+    [5, 6, 7],
+  ].flatMap((a) => a.map((a) => a * a))
+); // [1, 4,9, 16, 25, 36, 49]
+```
+
+위 flatMap과 동일한 동작을 수행하는 함수를 직접 구현하려면 `map` 한 값에 `flatten` 함수를 적용하면 된다.
+
+```jsx
+log(
+  flatten(
+    [
+      [1, 2],
+      [3, 4],
+      [5, 6, 7],
+    ].map((a) => a.map((a) => a * a))
+  )
+);
+log(
+  flatten(
+    [
+      [1, 2],
+      [3, 4],
+      [5, 6, 7],
+    ].map((a) => a.map((a) => a * a))
+  )
+);
+```
+
+`flatMap`함수가 존재하는 이유는 `map`과 `flatten`이 비효율적으로 동작하기 때문인데, `map`을 통해 모든 배열의 인자를 순회 후 다시 `flatten`을 적용하기 때문이다.
+
+물론 비효율적이라고 해서 시간복잡도가 차이나거나 하지 않는다. 그 이유는 위 flatMap 함수도 결국 모든 배열을 순회하기 때문이다. 순회하지 않아도 되는 부분이 발생하거나 연산자체를 하지 않아도 되는 부분이 있는 코드가 아니라면 시간복잡도가 동일하므로 굉장히 많은 효율을 만들어낼 수 있지는 않다.
+
+그러나 좀 더 효율적으로 동작하도록 하는 혹은 다형성이 높은 `FlatMap` 함수를 직접 구현해보자
+
+```jsx
+L.flatMap = curry(pipe(L.map, L.flatten));
+var it = L.flatMap(
+  map((a) => a * a),
+  [
+    [1, 2],
+    [3, 4],
+    [5, 6, 7],
+  ]
+);
+log([...it]); // [1, 4, 9, 16, 25, 36, 49]
+log(it.next()); // { value: 1, done: false }
+log(it.next()); // { value: 4, done: false }
+log(it.next()); // { value: 9, done: false }
+log(it.next()); // { value: 16, done: false }
+
+// 아래와 같이 만들 수도 있다.
+const flatMap = curry(pipe(L.map, flatten));
+log(
+  flatMap(
+    (a) => a,
+    [
+      [1, 2],
+      [3, 4],
+      [5, 6, 7],
+    ]
+  )
+); // [1, 2, 3, 4, 5, 6, 7]
+log(
+  flatMap(
+    L.range,
+    map((a) => a + 1, [1, 2, 3])
+  )
+); // [0, 1, 0, 1, 2, 0, 1, 2, 3]
+
+var it = L.flatMap(
+  L.range,
+  map((a) => a + 1, [1, 2, 3])
+);
+log(it.next()); // { value: 0, done: false }
+log(it.next()); // { value: 1, done: false }
+log(it.next()); // { value: 0, done: false }
+log(it.next()); // { value: 1, done: false }
+
+log(
+  take(
+    3,
+    L.flatMap(
+      L.range,
+      map((a) => a + 1, [1, 2, 3])
+    )
+  )
+); // [0, 1, 0]
 ```
