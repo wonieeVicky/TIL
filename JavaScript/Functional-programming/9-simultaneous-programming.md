@@ -250,3 +250,153 @@ setTimeout(function () {
 위와 같이 fg 함수를 then과 catch로 구성하면 이후 예상치 못한 users 정보가 들어와 에러가 발생하더라도 unedfined나 에러를 발생시키지 않고 없어요! 라는 값을 반환하도록 만들 수 있는 것이다.
 
 Promsie로 Kleisli Composition을 구현할 수 있다는 점은 바로 이런 것을 의미한다. 🥸
+
+### go, pipe, reduce에서 비동기 제어
+
+지난 시간 비동기를 값으로 다루는 Promise 의 성질을 이용하여 go1이라는 함수를 만들어 다양한 상황에서 대응 가능하도록 구현해보았고  Kleisli Composition와 재귀적으로 함수를 연속적으로 실행해주는 reduce 함수도 배워보았다. 위 함수들을 활용하여 비동기 제어를 할 수 있도록 코드를 구현해보자
+
+```jsx
+go(1,
+  a => a + 10,
+  a => Promise.resolve(a + 100),
+  a => a + 1000,
+  log); // [object Promise]1000
+```
+
+위처럼 특정 지점에서 비동기 상황이 발생하여 Promise를 리턴하는 함수가 합성되었을 때 비정상적으로 동작한다. 어떻게 하면 정상적으로 함수를 구현할 수 있을까?
+
+```jsx
+const go = (...args) => reduce((a, f) => f(a), args);
+const reduce = curry((f, acc, iter) => {
+  if (!iter) {
+    iter = acc[Symbol.iterator]();
+    acc = iter.next().value;
+  } else {
+    iter = iter[Symbol.iterator]();
+  }
+  let cur;
+  while (!(cur = iter.next()).done) {
+    const a = cur.value;
+    acc = f(acc, a);
+  }
+  return acc;
+});
+```
+
+바로 위 reduce 함수에서 Promise의 결과값을 지원하도록 처리해주면 된다. 
+
+```jsx
+const reduce = curry((f, acc, iter) => {
+  if (!iter) {
+    iter = acc[Symbol.iterator]();
+    acc = iter.next().value;
+  } else {
+    iter = iter[Symbol.iterator]();
+  }
+  let cur;
+  while (!(cur = iter.next()).done) {
+    const a = cur.value;
+    // acc = f(acc, a);
+    acc = acc instanceof Promise ? acc.then(acc => f(acc, a)) : f(acc, a);
+  }
+  return acc;
+});
+
+go(1,
+  a => a + 10,
+  a => Promise.resolve(a + 100),
+  a => a + 1000,
+  log); // 1111
+```
+
+위와 같이 `reduce` 함수에 `Promise` 값을 확인하여 적절히 리턴해주도록 처리하면 go 함수가 정상적으로 동작한다. 그런데 이는 아주 훌륭한 상태의 코드는 아니다. 왜냐하면 중간에 `Promise`를 한번 만나게 되면 계속해서 이어지는 `a => a + 1000` 함수들이 Promise Chain에 속해지므로 연속적으로 계속 비동기가 일어나게 되기 때문이다. 이로 인해 불필요한 로드가 발생하고 성능저하가 일어날 수 있다. 
+
+따라서 가능하다면 중간에 Promise를 만나더라도 다음 코드가 동기적으로 수행될 수 있도록 처리하는 것이 좋다.
+재귀를 통해 아래와 같이 처리할 수 있다.
+
+```jsx
+const reduce = curry((f, acc, iter) => {
+  if (!iter) {
+    iter = acc[Symbol.iterator]();
+    acc = iter.next().value;
+  } else {
+    iter = iter[Symbol.iterator]();
+  }
+	// 재귀로 구현
+  return function recur(acc) {
+    let cur;
+    while (!(cur = iter.next()).done) {
+      const a = cur.value;
+      acc = f(acc, a); // 먼저 함수를 적용해본 뒤 적절하게 처리 
+      if (acc instanceof Promise) return acc.then(recur); // Promise 객체가 반환되면 then으로 값을 전달
+    }
+    return acc;
+  }(acc);
+});
+go(1,
+  a => a + 10,
+  a => Promise.resolve(a + 100),
+  a => a + 1000,
+  log); // 1111
+```
+
+위처럼`f(acc,a);` 를 먼저 구한 뒤 해당 값이 Promise 객체라면 then을 통해 내부 값을 전달하는 방법으로 리팩토링 할 수 있다. 그러면 계속해서 이어지는 동기적 코드들이 Promise Chain에 속해지지 않고 그대로 연산이 이루어질 수 있는 것이다.
+
+여기에서 더 나아가 첫번째 인자가 Promise일 경우에도 고려해보자.
+
+```jsx
+go(Promise.resolve(1),
+  a => a + 10,
+  a => Promise.resolve(a + 100),
+  a => a + 1000,
+  log); // [object Promise]101001000
+```
+
+위와 같이 원하는대로 동작하지 않는다. 이는 즉 첫 acc 자체가 Promise이므로 `acc = f(acc, a);`에서 에러가 발생하는 것이다. Reduce 함수를 추가로 수정해보자.
+
+```jsx
+const go1 = (a, f) => a instaceof Promise ? a.then(f) : f(a);
+const reduce = curry((f, acc, iter) => {
+  if (!iter) {
+    iter = acc[Symbol.iterator]();
+    acc = iter.next().value;
+  } else {
+    iter = iter[Symbol.iterator]();
+  }
+  return go1(acc, function recur(acc) {
+    let cur;
+    while (!(cur = iter.next()).done) {
+      const a = cur.value;
+      acc = f(acc, a);
+      if (acc instanceof Promise) return acc.then(recur);
+    }
+    return acc;
+  });
+});
+```
+
+위와 같이 `go1` 함수를 만들어 재귀함수를 감싸서 처리하면 첫 인자가 `Promise`인지를 판별하여 적절하게 코드가 실행되게 된다. 그렇다면 `reject`가 코드에 포함된다면 어떻게 될까?
+
+```jsx
+go(Promise.resolve(1),
+  a => a + 10,
+  a => Promise.reject('error!!'),
+	a => console.log('----'),
+  a => a + 1000,
+  log); // Uncaught (in promise) error!!
+```
+
+위처럼 하위 `console.log`가 실행되지 않고 error를 뿜게 된다. 이는 아래와 같이 처리할 수 있다.
+
+```jsx
+go(Promise.resolve(1),
+  a => a + 10,
+  a => Promise.reject('error!!'),
+	a => console.log('----'),
+  a => a + 1000,
+  log).catch(a => console.log(a)); // error!!
+```
+
+`catch` 메서드를 추가하면 error!! 를 반환하여 에러를 발생하지 않고 함수를 합성할 수 있게 되는 것이다.
+
+이렇게 `Promise`를 단순히 then을 통해 콜백지옥을 해소하는 용도로만 사용하는 것이 아니라 Promise라는 값을 가지고 내가 원하는 로직을 사용한다거나 내가 원하는 시점에 원하는 방식으로 적절한 시점에 받아둔 함수를 실행하는 고차함수를 만든다던지 다하는 다양한 응용들을 다양하게 할 수 있다.
