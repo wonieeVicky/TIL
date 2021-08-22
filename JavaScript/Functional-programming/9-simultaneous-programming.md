@@ -400,3 +400,20 @@ go(Promise.resolve(1),
 `catch` 메서드를 추가하면 error!! 를 반환하여 에러를 발생하지 않고 함수를 합성할 수 있게 되는 것이다.
 
 이렇게 `Promise`를 단순히 then을 통해 콜백지옥을 해소하는 용도로만 사용하는 것이 아니라 Promise라는 값을 가지고 내가 원하는 로직을 사용한다거나 내가 원하는 시점에 원하는 방식으로 적절한 시점에 받아둔 함수를 실행하는 고차함수를 만든다던지 다하는 다양한 응용들을 다양하게 할 수 있다.
+
+### Promise.then의 중요한 규칙
+
+Promise에는 중요한 규칙이 있는데, then으로 반환받는 값은 반드시 Promise가 아니라는 것이다.
+
+```jsx
+Promise.resolve(Promise.resolve(Promise.resolve(1))).then(log); // 1
+new Promise(resolve => resolve(new Promise(resolve => resolve(1)))).then(log); // 1
+```
+
+위처럼 Promise 체인이 연속적으로 대기가 걸려있어도(중첩되어 있더라도) 원하는 시점에 한번의 then으로 해당하는 결과를 받을 수 있다는 것이다. 이 규칙은 개발 시 중요한 규칙이며, 정확한 소통을 가능케해준다.
+
+```jsx
+Promise.resolve(Promise.resolve(1)).then(function(a){
+	log(a);
+});
+```
