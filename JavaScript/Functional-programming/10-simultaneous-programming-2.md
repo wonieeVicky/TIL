@@ -241,3 +241,101 @@ go(
   log
 ); // [1, 3, 5]
 ```
+
+### reduce에서 nop 지원
+
+위 `take` 함수와 같이 `reduce`에서도 `nop`을 지원하도록 리팩토링해보자.
+
+이를 통해 지연성과 Promise를 모두 지원하는 이터러블 중심 프로그래밍이 가능해지고 나아가 동시성이나 비동기 상황들을 잘 제어해보고자 한다.
+
+```jsx
+go(
+  [1, 2, 3, 4],
+  L.map((a) => Promise.resolve(a * a)),
+  L.filter((a) => Promise.resolve(a % 2)),
+  reduce(add),
+  log
+); // 1[object Promise][object Promise][object Promise]
+// Uncaught (in promise) Symbol(nop)
+```
+
+reduce를 사용 시 위와 같이 에러가 나고 있다.
+
+```jsx
+// 기존 Reduce
+const reduce = curry((f, acc, iter) => {
+  if (!iter) {
+    iter = acc[Symbol.iterator]();
+    acc = iter.next().value;
+  } else {
+    iter = iter[Symbol.iterator]();
+  }
+  return go1(acc, function recur(acc) {
+    let cur;
+    while (!(cur = iter.next()).done) {
+      const a = cur.value;
+      acc = f(acc, a);
+      if (acc instanceof Promise) return acc.then(recur);
+    }
+    return acc;
+  });
+});
+
+const reduceF = (acc, a, f) =>
+  a instanceof Promise
+    ? a.then(
+        (a) => f(acc, a),
+        (e) => (e == nop ? acc : Promise.reject(e))
+      )
+    : f(acc, a);
+
+// 기존 Reduce
+const reduce = curry((f, acc, iter) => {
+  if (!iter) {
+    iter = acc[Symbol.iterator]();
+    acc = iter.next().value;
+  } else {
+    iter = iter[Symbol.iterator]();
+  }
+  return go1(acc, function recur(acc) {
+    let cur;
+    while (!(cur = iter.next()).done) {
+      acc = reduceF(acc, cur.value, f); // reduceF 적용
+      if (acc instanceof Promise) return acc.then(recur);
+    }
+    return acc;
+  });
+});
+```
+
+위와 같이 변경 후 위 go 함수를 실행시키면 정상적으로 동작한다.
+
+```jsx
+go(
+  [1, 2, 3, 4],
+  L.map((a) => Promise.resolve(a * a)),
+  L.filter((a) => Promise.resolve(a % 2)),
+  reduce(add),
+  log
+); // 10
+```
+
+위 reduce 함수를 좀 더 리팩토링 하면 아래와 같이 변경이 가능하다.
+
+```jsx
+const head = (iter) => go1(take(1, iter), ([h]) => h);
+
+const reduce = curry((f, acc, iter) => {
+  if (!iter) return reduce(f, head((iter = acc[Symbol.iterator]())), iter);
+
+  iter = iter[Symbol.iterator]();
+  return go1(acc, function recur(acc) {
+    let cur;
+    while (!(cur = iter.next()).done) {
+      acc = reduceF(acc, cur.value, f); // reduceF 적용
+      if (acc instanceof Promise) return acc.then(recur);
+    }
+    return acc;
+  });
+});
+```
