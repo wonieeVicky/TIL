@@ -339,3 +339,49 @@ const reduce = curry((f, acc, iter) => {
   });
 });
 ```
+
+### 지연평가 + Promise의 효율성
+
+위와 같이 map, filter, reduce에서 동기와 비동기 상황을 모두 제어하도록 코드를 완성시켜보았다. 이로써 함수가 많은 효율성이 생겼는데, 아래 코드를 보자
+
+```jsx
+go(
+  [1, 2, 3, 4, 5, 6, 7, 8],
+  L.map((a) => {
+    log(a);
+    return new Promise((resolve) => setTimeout(() => resolve(a * a), 1000));
+  }),
+  L.filter((a) => a % 2),
+  take(2),
+  log
+);
+// 1
+// 2
+// 3
+// [1, 9]
+```
+
+위 코드를 실행하였을 때 해당하지 않는 4 - 8은 아예 코드 동작이 진행되지 않는 것을 알 수 있다.
+
+```jsx
+go(
+	[1, 2, 3, 4, 5, 6, 7, 8],
+  L.map(a => {
+    lo`(a);
+    return new Promise(resolve => setTimeout(() => resolve(a * a), 1000))
+  }),
+  L.filter(a => {
+    log(a);
+    return new Promise(resolve => setTimeout(() => resolve(a % 2), 1000))
+  }),
+	take(2),
+  log
+);
+// 1
+// 1
+// 2
+// 4
+// 3
+// 9
+// [1, 9]
+```
