@@ -600,3 +600,150 @@ C.filter = curry(pipe(L.filter, C.takeAll));
 C.map((a) => delay1000(a * a), [1, 2, 3, 4]).then(log); // 1초 뒤 동시에 시작되어 [1, 4, 9, 16]
 C.filter((a) => delay1000(a % 2), [1, 2, 3, 4]).then(log); // 1초 뒤 동시에 시작되어 [1, 3]
 ```
+
+### 즉시, 지연, Promise, 병렬적 조합하기
+
+지금까지 즉시/지연 평가되는 함수와 Promise 지원 및 병렬적 실행이 가능한 코드들을 작성해보았다. 이러한 코드들을 조합하여 내가 원하는 평가전략을 세우는 식으로 코딩을 할 수 있다.
+
+아래 사례를 보자
+
+```jsx
+const delay500 = (a, name) =>
+  new Promise((resolve) => {
+    console.log(`${name}: ${a}`);
+    setTimeout(() => resolve(a), 100);
+  });
+
+// 엄격한 평가를 한 예
+console.time("");
+go(
+  [1, 2, 3, 4, 5],
+  map((a) => delay500(a * a, "map 1")),
+  filter((a) => delay500(a % 2, "filter 2")),
+  map((a) => delay500(a + 1, "map 3")),
+  take(2),
+  // reduce(add),
+  log,
+  (_) => console.timeEnd("")
+);
+// map 1: 1
+// map 1: 4
+// map 1: 9
+// map 1: 16
+// map 1: 25
+// filter 2: 1
+// filter 2: 0
+// filter 2: 1
+// filter 2: 0
+// filter 2: 1
+// map3: 2
+// map3: 10
+// map3: 26
+// (2) [2, 10]
+// :10064.1231231ms
+
+// 지연평가 적용한 얘
+console.time("");
+go(
+  [1, 2, 3, 4, 5],
+  L.map((a) => delay500(a * a, "map 1")),
+  L.filter((a) => delay500(a % 2, "filter 2")),
+  L.map((a) => delay500(a + 1, "map 3")),
+  take(2),
+  // reduce(add),
+  log,
+  (_) => console.timeEnd("")
+);
+// map 1: 1
+// filter 2: 1
+// map 3: 2
+// map 1: 4
+// filter 2: 0
+// map 1: 9
+// filter 2: 1
+// map 3: 10
+// (2) [2, 10]
+// :4064.1231231ms
+
+// C.map을 적용한 예
+console.time("");
+go(
+  [1, 2, 3, 4, 5],
+  C.map((a) => delay500(a * a, "map 1")),
+  L.filter((a) => delay500(a % 2, "filter 2")),
+  L.map((a) => delay500(a + 1, "map 3")),
+  take(2),
+  // reduce(add),
+  log,
+  (_) => console.timeEnd("")
+);
+// map 1: 1
+// map 1: 4
+// map 1: 9
+// map 1: 16
+// map 1: 25
+// filter 2: 1
+// map 3: 2
+// filter 2: 0
+// filter 2: 1
+// map 3: 10
+// (2) [2, 10]
+// 4542.1231231ms
+
+// C.filter 병렬 처리 적용한 예
+console.time("");
+go(
+  [1, 2, 3, 4, 5],
+  L.map((a) => delay500(a * a, "map 1")),
+  C.filter((a) => delay500(a % 2, "filter 2")),
+  L.map((a) => delay500(a + 1, "map 3")),
+  take(2),
+  // reduce(add),
+  log,
+  (_) => console.timeEnd("")
+);
+// map 1: 1
+// map 1: 4
+// map 1: 9
+// map 1: 16
+// map 1: 25
+// filter 2: 1
+// filter 2: 0
+// filter 2: 1
+// filter 2: 0
+// filter 2: 1
+// map3: 2 - 여기서부터 하나씩 연산
+// map3: 10
+// (2) [2, 10]
+// :2020.1293012931ms
+
+// C.filter 병렬 처리 적용한 예
+console.time("");
+go(
+  [1, 2, 3, 4, 5],
+  L.map((a) => delay500(a * a, "map 1")),
+  L.filter((a) => delay500(a % 2, "filter 2")),
+  L.map((a) => delay500(a + 1, "map 3")),
+  C.take(2),
+  // reduce(add),
+  log,
+  (_) => console.timeEnd("")
+);
+// map 1: 1
+// map 1: 4
+// map 1: 9
+// map 1: 16
+// map 1: 25
+// filter 2: 1
+// filter 2: 0
+// filter 2: 1
+// filter 2: 0
+// filter 2: 1
+// map3: 2
+// map3: 10
+// map3: 26
+// (2) [2, 10]
+// :1511.1231231ms
+```
+
+위와 같이 상황에 맞게 전략을 짜서 선언적으로 부하정도를 결정하여 프로그래밍 할 수 있다.
