@@ -578,3 +578,25 @@ go(
 각 전략에 따라 선택적으로 사용할 수 있게 된다.
 
 위처럼 이터러블 중심적으로 사고를 하면 병렬적인 프로그래밍을 안전하고 쉽고, 선언적으로 해결할 수 있다.
+
+### 즉시 병렬적으로 평가하기 - C.map, C.filter
+
+지금까지는 함수열들을 쭉 만든 뒤 마지막에 평가를 하는 함수인 reduce나 take에서 지금까지 등록되어 있는 함수를 병렬적 혹은 동기적으로 실행하겠다를 선택하여 여러 개의 대기열을 처리하는 식으로 만들어보았다.
+
+이번에는 특정 함수 라인에서만 병렬적으로 평가 후 이외에는 동기적으로 실행할 수 있도록 선택할 수 있는 C.map과 C.filter를 만들어보고자 한다.
+
+```jsx
+C.take = curry((l, iter) => take(l, catchNoop([...iter])));
+C.takeAll = C.take(Infinity); // 간단하게 C.take를 활용한 C.takeAll 구현
+
+// curry와 pipe, 그리고 C.takeAll을 활용해 C.map, C.filter 구현
+C.map = curry(pipe(L.map, C.takeAll));
+C.filter = curry(pipe(L.filter, C.takeAll));
+```
+
+위 C.map, C.filter로 아래 코드를 구현하면 1초 뒤 동시에 시작되어 값이 도출되도록 구현이 가능하다.
+
+```jsx
+C.map((a) => delay1000(a * a), [1, 2, 3, 4]).then(log); // 1초 뒤 동시에 시작되어 [1, 4, 9, 16]
+C.filter((a) => delay1000(a % 2), [1, 2, 3, 4]).then(log); // 1초 뒤 동시에 시작되어 [1, 3]
+```
