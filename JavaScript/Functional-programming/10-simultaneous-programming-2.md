@@ -766,3 +766,9 @@ const catchNoop = ([...arr]) => arr.forEach((a) => (a instanceof Promise ? a.cat
 // 변경 후 C.reduce
 C.reduce = curry((f, acc, iter) => (iter ? reduce(f, acc, catchNoop(iter)) : reduce(f, catchNoop(acc))));
 ```
+
+### Node.js 에서 SQL 병렬 평가로 얻은 효율
+
+SQL 평가 시에도 기존에 만들어놓은 `C.map` 함수들을 활용하여 처리하면 훨씬 더 효율성 높은 프로그래밍이 가능하다. Node.js 또한 자바스크립트 기반이므로 그동안 만들었던 함수들을 모두 Node.js와 데이터베이스 injection 과정에 활용할 수 있다.
+
+해당 함수에 대해서는 마플의 [FxSQL 라이브러리](https://github.com/marpple/FxSQL)를 이루는 함수들을 참고해 보도록 하자 :)
