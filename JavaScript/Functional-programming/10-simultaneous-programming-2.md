@@ -747,3 +747,22 @@ go(
 ```
 
 위와 같이 상황에 맞게 전략을 짜서 선언적으로 부하정도를 결정하여 프로그래밍 할 수 있다.
+
+### 코드 리팩토링
+
+`C.reduce` 함수를 좀 더 간결하게 리팩토링해보자
+
+```jsx
+// 기존 catchNoop
+const catchNoop = (arr) => arr.forEach((a) => (a instanceof Promise ? a.catch(noop) : a), arr);
+// 기존 C.reduce
+C.reduce = curry((f, acc, iter) => {
+  const iter2 = catchNoop(iter ? [...iter] : [...acc]);
+  return iter ? reduce(f, acc, iter2) : reduce(f, iter2);
+});
+
+// 변경 후 catchNoop
+const catchNoop = ([...arr]) => arr.forEach((a) => (a instanceof Promise ? a.catch(noop) : a), arr);
+// 변경 후 C.reduce
+C.reduce = curry((f, acc, iter) => (iter ? reduce(f, acc, catchNoop(iter)) : reduce(f, catchNoop(acc))));
+```
