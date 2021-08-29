@@ -91,3 +91,99 @@ const pa = f1();
 ```
 
 위 코드를 보면 async 내부에 await이 Promise의 결과값을 리턴해주는 역할을 하는 것을 알 수 있다. 위와 같은 모든 가정 즉, Promise와 async ~ await 합을 잘 다룰 수 있어야 비동기 코드에 대한 핸들링을 더 잘 구현할 수 있다.
+
+### Array.prototype.map이 있는데 왜 FxJS의 map 함수가 필요할까?
+
+```jsx
+function delayI(a) {
+  return new Promise((resolve) => setTimeout(() => resolve(a), 100));
+}
+
+// Array.prototype.map
+function f2() {
+  const list = [1, 2, 3, 4];
+  const result = list.map((a) => delayI(a * a));
+  log(result); // [Promise, Promise, Promise, Promise]
+  log(res.reduce(add)); // [object Promise][object Promise][object Promise][object Promise]
+}
+
+// async ~ await을 쓰면 되지 않을까?
+async function f2() {
+  const list = [1, 2, 3, 4];
+  const result = await list.map(async (a) => await delayI(a * a));
+  log(result); // [Promise, Promise, Promise, Promise] - 동일한 반환값!
+}
+```
+
+위와 같은 `f2` 함수가 있다고 할 때 `Array.prototype.map` 함수 적용 시 `async ~ await`을 적용해주어도 `Promise` 객체가 반환되어 원하는 값이 출력되지 않는다. `async~await`을 선언한다고 해도 map 함수가 비동기 상황인 `Promise`를 제어해주지 않기 때문이다. 따라서 `f2` 함수 자체가 비동기 상황을 잘 제어해주도록 처리되어야 한다.
+
+아래 `f3` 함수는 `FxJS`의 `map`함수를 적용한 경우이다. `FxJS`의 `Map` 함수는 `Promise`에 대한 제어를 모두 해주므로 원하는 값이 잘 출력되고 있다.
+
+```jsx
+// FxJS - map
+async function f3() {
+  const list = [1, 2, 3, 4];
+  const result = await map((a) => delayI(a * a), list);
+  log(result); // [1, 4, 9, 16]
+}
+```
+
+왜 `f2` 함수는 안되고 `f3` 함수는 되는가? 각 함수 내부에 map 함수 실행결과에 대해 로그를 찍어 확인해보자
+
+```jsx
+async function f2() {
+  const list = [1, 2, 3, 4];
+  const temp = list.map(async (a) => await delayI(a * a));
+  log(temp); // [Promise, Promise, Promise, Promise]
+  const res = await temp;
+  log(res); // [Promise, Promise, Promise, Promise]
+}
+f2();
+
+async function f3() {
+  const list = [1, 2, 3, 4];
+  const temp = map((a) => delayI(a * a), list);
+  log(temp); // Promise {<pending>} - array로 떨어질 준비가 된 map
+  const result = await temp;
+  log(result); // [1, 4, 9, 16]
+}
+f3();
+```
+
+FxJS의 map 함수에 대해 더 알아두어야 할 것이 있다. 만약 아래처럼 `f4`함수가 있다고 할 때,
+
+```jsx
+async function f4() {
+  const list = [1, 2, 3, 4];
+  const res = await map((a) => delayI(a * a), list);
+  log(res); // [1, 4, 9, 16]
+  return res;
+}
+log(f4()); // Promise {<pending>}
+f4().then(log); // [1, 4, 9, 16]
+```
+
+함수 내부의 `res`에 대한 값을 로그로 찍었을 때에는 `[1, 4, 9, 16]`으로 원하는 값이 나오지만 실제 함수를 동작 시켰을 때 반환값으로는 `Promise {<pending>}`을 뱉는다는 점이다. 따라서 then으로 이어받아야지만 원하는 값을 받아볼 수 있다.
+
+혹은 아래와 같이 해서 값을 반환받을 수 있다.
+
+```jsx
+async(() => {
+  log(await f4()); // [1, 4, 9, 16]
+})();
+```
+
+즉 값을 풀어서 전달하는 것과 직접 map 함수를 전달하는 것은 크게 차이가 없으며,
+이는 곧 `async-await`을 적용하지 않아도 된다는 뜻과 같다.
+
+```jsx
+function f4() {
+  return map((a) => delayI(a * a), [1, 2, 3, 4]);
+}
+log(f4()); // Promise {<pending>}
+f4().then(log); // [1, 4, 9, 16]
+```
+
+따라서 `async-await`가 어느 곳에 어떻게 사용되어야 하는지 아는 것이 매우 중요하며, 함수 콜에 있어서 비동기를 잘 제어하도록 고려되지 않은 Array.prototype.map 함수의 경우 `async-await`을 쉽게 사용할 수 없는 것이다.
+
+따라서 많은 사람들이 사용하게 될 공용(유틸)함수의 경우 프로미스를 잘 다루는 식으로 만들어진 함수를 만들어야 다양한 조건에서 활용될 수 있다.
