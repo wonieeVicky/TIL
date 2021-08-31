@@ -331,3 +331,79 @@ log(f7(null)); // Uncuaght TypeError: Cannot read property 'map' of null
         // SyntaxError: Unexpected end of JSON input
         // []
         ```
+
+### 동기 / 비동기 에러핸들링에서의 파이프라인 형태의 이점
+
+비동기 상황에서는 에러 핸들링이 조금 더 어렵다.
+
+```jsx
+function f8(list) {
+  try {
+    return list
+      .map(
+        (a) =>
+          new Promise((resolve) => {
+            adfadf;
+          })
+      )
+      .filter((a) => a % 2)
+      .slice(0, 2);
+  } catch (e) {
+    log(e);
+    return [];
+  }
+}
+log(f8(["0", "1", "2", "{"]));
+// []
+// error 발생함
+// Uncaught (in promise) ReferenceError: adfadf is not defined
+```
+
+위와 같이 비동기 코드에서 에러가 발생했을 때, `catch`에 에러가 잡히지 않고 바로 에러를 뿜어낸다. 에러 핸들링이 되지 않고, 하위 `filter`, `slice` 함수까지 모두 실행되어 [] 빈배열이 반환되었기 때문이다.
+
+위 코드를 에러핸들링을 잘하기 위해서는 반환 값이 `Promise` 객체 상태여야 한다.
+
+```jsx
+function f9(list){
+	try {
+		// await go() 처리로 Promise {<pending>} 으로 반환되도록 처리
+		return await go(
+			list,
+			map(a => new Promise(resolve => {
+				resolve(JSON.parse(a));
+			})),
+			filter(a => a % 2)
+			take(2)
+		);
+	} catch(e) {
+		log(e);
+		return [];
+	}
+}
+f9(['0', '1', '2', '{']).then(a => log(a, 'f9')).catch(e => log('에러핸들링!', e);
+// SyntaxError: Unexpected end of JSON input - console.log
+// [] "f9"
+```
+
+만약 위 상황에서 `map`과 `filter`를 지연처리되도록 `L.map`, `L.filter`로 변경하면 에러는 발생하지 않는다. 정상 데이터 2개만 바라본 뒤 이후 연산은 진행하지 않기 때문이다.
+
+```jsx
+function f9(list){
+	try {
+		return await go(
+			list,
+			L.map(a => new Promise(resolve => {
+				resolve(JSON.parse(a));
+			})),
+			L.filter(a => a % 2)
+			take(2)
+		);
+	} catch(e) {
+		log(e);
+		return [];
+	}
+}
+f9(['0', '1', '2', '{']).then(a => log(a, 'f9')); // [1, 3] "f9"
+```
+
+만약 위 파이프라인 형태가 아닌 일반 명령형 코드에서 비동기 동작에 대한 에러 핸들링을 하려면 정확히 에러 캐치 지점을 찾아 핸들링을 해주어야 한다. 하지만 위처럼 `go()` 함수를 적용하면 비동기 상황에서의 에러가 발생해도 이후 해당 함수가 `Promise` 객체로 리턴되도록 하여 catch에 잘 담겨지도록 쉽게 변경이 가능하다.
