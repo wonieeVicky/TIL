@@ -276,3 +276,58 @@ go(f52([1, 2, 3, 4, 5, 6, 7, 8]), log); // 106
 ```
 
 위 `f52()` 함수처럼 (1) 각 기능을 수행하는 함수를 문장형으로 만든 후 (2) 반환된 두 가지의 재료를 가지고 추가적인 비동기 코드를 실행하여 (3)리턴하는 함수를 만들 때 파이프라인과 `async ~ await`를 조합하여 단계적인 코드를 간단히 구현할 수 있다.
+
+### 동기 상황에서 에러 핸들링은 어떻게 해야할까?
+
+```jsx
+function f7(list) {
+  return list
+    .map((a) => a + 10)
+    .filter((a) => a % 2)
+    .slice(0, 2);
+}
+log(f7([1, 2, 3])); // [11, 13]
+log(f7([])); // []
+log(f7(null)); // Uncuaght TypeError: Cannot read property 'map' of null
+```
+
+위와 같이 null 값이 들어갈 때 어떻게 에러핸들링을 할 수 있을까?
+
+1.  기본 list 매개변수의 default value를 빈 배열로 부여한다.
+
+    ```jsx
+    function f7(list = []) {
+      // ...
+    }
+    ```
+
+2.  실제 사용되는 list 에 null인 상황을 대비해 빈 배열로 부여한다.
+
+    ```jsx
+    function f7(list) {
+      return (list || [])
+        .map((a) => a + 10)
+        .filter((a) => a % 2)
+        .slice(0, 2);
+    }
+    ```
+
+3.  최대한 비슷한 값으로 안전하게 흘려보내려면 `try ~ catch` 포맷을 적용한다.
+    이 방식은 에러에 대한 후속 조치가 가능하며 실제 map, filter 등의 함수 내부에서 에러가 발생해도 모두 에러 캐치가 가능하다.
+
+        ```jsx
+        function f7(list) {
+          try {
+            return list
+              .map(a => JSON.parse(a))
+              .filter(a => a % 2)
+              .slice(0, 2);
+          } catch (e) {
+            log(e);
+            return [];
+          }
+        }
+        log(f7(['0', '1', '2', '}']));
+        // SyntaxError: Unexpected end of JSON input
+        // []
+        ```
