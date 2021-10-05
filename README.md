@@ -282,6 +282,12 @@
    - [nginx, 콘솔 에러 개선](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/82-improve-nginx-and-console-error.md)
    - [forest-admin을 활용한 어드민 페이지 구현](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/84-create-admin.md)
 
+4. React + SWR + TypeScript로 실시간 채팅 구현하기
+
+   4-1. 프로젝트 초기 설정
+
+   - [Back 환경 세팅](https://github.com/wonieeVicky/TIL/blob/main/React/react-slack-chat/1-setting-for-backend.md)
+
 ## Node.js
 
 1. 노드 & 자바스크립트 개념
