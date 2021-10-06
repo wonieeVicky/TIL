@@ -286,7 +286,7 @@
 
    4-1. 프로젝트 초기 설정
 
-   - [Back 환경 세팅](https://github.com/wonieeVicky/TIL/blob/main/React/react-slack-chat/1-setting-for-backend.md)
+   - [Back 환경 세팅(feat. node, mySQL 설치)](https://github.com/wonieeVicky/TIL/blob/main/React/react-slack-chat/1-setting-for-backend.md)
 
 ## Node.js
 
