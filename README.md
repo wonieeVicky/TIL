@@ -76,7 +76,7 @@
 
 - Functional Programming
 
-  1. [함수형 자바스크립트 기본기](https://github.com/wonieeVicky/TIL/blob/main/JavaScript/Functional-programming/1-basic-for-functional-programming.md)
+  1. [함수형 자바스크립트 기본기](https://github.com/wonieeVicky/TIL/blob/main/JavaScript/Functional-programming/1-basic-for-**functional**-programming.md)
   2. [ES6에서의 순회와 이터러블/이터레이터 프로토콜](https://github.com/wonieeVicky/TIL/blob/main/JavaScript/Functional-programming/2-iterable-iterator-protocol.md)
   3. [제너레이터와 이터레이터](https://github.com/wonieeVicky/TIL/blob/main/JavaScript/Functional-programming/3-generator-and-iterator.md)
   4. [map, filter, reduce](https://github.com/wonieeVicky/TIL/blob/main/JavaScript/Functional-programming/4-map-filter-reduce.md)
@@ -84,6 +84,9 @@
   6. [장바구니 예제](https://github.com/wonieeVicky/TIL/blob/main/JavaScript/Functional-programming/6-example-cart.md)
   7. [지연성 1](https://github.com/wonieeVicky/TIL/blob/main/JavaScript/Functional-programming/7-delayability-1.md)
   8. [지연성 2](https://github.com/wonieeVicky/TIL/blob/main/JavaScript/Functional-programming/8-delayability-2.md)
+  9. [비동기: 동시성 프로그래밍 1](https://github.com/wonieeVicky/TIL/blob/main/JavaScript/Functional-programming/9-simultaneous-programming.md)
+  10. [비동기: 동시성 프로그래밍 2](https://github.com/wonieeVicky/TIL/blob/main/JavaScript/Functional-programming/10-simultaneous-programming-2.md)
+  11. [비동기: 동시성 프로그래밍 3](https://github.com/wonieeVicky/TIL/blob/main/JavaScript/Functional-programming/11-simultaneous-programming-3.md)
 
 ## TDD
 
@@ -278,6 +281,13 @@
    - [백엔드에 https 적용, CORS 개선](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/81-https-to-the-backend.md)
    - [nginx, 콘솔 에러 개선](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/82-improve-nginx-and-console-error.md)
    - [forest-admin을 활용한 어드민 페이지 구현](https://github.com/wonieeVicky/TIL/blob/main/React/react-nodebird-sns/84-create-admin.md)
+
+4. React + SWR + TypeScript로 실시간 채팅 구현하기
+
+   4-1. 프로젝트 초기 설정
+
+   - [Back 환경 세팅(feat. node, mySQL 설치)](https://github.com/wonieeVicky/TIL/blob/main/React/react-slack-chat/1-setting-for-backend.md)
+   - [Front 환경 세팅(feat. webpack, babel 설치)](https://github.com/wonieeVicky/TIL/blob/main/React/react-slack-chat/2-setting-for-frontend.md)
 
 ## Node.js
 
