@@ -1,4 +1,4 @@
-﻿## 프론트엔드 세팅하기 (feat. babel, webpack 설치)
+﻿## 프론트엔드 세팅하기 (feat. babel, webpack 설정)
 
 ### 프론트엔드 환경 세팅
 
@@ -283,3 +283,109 @@ $ npm run build
 ...
 sleact (webpack 5.57.1) compiled successfully in 1455 ms
 ```
+
+### 웹팩 데브 서버 세팅하기
+
+위와 같이 app.js를 추출하는 과정은 수정할 때마다 `npm run build`를 통해 파일을 수정해주어야 하므로 매우 번거롭다. 따라서 데브용 서버를 세팅하여 작업하도록 설정해준다. 아래 내용을 따라가보자
+
+```bash
+$ npm i -D webpack-dev-server @types/webpack-dev-server
+$ npm i @pmmmwh/react-refresh-webpack-plugin react-refresh
+$ npm i -D fork-ts-checker-webpack-plugin # typescript 타입 체크와 webpack이 동시에 동작하도록 해줌
+```
+
+위와 같이 데브서버 동작을 위한 라이브러리를 설치한 후 webpack 설정을 추가해준다.
+
+`front/webpack.config.ts`
+
+버전 변경에 따라 `webpack` 호출 하는 방법이 바뀌었고, `babel-loader`의 env 옵션, `ForkTsCheckerWebpackPlugin` 플러그인, devServer 옵션과 `HotModuleReplacementPlugin`, `ReactRefreshWebpackPlugin` 실행함수가 추가되었음
+
+```tsx
+import path from "path";
+import ReactRefreshWebpackPlugin from "@pmmmwh/react-refresh-webpack-plugin";
+import webpack, { Configuration as WebpackConfiguration } from "webpack";
+import { Configuration as WebpackDevServerConfiguration } from "webpack-dev-server";
+
+interface Configuration extends WebpackConfiguration {
+  devServer?: WebpackDevServerConfiguration;
+}
+
+import ForkTsCheckerWebpackPlugin from "fork-ts-checker-webpack-plugin";
+
+const config: Configuration = {
+  // ...
+  module: {
+    rules: [
+      {
+        test: /\.tsx?$/,
+        loader: "babel-loader",
+        options: {
+          presets: [
+            // ...
+          ],
+          // env 옵션 추가
+          env: {
+            development: {
+              plugins: [require.resolve("react-refresh/babel")],
+            },
+          },
+        },
+        exclude: path.join(__dirname, "node_modules"),
+      },
+      // ...
+    ],
+  },
+  plugins: [
+    // ForkTsCheckerWebpackPlugin 플러그인 추가 : typescript 변환 시 필요
+    new ForkTsCheckerWebpackPlugin({
+      async: false,
+    }),
+    // ...
+  ],
+  output: {
+    //..
+  },
+  // devServer 옵션 추가
+  devServer: {
+    historyApiFallback: true,
+    port: 3090,
+    devMiddleware: { publicPath: "/dist/" },
+    static: { directory: path.resolve(__dirname) },
+    /* proxy: {
+      '/api/': {
+        target: 'http://localhost:3095',
+        changeOrigin: true,
+        ws: true,
+      },
+    }, */
+  },
+};
+
+// 개발 환경 플러그인
+if (isDevelopment && config.plugins) {
+  config.plugins.push(new webpack.HotModuleReplacementPlugin());
+  config.plugins.push(new ReactRefreshWebpackPlugin());
+}
+// 런타임 환경 플러그인
+if (!isDevelopment && config.plugins) {
+  // ...
+}
+
+export default config;
+```
+
+`front/package.json`
+
+dev 환경 실행 명령어를 `package.json`에 추가해준다.
+
+```json
+{
+  "scripts": {
+    "dev": "cross-env TS_NODE_PROJECT=\"tsconfig-for-webpack-config.json\" webpack serve --env development"
+    // ...
+  }
+  // ...
+}
+```
+
+이후 `npm run dev`로 데스 서버 구동 시켜주면 localhost:3090으로 `App.tsx`가 잘 노출되는 것을 확인할 수 있다.. 😇
