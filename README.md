@@ -294,6 +294,7 @@
    4-2. 로그인, 회원가입 페이지
 
    - [회원가입 페이지와 커스텀 훅](https://github.com/wonieeVicky/TIL/blob/main/React/react-slack-chat/5-signup-page-and-custom-hook.md)
+   - [Axios request와 CORS, proxy 설정](https://github.com/wonieeVicky/TIL/blob/main/React/react-slack-chat/6-axios-request-and-cors-proxy.md)
 
 ## Node.js
 
