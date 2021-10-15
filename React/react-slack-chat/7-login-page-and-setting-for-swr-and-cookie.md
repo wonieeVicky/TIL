@@ -185,3 +185,54 @@ export default LogIn;
 (쿠키는 백엔드에서 생성해서 프론트엔드 브라우저가 기억하도록 만들어준다. 프론트엔드에서는 한번 기억한 쿠키를 매 요청마다 백엔드로 보내주는 역할을 한다.)
 
 ![](../../img/211014-5.png)
+
+### swr 설정 살펴보기
+
+swr은 자동으로 일정시간이 지나면 데이터를 fetching 해오는 기능이 있다는 것을 위에서 확인했다.
+그렇다면 계속 API를 요청하는 것은 성능상 좋지 않은 것이 아닐까 ? 이를 컨트롤 할 수 있다.
+
+여기에서 컨트롤이란 1) 원하는 시점에 data fetching을 처리하는 것 2) 빈번한 API 요청으로 인해 서버에 부하를 일으키지 않도록 주기적으로 data fetching을 하지 않도록 하는 것이다.
+
+`front/pages/Login/index.tsx`
+
+```tsx
+const LogIn = () => {
+  const { data, error, mutate } = useSWR("/api/users", fetcher, {
+    dedupingInterval: 100000,
+  }); // 2. dedupingInterval으로 주기적 호출 간격을 길게 설정: 기간 내에는 캐시에서 불러옴
+  // ..
+
+  const onSubmit = useCallback(
+    (e) => {
+      e.preventDefault();
+      setLogInError(false);
+      axios
+        .post("/api/users/login", { email, password }, { withCredentials: true })
+        .then((response) => {
+          mutate(); // 1) 원하는 시점에 data-fetching: 로그인 성공 시 revalidate
+        })
+        .catch((error) => {
+          setLogInError(error.response?.data?.statusCode === 401);
+        });
+    },
+    [email, password]
+  );
+
+  return <div id="container">{/* ... */}</div>;
+};
+
+export default LogIn;
+```
+
+위와 같이 로그인이 완료된 시점에 mutate 함수를 동작 시켜 원하는 시점에 data-fetching 하도록 설정하고, useSWR 동작시 option 객체에 `dedupingInterval` 을 100000(default는 2000, 2초)로 설정한다. 이후 후 실제 로그인을 수행하면 아래와 같이 완료된 시점에 users 요청을 정확하게 다시 요청하는 것을 확인할 수 있다.
+
+![](../../img/211014-6.png)
+
+이처럼 swr 옵션은 제한과 관련된 다양한 옵션기능들을 제공한다. 원래 직접 구현하려면 힘든 것들을 옵션으로 제공하는 것이다.
+
+- `dedupingInterval`: 재요청 시간, 기본 2초
+- `focusThrottleInterval`: revalidate를 다시하는 시간을 설정, 기본 5초
+- `errorRetryInterval`: API request error가 발생했을 때 다시 요청, 기본 5초
+- `loadingTimeout`: API request가 3초가 넘어가면, 로딩이 오래걸린다는 메시지를 제공해서 사용자 경험을 개선할 수 있음
+- `errorRetryCount`: 서버에 재요청을 보낼 때, 자주 보내지 않고 일정 횟수가 지나면 요청하지 않도록 처리
+- revalidateOnFocus: 다른 탭 갔다가 돌아왔을 때 `re-fetching` 처리
