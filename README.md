@@ -296,6 +296,7 @@
    - [회원가입 페이지와 커스텀 훅](https://github.com/wonieeVicky/TIL/blob/main/React/react-slack-chat/5-signup-page-and-custom-hook.md)
    - [Axios request와 CORS, proxy 설정](https://github.com/wonieeVicky/TIL/blob/main/React/react-slack-chat/6-axios-request-and-cors-proxy.md)
    - [로그인 페이지와 swr 적용, 쿠키 공유](https://github.com/wonieeVicky/TIL/blob/main/React/react-slack-chat/7-login-page-and-setting-for-swr-and-cookie.md)
+   - [워크스페이스 및 로그아웃 구현](https://github.com/wonieeVicky/TIL/blob/main/React/react-slack-chat/8-workspace-and-logout.md)
 
 ## Node.js
 
