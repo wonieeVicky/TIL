@@ -299,6 +299,10 @@
    - [워크스페이스 및 로그아웃 구현](https://github.com/wonieeVicky/TIL/blob/main/React/react-slack-chat/8-workspace-and-logout.md)
    - [swr 활용과 optimistic UI](https://github.com/wonieeVicky/TIL/blob/main/React/react-slack-chat/9-use-of-swr-and-optimistic-ui.md.md)
 
+   4-3. 메뉴, 모달
+
+   - [워크스페이스와 gravatar, 중첩 라우터](https://github.com/wonieeVicky/TIL/blob/main/React/react-slack-chat/10-workspace-and-gravatar-and-router.md)
+
 ## Node.js
 
 1. 노드 & 자바스크립트 개념
