@@ -302,6 +302,7 @@
    4-3. 메뉴, 모달
 
    - [워크스페이스와 gravatar, 중첩 라우터](https://github.com/wonieeVicky/TIL/blob/main/React/react-slack-chat/10-workspace-and-gravatar-and-router.md)
+   - [메뉴와 모달 구현](https://github.com/wonieeVicky/TIL/blob/main/React/react-slack-chat/11-menu-and-modal.md)
 
 ## Node.js
 
