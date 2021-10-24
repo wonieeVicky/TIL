@@ -341,3 +341,117 @@ const Workspace = () => {
 
 1. 위와 같이 돔 엘리먼트에 `toastify`를 위한 `ToastContainer` 삽입과 에러 시 하단에서 노출되도록 `toast.error`로 동작을 처리해주면 에러 시 UI에도 적절히 데이터가 노출 될 수 있다.
 2. 해당 내용으로 채널 추가 액션 실행 시 좌측 채널 화면에 채널이 새롭게 추가되는 것을 확인할 수 있다.
+
+### 채널 만드는 모달
+
+기존 워크스페이스를 추가하는 모달의 경우 별도로 분리하지 않고, Workspace 컴포넌트에서 구현했다. 하나의 컴포넌트 안에서 다양한 액션을 구현하여 한번에 볼 수 있다는 장점이 있지만, 여러 모달을 만들어야 하는 상황에서 코드가 길어져서 안좋다는 단점도 존재한다. 또 하나의 문제가 더 있는데, 바로 아래의 이미지를 보면 알 수 있다.
+
+![Input에 onChange 이벤트가 발생할 때마다 컴포넌트 전체가 리렌더링된다.](../../img/211024-1.png)
+
+모달 안의 인풋이 있을 경우 해당 인풋에 발생하는 onChange 이벤트가 발생할 때마다 상태가 바뀌므로 컴포넌트 리렌더링이 일어난다. 때문에 성능 최적화에 좋지 않은 아웃풋을 만들 수 있는 것이다. 어느정도의 컴포넌트 리렌더링은 성능면에 지대한 영향을 미치지 않지만, Workspace 처럼 모달이 많이 사용되는 곳에서 인풋이 포함된 모달은 별도의 컴포넌트로 분리해주는 것이 바람직하다.
+
+따라서 이번에 워크스페이스 내부에서 채널을 생성하는 모달을 별도의 컴포넌트로 분리하여 작업해본다.
+
+`front/components/CreateChannelModal/index.tsx`
+
+```tsx
+import React, { useCallback, VFC } from "react";
+import Modal from "@components/Modal";
+import useInput from "@hooks/useInput";
+import { Button, Input, Label } from "@pages/SignUp/styles";
+
+interface Props {
+  show: boolean;
+  onCloseModal: () => void;
+}
+
+const CreateChannelModal: VFC<Props> = ({ show, onCloseModal }) => {
+  const [newChannel, onChangeNewChannel] = useInput("");
+  const onCreateChannel = useCallback(() => {}, []);
+  return (
+    <Modal show={show} onCloseModal={onCloseModal}>
+      <form onSubmit={onCreateChannel}>
+        <Label id="channel-label">
+          <span>채널</span>
+          <Input id="channel" value={newChannel} onChange={onChangeNewChannel} />
+        </Label>
+        <Button type="submit">생성하기</Button>
+      </form>
+    </Modal>
+  );
+};
+
+export default CreateChannelModal;
+```
+
+- children이 사용되지 않는 컴포넌트의 경우 VFC로 타이핑을 한 후 제네릭으로 Prop 타입을 추가해준다.
+
+`front/layouts/Workspace/index.tsx`
+
+```tsx
+// ..
+import CreateChannelModal from "@components/CreateChannelModal";
+
+const Workspace: VFC = () => {
+  // ..
+  const [showCreateChannelModal, setShowCreateChannelModal] = useState(false);
+  const [newWorkspace, onChangeNewWorkspace, setNewWorkspace] = useInput("");
+
+  // onClick Events...
+
+  // onCloseModal은 close modal event에 공통으로 사용됨
+  const onCloseModal = useCallback(() => {
+    setShowCreateWorkspaceModal(false);
+    setShowCreateChannelModal(false);
+  }, []);
+
+  // Workspace 관리모달 toggle
+  const toggleWorkspaceModal = useCallback(() => {
+    setShowWorkspaceModal((prev) => !prev);
+  }, []);
+
+  // 채널추가 모달 toggle
+  const onClickAddChannel = useCallback(() => {
+    setShowCreateChannelModal(true);
+  }, []);
+
+  if (!userData) {
+    return <Redirect to="/login" />;
+  }
+
+  // if문이나 반복문, 이벤트 핸들러 이벤트는 return이나 hooks 아래에 있으면 안된다.
+  // Invalid hook call 발생
+
+  return (
+    <div>
+      <Header>{/* codes.. */}</Header>
+      <WorkspaceWrapper>
+        <Workspaces>{/* codes.. */}</Workspaces>
+        <Channels>
+          <WorkspaceName onClick={toggleWorkspaceModal}>Sleact</WorkspaceName>
+          <MenuScroll>
+            <Menu show={showWorkspaceModal} onCloseModal={toggleWorkspaceModal} style={{ top: 95, left: 80 }}>
+              <WorkspaceModal>
+                <h2>Sleact</h2>
+                {/* <button onClick={onClickInviteWorkspace}>워크스페이스에 사용자 초대</button> */}
+                <button onClick={onClickAddChannel}>채널 만들기</button>
+                <button onClick={onLogout}>로그아웃</button>
+              </WorkspaceModal>
+            </Menu>
+          </MenuScroll>
+        </Channels>
+        <Chats>{/* codes.. */}</Chats>
+      </WorkspaceWrapper>
+      {/* codes.. */}
+      <CreateChannelModal show={showCreateChannelModal} onCloseModal={onCloseModal} />
+      <ToastContainer position="bottom-center" />
+    </div>
+  );
+};
+
+export default Workspace;
+```
+
+위에서 분리한 CreateChannelModal을 분리한 뒤 Workspace에 임포트하여 인풋 onChange 이벤트를 발생시키면 기존 CreateWorkspaceModal 에서 발생하던 무분별한 리렌더링이 발생하지 않는 것을 확인할 수 있다. 게다가 해당 모달로 onChange 이벤트들이 모두 나뉘어지면서 코드가 분리되어 가독성이 높아졌다.
+
+![컴포넌트 구조가 복잡해질수록 나누는 습관을 들여야 효율적인 관리가 가능하당 :))](../../img/211024-2.png)
