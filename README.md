@@ -288,7 +288,7 @@
 
    - [Back 환경 세팅(feat. node, mySQL 설치)](https://github.com/wonieeVicky/TIL/blob/main/React/react-slack-chat/1-setting-for-backend.md)
    - [Front 환경 세팅(feat. webpack, babel 설정)](https://github.com/wonieeVicky/TIL/blob/main/React/react-slack-chat/2-setting-for-frontend.md)
-   - [폴더 구조와 React Router 설정)](https://github.com/wonieeVicky/TIL/blob/main/React/react-slack-chat/3-forder-structure-and-router-settings.md)
+   - [폴더 구조와 React Router 설정)](https://github.com/**wonieeVicky**/TIL/blob/main/React/react-slack-chat/3-forder-structure-and-router-settings.md)
    - [Code splitting과 Emotion 설정)](https://github.com/wonieeVicky/TIL/blob/main/React/react-slack-chat/4-setting-for-code-splitting-and-emotion.md)
 
    4-2. 로그인, 회원가입 페이지
@@ -303,7 +303,7 @@
 
    - [워크스페이스와 gravatar, 중첩 라우터](https://github.com/wonieeVicky/TIL/blob/main/React/react-slack-chat/10-workspace-and-gravatar-and-router.md)
    - [메뉴와 모달 구현](https://github.com/wonieeVicky/TIL/blob/main/React/react-slack-chat/11-menu-and-modal.md)
-   - [Router 주소 설계(Route Parameter)](https://github.com/wonieeVicky/TIL/blob/main/React/react-slack-chat/12-route-parameter-address-design.md)
+   - [Router 주소 설계(Route Parameter)와 사용자 초대 모달 구현](https://github.com/wonieeVicky/TIL/blob/main/React/react-slack-chat/12-route-parameter-address-design-and-invite-modal.md)
 
 ## Node.js
 

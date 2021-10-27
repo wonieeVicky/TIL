@@ -185,3 +185,197 @@ export default Workspace;
 이는 workspace 컴포넌트에 useSWR을 추가하여 적용해주는데, `const { data: channelData } = useSWR<IChannel[]>(userData ? `/api/workspaces/${workspace}/channels` : null, fetcher);` 이 코드를 보면 알겠지만 분기처리를 통해 값이 있을 경우에만 api request가 발생한다.
 
 해당 데이터가 정상적으로 호출되면 하단 렌더링 여역에 channelData가 리스트로 추가되도록 만들어진다.
+
+
+### 사용자 초대 모달 만들기
+
+이제 워크스페이스와 채널에 사용자 초대 모달을 만들어본다. 먼저 Workspace에 초대하는 모달을 만들어보자
+
+`front/components/InviteWorkspaceModal/index.tsx`
+
+```tsx
+// ..
+
+interface Props {
+  show: boolean;
+  onCloseModal: () => void;
+  setShowInviteWorkspaceModal: (flag: boolean) => void;
+}
+
+const InviteWorkspaceModal: VFC<Props> = ({ show, onCloseModal, setShowInviteWorkspaceModal }) => {
+  const { workspace } = useParams<{ workspace: string; channel: string }>(); // 현재 위치 url의 Params를 가져온다.
+  const [newMember, onChangeNewMember, setNewMember] = useInput('');
+
+  const { data: userData } = useSWR<IUser | false>('/api/users', fetcher);
+  const { mutate: revalidateMembers } = useSWR<IChannel[]>(
+    userData ? `/api/workspaces/${workspace}/members` : null,
+    fetcher,
+  );
+
+  const onInviteMember = useCallback(
+    (e) => {
+      e.preventDefault();
+      if (!newMember || !newMember.trim()) {
+        return;
+      }
+      axios
+        .post(
+          `/api/workspaces/${workspace}/members`,
+          {
+            email: newMember,
+          },
+          { withCredentials: true },
+        )
+        .then(() => {
+          revalidateMembers(); // 채널리스트 다시 불러오기
+          setShowInviteWorkspaceModal(false);
+          setNewMember('');
+        })
+        .catch((error) => {
+          console.dir(error);
+          toast.error(error.response?.data, { position: 'bottom-center' });
+        });
+    },
+    [workspace, newMember],
+  );
+  return (
+    <>
+      <Modal show={show} onCloseModal={onCloseModal}>
+        <form onSubmit={onInviteMember}>
+          <Label id="member-label">
+            <span>이메일</span>
+            <Input id="channel" value={newMember} onChange={onChangeNewMember} />
+          </Label>
+          <Button type="submit">초대하기</Button>
+        </form>
+      </Modal>
+      <ToastContainer position="bottom-center" />
+    </>
+  );
+};
+
+export default InviteWorkspaceModal;
+```
+
+채널에 사용자를 초대하는 모달을 아래와 같다.
+
+`front/components/InviteChannelModal/indextsx`
+
+```tsx
+// ..
+
+interface Props {
+  show: boolean;
+  onCloseModal: () => void;
+  setShowInviteChannelModal: (flag: boolean) => void;
+}
+
+const InviteChannelModal: VFC<Props> = ({ show, onCloseModal, setShowInviteChannelModal }) => {
+  const { workspace, channel } = useParams<{ workspace: string; channel: string }>(); // 현재 위치 url의 Params를 가져온다.
+  const [newMember, onChangeNewMember, setNewMember] = useInput('');
+
+  const { data: userData } = useSWR<IUser | false>('/api/users', fetcher);
+  const { mutate: revalidateMembers } = useSWR<IUser[]>(
+    userData ? `/api/workspaces/${workspace}/channels/${channel}/members` : null,
+    fetcher,
+  );
+
+  const onInviteMember = useCallback(
+    (e) => {
+      e.preventDefault();
+      if (!newMember || !newMember.trim()) {
+        return;
+      }
+      axios
+        .post(
+          `/api/workspaces/${workspace}/channels/${channel}/members`,
+          {
+            email: newMember,
+          },
+          { withCredentials: true },
+        )
+        .then(() => {
+          revalidateMembers();
+          setShowInviteChannelModal(false);
+          setNewMember('');
+        })
+        .catch((error) => {
+          console.dir(error);
+          toast.error(error.response?.data, { position: 'bottom-center' });
+        });
+    },
+    [newMember],
+  );
+  return (
+    <>
+      <Modal show={show} onCloseModal={onCloseModal}>
+        <form onSubmit={onInviteMember}>
+          <Label id="member-label">
+            <span>채널 멤버 초대</span>
+            <Input id="channel" value={newMember} onChange={onChangeNewMember} />
+          </Label>
+          <Button type="submit">초대하기</Button>
+        </form>
+      </Modal>
+      <ToastContainer position="bottom-center" />
+    </>
+  );
+};
+
+export default InviteChannelModal;
+```
+
+위의 내용을 Workspace에 추가해준다.
+
+`front/layouts/Workspace/index.tsx`
+
+```tsx
+// ..
+import InviteWorkspaceModal from '@components/InviteWorkspaceModal';
+import InviteChannelModal from '@components/InviteChannelModal';
+
+const Workspace: VFC = () => {
+	// ..
+  const [showInviteWorkspaceModal, setShowInviteWorkspaceModal] = useState(false);
+  const [showInviteChannelModal, setShowInviteChannelModal] = useState(false);
+  // ..
+
+  const onCloseModal = useCallback(() => {
+    setShowCreateWorkspaceModal(false);
+    setShowCreateChannelModal(false);
+    setShowInviteWorkspaceModal(false); // 추가
+    setShowInviteChannelModal(false); // 추가
+  }, []);
+
+  const onClickInviteWorkspace = useCallback(() => {
+    setShowInviteWorkspaceModal(true);
+  }, []);
+
+	const onClickInviteChannel = useCallback(() => {
+    setShowInviteChannelModal(true);
+  }, []);
+
+  // ...
+
+  return (
+    <div>
+      {/* codes... */}
+      <InviteWorkspaceModal
+        show={showInviteWorkspaceModal}
+        onCloseModal={onCloseModal}
+        setShowInviteWorkspaceModal={setShowInviteWorkspaceModal}
+      />
+      <InviteChannelModal
+        show={showInviteChannelModal}
+        onCloseModal={onCloseModal}
+        setShowInviteChannelModal={setShowInviteChannelModal}
+      /
+      <ToastContainer position="bottom-center" />
+    </div>
+  );
+};
+
+export default Workspace;
+```
+
+기존 모달들을 보면 모두 공통적인 포맷을 가진 형태로 만들어진다는 것을 확인할 수 있다..! 이를 추상화해서 하나의 컴포넌트로 만들어보는건 어떨까 ? ;)
