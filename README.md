@@ -307,7 +307,7 @@
 
    4-3. DM 보내기
 
-   - [DM 목록 만들기](https://github.com/wonieeVicky/TIL/blob/main/React/react-slack-chat/13-create-dm-list.md)
+   - [DM 및 채널 목록 만들기](https://github.com/wonieeVicky/TIL/blob/main/React/react-slack-chat/13-create-dm-list.md)
 
 ## Node.js
 
