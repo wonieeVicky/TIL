@@ -305,11 +305,15 @@
    - [메뉴와 모달 구현](https://github.com/wonieeVicky/TIL/blob/main/React/react-slack-chat/11-menu-and-modal.md)
    - [Router 주소 설계(Route Parameter)와 사용자 초대 모달 구현](https://github.com/wonieeVicky/TIL/blob/main/React/react-slack-chat/12-route-parameter-address-design-and-invite-modal.md)
 
-   4-3. DM 보내기
+   4-4. DM 보내기
 
    - [DM 및 채널 목록 만들기](https://github.com/wonieeVicky/TIL/blob/main/React/react-slack-chat/13-create-dm-list.md)
    - [DM 페이지 및 ChatBox 구현](https://github.com/wonieeVicky/TIL/blob/main/React/react-slack-chat/14-create-dm-page-and-chatbox-page.md)
    - [채팅 보내기 및 eslint에 react-app 적용](https://github.com/wonieeVicky/TIL/blob/main/React/react-slack-chat/15-send-chat.md)
+
+   4-5. 실시간 채팅 및 front 작업 팁 배우기
+
+   - [socket.io 훅스 및 이벤트 연결](https://github.com/wonieeVicky/TIL/blob/main/React/react-slack-chat/16-socket-io-hooks-and-connect-socket-event.md)
 
 ## Node.js
 
