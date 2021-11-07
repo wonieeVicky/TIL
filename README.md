@@ -314,6 +314,7 @@
    4-5. 실시간 채팅 및 front 작업 팁 배우기
 
    - [socket.io 훅스 및 이벤트 연결](https://github.com/wonieeVicky/TIL/blob/main/React/react-slack-chat/16-socket-io-hooks-and-connect-socket-event.md)
+   - [DM 내용(ChatList) 구현하기](https://github.com/wonieeVicky/TIL/blob/main/React/react-slack-chat/17-detail-chat-list.md)
 
 ## Node.js
 
