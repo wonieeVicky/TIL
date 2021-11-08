@@ -1,4 +1,4 @@
-﻿## DM 내용(ChatList) 구현하기
+﻿## DM 내용(ChatList) 구현하기(커스텀 스크롤바, dayjs)
 
 ### DM 내용 표시하기
 
@@ -86,4 +86,65 @@ const Chat: VFC<Props> = ({ data }) => {
 };
 
 export default Chat;
+```
+
+### 커스텀 스크롤바 적용하기
+
+ChatList 컴포넌트에 커스텀 스크롤바를 적용해보자.
+일반 스크롤로는 구현하기 어려운 다양한 스크롤을 쉽게 구현할 수 있도록 도와준다.
+
+```bash
+> npm i react-custom-scrollbars --save --force
+> npm i --save-dev @types/react-custom-scrollbars
+```
+
+`front/components/ChatList/index.tsx`
+
+```tsx
+// ...
+import { Scrollbars } from "react-custom-scrollbars";
+
+const ChatList: VFC<Props> = ({ chatData }) => {
+  const scrollbarRef = useRef(null);
+  const onScroll = useCallback(() => {}, []);
+  return (
+    <ChatZone>
+      <Scrollbars autoHide ref={scrollbarRef} onScrollFrame={onScroll}>
+        {/* ... */}
+      </Scrollbars>
+    </ChatZone>
+  );
+};
+```
+
+위 scrollbarRef와 onScroll은 이후 data Fetching 및 auto scroll 적용 시 활용하게 된다.
+
+### dayjs 적용하기
+
+현재 DM 내용에는 createdAt 데이터가 날 것 그대로 노출되고 있다. 이를 dayjs를 통해 예쁘게 만들어본다. date 정보를 포맷팅해주는 패키지는 dayjs 뿐만 아니라 moment, date-fns(lodash 형태의), luxon 등이 있다. immutable한 객체를 제공하므로 적절하게 편한 것으로 찾아 사용한다.
+
+```bash
+> npm i dayjs
+```
+
+`front/components/Chat/index.tsx`
+
+```tsx
+//..
+import dayjs from "dayjs";
+
+const Chat: VFC<Props> = ({ data }) => {
+  const user = data.Sender;
+  return (
+    <ChatWrapper>
+      {/* ... */}
+      <div className="chat-text">
+        <div className="chat-user">
+          <span>{dayjs(data.createdAt).format("h:mm A")}</span>
+          {/* ... */}
+        </div>
+      </div>
+    </ChatWrapper>
+  );
+};
 ```
