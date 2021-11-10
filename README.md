@@ -315,6 +315,7 @@
 
    - [socket.io 훅스 및 이벤트 연결](https://github.com/wonieeVicky/TIL/blob/main/React/react-slack-chat/16-socket-io-hooks-and-connect-socket-event.md)
    - [DM 내용 구현하기(커스텀 스크롤바, dayjs)](https://github.com/wonieeVicky/TIL/blob/main/React/react-slack-chat/17-detail-chat-list.md)
+   - [멘션 기능과 정규표현식 문자열 변환](https://github.com/wonieeVicky/TIL/blob/main/React/react-slack-chat/18-mention-function-and-regular-expression.md)
 
 ## Node.js
 
