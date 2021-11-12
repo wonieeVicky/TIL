@@ -98,3 +98,71 @@ export const EachMention = styled.button<{ focus: boolean }>`
 
 1. react-mentions를 사용할 때에는 몇가지 스타일도 수정되어야 하는데, 먼저 textarea를 수정해주던 MentionsTextarea에 MentionsInput을 대입해준다. styled-components는 이미 만들어진 컴포넌트에도 스타일을 추가할 수 있다.
 2. 함수 실행 방법 중에 ``` 를 사용할 수 있다. `aa();` 도 가능하지만 `a``;`도 가능하며,  ``` 사이에 인자도 넣을 수 있다. `a`123`;` 따라서 ` styled.button``; ` 이러한 문법도 결국 함수를 호출하는 것이라는 것을 알 수 있다. 그 내부에 인자로 props를 내려주며, `focus` 값에 따른 조건부 렌더링도 설정할 수 있다.
+
+### 정규표현식으로 문자열 변환 후 최적화 하기
+
+Chat 컴포넌트에 `@[vicky1](1)`로 들어오는 앵커를 정규표현식으로 예쁘게 바꿔서 `@vicky1`로 만들어보자
+먼저 정규표현식을 예쁘게 만들어주는 라이브러리를 장착한다.
+
+```bash
+> npm i regexify-string
+```
+
+`front/components/Chat/index.tsx`
+
+```tsx
+// ...
+import regexifyString from "regexify-string";
+
+interface Props {
+  data: IDM;
+}
+
+const Chat: VFC<Props> = ({ data }) => {
+  const { workspace } = useParams<{ workspace: string; channel: string }>();
+  const user = data.Sender;
+  // \d 숫자, +는 1개 이상 ?는 0개나 1개, *는 0개 이상을 의미함
+  // g는 모두 찾기, |는 또는, \n은 줄바꿈
+  const result = useMemo(
+    () =>
+      regexifyString({
+        input: data.content,
+        pattern: /@\[(.+?)]\((\d+?)\)|\n/g, // 1. 정규표현식
+        decorator(match, index) {
+          const arr: string[] | null = match.match(/@\[(.+?)]\((\d+?)\)/)!;
+          return arr ? (
+            <Link key={match + index} to={`/workspace/${workspace}/dm/${arr[2]}`}>
+              @{arr[1]}
+            </Link>
+          ) : (
+            <br key={index} />
+          );
+        },
+      }),
+    [data.content]
+  );
+
+  return (
+    <ChatWrapper>
+      <div className="chat-img">
+        <img src={gravatar.url(user.email, { s: "36px", d: "retro" })} alt={user.nickname} />
+      </div>
+      <div className="chat-text">
+        <div className="chat-user">
+          <b>{user.nickname}</b>
+          <span>{dayjs(data.createdAt).format("h:mm A")}</span>
+        </div>
+        <p>{result}</p>
+      </div>
+    </ChatWrapper>
+  );
+};
+
+export default memo(Chat); // 2. 최적화
+```
+
+1. 정규표현식에 따른 text 처리과정이다. 시간될 때 정규표현식 사용 방법은 반드시 공부를 해두자.
+
+   a?.b; - optional chaining, a??b; - nullish coalescing
+
+2. 위 `ChatBox` 타이핑에 따라 `Chat` 컴포넌트가 계속 리렌더링되는 구조를 화면에서 확인할 수 있는데, 이 때 최하위 자식 컴포넌트는 상속 데이터를 최소화하고 `memo`와 `useMemo`, `useCallback` 등으로 최적화해주는 것이 좋다. 위 컴포넌트에서는 Chat 컴포넌트를 `memo`로 감싸고, result 값을 `useMemo`로 감싸 최적화해줬다. 이후 다시 `ChatBox`에서 타이핑을 하면 `Chat` 컴포넌트가 불필요하게 리렌더링되지 않는다..!
