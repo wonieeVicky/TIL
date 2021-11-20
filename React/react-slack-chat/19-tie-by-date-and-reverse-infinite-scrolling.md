@@ -180,3 +180,106 @@ const ChatList = forwardRef<Scrollbars, Props>(({ chatSections, setSize, isEmpty
 
 export default ChatList;
 ```
+
+### 스크롤바 조정하기
+
+리버스 인피니트 스크롤링 적용 후 발견되는 스크롤바 버그를 간단히 해결해보자!
+
+`front/pages/DirectMessage/index.tsx`
+
+```tsx
+// ..
+import React, { useCallback, useRef, useEffect } from "react";
+
+const DirectMessage = () => {
+  // ...
+  // 1. 로딩 시 스크롤바 제일 아래로
+  useEffect(() => {
+    if (chatData?.length === 1) {
+      scrollbarRef.current?.scrollToBottom();
+    }
+  }, [chatData]);
+
+  // 2. mutate로 optimistic ui 구현
+  const onSubmitForm = useCallback(
+    (e) => {
+      e.preventDefault();
+      if (chat?.trim() && chatData && myData && userData) {
+        const savedChat = chat;
+        mutateChat((prevChatData) => {
+          prevChatData?.[0].unshift({
+            id: (chatData[0][0]?.id || 0) + 1,
+            content: savedChat,
+            SenderId: myData.id,
+            Sender: myData,
+            ReceiverId: userData.id,
+            Receiver: userData,
+            createdAt: new Date(),
+          });
+          return prevChatData;
+        }, false).then(() => {
+          setChat("");
+          scrollbarRef.current?.scrollToBottom();
+        });
+
+        axios
+          .post(`/api/workspaces/${workspace}/dms/${id}/chats`, {
+            content: chat,
+          })
+          .then(() => mutateChat())
+          .catch(() => {
+            console.error();
+            mutateChat();
+          });
+      }
+    },
+    [chat, chatData, myData, userData, workspace, id]
+  );
+
+  return <Container>{/* codes.. */}</Container>;
+};
+
+export default DirectMessage;
+```
+
+1. 먼저 데이터를 form submit 할 때 `ChatList`가 가장 최하단으로 내려가도록 처리하는 것이 필요하다. (신규메시지가 추가된 것이므로) 위와 같이 `useEffect`로 `chatData`의 길이가 달라졌을 때를 감지하여 `scrollToBottom`을 처리해주면 간단하게 개선이 가능하다.
+2. 데이터 form submit 시 api response에 따른 `ChatList` 데이터 갱신 과정에서 시간 지연이 발생한다. 이는 UX에 좋지 않으므로 더미데이터를 우선적으로 `ChatList`에 노출하는 optimistic UI를 구현한다. 해당 방법은 `swr`의 `mutate` 메서드를 사용해서 구현할 수 있다. (반드시 두 번째 인자에 `false`삽입)
+
+`front/components/ChatList/index.tsx`
+
+```tsx
+import React, { useCallback, forwardRef, RefObject } from 'react';
+// ..
+
+interface Props {
+  chatSections: { [key: string]: IDM[] };
+  setSize: (f: (size: number) => number) => Promise<IDM[][] | undefined>;
+  isReachingEnd: boolean;
+  scrollRef: RefObject<Scrollbars>; // 1. 추가
+}
+
+const ChatList = forwardRef<Scrollbars, Props>(({ chatSections, setSize, scrollRef, isReachingEnd }) => {
+  const onScroll = useCallback(
+    (values) => {
+      if (values.scrollTop === 0 && !isReachingEnd) {
+        setSize((prevSize) => prevSize + 1).then(() => {
+          // 2. scroll 위치 유지
+          const current = scrollRef.current;
+          if (current) {
+            current.scrollTop(current.getScrollHeight() - values.scrollHeight);
+          }
+        });
+      }
+    },
+    [scrollRef],
+  );
+
+  return (
+		// ..
+	)
+});
+```
+
+두 번째 개선점으로는 `scollTop`이 0일 때 신규 데이터를 가져오는 과정에서 스크롤이 최상단으로 올라가는 이슈를 고쳐줬는데,
+`ChatList` 컴포넌트에서 `scrollRef` 인자를 받아 현재 위치를 잡아주는 코드를 넣어주면 된다.
+(`scrollRef` 타이핑 및 `scrollTop` 위치 찾는 방법은 콘솔로 디버깅하여 찾아내본다.)
