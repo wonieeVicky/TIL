@@ -1,4 +1,4 @@
-﻿## 날짜별로 묶기, 리버스 인피니스 스크롤링
+﻿## 날짜별로 묶기, 리버스 인피니스 스크롤링, DM 채팅
 
 ### 대화를 날짜별로 묶기
 
@@ -280,6 +280,55 @@ const ChatList = forwardRef<Scrollbars, Props>(({ chatSections, setSize, scrollR
 });
 ```
 
-두 번째 개선점으로는 `scollTop`이 0일 때 신규 데이터를 가져오는 과정에서 스크롤이 최상단으로 올라가는 이슈를 고쳐줬는데,
-`ChatList` 컴포넌트에서 `scrollRef` 인자를 받아 현재 위치를 잡아주는 코드를 넣어주면 된다.
-(`scrollRef` 타이핑 및 `scrollTop` 위치 찾는 방법은 콘솔로 디버깅하여 찾아내본다.)
+두 번째 개선점으로는 `scollTop`이 0일 때 신규 데이터를 가져오는 과정에서 스크롤이 최상단으로 올라가는 이슈를 고쳐줬는데, `ChatList` 컴포넌트에서 `scrollRef` 인자를 받아 현재 위치를 잡아주는 코드를 넣어주면 된다. (`scrollRef` 타이핑 및 `scrollTop` 위치 찾는 방법은 콘솔로 디버깅하여 찾아내본다.)
+
+### DM 채팅하기
+
+DM 채팅을 마무리해보자
+
+`front/components/ChatBox/index.tsx`
+
+```tsx
+// ...
+import useSocket from "@hooks/useSocket";
+
+const DirectMessage = () => {
+  // ..
+  const [socket] = useSocket(workspace);
+
+  // 메시지 전송 시 스크롤 이벤트 구현
+  const onMessage = useCallback((data: IDM) => {
+    // id는 상대방 아이디
+    if (data.SenderId === Number(id) && myData?.id !== Number(id)) {
+      // 내가 채팅보낼 때는 onSubmitForm에서 scrollToBottom 처리해주므로
+      // 내 아이디가 아니고 스크롤 영역이 150이하일 때만 scrollToBottom 처리
+      mutateChat((chatData) => {
+        chatData?.[0].unshift(data);
+        return chatData;
+      }, false).then(() => {
+        if (scrollbarRef.current) {
+          if (
+            scrollbarRef.current.getScrollHeight() <
+            scrollbarRef.current.getClientHeight() + scrollbarRef.current.getScrollTop() + 150
+          ) {
+            console.log("scrollToBottom!", scrollbarRef.current?.getValues());
+            setTimeout(() => scrollbarRef.current?.scrollToBottom(), 50);
+          }
+        }
+      });
+    }
+  }, []);
+
+  useEffect(() => {
+    // socket 연결
+    socket?.on("dm", onMessage);
+    // socket 해제
+    return () => socket?.off("dm", onMessage);
+  }, [socket, onMessage]);
+  // ..
+
+  return <Container>{/* codes... */}</Container>;
+};
+
+export default DirectMessage;
+```
