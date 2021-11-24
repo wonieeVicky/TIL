@@ -318,6 +318,10 @@
    - [멘션 기능과 정규표현식 문자열 변환](https://github.com/wonieeVicky/TIL/blob/main/React/react-slack-chat/18-mention-function-and-regular-expression.md)
    - [날짜별로 묶기, 리버스 인피니스 스크롤링, DM 채팅](https://github.com/wonieeVicky/TIL/blob/main/React/react-slack-chat/19-tie-by-date-and-reverse-infinite-scrolling.md)
 
+   4-6. 배포 및 프로젝트 마무리
+
+   - [채널 생성 및 타입 가드를 통한 타입 점검](https://github.com/wonieeVicky/TIL/blob/main/React/react-slack-chat/20-generate-channel-and-check-type.md)
+
 ## Node.js
 
 1. 노드 & 자바스크립트 개념
