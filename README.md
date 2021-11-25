@@ -321,6 +321,7 @@
    4-6. 배포 및 프로젝트 마무리
 
    - [채널 생성 및 타입 가드를 통한 타입 점검](https://github.com/wonieeVicky/TIL/blob/main/React/react-slack-chat/20-generate-channel-and-check-type.md)
+   - [배포 준비(bundleAnalyzer)](https://github.com/wonieeVicky/TIL/blob/main/React/react-slack-chat/21-ready-for-deploy.md)
 
 ## Node.js
 
