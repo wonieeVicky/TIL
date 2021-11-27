@@ -322,6 +322,7 @@
 
    - [채널 생성 및 타입 가드를 통한 타입 점검](https://github.com/wonieeVicky/TIL/blob/main/React/react-slack-chat/20-generate-channel-and-check-type.md)
    - [배포 준비(bundleAnalyzer)](https://github.com/wonieeVicky/TIL/blob/main/React/react-slack-chat/21-ready-for-deploy.md)
+   - [이미지 드래그&드롭 업로드 및 기타 기능 구현](https://github.com/wonieeVicky/TIL/blob/main/React/react-slack-chat/22-image-drag-and-drop-and-extra-functions.md)
 
 ## Node.js
 
