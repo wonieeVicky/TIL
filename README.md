@@ -93,7 +93,7 @@
 - React Test
 
   1. [React 테스트에 대해서](https://github.com/wonieeVicky/TIL/blob/main/TDD/react-tdd/1-about-react-test.md)
-  2. [테스트 환경 구성]](https://github.com/wonieeVicky/TIL/blob/main/TDD/react-tdd/2-configuration-of-test-environment.md)
+  2. [테스트 환경 구성](https://github.com/wonieeVicky/TIL/blob/main/TDD/react-tdd/2-configuration-of-test-environment.md)
 
 - Jasmine
 
