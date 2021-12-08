@@ -94,6 +94,7 @@
 
   1. [React 테스트에 대해서](https://github.com/wonieeVicky/TIL/blob/main/TDD/react-tdd/1-about-react-test.md)
   2. [테스트 환경구성 및 주요 API](https://github.com/wonieeVicky/TIL/blob/main/TDD/react-tdd/2-configuration-of-test-environment.md)
+  3. [카운터 앱 TDD로 구현하기](https://github.com/wonieeVicky/TIL/blob/main/TDD/react-tdd/3-simple-counter-test-app.md)
 
 - Jasmine
 
