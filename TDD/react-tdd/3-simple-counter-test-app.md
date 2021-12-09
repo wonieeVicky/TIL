@@ -35,12 +35,10 @@ Describe(과일)
 ### 간단한 카운터 앱을 TDD 방식으로 만들어본다.
 
 - Counter 생성
-
   - 해야 할 일은?
     - Counter는 0부터 시작한다.
   - 테스트 작성
     `App.test.js`
-
     ```jsx
     import { render, screen } from "@testing-library/react";
     import App from "./App";
@@ -54,12 +52,10 @@ Describe(과일)
       expect(counterElement).toBe(0);
     });
     ```
-
   - 테스트 실행
     - Fail
   - 테스트 코드에 대응하는 실제 코드 작성
     `App.js`
-
     ```jsx
     import { useState } from "react";
     import "./App.css";
@@ -78,11 +74,8 @@ Describe(과일)
 
     export default App;
     ```
-
   - 테스트 실행
-
     - Fail
-
       ```bash
       FAIL  src/App.test.js (6.084 s)
         ✕ renders learn react link (118 ms)
@@ -93,10 +86,8 @@ Describe(과일)
           Expected: 0
           Received: <h3 data-testid="counter">0</h3> // 0을 받아야하는데 엘리먼트를 받았기 때문에 에러
       ```
-
   - 테스트 코드 수정
     `App.test.js`
-
     ```jsx
     import { render, screen } from "@testing-library/react";
     import App from "./App";
@@ -106,11 +97,8 @@ Describe(과일)
       expect(counterElement).toHaveTextContent(0);
     });
     ```
-
   - 테스트 실행
-
     - Success
-
       ```bash
       PASS  src/App.test.js
         ✓ renders learn react link (47 ms)
@@ -121,3 +109,66 @@ Describe(과일)
       Time:        6.194 s, estimated 7 s
       Ran all test suites related to changed files.
       ```
+
+### 플러스, 마이너스 버튼 생성
+
+카운터를 올리고 내리는 버튼을 생성해보자
+
+- 해야할 일
+  - +, - 버튼 두 개를 생성한다.
+- 테스트 작성
+  `App.test.js`
+  ```jsx
+  // ..
+  test("minus button has correct text", () => {
+    render(<App />);
+    const minusButtonElement = screen.getByTestId("minus-button");
+    expect(minusButtonElement).toHaveTextContent("-");
+  });
+
+  test("plus button has correct text", () => {
+    render(<App />);
+    const plusButtonElement = screen.getByTestId("plus-button");
+    expect(plusButtonElement).toHaveTextContent("+");
+  });
+  ```
+- 테스트 실행
+  - Fail
+    ```bash
+    FAIL  src/App.test.js
+      ✓ renders learn react link (35 ms)
+      ✕ minus button has correct text (9 ms)
+      ✕ plus button has correct text (5 ms)
+    ```
+- 테스트 코드에 대응하는 실제 코드 작성
+  `App.js`
+  ```jsx
+  function App() {
+    // ..
+    return (
+      <div className="App">
+        <header className="App-header">
+          {/* ... */}
+          <div>
+            <button data-testid="minus-button">-</button>
+            <button data-testid="plus-button">+</button>
+          </div>
+        </header>
+      </div>
+    );
+  }
+  ```
+- 테스트 실행
+  - Success
+    ```bash
+    PASS  src/App.test.js
+      ✓ renders learn react link (108 ms)
+      ✓ minus button has correct text (12 ms)
+      ✓ plus button has correct text (6 ms)
+
+    Test Suites: 1 passed, 1 total
+    Tests:       3 passed, 3 total
+    Snapshots:   0 total
+    Time:        6.413 s
+    Ran all test suites related to changed files.
+    ```
