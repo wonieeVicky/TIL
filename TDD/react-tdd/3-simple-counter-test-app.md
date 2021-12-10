@@ -35,10 +35,12 @@ Describe(과일)
 ### 간단한 카운터 앱을 TDD 방식으로 만들어본다.
 
 - Counter 생성
+
   - 해야 할 일은?
     - Counter는 0부터 시작한다.
   - 테스트 작성
     `App.test.js`
+
     ```jsx
     import { render, screen } from "@testing-library/react";
     import App from "./App";
@@ -52,10 +54,12 @@ Describe(과일)
       expect(counterElement).toBe(0);
     });
     ```
+
   - 테스트 실행
     - Fail
   - 테스트 코드에 대응하는 실제 코드 작성
     `App.js`
+
     ```jsx
     import { useState } from "react";
     import "./App.css";
@@ -74,8 +78,11 @@ Describe(과일)
 
     export default App;
     ```
+
   - 테스트 실행
+
     - Fail
+
       ```bash
       FAIL  src/App.test.js (6.084 s)
         ✕ renders learn react link (118 ms)
@@ -86,8 +93,10 @@ Describe(과일)
           Expected: 0
           Received: <h3 data-testid="counter">0</h3> // 0을 받아야하는데 엘리먼트를 받았기 때문에 에러
       ```
+
   - 테스트 코드 수정
     `App.test.js`
+
     ```jsx
     import { render, screen } from "@testing-library/react";
     import App from "./App";
@@ -97,8 +106,11 @@ Describe(과일)
       expect(counterElement).toHaveTextContent(0);
     });
     ```
+
   - 테스트 실행
+
     - Success
+
       ```bash
       PASS  src/App.test.js
         ✓ renders learn react link (47 ms)
@@ -118,6 +130,7 @@ Describe(과일)
   - +, - 버튼 두 개를 생성한다.
 - 테스트 작성
   `App.test.js`
+
   ```jsx
   // ..
   test("minus button has correct text", () => {
@@ -132,6 +145,7 @@ Describe(과일)
     expect(plusButtonElement).toHaveTextContent("+");
   });
   ```
+
 - 테스트 실행
   - Fail
     ```bash
@@ -159,7 +173,9 @@ Describe(과일)
   }
   ```
 - 테스트 실행
+
   - Success
+
     ```bash
     PASS  src/App.test.js
       ✓ renders learn react link (108 ms)
@@ -171,4 +187,134 @@ Describe(과일)
     Snapshots:   0 total
     Time:        6.413 s
     Ran all test suites related to changed files.
+    ```
+
+### 플러스 마이너스 버튼 기능 추가(fire event)
+
+카운터를 올리고 내리는 버튼의 기능을 넣어 카운터를 변화시켜본다.
+이때 FireEvent API를 사용하는데, 유저가 발생시키는 액션(이벤트)에 대한 테스트를 해야 하는 경우에 사용한다.
+
+- 해야할 일
+  - - 버튼을 누르면 카운터가 1로 변하고, - 버튼을 누르면 -1로 변한다.
+- 테스트 작성
+  `App.test.js`
+
+  ```jsx
+  // ..
+  test("when the + button is pressed, the counter changes to 1", () => {
+    render(<App />);
+    const buttonElement = screen.getByTestId("plus-button");
+    // click plus button
+    fireEvent.click(buttonElement);
+    // 카운터가 0 > 1로 변경된다.
+    const counterElement = screen.getByTestId("counter");
+    expect(counterElement).toHaveTextContent(1);
+  });
+
+  test("when the - button is pressed, the counter changes to 1", () => {
+    render(<App />);
+    const buttonElement = screen.getByTestId("minus-button");
+    // click minus button
+    fireEvent.click(buttonElement);
+    // 카운터가 0 > -1로 변경된다.
+    const counterElement = screen.getByTestId("counter");
+    expect(counterElement).toHaveTextContent(-1);
+  });
+  ```
+
+- 테스트 실행
+  - Fail
+    ```bash
+    FAIL  src/App.test.js
+      ✓ ...
+      ✕ when the + button is pressed, the counter changes to 1 (9 ms)
+      ✕ when the - button is pressed, the counter changes to 1 (10 ms)
+    ```
+- 테스트 코드에 대응하는 실제 코드 작성
+  `App.js`
+  ```jsx
+  function App() {
+    // ..
+    return (
+      <div className="App">
+        <header className="App-header">
+          <h3 data-testid="counter">{counter}</h3>
+          <div>
+            <button data-testid="minus-button" onClick={() => setCounter((count) => count - 1)}>
+              -
+            </button>
+            <button data-testid="plus-button" onClick={() => setCounter((count) => count + 1)}>
+              +
+            </button>
+          </div>
+        </header>
+      </div>
+    );
+  }
+  ```
+- 테스트 실행
+
+  - Success
+
+    ```bash
+    PASS  src/App.test.js
+      ✓ ...
+      ✓ when the + button is pressed, the counter changes to 1 (19 ms)
+      ✓ when the - button is pressed, the counter changes to 1 (10 ms)
+
+    Test Suites: 1 passed, 1 total
+    Tests:       5 passed, 5 total
+    Snapshots:   0 total
+    Time:        6.103 s, estimated 8 s
+    Ran all test suites related to changed files.
+    ```
+
+### on/off 버튼 생성
+
+- 해야할 일
+  - on/off 버튼을 생성한다.
+- 테스트 작성
+  `App.test.js`
+  ```jsx
+  test("on/off button has blue **color**", () => {
+    render(<App />);
+    const buttonElement = screen.getByTestId("on/off-button");
+    expect(buttonElement).toHaveStyle({ backgroundColor: "blue" });
+  });
+  ```
+- 테스트 실행
+  - Fail
+    ```bash
+    FAIL  src/App.test.js
+      ✓ ...
+      ✕ when the + button is pressed, the counter changes to 1 (9 ms)
+      ✕ when the - button is pressed, the counter changes to 1 (10 ms)
+    ```
+- 테스트 코드에 대응하는 실제 코드 작성
+  `App.js`
+
+  ```jsx
+  function App() {
+  	// ..
+    return (
+      <div className="App">
+        <header className="App-header">
+          {/* codes.. */}
+  				<div>
+            <button data-testid="on/off-button" style={{ backgroundColor: 'blue' }}>
+              on/off
+            </button>
+          </div>
+      </div>
+    );
+  }
+
+  ```
+
+- 테스트 실행
+  - Success
+    ```bash
+    PASS  src/App.test.js (8.434 s)
+      ✓ ...
+      ✓ on/off button has blue color (289 ms)
     ```
