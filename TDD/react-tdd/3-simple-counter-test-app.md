@@ -35,12 +35,10 @@ Describe(과일)
 ### 간단한 카운터 앱을 TDD 방식으로 만들어본다.
 
 - Counter 생성
-
   - 해야 할 일은?
     - Counter는 0부터 시작한다.
   - 테스트 작성
     `App.test.js`
-
     ```jsx
     import { render, screen } from "@testing-library/react";
     import App from "./App";
@@ -54,12 +52,10 @@ Describe(과일)
       expect(counterElement).toBe(0);
     });
     ```
-
   - 테스트 실행
     - Fail
   - 테스트 코드에 대응하는 실제 코드 작성
     `App.js`
-
     ```jsx
     import { useState } from "react";
     import "./App.css";
@@ -78,11 +74,8 @@ Describe(과일)
 
     export default App;
     ```
-
   - 테스트 실행
-
     - Fail
-
       ```bash
       FAIL  src/App.test.js (6.084 s)
         ✕ renders learn react link (118 ms)
@@ -93,10 +86,8 @@ Describe(과일)
           Expected: 0
           Received: <h3 data-testid="counter">0</h3> // 0을 받아야하는데 엘리먼트를 받았기 때문에 에러
       ```
-
   - 테스트 코드 수정
     `App.test.js`
-
     ```jsx
     import { render, screen } from "@testing-library/react";
     import App from "./App";
@@ -106,11 +97,8 @@ Describe(과일)
       expect(counterElement).toHaveTextContent(0);
     });
     ```
-
   - 테스트 실행
-
     - Success
-
       ```bash
       PASS  src/App.test.js
         ✓ renders learn react link (47 ms)
@@ -130,7 +118,6 @@ Describe(과일)
   - +, - 버튼 두 개를 생성한다.
 - 테스트 작성
   `App.test.js`
-
   ```jsx
   // ..
   test("minus button has correct text", () => {
@@ -145,7 +132,6 @@ Describe(과일)
     expect(plusButtonElement).toHaveTextContent("+");
   });
   ```
-
 - 테스트 실행
   - Fail
     ```bash
@@ -173,9 +159,7 @@ Describe(과일)
   }
   ```
 - 테스트 실행
-
   - Success
-
     ```bash
     PASS  src/App.test.js
       ✓ renders learn react link (108 ms)
@@ -198,7 +182,6 @@ Describe(과일)
   - - 버튼을 누르면 카운터가 1로 변하고, - 버튼을 누르면 -1로 변한다.
 - 테스트 작성
   `App.test.js`
-
   ```jsx
   // ..
   test("when the + button is pressed, the counter changes to 1", () => {
@@ -221,7 +204,6 @@ Describe(과일)
     expect(counterElement).toHaveTextContent(-1);
   });
   ```
-
 - 테스트 실행
   - Fail
     ```bash
@@ -253,9 +235,7 @@ Describe(과일)
   }
   ```
 - 테스트 실행
-
   - Success
-
     ```bash
     PASS  src/App.test.js
       ✓ ...
@@ -276,7 +256,7 @@ Describe(과일)
 - 테스트 작성
   `App.test.js`
   ```jsx
-  test("on/off button has blue **color**", () => {
+  test("on/off button has blue color", () => {
     render(<App />);
     const buttonElement = screen.getByTestId("on/off-button");
     expect(buttonElement).toHaveStyle({ backgroundColor: "blue" });
@@ -292,7 +272,6 @@ Describe(과일)
     ```
 - 테스트 코드에 대응하는 실제 코드 작성
   `App.js`
-
   ```jsx
   function App() {
   	// ..
@@ -310,11 +289,77 @@ Describe(과일)
   }
 
   ```
-
 - 테스트 실행
   - Success
     ```bash
     PASS  src/App.test.js (8.434 s)
       ✓ ...
       ✓ on/off button has blue color (289 ms)
+    ```
+
+### on/off 버튼 disabled 컨트롤하기
+
+- 해야할 일
+  - on/off 버튼 클릭 시 -, + 버튼에 disabled 속성을 부여하여 못 누르게 막는다.
+- 테스트 작성
+  `App.test.js`
+  ```jsx
+  test("Prevent the -, + button from being pressed when the on/off button is clicked", () => {
+    // App 컴포넌트를 렌더링 한다.
+    render(<App />);
+    // screen object를 이용해서 원하는 엘리먼트에 접근(접근할 때 ID로 접근)
+    const onOffButtonElement = screen.getByTestId("on/off-button");
+    // click onOffbuttonElement button
+    fireEvent.click(onOffButtonElement);
+    // screen object를 이용해서 원하는 엘리먼트에 접근(접근할 때 ID로 접근)
+    const plusButtonElement = screen.getByTestId("plus-button");
+    expect(plusButtonElement).toBeDisabled();
+  });
+  ```
+- 테스트 실행
+  - Fail
+    ```bash
+    FAIL  src/App.test.js (7.414 s)
+      ✕ Prevent the -, + button from being pressed when the on/off button is clicked (172 ms)
+      // ..
+    ```
+- 테스트 코드에 대응하는 실제 코드 작성
+  `App.js`
+  ```jsx
+  function App() {
+    const [counter, setCounter] = useState(0);
+    const [disabled, setDisabled] = useState(false);
+
+    return (
+      <div className="App">
+        <header className="App-header">
+          {/* codes.. */}
+          <div>
+            <button data-testid="minus-button" disabled={disabled} onClick={() => setCounter((count) => count - 1)}>
+              -
+            </button>
+            <button data-testid="plus-button" disabled={disabled} onClick={() => setCounter((count) => count + 1)}>
+              +
+            </button>
+          </div>
+          <div>
+            <button
+              data-testid="on/off-button"
+              style={{ backgroundColor: "blue" }}
+              onClick={() => setDisabled((prev) => !prev)}
+            >
+              on/off
+            </button>
+          </div>
+        </header>
+      </div>
+    );
+  }
+  ```
+- 테스트 실행
+  - Success
+    ```bash
+    PASS  src/App.test.js (7.76 s)
+      ✓ ...
+      ✓ Prevent the -, + button from being pressed when the on/off button is clicked (241 ms)
     ```
