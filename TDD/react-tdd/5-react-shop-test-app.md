@@ -138,3 +138,109 @@
     Time:        20.389 s
     Ran all test suites related to changed files.
     ```
+
+### Mock Service Worker
+
+첫 번째 페이지에서 Products(여행 상품), Options(여행 옵션)들은 백엔드 서버에서 가져온다.(사진, 이름, 설명) 여행 상품의 가격은 각각 동일하며, 옵션들도 동일하다. 그리고 여행 상품 선택 개수와 옵션 선택에 따라 총 가격을 계산해주면 된다. 그렇다면 이러한 부분은 어떻게 테스트 해줄까? Mock Service Worker 모듈을 사용한다.
+
+백엔드에서 데이터를 가져오는 부분을 테스트하기 위해서는 실제로 서버에 호출하는 end-to-end 테스트를 할 수 있지만 여기서는 서버에 요청을 보낼 때 그 요청을 가로채서 Mock Service Worker라는 것으로 요청을 처리하고 모의 응답(mocked response)을 보내준다.
+
+![](https://mermaid.ink/img/eyJjb2RlIjoic2VxdWVuY2VEaWFncmFtXG5cdEJyb3dzZXIgLT4-IFNlcnZpY2UgV29ya2VyOiAxLiByZXF1ZXN0XG4gIFNlcnZpY2UgV29ya2VyIC0tPj4gbXN3OiAyLiByZXF1ZXN0IGNsb25lXG4gIG1zdyAtLT4-IG1zdzogMy4gbWF0Y2ggYWdhaW5zdCBtb2Nrc1xuICBtc3cgLS0-PiBTZXJ2aWNlIFdvcmtlcjogNC4gTW9ja2VkIHJlc3BvbnNlXG4gIFNlcnZpY2UgV29ya2VyIC0-PiBCcm93c2VyOiA1LiByZXNwb25kV2l0aChtb2NrZWRSZXNwb25zZSlcblx0XHRcdFx0XHQiLCJtZXJtYWlkIjp7InRoZW1lIjoiZGVmYXVsdCJ9LCJ1cGRhdGVFZGl0b3IiOmZhbHNlfQ)
+
+### [MSW 작동 방식](https://mswjs.io/docs/getting-started/mocks/rest-api)
+
+브라우저에 서비스 워커를 등록하여 외부로 나가는 네트워크 리퀘스트를 감지한다. 그리고 그 요청을 실제 서버로 갈 때 중간에 가로채서(intercept) MSW 클라이언트 사이드 라이브러리로 보낸다. 그 후 등록된 핸들러에서 요청을 처리한 후 모의 응답을 브라우저로 보낸다.
+
+- 브라우저와 통합
+  - 브라우저에 서비스 워커를 등록해서 네트워크를 가로챈다.
+- 노드와 통합(Jest 사용하는 테스트 환경)
+  - MSW가 서버를 생성해서 데이터를 전송해준다.
+
+### MSW 설치하기
+
+1. msw 설치
+
+```bash
+> npm i msw --save
+```
+
+1. 핸들러 생성
+
+`src/mocks/handlers.js`
+
+```jsx
+import { rest } from "msw";
+
+export const handlers = [
+  rest.get("http://localhost:5000/products", (req, res, ctx) => {
+    return res(
+      ctx.json([
+        {
+          name: "America",
+          imagePath: "/images/america.jpeg",
+        },
+        {
+          name: "England",
+          imagePath: "/images/england.jpeg",
+        },
+      ])
+    );
+  }),
+  rest.get("http://localhost:5000/options", (req, res, ctx) => {
+    return res(
+      ctx.json([
+        {
+          name: "Insurance",
+        },
+        {
+          name: "Dinner",
+        },
+      ])
+    );
+  }),
+];
+```
+
+- 핸들러 Type
+  - Rest 또는 Graphql
+- HTTP method
+  - get, post, delete, ..
+- 매개변수
+  - req: 매칭 요청에 대한 정보
+  - res: 모의 응답을 생성하는 기능적 유틸리티
+  - ctx: 모의 응답의 상태 코드, 헤더, 본문 등을 설정하는 데 도움이 되는 함수 그룹
+
+1. 노드와 통합(Jest 사용하는 테스트 환경)
+
+- 서버 생성
+  `src/mocks/server.js`
+
+  ```jsx
+  import { setupServer } from "msw/node";
+  import { handler } from "./handlers";
+
+  // This configures a request mocking server
+  // with the given request handlers.
+  export const server = setupServer(...handler);
+  ```
+
+  `root/setupTests.js`
+
+  ```jsx
+  // jest-dom adds custom jest matchers for asserting on DOM nodes.
+  // allows you to do things like:
+  // expect(element).toHaveTextContent(/react/i)
+  // learn more: https://github.com/testing-library/jest-dom
+  import "@testing-library/jest-dom";
+
+  // 아래부터 추가
+  // src/setupTests.js
+  import { server } from "./mocks/server.js";
+  // Establish API mocking before all tests.
+  beforeAll(() => server.listen());
+  // Reset any request handlers that we may add during the tests,
+  // so they don't affect other tests.
+  afterEach(() => server.resetHandlers());
+  // Clean up after the tests are finished
+  afterAll(() => server.close());
+  ```
