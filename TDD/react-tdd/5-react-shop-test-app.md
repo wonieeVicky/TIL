@@ -244,3 +244,97 @@ export const handlers = [
   // Clean up after the tests are finished
   afterAll(() => server.close());
   ```
+
+### MSW를 이용한 테스트 - 상품 이미지 가져오기
+
+mock service worker를 사용해 여행 상품부분 products를 테스트해본다.
+
+1. Type 파일 생성
+2. Type.test.js 테스트 파일 생성
+3. Products 파일 생성
+
+- 해야 할 일은?
+  - 서버에서 여행 상품 이미지를 가져온다.
+- 테스트 작성
+  `Type.test.js`
+  ```jsx
+  import { screen, render } from "@testing-library/react";
+  import Type from "../Type";
+
+  test("displays product images from server", async () => {
+    render(<Type orderType="products" />);
+
+    // 이미지 찾기
+    const productImages = await screen.findAllByRole("img", {
+      name: /product$/i,
+    });
+    expect(productImages).toHaveLength(2);
+
+    const altText = productImages.map((element) => element.alt);
+    expect(altText).toEqual(["America product", "England product"]);
+  });
+  ```
+- 테스트 실행
+  - Fail
+- 테스트 코드에 대응하는 실제 코드 작성
+  `Type.js`
+  ```jsx
+  import axios from "axios";
+  import React, { useEffect, useState } from "react";
+  import Products from "./Products";
+
+  export default function Type({ orderType }) {
+    const [items, setItems] = useState([]);
+
+    useEffect(() => {
+      loadItems(orderType);
+    }, [orderType]);
+
+    const loadItems = async (orderType) => {
+      try {
+        let response = await axios.get(`http://localhost:5000/${orderType}`);
+        setItems(response.data);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    const ItemComponent = orderType === "products" ? Products : null;
+
+    const optionItems = items.map((item) => (
+      <ItemComponent key={item.name} name={item.name} imagePath={item.imagePath} />
+    ));
+
+    return <div>{optionItems}</div>;
+  }
+  ```
+  `Products.js`
+  ```jsx
+  import React from "react";
+
+  function Products({ name, imagePath }) {
+    return (
+      <div style={{ textAlign: "center" }}>
+        <img style={{ width: "75%" }} src={`http://localhost:5000/${imagePath}`} alt={`${name} product`} />
+        <form style={{ marginTop: "10px" }}>
+          <label style={{ textAlign: "right" }}>{name}</label>
+          <input style={{ marginLeft: 7 }} type="number" name="quantity" min="0" defaultValue={0} />
+        </form>
+      </div>
+    );
+  }
+
+  export default Products;
+  ```
+- 테스트 실행
+  - Success
+    ```bash
+    PASS  src/2-react-shop-test/pages/OrderPage/tests/Type.test.js
+    PASS  src/2-react-shop-test/pages/SummaryPage/tests/SummaryPage.test.js (6.762 s)
+
+    Test Suites: 3 passed, 3 total
+    Tests:       9 passed, 9 total
+    Snapshots:   0 total
+    Time:        9.278 s
+    Ran all test suites.
+    ```
