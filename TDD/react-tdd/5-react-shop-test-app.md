@@ -257,6 +257,7 @@ mock service worker를 사용해 여행 상품부분 products를 테스트해본
   - 서버에서 여행 상품 이미지를 가져온다.
 - 테스트 작성
   `Type.test.js`
+
   ```jsx
   import { screen, render } from "@testing-library/react";
   import Type from "../Type";
@@ -274,10 +275,12 @@ mock service worker를 사용해 여행 상품부분 products를 테스트해본
     expect(altText).toEqual(["America product", "England product"]);
   });
   ```
+
 - 테스트 실행
   - Fail
 - 테스트 코드에 대응하는 실제 코드 작성
   `Type.js`
+
   ```jsx
   import axios from "axios";
   import React, { useEffect, useState } from "react";
@@ -308,7 +311,9 @@ mock service worker를 사용해 여행 상품부분 products를 테스트해본
     return <div>{optionItems}</div>;
   }
   ```
+
   `Products.js`
+
   ```jsx
   import React from "react";
 
@@ -326,8 +331,11 @@ mock service worker를 사용해 여행 상품부분 products를 테스트해본
 
   export default Products;
   ```
+
 - 테스트 실행
+
   - Success
+
     ```bash
     PASS  src/2-react-shop-test/pages/OrderPage/tests/Type.test.js
     PASS  src/2-react-shop-test/pages/SummaryPage/tests/SummaryPage.test.js (6.762 s)
@@ -337,4 +345,87 @@ mock service worker를 사용해 여행 상품부분 products를 테스트해본
     Snapshots:   0 total
     Time:        9.278 s
     Ran all test suites.
+    ```
+
+### 서버에서 데이터를 가져올 때 에러 발생 시 UI 처리
+
+서버에서 데이터를 가져올 때 에러가 발생할 경우 에러 표시를 적절하게 해주고자 한다.
+
+- 해야 할 일은?
+  - 서버에서 에러 발생 시 에러 문구를 표출해준다.
+- 테스트 작성
+  `Type.test.js`
+  ```jsx
+  test("when fetching product datas, face an error", async () => {
+    server.resetHandlers(rest.get("http://localhost:5000/products", (req, res, ctx) => res(ctx.status(500))));
+
+    render(<Type orderType="products" />);
+
+    const errorBanner = await screen.findByTestId("error-banner");
+    expect(errorBanner).toHaveTextContent("에러가 발생했습니다.");
+  });
+  ```
+- 테스트 실행
+  - Fail
+- 테스트 코드에 대응하는 실제 코드 작성
+  `Type.js`
+  ```jsx
+  // ...
+  import ErrorBanner from "../../components/ErrorBanner";
+
+  export default function Type({ orderType }) {
+    const [items, setItems] = useState([]);
+    const [error, setError] = useState(false);
+
+    useEffect(() => {
+      loadItems(orderType);
+    }, [orderType]);
+
+    const loadItems = async (orderType) => {
+      try {
+        let response = await axios.get(`http://localhost:5000/${orderType}`);
+        setItems(response.data);
+      } catch (error) {
+        setError(true); // error state 변경
+      }
+    };
+
+    if (error) {
+      return <ErrorBanner message="에러가 발생했습니다." />;
+    }
+
+    // ..
+  }
+  ```
+  `components/ErrorBanner.js`
+  ```jsx
+  import React from "react";
+
+  const ErrorBanner = ({ message }) => {
+    let errorMessage = message || "에러입니다.";
+
+    return (
+      <div
+        data-testid="error-banner"
+        style={{
+          backgroundColor: "red",
+          color: "white",
+        }}
+      >
+        {errorMessage}
+      </div>
+    );
+  };
+
+  export default ErrorBanner;
+  ```
+- 테스트 실행
+  - Success
+    ```bash
+    PASS  src/2-react-shop-test/pages/OrderPage/tests/Type.test.js
+      ✓ displays product images from server (268 ms)
+      ✓ when fetching product datas, face an error (157 ms)
+
+    Test Suites: 1 passed, 1 total
+    Tests:       2 passed, 2 total
     ```
