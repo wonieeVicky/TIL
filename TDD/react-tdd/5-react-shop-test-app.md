@@ -355,6 +355,7 @@ mock service worker를 사용해 여행 상품부분 products를 테스트해본
   - 서버에서 에러 발생 시 에러 문구를 표출해준다.
 - 테스트 작성
   `Type.test.js`
+
   ```jsx
   test("when fetching product datas, face an error", async () => {
     server.resetHandlers(rest.get("http://localhost:5000/products", (req, res, ctx) => res(ctx.status(500))));
@@ -365,10 +366,12 @@ mock service worker를 사용해 여행 상품부분 products를 테스트해본
     expect(errorBanner).toHaveTextContent("에러가 발생했습니다.");
   });
   ```
+
 - 테스트 실행
   - Fail
 - 테스트 코드에 대응하는 실제 코드 작성
   `Type.js`
+
   ```jsx
   // ...
   import ErrorBanner from "../../components/ErrorBanner";
@@ -397,7 +400,9 @@ mock service worker를 사용해 여행 상품부분 products를 테스트해본
     // ..
   }
   ```
+
   `components/ErrorBanner.js`
+
   ```jsx
   import React from "react";
 
@@ -419,8 +424,11 @@ mock service worker를 사용해 여행 상품부분 products를 테스트해본
 
   export default ErrorBanner;
   ```
+
 - 테스트 실행
+
   - Success
+
     ```bash
     PASS  src/2-react-shop-test/pages/OrderPage/tests/Type.test.js
       ✓ displays product images from server (268 ms)
@@ -429,3 +437,77 @@ mock service worker를 사용해 여행 상품부분 products를 테스트해본
     Test Suites: 1 passed, 1 total
     Tests:       2 passed, 2 total
     ```
+
+### 옵션 정보 가져오기
+
+옵션 정보를 가져온 뒤 checkbox로 보여주는 부분을 테
+스트해보자.
+
+- 해야 할 일은?
+  - 서버에서 옵션 정보를 가져온다.
+- 테스트 작성
+
+  ***
+
+  `Type.test.js`
+
+  ```jsx
+  test("fetch option information from server", async () => {
+    render(<Type orderType="options" />);
+
+    // 체크박스 가져오기
+    const optionCheckboxes = await screen.findAllByRole("checkbox");
+    expect(optionCheckboxes).toHaveLength(2);
+  });
+  ```
+
+- 테스트 실행
+  - Fail
+- 테스트 코드에 대응하는 실제 코드 작성
+  `Type.js`
+
+  ```jsx
+  // ..
+  import Options from "./Options";
+
+  export default function Type({ orderType }) {
+    // ..
+
+    const ItemComponent = orderType === "products" ? Products : Options;
+
+    // ..
+  }
+  ```
+
+  `Options.js`
+
+  ```jsx
+  import React from "react";
+
+  const Options = ({ name }) => {
+    return (
+      <form>
+        <input type="checkbox" id={`${name} option`} />
+        {"  "}
+        <label htmlFor={`${name} option`}>{name}</label>
+      </form>
+    );
+  };
+
+  export default Options;
+  ```
+
+- 테스트 실행
+  - Success
+    ```bash
+    PASS  src/2-react-shop-test/pages/OrderPage/tests/Type.test.js (12.634 s)
+      ✓ displays product images from server (564 ms)
+      ✓ when fetching product datas, face an error (87 ms)
+      ✓ fetch option information from server (228 ms)
+    ```
+    `connect ECONNREFUSED` 에러가 발생한다면, setupTests.js에서 server 동작 설정을 수정해준다.
+  ```jsx
+  //
+  // afterEach(() => server.close()); // 각 요청마다 server close 처리하는게 아닌
+  afterAll(() => server.close()); // 모든 API 요청을 처리한 뒤 close 한다.
+  ```
