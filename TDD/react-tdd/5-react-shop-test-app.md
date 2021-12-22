@@ -511,3 +511,64 @@ mock service worker를 사용해 여행 상품부분 products를 테스트해본
   // afterEach(() => server.close()); // 각 요청마다 server close 처리하는게 아닌
   afterAll(() => server.close()); // 모든 API 요청을 처리한 뒤 close 한다.
   ```
+
+### UI를 위한 작업
+
+테스팅을 위주로 작업하면서 실제 리액트 앱의 UI를 확인하지 못했다. 따라서 실제 리액트를 실행하여 UI 를 보강해보자
+
+- 해야 할 일은?
+  - 전체적인 틀을 만든다.
+- 코드작성
+
+  `OrderPage.js`
+
+  ```jsx
+  import React from "react";
+  import Type from "./Type";
+
+  function OrderPage() {
+    return (
+      <div>
+        <h1>Travel Products</h1>
+        <div>
+          <Type orderType="products" />
+        </div>
+        <div style={{ display: "flex", marginTop: 20 }}>
+          <div style={{ width: "50%" }}>
+            <Type orderType="options" />
+          </div>
+          <div style={{ width: "50%" }}>
+            <h2>Total Price: </h2>
+            <br />
+            <button>주문</button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  export default OrderPage;
+  ```
+
+  `Type.js`
+
+  ```jsx
+  // ...
+
+  export default function Type({ orderType }) {
+    // UI를 위한 각종 엘리먼트 추가
+    return (
+      <>
+        <h2>주문 종류</h2>
+        <p>하나의 가격</p>
+        <p>총 가격: </p>
+        <div style={{ display: "flex", flexDirection: orderType === "options" && "column" }}>{optionItems}</div>
+      </>
+    );
+  }
+  ```
+
+- API request를 위한 백엔드 서버 실행
+  - 프로젝트 다운로드 받은 후 `npm start`
+- UI 확인
+  - OK!
