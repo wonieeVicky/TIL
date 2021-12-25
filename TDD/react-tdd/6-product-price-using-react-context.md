@@ -59,3 +59,156 @@
   - React Context 사용 (이것을 사용!)
   - mob, redux 사용 등..
 - 리액트 테스트에서는 각 주문 금액을 OrderPage, CompletePage 등에서 공유하여 사용해야 하므로 이러한 컴포넌트 간 데이터 전달에 대한 테스트 코드는 React context를 사용해 구현해보기로 한다.
+
+### context를 사용한 컴포넌트 데이터 제공
+
+- context를 이용하면
+  일반적인 react 애플리케이션에서 데이터는 위에서 아래로, 즉 부모에서 자식에게 props를 통해 정보를 내려주는 구조를 가지지만, 애플리케이션 안의 여러 컴포넌트들에 전해줘야 하는 props의 경우 이 과정이 매우 중복적이고 번거로울 수 있다. 이때 context를 이용하며 트리 단계마다 명시적으로 props를 넘겨주지 않고 많은 컴포넌트가 값을 공유하도록 만들 수 있음
+- context를 사용해서 할 일
+  - 어떠한 컴포넌트에서 총 가격을 Update해주는 것
+  - 어떠한 컴포넌트에서 총 가격을 보여주는 것
+- context를 사용하는 방법
+  1. context 생성
+
+     `contexts/OrderContext.js`
+
+     ```jsx
+     import { createContext, useMemo } from "react";
+
+     const OrderContext = createContext();
+
+     export function OrderContextProvider(props) {
+       return <OrderContext.Provider value {...props} />;
+     }
+     ```
+
+  2. context는 Provider 안에서 사용 가능하기 때문에 Provider 생성
+
+     `App.js`
+
+     ```jsx
+     // ..
+     import { OrderContextProvider } from "./contexts/OrderContext";
+
+     function App() {
+       return (
+         <div style={{ padding: "4rem" }}>
+           <OrderContextProvider>
+             <OrderPage />
+           </OrderContextProvider>
+         </div>
+       );
+     }
+     ```
+
+  3. value로 넣을 데이터 만들어주기(필요한 데이터와 데이터를 업데이트 해줄 함수들)
+     - 필요한 데이터 형식 만들기
+       `contexts/OrderContext.js`
+       ```jsx
+       // ..
+       export function OrderContextProvider(props) {
+         // Map은 간단한 키와 값을 서로 연결(매핑)시켜 저장하며
+         // 저장된 순서대로 각 요소들을 반복적으로 접근할 수 있도록 함
+         const [orderCounts, setOrderCounts] = useState({
+           products: new Map(),
+           options: new Map(),
+         });
+
+         // value가 바뀔 때마다 OrderContext를 사용하는 모든 컴포넌트들이 모두 리렌더링됨
+         // 따라서 useMemo를 사용해서 성능을 최적화해준다.
+         const value = useMemo(() => [{ ...orderCounts }], [orderCounts]);
+
+         return <OrderContext.Provider value={value} {...props} />;
+       }
+       ```
+     - 데이터를 업데이트 해주는 함수 만들기
+       `context/OrderContext.js`
+       ```jsx
+       // ..
+       export function OrderContextProvider(props) {
+         // ..
+         const value = useMemo(() => {
+           function updateItemCount(itemName, newItemCount, orderType) {
+             const newOrderCounts = { ...orderCounts };
+             console.log("newOrderCount before: ", newOrderCounts);
+
+             const orderCountsMap = orderCounts[orderType];
+             orderCountsMap.set(itemName, parseInt(newItemCount));
+
+             console.log("newOrderCount after: ", newOrderCounts);
+             setOrderCounts(newOrderCounts);
+           }
+
+           return [{ ...orderCounts }, updateItemCount];
+         }, [orderCounts]);
+
+         return <OrderContext.Provider value={value} {...props} />;
+       }
+       ```
+     - 상품 Count를 이용한 가격 계산
+       `context/OrderContext.js`
+       ```jsx
+       //..
+       import { useEffect } from "react";
+
+       const pricePerItem = {
+         products: 1000,
+         options: 500,
+       };
+
+       const calculateSubtotal = (orderType, orderCounts) => {
+         let optionCount = 0;
+         for (const count of orderCounts[orderType].values()) {
+           optionCount += count;
+         }
+
+         return optionCount * pricePerItem[orderType];
+       };
+
+       export function OrderContextProvider(props) {
+         // 상품 count를 이용한 가격 계산
+         const [totals, setTotals] = useState({
+           products: 0,
+           options: 0,
+           total: 0,
+         });
+
+         useEffect(() => {
+           const productsTotal = calculateSubtotal("products", orderCounts);
+           const optionsTotal = calculateSubtotal("options", orderCounts);
+           const total = productsTotal + optionsTotal;
+           setTotals({
+             products: productsTotal,
+             options: optionsTotal,
+             total: total,
+           });
+         }, [orderCounts]);
+
+         const value = useMemo(() => {
+           // totals 추가
+           return [{ ...orderCounts, totals }, updateItemCount];
+         }, [orderCounts, totals]);
+       }
+       ```
+  4. orderContext 사용하기
+
+     `contexts/OrderContext.js`
+
+     ```jsx
+     export const OrderContext = createContext();
+     ```
+
+     `Type.js`
+
+     ```jsx
+     // ..
+     import React, { useEffect, useState, useContext } from "react";
+     import { OrderContext } from "../../contexts/OrderContext";
+
+     export default function Type({ orderType }) {
+       // ..
+       const [orderDatas, updateItemCount] = useContext(OrderContext);
+
+       // ..
+     }
+     ```
