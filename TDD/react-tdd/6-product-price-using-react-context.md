@@ -228,8 +228,10 @@ context를 사용할 준비가 끝났다면 이 context를 통해 여행 상품,
 - 해야할 일?
   - 여행 상품의 총 가격, 옵션의 총 가격을 구한다.
 - 코드 작성
+
   - Products, Options 두 컴포넌트에 updateItemCount를 Prop로 전달
     `Type.js`
+
     ```jsx
     // ..
     import React, { useEffect, useState, useContext } from "react";
@@ -249,6 +251,7 @@ context를 사용할 준비가 끝났다면 이 context를 통해 여행 상품,
       ));
     }
     ```
+
   - 여행 가격은 각 상품의 숫자를 올리거나 내릴 때(Products 컴포넌트)
     `Products.js`
     ```jsx
@@ -295,6 +298,7 @@ context를 사용할 준비가 끝났다면 이 context를 통해 여행 상품,
 ### context wrapper 추가로 에러 개선
 
 - 현재까지 구현한 context를 테스트하면 아래와 같다.
+
   ```bash
   ● update product's total when products change
   TypeError: undefined is not iterable (cannot read property Symbol(Symbol.iterator))
@@ -304,11 +308,14 @@ context를 사용할 준비가 끝났다면 이 context를 통해 여행 상품,
   > 11 |   const [orderDatas, updateItemCount] = useContext(OrderContext);
        |                                         ^
   ```
+
 - 에러가 나는 이유는?
   - 에러가 발생하는 이유는 OrderContextProvider로 실제 코드를 감싸주었으나 테스트 코드에서는 별도로 감싸주지 않았기 때문에 Context 사용과정에서 에러가 발생!
 - 에러 해결 방법은?
+
   - App.js 에서 감싸준 것처럼 테스트 코드에도 wrapper로 감싸준다. 단, 방법이 다르다.
     `calculate.test.js`
+
     ```jsx
     // ..
     import { OrderContextProvider } from "../../../contexts/OrderContext";
@@ -320,6 +327,7 @@ context를 사용할 준비가 끝났다면 이 context를 통해 여행 상품,
       // ..
     });
     ```
+
 - 테스트로 확인(단, 테스트할 때 p를 입력하여 해당 파일만 테스트를 해야한다.)
   - 에러 발생!
     `Products.js`
@@ -332,3 +340,31 @@ context를 사용할 준비가 끝났다면 이 context를 통해 여행 상품,
     Time:        21.982 s
     Ran all test suites matching /ca/i.
     ```
+
+### 모든 테스트 케이스를 wrapper로 감싸주기
+
+이전 영상의 테스트 케이스에서 context가 필요했으므로 wrapper로 감싸줌. 하지만 다른 테스트에서도 context가 필요하므로 다 씌워주는 것이 불편.. 따라서 Custom render를 만들어 적용해본다. ([참고](https://testing-library.com/docs/react-testing-library/setup/#custom-render))
+
+- Custom Render를 만들 파일 생성 후 Custom Render 생성
+  `test-utils.js`
+
+  ```jsx
+  import { render } from "@testing-library/react";
+  import { OrderContextProvider } from "./2-react-shop-test/contexts/OrderContext";
+
+  // ui: 렌더하고자하는 jsx
+  // options: wrapper 옵션 이외에 우리가 주고자 하는 다른 옵션들
+  const customRender = (ui, options) => render(ui, { wrapper: OrderContextProvider, ...options });
+
+  // render 메소드 이외에도 tlr에서 제공하는 모든 것을 다시 export
+  export * from "@testing-library/react";
+  // 원래 tlr에서 제공하는 render 메소드를 customRender로 override 해주기
+  export { customRender as render };
+  ```
+
+- 원래 tlr에서 import 했던 것을 방금 생성한 파일에서 Import
+  `calculate.test.js`, `Type.test.js`
+  ```jsx
+  // import { render, screen } from '@testing-library/react';
+  import { render, screen } from "../../../test-utils";
+  ```
