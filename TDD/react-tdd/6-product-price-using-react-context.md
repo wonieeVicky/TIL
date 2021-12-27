@@ -368,3 +368,68 @@ context를 사용할 준비가 끝났다면 이 context를 통해 여행 상품,
   // import { render, screen } from '@testing-library/react';
   import { render, screen } from "../../../test-utils";
   ```
+
+### 옵션 가격 TDD 구현
+
+context를 이용해 상품 가격을 계산하고 그에 대한 테스트를 구현해보았다. 이번에는 옵션 가격을 위한 테스트도 구현해보자..!
+
+- 해야 할 일?
+  - 옵션 체크 박스를 체크해서 옵션 총 가격을 업데이트 한다.
+- 테스트 작성
+  `pages/OrderPagecalculate.test.js`
+  ```jsx
+  test("update option's total when options change", async () => {
+    render(<Type orderType="options" />);
+
+    // 옵션 총 가격이 0부터 시작
+    const optionsTotal = screen.getByText("옵션 총 가격:", { exact: false });
+    expect(optionsTotal).toHaveTextContent("0");
+
+    // 보험 옵션 추가
+    const insuranceCheckbox = await screen.findByRole("checkbox", {
+      name: "Insurance",
+    });
+    userEvent.click(insuranceCheckbox);
+    expect(optionsTotal).toHaveTextContent("500");
+
+    // 디너 옵션 추가
+    const dinnerCheckbox = screen.getByRole("checkbox", { name: "Dinner" });
+    userEvent.click(dinnerCheckbox);
+    expect(optionsTotal).toHaveTextContent("1000");
+
+    // 디너 옵션 제거
+    userEvent.click(dinnerCheckbox);
+    expect(optionsTotal).toHaveTextContent("500");
+  });
+  ```
+- 테스트
+  - FAIL : `screen.getByText('옵션 총 가격:', { exact: false })`이 미존재하므로
+- 실제 코드 작성
+  `Type.js`
+  ```jsx
+  export default function Type({ orderType }) {
+    // ..
+    const orderTypeKorean = useMemo(() => (orderType === "products" ? "상품" : "옵션"), [orderType]);
+
+    useEffect(() => {
+      loadItems(orderType);
+    }, [orderType]);
+
+    //..
+    return (
+      <>
+        {/* codes.. */}
+        <p>
+          {orderTypeKorean} 총 가격:{orderDatas.totals[orderType]}
+        </p>
+      </>
+    );
+  }
+  ```
+- 테스트
+  - Success
+    ```bash
+    PASS  src/2-react-shop-test/pages/OrderPage/tests/calculate.test.js
+    	✓ update product's total when products change (363 ms)
+    	✓ update option's total when options change (183 ms)
+    ```
