@@ -433,3 +433,102 @@ context를 이용해 상품 가격을 계산하고 그에 대한 테스트를 �
     	✓ update product's total when products change (363 ms)
     	✓ update option's total when options change (183 ms)
     ```
+
+### 상품 가격, 옵션 가격을 더한 총 가격 산출
+
+상품 가격과 옵션 가격을 모두 구했으니 이 둘을 합친 총 가격도 구해본다.
+
+- 해야 할 일?
+    - 상품 총 가격, 옵션 총 가격 합치기
+- 테스트 작성
+    
+    `calculate.test.js`
+    
+    같은 분류의 테스트들은 describe 하위로 그룹핑 할 수 있다.
+    
+    ```jsx
+    **describe('total price of goods and options', () => {
+      test('total price starts with 0 and Updating total price when adding one product', async () => {
+        render(<OrderPage />);
+    
+        // const total = screen.getByRole('heading:', { name: /Total Price: i$/ });
+        const total = screen.getByText('Total Price:', { exact: false });
+        expect(total).toHaveTextContent('0');
+    
+        const americaInput = await screen.findByRole('spinbutton', { name: 'America' });
+        userEvent.clear(americaInput);
+        userEvent.type(americaInput, '1');
+        expect(total).toHaveTextContent('1000');
+      });
+      test('Updating total price when adding one option', async () => {
+        render(<OrderPage />);
+    
+        const total = screen.getByText('Total Price:', { exact: false });
+        const insuranceCheckbox = await screen.findByRole('checkbox', {
+          name: 'Insurance',
+        });
+        userEvent.click(insuranceCheckbox);
+        expect(total).toHaveTextContent('500');
+      });
+      test('Updating total price when removing option and product', async () => {
+        render(<OrderPage />);
+    
+        const total = screen.getByText('Total Price:', { exact: false });
+        const insuranceCheckbox = await screen.findByRole('checkbox', {
+          name: 'Insurance',
+        });
+        userEvent.click(insuranceCheckbox);
+    
+        const americaInput = await screen.findByRole('spinbutton', { name: 'America' });
+        userEvent.clear(americaInput);
+        userEvent.type(americaInput, '3');
+    
+        userEvent.clear(americaInput);
+        userEvent.type(americaInput, '1');
+    
+        expect(total).toHaveTextContent('1500');
+      });
+    });**
+    ```
+    
+- 테스트
+    - FAIL : 
+    **`const total = screen.getByText('Total Price:', { exact: false });`에 값이 들어오고 있지 않으므로 :)**
+- 실제 코드 작성
+    
+    `OrderPage.js`
+    
+    ```jsx
+    // ..
+    import { OrderContext } from '../../contexts/OrderContext';
+    
+    function OrderPage() {
+      const [orderDatas] = useContext(OrderContext); // orderDatas 가져오기
+      return (
+        <div>
+          {/* codes.. */}
+          <div style={{ display: 'flex', marginTop: 20 }}>
+            {/* codes.. */}
+            <div style={{ width: '50%' }}>
+              <h2>Total Price: {orderDatas.totals.total}</h2>
+              <br />
+              <button>주문</button>
+            </div>
+          </div>
+        </div>
+      );
+    }
+    ```
+    
+- 테스트
+    - Success
+    
+    ```bash
+    PASS  src/2-react-shop-test/pages/OrderPage/tests/calculate.test.js
+      ✓ update product's total when products change (561 ms)
+      ✓ update option's total when options change (117 ms)
+      total price of goods and options
+        ✓ total price starts with 0 and Updating total price when adding one product (152 ms)
+        ✓ Updating total price when adding one option (145 ms)
+        ✓ Updating total price when removing option and product (174 ms)
+    ```
