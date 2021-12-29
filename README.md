@@ -98,6 +98,7 @@
   4. [더 나은 리액트 테스트하기](https://github.com/wonieeVicky/TIL/blob/main/TDD/react-tdd/4-for-a-better-test.md)
   5. [여행 상품 판매 앱 TDD 구현](https://github.com/wonieeVicky/TIL/blob/main/TDD/react-tdd/5-react-shop-test-app.md)
   6. [React Context를 이용한 상품 가격 처리 TDD 구현](https://github.com/wonieeVicky/TIL/blob/main/TDD/react-tdd/6-product-price-using-react-context.md)
+  7. [나머지(주문 요약, 주문 완료) 페이지 TDD 구현](https://github.com/wonieeVicky/TIL/blob/main/TDD/react-tdd/7-implement-remain-pages-of-tdd.md)
 
 - Jasmine
 
