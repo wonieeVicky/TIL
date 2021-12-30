@@ -97,3 +97,117 @@
   Snapshots:   0 total
   Time:        14.957 s
   ```
+
+### 주문 확인 페이지
+
+주문 페이지에서 주문하기 버튼을 누르는 것까지 구현이 완료되었다. 이제 주문 확인 페이지를 만들어보자
+
+- 해야 할 일?
+  - 주문 확인 페이지에서 체크박스와 버튼 클릭
+  - 테스트 작성
+    `./App.test.js`
+    ```jsx
+    // ..
+
+    test("From order to order completion", async () => {
+      // ..
+
+      // 주문 확인 페이지
+      // 제목
+      const summaryHeading = screen.getByRole("heading", { name: "주문 확인" });
+      expect(summaryHeading).toBeInTheDocument();
+
+      // 여행 상품 총 가격
+      const productsHeading = screen.getByRole("heading", { name: "여행 상품: 5000" });
+      expect(productsHeading).toBeInTheDocument();
+
+      // 옵션 총 가격
+      const optionsHeading = screen.getByRole("heading", { name: "옵션: 500" });
+      expect(optionsHeading).toBeInTheDocument();
+
+      // 특정 상품 나열
+      expect(screen.getByText("2 America")).toBeInTheDocument();
+      expect(screen.getByText("3 England")).toBeInTheDocument();
+      expect(screen.getByText("Insurance")).toBeInTheDocument();
+
+      // 체크 박스 체크
+      const confirmCheckbox = screen.getByRole("checkbox", { name: "주문하려는 것을 확인하셨나요?" });
+      userEvent.click(confirmCheckbox);
+
+      const confirmOrderButton = screen.getByRole("button", {
+        name: "주문 확인",
+      });
+      userEvent.click(confirmOrderButton);
+    });
+    ```
+  - 실제 코드 구현
+    `Summary.js`
+    ```jsx
+    import React, { useContext, useState } from "react";
+    import { OrderContext } from "../../contexts/OrderContext";
+
+    const SummaryPage = ({ setStep }) => {
+      const [checked, setChecked] = useState(false);
+      const [orderDatas] = useContext(OrderContext);
+
+      const productArray = Array.from(orderDatas.products); // 배열 객체 복사
+      const productList = productArray.map(([key, value]) => (
+        <li key={key}>
+          {value} {key}
+        </li>
+      ));
+
+      const hasOptions = orderDatas.options.size > 0;
+      let optionRender = null;
+
+      if (hasOptions) {
+        const optionsArray = Array.from(orderDatas.options.keys());
+        const optionList = optionsArray.map((key) => <li key={key}>{key}</li>);
+        optionRender = (
+          <>
+            <h2>옵션: {orderDatas.totals.options}</h2>
+            <ul>{optionList}</ul>
+          </>
+        );
+      }
+
+      const handleSubmit = (e) => {
+        e.preventDefault();
+        setStep(2);
+      };
+
+      return (
+        <div>
+          <h1>주문 확인</h1>
+          <h2>여행 상품: {orderDatas.totals.products}</h2>
+          <ul>{productList}</ul>
+          {optionRender}
+          <form onSubmit={handleSubmit}>
+            <input
+              type="checkbox"
+              checked={checked}
+              onChange={(e) => setChecked(e.target.checked)}
+              id="confirm-checkbox"
+            />{" "}
+            <label htmlFor="confirm-checkbox">주문하려는 것을 확인하셨나요?</label>
+            <br />
+            <button type="submit" disabled={!checked}>
+              주문 확인
+            </button>
+          </form>
+        </div>
+      );
+    };
+
+    export default SummaryPage;
+    ```
+  - 테스트
+    ```bash
+    PASS  src/App.test.js (10.481 s)
+      ✓ From order to order completion (2600 ms)
+
+    Test Suites: 1 passed, 1 total
+    Tests:       1 passed, 1 total
+    Snapshots:   0 total
+    Time:        15.615 s
+    ```
