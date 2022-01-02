@@ -103,9 +103,11 @@
 주문 페이지에서 주문하기 버튼을 누르는 것까지 구현이 완료되었다. 이제 주문 확인 페이지를 만들어보자
 
 - 해야 할 일?
+
   - 주문 확인 페이지에서 체크박스와 버튼 클릭
   - 테스트 작성
     `./App.test.js`
+
     ```jsx
     // ..
 
@@ -140,8 +142,10 @@
       userEvent.click(confirmOrderButton);
     });
     ```
+
   - 실제 코드 구현
     `Summary.js`
+
     ```jsx
     import React, { useContext, useState } from "react";
     import { OrderContext } from "../../contexts/OrderContext";
@@ -201,7 +205,9 @@
 
     export default SummaryPage;
     ```
+
   - 테스트
+
     ```bash
     PASS  src/App.test.js (10.481 s)
       ✓ From order to order completion (2600 ms)
@@ -210,4 +216,120 @@
     Tests:       1 passed, 1 total
     Snapshots:   0 total
     Time:        15.615 s
+    ```
+
+### 주문 완료 페이지
+
+마지막 페이지인 주문 완료 페이지를 구현해본다.
+
+- 해야할 일
+  - 주문 완료 페이지에서 완료 기능 확인
+- 테스트 작성
+  `App.test.js`
+  ```jsx
+  //..
+
+  test("From order to order completion", async () => {
+    // //
+    // 주문 완료 페이지
+    // 백엔드에서 데이터를 가져오는 동안 loading 문구
+    const loading = screen.getByText(/loading/i);
+    expect(loading).toBeInTheDocument();
+
+    // getByRole이 아닌 findByRole을 사용하는 이유는 주문 완료 페이지에 올 때
+    // post request를 보내서 async 작업이 이뤄지고 주문이 성공했습니다. 문구가 나오기 때문
+    const completeHeader = await screen.findByRole("heading", {
+      name: "주문이 성공했습니다.",
+    });
+    expect(completeHeader).toBeInTheDocument();
+
+    // 데이터를 받아온 후에 loading 문구는 사라진다.
+    const loadingDisappeared = screen.queryByText("loading");
+    expect(loadingDisappeared).not.toBeInTheDocument();
+
+    // 첫 페이지로 버튼 클릭
+    const firstPageButton = screen.getByRole("button", { name: "첫페이지로" });
+    userEvent.click(firstPageButton);
+  });
+  ```
+  `handlers.js`
+  order API request에 대한 response를 handler에 추가해준다.
+  ```jsx
+  export const handlers = [
+    // order API 추가
+    rest.post("http://localhost:5000/order", (req, res, ctx) => {
+      let dummyData = [{ orderNumber: 123455676, price: 2000 }];
+      return res(ctx.json(dummyData));
+    }),
+  ];
+  ```
+- 실제 코드 작성
+  `pages/CompletePageCompletePage.js`
+  ```jsx
+  import React, { useContext, useEffect, useState } from "react";
+  import axios from "axios";
+  import { OrderContext } from "../../contexts/OrderContext";
+  import ErrorBanner from "../../components/ErrorBanner";
+
+  function CompletePage({ setStep }) {
+    const [orderDatas] = useContext(OrderContext);
+    const [orderHistory, setOrderHistory] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(false);
+
+    useEffect(() => orderCompleted(orderDatas), [orderDatas]);
+
+    const orderCompleted = async (orderDatas) => {
+      try {
+        let response = await axios.post(`http://localhost:5000/order`, orderDatas);
+        setOrderHistory(response.data); // [{ orderNumber: 123455676, price: 2000 }]
+        setLoading(false);
+      } catch (err) {
+        setError(true);
+      }
+    };
+
+    if (error) {
+      return <ErrorBanner message="에러가 발생했습니다." />;
+    }
+
+    const orderTable = orderHistory.map((item) => (
+      <tr key={item.orderNumber}>
+        <td>{item.orderNumber}</td>
+        <td>{item.price}</td>
+      </tr>
+    ));
+
+    if (loading) {
+      return <div>loading</div>;
+    } else {
+      return (
+        <div style={{ textAlign: "center" }}>
+          <h2>주문이 성공했습니다.</h2>
+          <h3>지금까지 모든 주문</h3>
+          <table style={{ margin: "auto" }}>
+            <tbody>
+              <tr>
+                <th>주문 번호</th>
+                <th>주문 가격</th>
+              </tr>
+              {orderTable}
+            </tbody>
+          </table>
+          <br />
+          <button className="rainbow rainbow-1" onClick={() => setStep(0)}>
+            첫페이지로
+          </button>
+        </div>
+      );
+    }
+  }
+
+  export default CompletePage;
+  ```
+  - 테스트 실행
+    - Success
+    ```bash
+    PASS  src/App.test.js (8.292 s)
+      ✓ From order to order completion (2475 ms)
     ```
