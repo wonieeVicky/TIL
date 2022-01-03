@@ -226,6 +226,7 @@
   - 주문 완료 페이지에서 완료 기능 확인
 - 테스트 작성
   `App.test.js`
+
   ```jsx
   //..
 
@@ -252,8 +253,10 @@
     userEvent.click(firstPageButton);
   });
   ```
+
   `handlers.js`
   order API request에 대한 response를 handler에 추가해준다.
+
   ```jsx
   export const handlers = [
     // order API 추가
@@ -263,8 +266,10 @@
     }),
   ];
   ```
+
 - 실제 코드 작성
   `pages/CompletePageCompletePage.js`
+
   ```jsx
   import React, { useContext, useEffect, useState } from "react";
   import axios from "axios";
@@ -327,9 +332,95 @@
 
   export default CompletePage;
   ```
+
   - 테스트 실행
     - Success
     ```bash
     PASS  src/App.test.js (8.292 s)
       ✓ From order to order completion (2475 ms)
     ```
+
+### no wrapped in act 경고
+
+위 테스트를 실행하면 성공이 나오지만 no wrapped in act 경고가 발생한다. 이 에러는 뭘까?
+
+```bash
+console.error
+    Warning: An update to Type inside a test was not wrapped in act(...).
+
+    When testing, code that causes React state updates should be wrapped into act(...):
+
+    act(() => {
+      /* fire events that update state */
+    });
+    /* assert on the output */
+```
+
+- 왜 나는 건가?
+  리액트에서 나오는 act 경고는 우리가 컴포넌트에 아무것도 일어나지 않을 것으로 예상하고 있을 대 컴포넌트에 어떤 일이 일어나면 나오는 경고이다. 원래 컴포넌트에서 무언가 일어난다고 해주려면 act라는 함수로 감싸주어야 함
+  ```jsx
+  act(() => {
+    /* fire events that update state */
+  });
+  ```
+  이렇게 감싸주면 리액트는 이 컴포넌트에서 어떤 일이 일어날 것이라고 생각하며, 만약 일어나지 않는다면 리액트가 경고를 보여주게 된다.
+- 지금까지 act로 감싸주지 않은 이유?
+  RTL 내부 API에 act를 이미 내포하고 있어서 우리가 일부러 act로 감싸서 호출하지 않고 렌더링과 업데이트를 할 수 있다.(리액트의 콜 스택 안에 있을 때, 예를 들면 아래와 같다.)
+
+  ```jsx
+  it("should render and update a counter", () => {
+    // 컴포넌트 렌더링
+    act(() => {
+      ReactDOM.render(<Counter />, container);
+    });
+
+    // 컴포넌트 업데이트를 트리거하는 이벤트 발생
+    act(() => button.dispatchEvent(new MouseEvent("click", { bubbles: true })));
+  });
+
+  // With react-testing-library
+  it("should render and update a counter", () => {
+    // 컴포넌트 렌더링
+    const { getByText } = render(<Counter />);
+
+    // 컴포넌트 업데이트를 트리거하는 이벤트 발생
+    fireEvent.click(getByText("Save"));
+  });
+  ```
+
+- 그런데 이미 act로 감싸주었는데 지금은 왜 에러가 났을까?
+  컴포넌트가 비동기 API 호출을 할 때나 렌더링이나 어떠한 것이 업데이트 되기 전에 테스트가 종료될 때는 따로 act로 감싸주어야 한다. (리액트 콜 스택 밖에 있을 떄) 그래서 이 때는 `waitFor API`를 이용해서 테스트가 끝나기 전에 컴포넌트가 다 업데이트 되기를 기다려주어야 한다.
+- 그렇다면 act 경고를 어떠헥 해결해야 하는가?
+  만들고 있는 앱의 주문 완료 페이지에 “첫페이지로” 버튼을 누르면
+
+  ```jsx
+  // 첫 페이지로 버튼 클릭
+  const firstPageButton = screen.getByRole("button", { name: "첫페이지로" });
+  userEvent.click(firstPageButton);
+  ```
+
+  첫페이지로 갔기 때문에 리액트는 첫 페이지에서 어떠한 일이 일어날거라고 생각한다.(America 여행 상품이나 Insurance 옵션 등을 비동기로 가져오는..) 하지만 테스트 코드에서는 첫 페이지 부분으로 가는 버튼을 누르고 바로 테스트가 끝나버린다. 따라서 리액트가 act 경고를 보여줌
+
+  ```jsx
+  // 첫 페이지로 버튼 클릭
+  const firstPageButton = screen.getByRole("button", { name: "첫페이지로" });
+  userEvent.click(firstPageButton);
+
+  /* await waitFor(() => {
+  	screen.getByRole("spinbutton", { name: "America" });
+  }); */
+  await screen.findByRole("spinbutton", { name: "America" });
+  ```
+
+  위와 같이 첫 페이지에 온 후의 일어날 일들을 waitFor API를 이용해 넣어주면 경고가 사라진다.
+
+### 다른 예제
+
+회원가입 → 비동기 요청 → 데이터 베이스 → 새로운 유저 정보
+
+```jsx
+// "정보를 저장 중입니다." 가 지워지기 까지 기다린다.를 의미하는 코드
+await waitForElementToBeRemoved(() => screen.getByText("정보를 저장 중입니다."));
+```
+
+위와 같이 넣어줘야 act 경고가 발생하지 않음. react는 “정보가 저장 중입니다.”가 없어지고 있는 걸 예상하고 실제로 테스트에서 없애줘야 경고가 나타나지 않게 된다. waitForElementToBeRemoved는 어떠한 요소(element)가 돔에서 사라지는 것을 기다리는 것이다.
