@@ -424,3 +424,93 @@ await waitForElementToBeRemoved(() => screen.getByText("정보를 저장 중입�
 ```
 
 위와 같이 넣어줘야 act 경고가 발생하지 않음. react는 “정보가 저장 중입니다.”가 없어지고 있는 걸 예상하고 실제로 테스트에서 없애줘야 경고가 나타나지 않게 된다. waitForElementToBeRemoved는 어떠한 요소(element)가 돔에서 사라지는 것을 기다리는 것이다.
+### 첫 페이지로 돌아갈 때 State Reset!
+
+결제 완료 페이지에서 첫 페이지로 버튼을 눌러 첫 페이지로 돌아갈 때 OrderContext 안에 있는 State를 Reset시켜줘보자!
+
+- 해야 할 일?
+    - 첫 페이지로 돌아올 때 모든 값이 초기화되게 만들기
+- 테스트 작성
+    
+    `App.test.js`
+    
+    ```jsx
+    // 첫 페이지로 버튼 클릭
+    const firstPageButton = screen.getByRole('button', { name: '첫페이지로' });
+    userEvent.click(firstPageButton);
+    
+    // 여행 상품 총 가격 옵션 총 가격이 reset 되었는지 확인
+    const productsTotal = screen.getByText('상품 총 가격: 0');
+    expect(productsTotal).toBeInTheDocument();
+    const optionsTotal = screen.getByText('옵션 총 가격: 0');
+    expect(optionsTotal).toBeInTheDocument();
+    
+    await screen.findByRole('spinbutton', { name: 'America' });
+    await screen.findByRole('checkbox', { name: 'Insurance' });
+    ```
+    
+- 테스트에 대응하는 실제 코드 작성
+    
+    `context/OrderContext.js`
+    
+    ```jsx
+    //..
+    export function OrderContextProvider(props) {
+      // ..
+      const value = useMemo(() => {
+        // ..
+        const resetOrderDatas = () => {
+          setOrderCounts({ products: new Map(), options: new Map() });
+        };
+        return [{ ...orderCounts, totals }, updateItemCount, resetOrderDatas];
+      }, [orderCounts, totals]);
+    
+      return <OrderContext.Provider value={value} {...props} />;
+    }
+    ```
+    
+    `CompletePage.js`
+    
+    ```jsx
+    function CompletePage({ setStep }) {
+      const [orderDatas, , resetOrderDatas] = useContext(OrderContext); // resetOrderDatas 호출
+    	// ..
+    
+      const handleClick = () => {
+        // order data를 reset
+        resetOrderDatas();
+        // 첫 페이지로 보내기
+        setStep(0);
+      };
+    
+      if (loading) {
+        return <div>loading</div>;
+      } else {
+        return (
+          <div style={{ textAlign: 'center' }}>
+            {/* codes.. */}
+            <button className="rainbow rainbow-1" onClick={handleClick}>
+              첫페이지로
+            </button>
+          </div>
+        );
+      }
+    }
+    ```
+    
+    `resetOrderDatas` 함수를 OrderContext에서 호출하여 handleClick event에 바인드
+    
+- 테스트
+    - success
+    
+    ```bash
+    PASS  src/App.test.js (9.183 s)
+      ✓ From order to order completion (2690 ms)
+    
+    Test Suites: 1 passed, 1 total
+    Tests:       1 passed, 1 total
+    Snapshots:   0 total
+    Time:        12.535 s, estimated 14 s
+    Ran all test suites matching /src\/App\.test\.js/i.
+    ```
+    
