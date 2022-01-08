@@ -28,6 +28,22 @@
       // 3. 값 변화 후 변수 할당을 map으로
       // 4. break를 take로
       // 5. 축약 및 합산을 reduce로
+      function f2(limit, list) {
+        let acc = 0;
+        for (const a of L.filter((a) => a % 2, list)) {
+          const b = a * a;
+          acc += b;
+          if (--limit === 0) break;
+        }
+        console.log(acc);
+      }
+      f2(3, [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]); // 앞에서 3개를 꺼내 각 값들의 제곱을 모두 더한다.
+      var it = L.filter((a) => a % 2, [1, 2, 3, 4]);
+      // console.log(it); //filterLazy {<suspended>}
+      console.log([...it]); // [1,3];
+      console.log(it.next()); // {value: 1, done: false}
+      console.log(it.next()); // {value: 3, done: false}
+      console.log(it.next()); // {value: undefined, done: true}
     </script>
   </body>
 </html>
