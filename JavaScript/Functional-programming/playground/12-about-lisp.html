@@ -1,0 +1,33 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Document</title>
+    <script src="./fx.js"></script>
+  </head>
+  <body>
+    ## 이터러블 프로그래밍 혹은 리스트 프로세스(Lisp)
+
+    <script>
+      // 1. 홀수 n개 더하기
+      // 명령형으로 작성한 홀수 n개 제곱값 더하기
+      function f1(limit, list) {
+        let acc = 0;
+        for (const a of list) {
+          if (a % 2) {
+            const b = a * a;
+            acc += b;
+            if (--limit === 0) break;
+          }
+        }
+        console.log(acc);
+      }
+      f1(3, [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]); // 앞에서 3개를 꺼내 각 값들의 제곱을 모두 더한다.
+
+      // 동일한 효율을 가진 함수형 프로그래밍 코드 혹은 이터러블 프로그래밍, 리스트 프로세싱으로 표현
+      // 2. if를 filter로
+      // 3. 값 변화 후 변수 할당을 map으로
+      // 4. break를 take로
+      // 5. 축약 및 합산을 reduce로
+    </script>
+  </body>
+</html>
