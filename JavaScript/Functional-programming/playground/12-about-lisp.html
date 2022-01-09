@@ -43,27 +43,33 @@
         console.log(it.next()); // {value: 3, done: false}
         console.log(it.next()); // {value: undefined, done: true} */
 
-      // 3. 값 변화 후 변수 할당을 map으로
-      // 4. break를 take로
-      function f2(limit, list) {
-        let acc = 0;
-        for (const a of L.take(
-          limit,
-          L.map(
-            (a) => a * a,
-            L.filter((a) => a % 2, list)
-          )
-        )) {
-          acc += a;
-          if (--limit === 0) break;
-        }
-        console.log(acc);
-      }
-      f2(3, [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]); // 앞에서 3개를 꺼내 각 값들의 제곱을 모두 더한다.
       var it = L.take(2, [1, 2, 3, 4]);
       console.log(it.next()); // {value: 1, done: false}
       console.log(it.next()); // {value: 2, done: false}
       console.log(it.next()); // {value: undefined, done: true}
+
+      const add = (a, b) => a + b;
+      // prettier-ignore
+      function f2(limit, list) {
+        console.log(
+          _.reduce(add, // 5. 축약 및 합산을 reduce로
+            L.take(limit, // 4. break를 take로
+              L.map((a) => a * a, // 3. 값 변화 후 변수 할당을 map으로
+                L.filter((a) => a % 2, list) // 2. if를 filter로
+              )
+            )
+          )
+        );
+        _.go(
+          list,
+          L.filter((a) => a % 2),
+          L.map((a) => a * a),
+          L.take(limit),
+          _.reduce(add),
+          console.log
+        );
+      }
+      f2(3, [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]); // 앞에서 3개를 꺼내 각 값들의 제곱을 모두 더한다.
     </script>
   </body>
 </html>
