@@ -74,7 +74,7 @@
   12. [Proxy](https://github.com/wonieeVicky/TIL/blob/main/JavaScript/EcmaScript6/12-proxy.md)
   13. [Mini Project](https://github.com/wonieeVicky/TIL/blob/main/JavaScript/EcmaScript6/13-mini-project.md)
 
-- Functional Programming
+- Functional Programming(Basic)
 
   1. [함수형 자바스크립트 기본기](https://github.com/wonieeVicky/TIL/blob/main/JavaScript/Functional-programming/1-basic-for-**functional**-programming.md)
   2. [ES6에서의 순회와 이터러블/이터레이터 프로토콜](https://github.com/wonieeVicky/TIL/blob/main/JavaScript/Functional-programming/2-iterable-iterator-protocol.md)
@@ -87,6 +87,10 @@
   9. [비동기: 동시성 프로그래밍 1](https://github.com/wonieeVicky/TIL/blob/main/JavaScript/Functional-programming/9-simultaneous-programming.md)
   10. [비동기: 동시성 프로그래밍 2](https://github.com/wonieeVicky/TIL/blob/main/JavaScript/Functional-programming/10-simultaneous-programming-2.md)
   11. [비동기: 동시성 프로그래밍 3](https://github.com/wonieeVicky/TIL/blob/main/JavaScript/Functional-programming/11-simultaneous-programming-3.md)
+
+- Functional PRogramming(Application)
+
+  1. [이터러블 프로그래밍(리스트 프로세싱, Lisp)](https://github.com/wonieeVicky/TIL/blob/main/JavaScript/Functional-programming/12-iterable-programming-lisp.md)
 
 ## TDD
 
@@ -486,6 +490,8 @@
     - [Git, Github 사용하기](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/15-6-use-lightsail.md)
 
 15. 서버리스 노드 개발
+
+---
 
     - [S3 설정하기](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/16-1-set-s3.md)
     - [S3 이미지 업로드](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/16-2-upload-image-to-s3.md)

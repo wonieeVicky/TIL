@@ -1,0 +1,138 @@
+﻿## 이터러블 프로그래밍(리스트 프로세싱, Lisp)
+
+### 홀수 n개 더하기
+
+아래는 list의 홀수 n개를 꺼내 각 값의 제곱값을 모두 더하는 `명령형 함수`의 예이다.
+
+```jsx
+// 명령형으로 작성한 홀수 n개 제곱값 더하기
+function f1(limit, list) {
+  let acc = 0;
+  for (const a of list) {
+    if (a % 2) {
+      const b = a * a;
+      acc += b;
+      if (--limit === 0) break;
+    }
+  }
+  console.log(acc);
+}
+
+f1(3, [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]); // 앞에서 3개를 꺼내 각 값들의 제곱을 모두 더한다.
+```
+
+f1 함수가 쉬운 함수로 보이지만 사실 우리가 표현하는 프로그래밍의 전부라고 할 수 있다.
+자료구조를 다루고, 순회를 하면서, 반복을 하고 제어를 하면서 break 문을 사용하여 시간복잡도를 효율적으로 운용하고, 변수에 할당하고 스코프로 누적된 값을 관리하고 반환하는 기능을 모두 담고 있는 함수라는 것이다.
+
+그렇다면 f1 함수를 동일한 효율을 가진 함수형 프로그래밍 코드 혹은 iterable programming, 리스트 프로세싱(Lisp)으로 표현하면 어떻게 할 수 있을까? 먼저 이터러블 프로그래밍이란 기존에 변수에 값을 할당하고, 제어하던 모든 명령형 코드들이 함수형으로 추상화되어 있는 것이라고 할 수 있다.
+
+먼저 위 코드의 if는 filter로 추상화할 수 있다.
+
+```jsx
+function f2(limit, list) {
+  let acc = 0;
+  for (const a of L.filter((a) => a % 2, list)) {
+    const b = a * a;
+    acc += b;
+    if (--limit === 0) break;
+  }
+  console.log(acc);
+}
+f2(3, [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]); // 35
+```
+
+`filter` 함수는 아래와 같이 도출되는 함수이다.
+
+```jsx
+var it = L.filter((a) => a % 2, [1, 2, 3, 4]);
+console.log([...it]); // [1,3];
+
+// 혹은
+var it = L.filter((a) => a % 2, [1, 2, 3, 4]);
+console.log(it.next()); // {value: 1, done: false}
+console.log(it.next()); // {value: 3, done: false}
+console.log(it.next()); // {value: undefined, done: true}
+```
+
+다음으로는 값 변화 후 변수 할당(`const b = a * a`)을 `map` 함수로 추상화할 수 있다.
+
+```jsx
+function f2(limit, list) {
+  let acc = 0;
+  for (const a of L.map(
+    (a) => a * a,
+    L.filter((a) => a % 2, list)
+  )) {
+    acc += a;
+    if (--limit === 0) break;
+  }
+  console.log(acc);
+}
+f2(3, [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]); // 35
+```
+
+다음으로는 break 문을 `take` 함수로 변경한다.
+
+```jsx
+function f2(limit, list) {
+  let acc = 0;
+  for (const a of L.take(
+    limit,
+    L.map(
+      (a) => a * a,
+      L.filter((a) => a % 2, list)
+    )
+  )) {
+    acc += a;
+  }
+  console.log(acc);
+}
+f2(3, [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]); // 35
+```
+
+`take`함수는 아래와 같이 도출되는 함수이다.
+
+```jsx
+var it = L.take(2, [1, 2, 3, 4]);
+console.log(it.next()); // {value: 1, done: false}
+console.log(it.next()); // {value: 2, done: false}
+console.log(it.next()); // {value: undefined, done: true}
+```
+
+이제 도출된 값의 축약과 합산을 `reduce` 함수로 처리해준다.
+
+```jsx
+const add = (a, b) => a + b;
+function f2(limit, list) {
+  console.log(
+    _.reduce(
+      add, // 5. 축약 및 합산을 reduce로
+      L.take(
+        limit, // 4. break를 take로
+        L.map(
+          (a) => a * a, // 3. 값 변화 후 변수 할당을 map으로
+          L.filter((a) => a % 2, list) // 2. if를 filter로
+        )
+      )
+    )
+  );
+}
+f2(3, [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]); // 35
+```
+
+이처럼 함수형 프로그래밍을 이용하면 기존의 명령형 코드보다 훨씬 더 순차적으로 처리되도록 추상화되어있는 것을 확인할 수 있다. 여기에서 go함수를 사용해 더욱 절차를 명시적으로 표현해줄 수 있는데 아래의 코드를 보자.
+
+```jsx
+const add = (a, b) => a + b;
+function f2(limit, list) {
+  _.go(
+    list,
+    L.filter((a) => a % 2),
+    L.map((a) => a * a),
+    L.take(limit),
+    _.reduce(add),
+    console.log
+  );
+}
+f2(3, [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]); // 35
+```
