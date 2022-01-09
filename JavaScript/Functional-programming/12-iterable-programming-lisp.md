@@ -136,3 +136,44 @@ function f2(limit, list) {
 }
 f2(3, [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]); // 35
 ```
+
+### while을 range로 + effect를 each로
+
+while 문은 iterable programming 관점에서 range로 해석할 수 있다. while 문은 break 조건이 있는 반복문 코드를 의미한다. 코드를 통해 확인해보자
+
+아래와 같이 0부터 9까지 순회하는 while 문 함수가 있다고 하자
+
+```jsx
+function f3(end) {
+  let i = 1;
+  while (i < end) {
+    console.log(i); // 1, 3, 5, 7, 9
+    i += 2;
+  }
+}
+f3(10);
+```
+
+위 코드는 `range` 함수와 `each` 함수의 조합으로 변경할 수 있다.
+each 함수는 인자로 전달된 값을 그대로 반환하며, 값에 효과(effect)를 줄 때 구분자로 활용한다.
+
+```jsx
+function f4(end) {
+  //	_.each(console.log, L.range(1, end, 2)); // 0 ~ 9
+  _.go(L.range(1, end, 2), _.each(console.log));
+}
+f4(10);
+```
+
+range 함수는 아래와 같이 도출되는 함수이다.
+
+```jsx
+const it = L.range(3);
+console.log(it.next()); // {value: 0, done: false}
+console.log(it.next()); // {value: 1, done: false}
+console.log(it.next()); // {value: 2, done: false}
+console.log(it.next()); // {value: undefined, done: true}
+
+const it2 = L.range(1, 5, 2);
+[...it2]; // [1, 3, 5]
+```

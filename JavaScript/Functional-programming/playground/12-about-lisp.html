@@ -81,7 +81,7 @@
       }
       f3(10);
       function f4(end) {
-        _.each(console.log, L.range(1, end, 2)); // 0 ~ 9
+        _.go(L.range(1, end, 2), _.each(console.log));
       }
       f4(10);
 
