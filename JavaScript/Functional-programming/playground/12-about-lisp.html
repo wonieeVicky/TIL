@@ -41,12 +41,12 @@
         console.log([...it]); // [1,3];
         console.log(it.next()); // {value: 1, done: false}
         console.log(it.next()); // {value: 3, done: false}
-        console.log(it.next()); // {value: undefined, done: true} */
+        console.log(it.next()); // {value: undefined, done: true}
 
       var it = L.take(2, [1, 2, 3, 4]);
       console.log(it.next()); // {value: 1, done: false}
       console.log(it.next()); // {value: 2, done: false}
-      console.log(it.next()); // {value: undefined, done: true}
+      console.log(it.next()); // {value: undefined, done: true} */
 
       const add = (a, b) => a + b;
       // prettier-ignore
@@ -70,6 +70,26 @@
         );
       }
       f2(3, [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]); // 앞에서 3개를 꺼내 각 값들의 제곱을 모두 더한다.
+
+      // 6. while을 range로
+      function f3(end) {
+        let i = 1;
+        while (i < end) {
+          console.log(i); // 1, 3, 5, 7, 9
+          i += 2;
+        }
+      }
+      f3(10);
+      function f4(end) {
+        _.each(console.log, L.range(1, end, 2)); // 0 ~ 9
+      }
+      f4(10);
+
+      /* const it = L.range(3);
+      console.log(it.next()); // {value: 0, done: false}
+      console.log(it.next()); // {value: 1, done: false}
+      console.log(it.next()); // {value: 2, done: false}
+      console.log(it.next()); // {value: undefined, done: true} */
     </script>
   </body>
 </html>
