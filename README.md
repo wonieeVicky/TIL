@@ -491,8 +491,6 @@
 
 15. 서버리스 노드 개발
 
----
-
     - [S3 설정하기](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/16-1-set-s3.md)
     - [S3 이미지 업로드](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/16-2-upload-image-to-s3.md)
     - [람다 함수 만들기](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/16-3-create-lambda-func.md)
