@@ -504,3 +504,4 @@
 1. SVG
 
    - [SVG 개념과 기본적인 사용법](https://github.com/wonieeVicky/TIL/blob/main/GraphicLayout/svg/1-learn-basic-svg.md)
+   - [SVG에 CSS, JS 적용하기](https://github.com/wonieeVicky/TIL/blob/main/GraphicLayout/svg/2-styling-and-script-in-svg.md)
