@@ -9,7 +9,6 @@
   <body>
     <svg class="face" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 571 625.5">
       <style>
-        <![CDATA[
         .face {
           /* 중간정렬 */
           position: absolute;
@@ -36,6 +35,9 @@
         }
         .face__eye {
           /* transform-origin: center center; */
+          transform-origin: 50% 50%;
+        }
+        .ani-on .face__eye {
           animation: eye-ani 1s infinite alternate;
         }
         .face__eye:nth-of-type(2) {
@@ -44,8 +46,11 @@
         .face__eye:nth-of-type(3) {
           transform-origin: 397px 380.5px;
         }
-        ]]>
       </style>
+      <script>
+        const faceElem = document.querySelector(".face"); faceElem.addEventListener("click", function () {
+        this.classList.toggle("ani-on"); });
+      </script>
       <circle cx="286.5" cy="354.5" r="251" stroke-width="40" fill="none" stroke="#000" stroke-miterlimit="10" />
       <circle class="face__eye" cx="175" cy="380.5" r="42.5" />
       <circle class="face__eye" cx="397" cy="380.5" r="42.5" />
