@@ -48,7 +48,7 @@
       console.log(it.next()); // {value: 2, done: false}
       console.log(it.next()); // {value: undefined, done: true} */
 
-      const add = (a, b) => a + b;
+      /* const add = (a, b) => a + b;
       // prettier-ignore
       function f2(limit, list) {
         console.log(
@@ -71,7 +71,7 @@
       }
       f2(3, [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]); // 앞에서 3개를 꺼내 각 값들의 제곱을 모두 더한다.
 
-      // 6. while을 range로
+      // 6. while을 range로 - 명령형
       function f3(end) {
         let i = 1;
         while (i < end) {
@@ -80,16 +80,42 @@
         }
       }
       f3(10);
+
+      // 6. while을 range로 - 함수형
       function f4(end) {
         _.go(L.range(1, end, 2), _.each(console.log));
       }
-      f4(10);
+      f4(10); */
 
       /* const it = L.range(3);
       console.log(it.next()); // {value: 0, done: false}
       console.log(it.next()); // {value: 1, done: false}
       console.log(it.next()); // {value: 2, done: false}
       console.log(it.next()); // {value: undefined, done: true} */
+
+      // 8. 추억의 별 그리기, 구구단
+      const join = (sep) => _.reduce((a, b) => `${a}${sep}${b}`);
+      _.go(
+        L.range(1, 6),
+        L.map(L.range),
+        L.map(L.map((_) => "*")),
+        L.map(join("")),
+        join("\n"),
+        console.log
+      );
+
+      _.go(
+        L.range(1, 6),
+        L.map((s) =>
+          _.go(
+            L.range(s),
+            L.map((_) => "*"),
+            _.reduce((a, b) => `${a}${b}`)
+          )
+        ),
+        _.reduce((a, b) => `${a}\n${b}`),
+        console.log
+      );
     </script>
   </body>
 </html>
