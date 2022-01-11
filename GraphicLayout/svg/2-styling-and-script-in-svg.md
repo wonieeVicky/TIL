@@ -106,3 +106,67 @@ svg를 스타일링하는 다른 방법도 있다. 바로 svg 태그 안에 스�
 ```
 
 svg 파일 안에 스타일이 포함되어 있으므로, 단독으로 사용할 수 있다는 점에서 장점이라고 할 수 있다.
+
+### JavaScript 적용하기
+
+스크립트 삽입은 돔스크립트에서 사용하듯이 똑같이 사용하면 되고,
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+  <head></head>
+  <body>
+    <svg class="face" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 571 625.5">
+      <circle cx="286.5" cy="354.5" r="251" stroke-width="40" fill="none" stroke="#000" stroke-miterlimit="10" />
+      <circle class="face__eye" cx="175" cy="380.5" r="42.5" />
+      <circle class="face__eye" cx="397" cy="380.5" r="42.5" />
+      <path
+        d="M422 476.16a181.3 181.3 0 0 1-135.48 60.59H286a181.3 181.3 0 0 1-135.48-60.59"
+        stroke-width="30"
+        fill="none"
+        stroke="#000"
+        stroke-miterlimit="10"
+      />
+      <ellipse class="face__hair" cx="168.5" cy="210.5" rx="168.5" ry="121.5" />
+      <ellipse class="face__hair" cx="428.5" cy="198.5" rx="142.5" ry="123.5" />
+      <ellipse class="face__hair" cx="245.5" cy="103" rx="151.5" ry="103" />
+    </svg>
+    <script>
+      const faceElem = document.querySelector(".face");
+      faceElem.addEventListener("click", function () {
+        this.classList.toggle("ani-on"); // svg tag 바깥에서 동작
+      });
+    </script>
+  </body>
+</html>
+```
+
+svg 태그 안에서 처리할 수도 있다. 이 또한 svg 파일 안에서 단독으로 사용할 수 있어 활용면이 높다.
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+  <head></head>
+  <body>
+    <svg class="face" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 571 625.5">
+      <script>
+        const faceElem = document.querySelector(".face"); faceElem.addEventListener("click", function () {
+        this.classList.toggle("ani-on"); // svg tag 바깥에서 동작 });
+      </script>
+      <circle cx="286.5" cy="354.5" r="251" stroke-width="40" fill="none" stroke="#000" stroke-miterlimit="10" />
+      <circle class="face__eye" cx="175" cy="380.5" r="42.5" />
+      <circle class="face__eye" cx="397" cy="380.5" r="42.5" />
+      <path
+        d="M422 476.16a181.3 181.3 0 0 1-135.48 60.59H286a181.3 181.3 0 0 1-135.48-60.59"
+        stroke-width="30"
+        fill="none"
+        stroke="#000"
+        stroke-miterlimit="10"
+      />
+      <ellipse class="face__hair" cx="168.5" cy="210.5" rx="168.5" ry="121.5" />
+      <ellipse class="face__hair" cx="428.5" cy="198.5" rx="142.5" ry="123.5" />
+      <ellipse class="face__hair" cx="245.5" cy="103" rx="151.5" ry="103" />
+    </svg>
+  </body>
+</html>
+```
