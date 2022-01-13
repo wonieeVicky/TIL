@@ -1,0 +1,30 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Document</title>
+    <script src="./fx.js"></script>
+  </head>
+  <body>
+    ## 명령형 코딩 습관 지우기 ### 1. reduce + 복잡한 함수 + acc < map + 간단한 함수 + reduce
+
+    <script>
+      const users = [
+        { name: "AA", age: 35 },
+        { name: "BB", age: 30 },
+        { name: "CC", age: 25 },
+        { name: "DD", age: 34 },
+        { name: "EE", age: 38 },
+      ];
+      console.log(_.reduce((total, u) => total + u.age, 0, users)); // 162
+      console.log(
+        _.reduce(
+          (a, b) => a + b,
+          L.map((u) => u.age, users)
+        )
+      );
+      const add = (a, b) => a + b; // 인자를 모두 더하는 보조함수
+      const ages = L.map((u) => u.age); // 나이만 뽑는 보조함수
+      console.log(_.reduce(add, ages(users)));
+    </script>
+  </body>
+</html>

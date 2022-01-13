@@ -91,6 +91,7 @@
 - Functional PRogramming(Application)
 
   1. [이터러블 프로그래밍(리스트 프로세싱, Lisp)](https://github.com/wonieeVicky/TIL/blob/main/JavaScript/Functional-programming/12-iterable-programming-lisp.md)
+  2. [명령형 습관 지우기 + reduce 절제하기](https://github.com/wonieeVicky/TIL/blob/main/JavaScript/Functional-programming/13-remove-imperative-programming-habits.md)
 
 ## TDD
 
