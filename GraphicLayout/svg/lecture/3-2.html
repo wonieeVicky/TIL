@@ -1,0 +1,34 @@
+﻿<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>SVG</title>
+    <style>
+      .shapes {
+        width: 600px;
+        height: 400px;
+        background: #ddd;
+      }
+      path {
+        stroke: tomato;
+        stroke-width: 20;
+        /* stroke-linecap: butt, square, round */
+        stroke-linecap: round;
+        /* stroke-linejoin: miter, round, bevel */
+        stroke-linejoin: bevel;
+        fill: transparent;
+      }
+    </style>
+  </head>
+  <body>
+    <svg class="shapes" xmlns="http://www.w3.org/2000/svg">
+      <!-- d: M(시작점) x좌표, y좌표, L(직선) x좌표, y좌표, H(가로직선) x좌표, V(세로직선) y좌표, Z(다각형의 원성)-->
+      <!-- <path d="M 300 200 L 500 100 H 50 V 300 Z"></path> -->
+      <!-- d: M(시작점, x, y), C(곡선 설정, 시작(x, y), 조정점(x, y), 끝점(x, y)) -->
+      <!-- <path d="M 100 150 C 100 150, 300, 50, 500 250"></path> -->
+      <path d="M 50 200 L 300 100 L 400 200"></path>
+    </svg>
+  </body>
+</html>
