@@ -15,16 +15,41 @@
         { name: "DD", age: 34 },
         { name: "EE", age: 38 },
       ];
-      console.log(_.reduce((total, u) => total + u.age, 0, users)); // 162
+
+      /* console.log(_.reduce((total, u) => total + u.age, 0,  users)); // 162
       console.log(
         _.reduce(
           (a, b) => a + b,
           L.map((u) => u.age, users)
         )
-      );
+      ); */
       const add = (a, b) => a + b; // 인자를 모두 더하는 보조함수
       const ages = L.map((u) => u.age); // 나이만 뽑는 보조함수
-      console.log(_.reduce(add, ages(users)));
+      // console.log(_.reduce(add, ages(users)));
+    </script>
+
+    ### 2. reduce 하나 보다 Map + filter + reduce
+    <script>
+      // user age가 30 이상 유무에 따라 분기처리를 한다고하면 아래와 같이 할 수 있다.
+      console.log(_.reduce((total, u) => (u.age >= 30 ? total : total + u.age), 0, users));
+      console.log(
+        _.reduce(
+          add,
+          L.map(
+            (u) => u.age,
+            L.filter((u) => u.age < 30, users)
+          )
+        )
+      );
+      console.log(
+        _.reduce(
+          add,
+          L.filter(
+            (n) => n < 30,
+            L.map((u) => u.age, users)
+          )
+        )
+      );
     </script>
   </body>
 </html>
