@@ -43,3 +43,84 @@ _.reduce(add, ages(users)); // 162
 만약 명령형으로 작성된 위 reduce 함수의 `(total, u) => total + u.age;` 를 별도 함수로 분리한다면, 함수명을 짓기도 애매하고, 재사용될 것이라는 기대를 갖기에도 어렵다.
 
 즉, 여러가지 코드를 만들어갈 때 `reduce` 함수 하나에 복잡도를 높이는 것보다, `map`과 함께 사용해서 `reduce`의 축약 함수를 더 간단하고 단순하게 만드는 방식으로 처리하는 것이 `Lisp`으로 프로그래밍하는 더 바람직한 방법이라고 할 수 있다.
+
+### reduce 하나보다 map + filter + reduce
+
+조금 더 복잡한 Reduce 함수를 만들어보자. 만약 user의 age가 30 이상 유무에 따라 분기처리를 한다면 아래와 같이 처리할 수 있다.
+
+```jsx
+_.reduce((total, u) => (u.age >= 30 ? total : total + u.age), 0, users); // 25
+```
+
+위 함수는 3항 연산자를 사용해 조금 더 간결해보이는 코드일 뿐 실제 로직은 복잡도가 개선되지 않았다. 사이사이의 로직으로 인해 에러에 대해 좀 더 신경써서 코딩을 해야하는 단점이 있는 것이다. 이때 `map`, `filter`함수를 섞어서 사용하면 훨씬 로직을 가볍게 만들 수 있다.
+
+```jsx
+const add = (a, b) => a + b; // 인자를 모두 더하는 보조함수
+
+console.log(
+  _.reduce(
+    add,
+    L.map(
+      (u) => u.age,
+      L.filter((u) => u.age < 30, users)
+    )
+  )
+);
+
+// 혹은
+console.log(
+  _.reduce(
+    add,
+    L.filter(
+      (n) => n < 30,
+      L.map((u) => u.age, users)
+    )
+  )
+);
+```
+
+### query
+
+query, queryToObject 를 사용해서 reduce 안의 보조함수를 간소화하는 것에 대한 중요성을 살펴보자.
+아래와 같은 `obj1` 객체를 문자열 쿼리 로 변환하는 함수를 만들어보고자 한다.
+
+```jsx
+const obj1 = {
+  a: 1,
+  b: undefined,
+  c: "CC",
+  d: "DD",
+};
+// a=1&c=CC&d=DD 형태로 만드는 함수를 만들어보자
+```
+
+명령형으로 구현하면 아래와 같이 만들 수 있다.
+
+```jsx
+function query1(obj) {
+  let res = "";
+  for (const k in obj) {
+    // console.log(k); // a, b, c, d
+    const v = obj[k];
+    if (v === undefined) continue; // undefined는 skip
+    if (res != "") res += "&";
+    res += k + "=" + v; //
+  }
+  return res;
+}
+console.log(query1(obj1)); // a=1&c=CC&d=DD
+```
+
+위의 함수를 함수형으로 변환해보면 아래와 같이 바꿀 수 있다.
+
+```jsx
+function query2(obj) {
+  return Object.entries(obj).reduce((query, [k, v], i) => {
+    if (v === undefined) return query;
+    return `${query}${i > 0 ? "&" : ""}${k}=${v}`;
+  }, "");
+}
+console.log(query2(obj1)); // a=1&c=CC&d=DD
+```
+
+위 reduce 함수에서 i를 의존하여 if문 조건 분기를 치는 건 아무래도 복잡한 감이 있다고 볼 수 있다.
