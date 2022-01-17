@@ -506,3 +506,4 @@
    - [SVG에 CSS, JS 적용하기](https://github.com/wonieeVicky/TIL/blob/main/GraphicLayout/svg/2-styling-and-script-in-svg.md)
    - [SVG 그리기](https://github.com/wonieeVicky/TIL/blob/main/GraphicLayout/svg/3-drawing-svg.md)
    - [SVG 텍스트](https://github.com/wonieeVicky/TIL/blob/main/GraphicLayout/svg/4-text-svg.md)
+   - [SVG 효과](https://github.com/wonieeVicky/TIL/blob/main/GraphicLayout/svg/5-svg-effect.md)
