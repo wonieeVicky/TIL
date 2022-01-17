@@ -1,0 +1,52 @@
+﻿<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>SVG</title>
+    <style>
+      body {
+        margin: 0;
+      }
+      .svg {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        background: #ddd;
+      }
+      text {
+        font-size: 1.5rem;
+        font-weight: bold;
+        fill: red;
+      }
+      path {
+        stroke: red;
+        fill: transparent;
+      }
+      .special {
+        fill: dodgerblue;
+      }
+    </style>
+  </head>
+  <body>
+    <svg class="svg" xmlns="http://www.w3.org/2000/svg">
+      <!-- defs: 나중에 참조할 그래픽 요소를 담아놓는 공간, 마스크나 그라디언트를 정의해서 넣어둘 수 있음, style 정보도 넣어도 된다. -->
+      <!-- defs 안에 들어가서 레이아웃에 노출되지 않음 -->
+      <defs>
+        <path
+          id="text-curve"
+          d="M 50 400 C 50 400, 300 500, 400 400 C 400 400, 600 170, 700 300"
+        ></path>
+      </defs>
+      <text x="20" y="50">
+        <textPath href="#text-curve">
+          Lorem
+          <tspan class="special">ipsum</tspan>
+          dolor sit amet consectetur, adipisicing elit. Repudiandae doloribus in sit porro, magnam
+          modi sint facilis voluptas incidunt fugiat.
+        </textPath>
+      </text>
+    </svg>
+  </body>
+</html>
