@@ -123,4 +123,56 @@ function query2(obj) {
 console.log(query2(obj1)); // a=1&c=CC&d=DD
 ```
 
-위 reduce 함수에서 i를 의존하여 if문 조건 분기를 치는 건 아무래도 복잡한 감이 있다고 볼 수 있다.
+위 함수가 과연 함수형 프로그래밍이 추구하는 적절한 추상화에 fit된 함수라고 할 수 있을까? 그렇지 않다.
+reduce 함수에서 i를 의존하여 if문 조건 분기를 치고 있는 모든 로직을 함께 가지고 있으므로 복잡한 로직이라고 할 수 있다.
+
+따라서 map, filter, reject 등을 활용해 아래와 같이 절차적인 코드를 만들 수 있다.
+
+```jsx
+const query3 = (obj) =>
+  _.reduce(
+    (a, b) => `${a}&${b}`,
+    _.map(
+      ([k, v]) => `${k}=${v}`,
+      _.reject(([_, v]) => v === undefined, Object.entries(obj))
+    )
+  );
+
+console.log(query3(obj1)); // a=1&c=CC&d=DD
+```
+
+또 위와 같은 Reduce 코드를 추상화하면 아래와 같이 수정할 수도 있음
+
+```jsx
+// seq에 따라 문자를 합쳐주는 함수
+const join = _.curry((sep, iter) => _.reduce((a, b) => `${a}${sep}${b}`, iter));
+
+const query3 = (obj) =>
+  join(
+    "&",
+    _.map(
+      join("="),
+      _.reject(([_, v]) => v === undefined, Object.entries(obj))
+    )
+  );
+
+console.log(query3(obj1)); // a=1&c=CC&d=DD
+```
+
+또, 함수를 리턴하는 pipe 함수를 이용해 더 좋은 표현력을 가진 이터러블 프로그래밍으로 개선해줄 수도 있다.
+
+```jsx
+const join = _.curry((sep, iter) => _.reduce((a, b) => `${a}${sep}${b}`, iter));
+
+const query4 = _.pipe(
+  Object.entries,
+  L.reject(([_, v]) => v === undefined),
+  L.map(join("=")),
+  join("&")
+);
+
+console.log(query4(obj1)); // a=1&c=CC&d=DD
+```
+
+기존의 명령형 프로그래밍 방법 혹은 reduce 함수 하나로 모든 것을 구현했던 것과 어떤 점이 다른가?
+reduce로 함수형 프로그래밍을 구현하면서도 복잡함을 유지했으므로 이는 계속 명령형 프로그래밍 사고를 유지하는 것이라고 할 수 있음. 따라서 reject, map, filter 등을 조합하여 좀 더 명료하고 함수형 프로그래밍 적인 사고를 하도록 노력하는 것이 좋겠다 :)

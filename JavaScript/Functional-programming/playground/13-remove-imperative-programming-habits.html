@@ -31,7 +31,7 @@
     ### 2. reduce 하나 보다 Map + filter + reduce
     <script>
       // user age가 30 이상 유무에 따라 분기처리를 한다고하면 아래와 같이 할 수 있다.
-      /* console.log(_.reduce((total, u) => (u.age >= 30 ? total : total + u.age), 0, users));
+      console.log(_.reduce((total, u) => (u.age >= 30 ? total : total + u.age), 0, users));
       console.log(
         _.reduce(
           add,
@@ -49,7 +49,7 @@
             L.map((u) => u.age, users)
           )
         )
-      ); */
+      );
     </script>
     ### 3. query, qeuryToObject
     <script>
@@ -82,6 +82,26 @@
         }, "");
       }
       console.log(query2(obj1)); // a=1&c=CC&d=DD
+
+      const join = _.curry((sep, iter) => _.reduce((a, b) => `${a}${sep}${b}`, iter));
+
+      const query3 = (obj) =>
+        join(
+          "&",
+          _.map(
+            join("="),
+            _.reject(([_, v]) => v === undefined, Object.entries(obj))
+          )
+        );
+      console.log(query3(obj1));
+
+      const query4 = _.pipe(
+        Object.entries,
+        L.reject(([_, v]) => v === undefined),
+        L.map(join("=")),
+        join("&")
+      );
+      console.log(query4(obj1)); // a=1&c=CC&d=DD
     </script>
   </body>
 </html>
