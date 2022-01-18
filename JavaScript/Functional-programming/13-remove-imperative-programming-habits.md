@@ -176,3 +176,20 @@ console.log(query4(obj1)); // a=1&c=CC&d=DD
 
 기존의 명령형 프로그래밍 방법 혹은 reduce 함수 하나로 모든 것을 구현했던 것과 어떤 점이 다른가?
 reduce로 함수형 프로그래밍을 구현하면서도 복잡함을 유지했으므로 이는 계속 명령형 프로그래밍 사고를 유지하는 것이라고 할 수 있음. 따라서 reject, map, filter 등을 조합하여 좀 더 명료하고 함수형 프로그래밍 적인 사고를 하도록 노력하는 것이 좋겠다 :)
+
+### queryToObject
+
+이번에는 쿼리스트링을 반대로 object로 변환하는 함수를 구현해보자.
+
+```jsx
+const split = _.curry((sep, str) => str.split(sep));
+const queryToObject = _.pipe(
+  split("&"),
+  L.map(split("=")),
+  L.map(([k, v]) => ({ [k]: v })),
+  _.reduce(Object.assign)
+);
+console.log(queryToObject("a=1&c=CC&d=DD")); // {a: '1', c: 'CC', d: 'DD'}
+```
+
+위 함수도 기능을 잘게 쪼개서 map, filter를 reduce 이전에 충분히 사용해준 뒤 마지막에 축약하는 식으로 구현했다. 이러한 프로그래밍 사고는 문제를 단순하게 만들 수 있다는 장점을 가진다. 문제를 단순히 만들면 문제를 해결하기 쉬워지고, 코드에 확신을 가질 수 있게 된다.

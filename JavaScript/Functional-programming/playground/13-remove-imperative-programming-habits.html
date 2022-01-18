@@ -5,8 +5,9 @@
     <script src="./fx.js"></script>
   </head>
   <body>
-    ## 명령형 코딩 습관 지우기 ### 1. reduce + 복잡한 함수 + acc < map + 간단한 함수 + reduce
-
+    ## 명령형 코딩 습관 지우기
+    <hr />
+    ### 1. reduce + 복잡한 함수 + acc < map + 간단한 함수 + reduce
     <script>
       const users = [
         { name: "AA", age: 35 },
@@ -51,6 +52,7 @@
         )
       );
     </script>
+
     ### 3. query, qeuryToObject
     <script>
       const obj1 = {
@@ -102,6 +104,18 @@
         join("&")
       );
       console.log(query4(obj1)); // a=1&c=CC&d=DD
+    </script>
+
+    ### 4. queryToObject
+    <script>
+      const split = _.curry((sep, str) => str.split(sep));
+      const queryToObject = _.pipe(
+        split("&"),
+        L.map(split("=")),
+        L.map(([k, v]) => ({ [k]: v })),
+        _.reduce(Object.assign)
+      );
+      console.log(queryToObject("a=1&c=CC&d=DD"));
     </script>
   </body>
 </html>
