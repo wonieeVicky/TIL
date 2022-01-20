@@ -210,3 +210,76 @@ viewBox를 0 0 1000 1000으로 하면 위와 같이 가운데 정렬되어 10개
 `viewBox="0 0 500 500”` 과 pattern을 `width="0.2" height="0.2”`로 설정하면 된다.
 
 ![스크린샷 2022-01-19 오전 11.53.52.png](../../img/220119-3.png)
+
+### 애니메이션이 적용된 일러스트 패턴
+
+이번에는 svg 요소를 사용하지 않고 body에 background-image로 svg 요소를 사용해보자.
+가장 간단하게 아래와 같이 background-image를 넣어보자
+
+```html
+<!DOCTYPE html>
+<html>
+  <head>
+    <style>
+      body {
+        background-image: url(./images/face_hair.svg);
+      }
+    </style>
+  </head>
+  <body></body>
+</html>
+```
+
+그러면 작은 알갱이들이 가득 차는 상황이 발생한다.
+
+![](../../img/220120-1.png)
+
+body에 background-size를 100px로 주면 아래와 같이 잘 나온다.
+
+![](../../img/220120-2.png)
+
+svg 파일에 애니메이션 효과를 추가하여 오른쪽 눈만 움직이도록 처리할 수도 있음
+
+`/images/face_s.svg`
+
+```html
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 63 69.01" class="face">
+  <defs>
+    <style>
+      @keyframes eye-ani {
+        from {
+          transform: scaleY(1);
+        }
+        to {
+          transform: scaleY(0.2);
+        }
+      }
+      .face::hover {
+        fill: red;
+      }
+      .face:hover .right-eye {
+        transform-origin: 19px 42px;
+        animation: eye-ani 0.5s alternate infinite;
+      }
+    </style>
+  </defs>
+  <path
+    d="M138.61,133a29.89,29.89,0,1,1,21.14-8.75A29.72,29.72,0,0,1,138.61,133Zm0-55.38a25.49,25.49,0,1,0,18,7.46A25.32,25.32,0,0,0,138.61,77.63Z"
+    transform="translate(-107 -64)"
+  />
+  <g>
+    <circle class="right-eye" cx="19.31" cy="41.98" r="4.69" />
+    <circle cx="43.8" cy="41.98" r="4.69" />
+  </g>
+  <path
+    d="M138.61,124.88h-.05a21.76,21.76,0,0,1-16.19-7.24l2.47-2.21a18.44,18.44,0,0,0,13.72,6.14h.05a18.44,18.44,0,0,0,13.72-6.14l2.46,2.21A21.73,21.73,0,0,1,138.61,124.88Z"
+    transform="translate(-107 -64)"
+  />
+  <path
+    d="M154.28,72.27a17.56,17.56,0,0,0-3.94.44c-1.76-5-8.37-8.71-16.25-8.71-9.15,0-16.58,5-16.72,11.2C111.23,77.38,107,82,107,87.23c0,7.4,8.32,13.4,18.59,13.4,6.84,0,12.82-2.66,16-6.63a16.61,16.61,0,0,0,12.65,5.53C163,99.53,170,93.43,170,85.9S163,72.27,154.28,72.27Z"
+    transform="translate(-107 -64)"
+  />
+</svg>
+```
+
+![](../../img/220120-3.gif)
