@@ -36,6 +36,7 @@
       </mask>
 
       <style>
+        /* 눈이 움직이는 애니메이션 적용 */
         @keyframes eye-ani {
           to { transform: scaleY(0.2); }
         }
@@ -50,9 +51,11 @@
 
       <script>
       window.addEventListener('DOMContentLoaded', () => {
+        // 모든 요소들이 load 되고난 후 요소 읽어오기!
         const magnifierElem = document.querySelector('.magnifier');
         const maskElem = document.querySelector('#mask-glass circle');
 
+        // 마우스이벤트 추가
         window.addEventListener('mousemove', (e) => {
           magnifierElem.style.transform = `translate(${e.clientX}px, ${e.clientY}px)`;
           maskElem.style.transform = `translate(${e.clientX}px, ${e.clientY}px)`;
