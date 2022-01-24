@@ -508,3 +508,4 @@
    - [SVG 그리기](https://github.com/wonieeVicky/TIL/blob/main/GraphicLayout/svg/3-drawing-svg.md)
    - [SVG 텍스트](https://github.com/wonieeVicky/TIL/blob/main/GraphicLayout/svg/4-text-svg.md)
    - [SVG 효과](https://github.com/wonieeVicky/TIL/blob/main/GraphicLayout/svg/5-svg-effect.md)
+   - [SVG Stroke](https://github.com/wonieeVicky/TIL/blob/main/GraphicLayout/svg/6-svg-stroke.md)
