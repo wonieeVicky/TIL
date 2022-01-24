@@ -1,0 +1,27 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Document</title>
+    <script src="./fx.js"></script>
+  </head>
+  <body>
+    ## 객체를 이터터블 프로그래밍으로 다루기
+    <script>
+      const obj1 = {
+        a: 1,
+        b: 2,
+        c: 3,
+      };
+      // 이를 배열화 할 수 있는 가장 간단한 방법은
+      var arr = Object.entries(obj1); // [["a", 1], ["b", 2], ["c", 3]]
+      console.log(arr[Symbol.iterator]); // values(){ [native code] }
+      console.log(arr[Symbol.iterator]()); // Array Iterator {}
+      // 아직 평가가 마치지 않은 상태의 iterator을 만듦으로써
+      // 이후 filter, take 함수를 통해 최적화를 할 수 있는 여지를 남겨놓기 위함이다.
+      // 지연성과 동시성을 함께 사용할 수 있게 됨
+
+      // 위 방법은 같은 크기의 Array를 별도로 만드는 것이므로 비효율적
+      // key, value 구성의 object에 동시성, 지연성을 적용할 수 있는 이터러블 프로그래밍 방법을 알아보자
+    </script>
+  </body>
+</html>
