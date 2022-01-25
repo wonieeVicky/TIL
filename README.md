@@ -93,6 +93,7 @@
   1. [이터러블 프로그래밍(리스트 프로세싱, Lisp)](https://github.com/wonieeVicky/TIL/blob/main/JavaScript/Functional-programming/12-iterable-programming-lisp.md)
   2. [명령형 습관 지우기 + reduce 절제하기](https://github.com/wonieeVicky/TIL/blob/main/JavaScript/Functional-programming/13-remove-imperative-programming-habits.md)
   3. [안전한 합성에 대하여](https://github.com/wonieeVicky/TIL/blob/main/JavaScript/Functional-programming/14-compose-function.md)
+  4. [객체를 이터러블 프로그래밍으로 다루기](https://github.com/wonieeVicky/TIL/blob/main/JavaScript/Functional-programming/15-object-iterable-programming.md)
 
 ## TDD
 
