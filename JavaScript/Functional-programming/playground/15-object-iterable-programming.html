@@ -23,5 +23,38 @@
       // 위 방법은 같은 크기의 Array를 별도로 만드는 것이므로 비효율적
       // key, value 구성의 object에 동시성, 지연성을 적용할 수 있는 이터러블 프로그래밍 방법을 알아보자
     </script>
+
+    1. values
+    <script>
+      console.log(Object.values(obj1));
+
+      L.values = function* (obj) {
+        for (const k in obj) yield obj[k];
+      };
+      var it = L.values(obj1);
+      // console.log([...it]); // [1,2,3,4]
+      var it2 = L.take(2, it);
+      console.log([...it2]); // [1, 2]
+
+      // 객체의 값이 obj1과 같이 4개만 있을 때에는 지연평가로 하는 것이 차이가 없거나 혹은 비용이 더 드는 일이 될 수 있다.
+      // 하지만 객체의 길이가 깊어지거나 보조함수가 하는 일이 복잡할수록 좀 더 유리한 연산이 될 수 있다.
+
+      _.go(
+        obj1,
+        Object.values, // 즉시 모든 값을 배열로 변환
+        _.map((a) => a + 10),
+        _.reduce((a, b) => a + b),
+        console.log
+      );
+
+      _.go(
+        obj1,
+        L.values, // 평가를 모두 하지 않고 결과를 만들어나갈 수 있음
+        L.take(2), // iterable 최소화
+        _.map((a) => a + 10),
+        _.reduce((a, b) => a + b),
+        console.log
+      );
+    </script>
   </body>
 </html>
