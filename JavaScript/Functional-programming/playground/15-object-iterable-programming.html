@@ -56,5 +56,54 @@
         console.log
       );
     </script>
+
+    2. entries
+    <script>
+      L.entries = function* (obj) {
+        for (const k in obj) {
+          yield [k, obj[k]];
+        }
+      };
+      var it = L.entries(obj1);
+      console.log(it.next().value); // ["a", 1]
+      console.log(it.next().value); // ["b", 2]
+      console.log(it.next().value); // ["c", 3]
+      console.log(it.next().value); // undefined
+
+      _.go(obj1, L.entries, _.takeAll, console.log); // [["a", 1], ["b", 2], ["c", 3]]
+      _.go(obj1, L.entries, _.take(2), console.log); // [["a", 1], ["b", 2]]
+      _.go(
+        obj1,
+        L.entries,
+        L.filter(([_, v]) => v % 2),
+        L.map(([k, v]) => ({ [k]: v })),
+        _.each(console.log)
+      ); // {a: 1}, {c: 3}
+      _.go(
+        obj1,
+        L.entries,
+        L.filter(([_, v]) => v % 2),
+        L.map(([k, v]) => ({ [k]: v })),
+        _.reduce(Object.assign),
+        console.log
+      ); // {a: 1, c: 3}
+
+      // 위와 같이 entries를 이터러블 프로그래밍을 하는 이유가
+      // 단순히 entries를 어떻게 구현하느냐를 보여주기 위함뿐만 아니라
+      // 이터러블하지 않은 값을 이터러블화하도록 변경하는 함수를 만듦으로써
+      // 이후 이터러블 프로그래밍으로 만들어나갈 수 있다는 사례를 보여주는 것임
+      // 주어진 값이 어떤 형태이던지, 이터러블 프로그래밍으로 구현해 나갈 수 있다.
+    </script>
+
+    3. keys
+    <script>
+      L.keys = function* (obj) {
+        for (const k in obj) {
+          yield k;
+        }
+      };
+
+      _.go(obj1, L.keys, _.each(console.log)); // a, b, c
+    </script>
   </body>
 </html>
