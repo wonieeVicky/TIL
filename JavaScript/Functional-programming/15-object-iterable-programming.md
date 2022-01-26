@@ -68,3 +68,73 @@ _.go(
 위와 같이 처리하면 평가를 모두하지 않고 결과를 단계별로 만들어나갈 수 있게된다.
 
 위와 같은 방법이 언제나 정답인 것은 아니다. 객체의 값이 obj1과 같이 4개만 있을 경우 지연평가로 하는 방식이 연산에 차이가 없거나 혹은 비용이 더 드는 일이 될 수도 있다. 하지만 객체의 길이가 길어지거나 보조함수가 하는 일이 복잡해질수록 좀 더 유리한 연산이 될 수 있는 것이다.
+
+### entries
+
+이번에는 key, value 들이 들어있는 `entries`는 어떻게 지연평가하도록 만들 수 있을까
+
+```jsx
+L.entries = function* (obj) {
+  for (const k in obj) {
+    yield [k, obj[k]];
+  }
+};
+```
+
+위와 같이 구현할 수 있다. 반환된 iterator에 유의해서 보자
+
+```jsx
+var it = L.entries(obj1);
+console.log(it.next().value); // ["a", 1]
+console.log(it.next().value); // ["b", 2]
+console.log(it.next().value); // ["c", 3]
+console.log(it.next().value); // undefined
+```
+
+위처럼 지연평가가 가능하도록 만들 수 있다. 이를 조합해 values에서 만들었던 함수를 변경해보면 아래와 같다.
+
+```jsx
+_.go(obj1, L.entries, _.takeAll, console.log); // [["a", 1], ["b", 2], ["c", 3]]
+
+_.go(obj1, L.entries, _.take(2), console.log); // [["a", 1], ["b", 2]]
+
+_.go(
+  obj1,
+  L.entries,
+  L.filter(([_, v]) => v % 2),
+  L.map(([k, v]) => ({ [k]: v })),
+  _.each(console.log)
+); // {a: 1}, {c: 3}
+
+_.go(
+  obj1,
+  L.entries,
+  L.filter(([_, v]) => v % 2),
+  L.map(([k, v]) => ({ [k]: v })),
+  _.reduce(Object.assign),
+  console.log
+); // {a: 1, c: 3}
+```
+
+위처럼 다양한 형태로의 도출이 가능해진다!
+
+위와 같이 entries를 이터러블하게 변경하는 이유가 단순히 entries를 어떻게 구현하느냐를 보여주기 위한 것은 아니다. 이터러블하지 않은 값을 어터러블화하게 변경하는 함수를 직접 구현함으로써 이후 이터러블 프로그래밍으로 더욱 효율이 높은 프로그래밍을 만들어 나갈 수 있도록 하기 위한 사례를 보여주기 위함임
+
+주어진 값이 어떤 형태, 어떤 구조를 가지던지 이터러블 프로그래밍으로 응용해나갈 수 있어야 한다.
+
+### keys
+
+keys도 앞선 경우와 비슷하게 구현할 수 있다.
+
+```jsx
+L.keys = function* (obj) {
+  for (const k in obj) {
+    yield k;
+  }
+};
+
+_.go(obj1, L.keys, _.each(console.log)); // a, b, c
+```
+
+이처럼 values, entries, keys를 이터러블하게 변경할 수 있다는 것을 가벼운 사례로 알아보았다.
+그렇다면 위 지연평가를 바탕으로 어떻게 응용해나갈 수 있을지 살펴보자
