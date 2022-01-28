@@ -13,9 +13,9 @@
         c: 3,
       };
       // 이를 배열화 할 수 있는 가장 간단한 방법은
-      var arr = Object.entries(obj1); // [["a", 1], ["b", 2], ["c", 3]]
-      console.log(arr[Symbol.iterator]); // values(){ [native code] }
-      console.log(arr[Symbol.iterator]()); // Array Iterator {}
+      // var arr = Object.entries(obj1); // [["a", 1], ["b", 2], ["c", 3]]
+      // console.log(arr[Symbol.iterator]); // values(){ [native code] }
+      // console.log(arr[Symbol.iterator]()); // Array Iterator {}
       // 아직 평가가 마치지 않은 상태의 iterator을 만듦으로써
       // 이후 filter, take 함수를 통해 최적화를 할 수 있는 여지를 남겨놓기 위함이다.
       // 지연성과 동시성을 함께 사용할 수 있게 됨
@@ -55,6 +55,7 @@
         _.reduce((a, b) => a + b),
         console.log
       );
+      console.clear();
     </script>
 
     2. entries
@@ -93,6 +94,7 @@
       // 이터러블하지 않은 값을 이터러블화하도록 변경하는 함수를 만듦으로써
       // 이후 이터러블 프로그래밍으로 만들어나갈 수 있다는 사례를 보여주는 것임
       // 주어진 값이 어떤 형태이던지, 이터러블 프로그래밍으로 구현해 나갈 수 있다.
+      console.clear();
     </script>
 
     3. keys
@@ -104,6 +106,65 @@
       };
 
       _.go(obj1, L.keys, _.each(console.log)); // a, b, c
+      console.clear();
+    </script>
+
+    4. 어떠한 값이든 이터러블 프로그래밍으로 다루기 
+    - 이터러블로 이터러블 프로그래밍
+    - 객체를 제너레이터를 이용해서 이터레이터로 만들어서 이터러블 프로그래밍 
+    - 어떤 제너레이터든 이터레이터로 만들어서 이터러블 프로그래밍
+
+    <script>
+    const it1 = (function*(){
+      yield 10;
+      yield 20;
+      yield 30;
+    })();
+    // console.log([...it]); // [10, 20, 30]
+    console.log(it.next()); // { value: 10, done: false }
+    console.log(it1.next()); // { value: 20, done: false }
+    console.log(it1.next()); // { value: 30, done: false }
+    console.log(it1.next()); // { value: undefined, done: true }
+
+    const it_2 = (function*(){
+      let i = -1;
+      while (++i < 5){
+        yield 10;
+        if (false) yield 20 + 30;
+        yield 30;
+      }
+    })();
+
+    console.log([...it_2]); // [10, 30, 10, 30, 10, 30, 10, 30, 10, 30]
+
+    // 인자를 받는 제너레이터
+    const g1 = function*(stop){
+      let i = -1;
+      while (++i < stop){
+        yield 10;
+        if (false) yield 20 + 30;
+        yield 30;
+      }
+    }
+
+    console.log([...g1(3)]); // [10, 30, 10, 30, 10, 30]
+    console.log([...L.take(3,g1(3))]); // [10, 30, 10], 어디까지 평가할 것인가를 평가할 수 있다.
+    _.each(console.log, g1(10)); // 
+    _.go(
+      g1(10),
+      _.reduce((a, b) => a + b),
+      console.log
+    ); // 400
+    _.go(
+      g1(10),
+      L.take(1),
+      _.reduce((a, b) => a + b),
+      console.log
+    ); // 10
+    // 위처럼 어떠한 코드도 값으로 다뤄질 수 있다.
+    // 제너레이터를 이용해 map, filter, reduce를 이용해 이터러블 프로그래밍을 다룰 수 있다.
+
+
     </script>
   </body>
 </html>
