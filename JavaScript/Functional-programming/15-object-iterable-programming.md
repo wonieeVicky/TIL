@@ -138,3 +138,70 @@ _.go(obj1, L.keys, _.each(console.log)); // a, b, c
 
 이처럼 values, entries, keys를 이터러블하게 변경할 수 있다는 것을 가벼운 사례로 알아보았다.
 그렇다면 위 지연평가를 바탕으로 어떻게 응용해나갈 수 있을지 살펴보자
+
+### 어떤 값이든 이터러블 프로그래밍으로 다루기
+
+여태까지 다양한 객체 형태를 제너레이터를 이용해 iterator로 만들어서 iterable programming을 구현해보았다. 위처럼 실제 만들어져있는 메서드를 이용할 뿐만 아니라 어떤 값이든 혹은 어떤 제너레이터든 iterator로 만들어 이터러블 프로그래밍을 할 수 있다.
+
+```jsx
+const it1 = (function*(){
+  yield 10;
+  yield 20;
+  yield 30;
+})();
+
+// console.log([...it]); // [10, 20, 30]
+console.log(it1.next()); // { value: 10, done: false }
+console.log(it1.next()); // { value: 20, done: false }
+console.log(it1.next()); // { value: 30, done: false }
+console.log(it1.next()); // { value: undefined, done: true }
+```
+
+위처럼 어떠한 함수를 즉시 실햄함수를 만들어 값으로 사용할 수 있다. 
+이러한 함수에는 아래와 같이 조건을 추가할 수도 있다.
+
+```jsx
+const it_2 = (function*(){
+  let i = -1;
+  while (++i < 5){ // 조건을 추가해준 제너레이터
+    yield 10;
+    if (false) yield 20 + 30;
+    yield 30;
+  }
+})();
+
+console.log([...it_2]); // [10, 30, 10, 30, 10, 30, 10, 30, 10, 30]
+```
+
+위 함수에 인자를 전달받도록 구현할수도 있겠다.
+
+```jsx
+const g1 = function*(stop){
+  let i = -1;
+  while (++i < stop){
+    yield 10;
+    if (false) yield 20 + 30;
+    yield 30;
+  }
+}
+
+console.log([...g1(3)]); // [10, 30, 10, 30, 10, 30]
+console.log([...L.take(3,g1(3))]); // [10, 30, 10], 어디까지 평가할 것인가를 평가할 수 있음
+
+_.go(
+  g1(10),
+  _.reduce((a, b) => a + b),
+  console.log
+); // 400
+_.go(
+  g1(10),
+  L.take(1),
+  _.reduce((a, b) => a + b),
+  console.log
+); // 10
+// 위처럼 어떠한 코드도 값으로 다뤄질 수 있다.
+// 제너레이터를 이용해 map, filter, reduce를 이용해 이터러블 프로그래밍을 다룰 수 있다.
+```
+
+위 코드처럼 어떠한 함수도 어떠한 코드도, 값으로 다뤄질 수 있다는 것이 포인트! 
+어떤 상황에서든 제너레이터를 이용해 map,filter, reduce를 활용함으로서 이터러블 프로그래밍을 다룰 수 있는 것임. 따라서 여러 상황에서 이터러블 프로그래밍으로 구현할 수 있는 능력이 중요하겠다.
