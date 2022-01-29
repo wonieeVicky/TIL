@@ -109,62 +109,97 @@
       console.clear();
     </script>
 
-    4. 어떠한 값이든 이터러블 프로그래밍으로 다루기 
-    - 이터러블로 이터러블 프로그래밍
-    - 객체를 제너레이터를 이용해서 이터레이터로 만들어서 이터러블 프로그래밍 
-    - 어떤 제너레이터든 이터레이터로 만들어서 이터러블 프로그래밍
+    <!-- 4. 어떠한 값이든 이터러블 프로그래밍으로 다루기  -->
+    <!-- - 이터러블로 이터러블 프로그래밍  -->
+    <!-- - 객체를 제너레이터를 이용해서 제너레이터로 만들어서 이터러블 프로그래밍  -->
+    <!-- - 어떤 제너레이터든 이터레이터로 만들어서 이터러블 프로그래밍 -->
 
     <script>
-    const it1 = (function*(){
-      yield 10;
-      yield 20;
-      yield 30;
-    })();
-    // console.log([...it]); // [10, 20, 30]
-    console.log(it.next()); // { value: 10, done: false }
-    console.log(it1.next()); // { value: 20, done: false }
-    console.log(it1.next()); // { value: 30, done: false }
-    console.log(it1.next()); // { value: undefined, done: true }
-
-    const it_2 = (function*(){
-      let i = -1;
-      while (++i < 5){
+      const it1 = (function* () {
         yield 10;
-        if (false) yield 20 + 30;
+        yield 20;
         yield 30;
-      }
-    })();
+      })();
+      // console.log([...it]); // [10, 20, 30]
+      console.log(it.next()); // { value: 10, done: false }
+      console.log(it1.next()); // { value: 20, done: false }
+      console.log(it1.next()); // { value: 30, done: false }
+      console.log(it1.next()); // { value: undefined, done: true }
 
-    console.log([...it_2]); // [10, 30, 10, 30, 10, 30, 10, 30, 10, 30]
+      const it_2 = (function* () {
+        let i = -1;
+        while (++i < 5) {
+          yield 10;
+          if (false) yield 20 + 30;
+          yield 30;
+        }
+      })();
 
-    // 인자를 받는 제너레이터
-    const g1 = function*(stop){
-      let i = -1;
-      while (++i < stop){
-        yield 10;
-        if (false) yield 20 + 30;
-        yield 30;
-      }
-    }
+      console.log([...it_2]); // [10, 30, 10, 30, 10, 30, 10, 30, 10, 30]
 
-    console.log([...g1(3)]); // [10, 30, 10, 30, 10, 30]
-    console.log([...L.take(3,g1(3))]); // [10, 30, 10], 어디까지 평가할 것인가를 평가할 수 있다.
-    _.each(console.log, g1(10)); // 
-    _.go(
-      g1(10),
-      _.reduce((a, b) => a + b),
-      console.log
-    ); // 400
-    _.go(
-      g1(10),
-      L.take(1),
-      _.reduce((a, b) => a + b),
-      console.log
-    ); // 10
-    // 위처럼 어떠한 코드도 값으로 다뤄질 수 있다.
-    // 제너레이터를 이용해 map, filter, reduce를 이용해 이터러블 프로그래밍을 다룰 수 있다.
+      // 인자를 받는 제너레이터
+      const g1 = function* (stop) {
+        let i = -1;
+        while (++i < stop) {
+          yield 10;
+          if (false) yield 20 + 30;
+          yield 30;
+        }
+      };
 
+      console.log([...g1(3)]); // [10, 30, 10, 30, 10, 30]
+      console.log([...L.take(3, g1(3))]); // [10, 30, 10], 어디까지 평가할 것인가를 평가할 수 있다.
+      _.each(console.log, g1(10)); //
+      _.go(
+        g1(10),
+        _.reduce((a, b) => a + b),
+        console.log
+      ); // 400
+      _.go(
+        g1(10),
+        L.take(1),
+        _.reduce((a, b) => a + b),
+        console.log
+      ); // 10
+      // 위처럼 어떠한 코드도 값으로 다뤄질 수 있다.
+      // 제너레이터를 이용해 map, filter, reduce를 이용해 이터러블 프로그래밍을 다룰 수 있다.
+      console.clear();
+    </script>
 
+    5. object
+    <script>
+      // [['a', 1], ['b', 2], ['c', 3]]  =>  { a: 1, b: 2, c: 3 }
+      const a = [
+        ["a", 1],
+        ["b", 2],
+        ["c", 3],
+      ];
+      const b = { a: 1, b: 2, c: 3 };
+
+      const object1 = (entries) =>
+        _.go(
+          entries,
+          L.map(([k, v]) => ({ [k]: v })),
+          _.reduce(Object.assign),
+          console.log
+        );
+      object1(a); // {a: 1, b: 2, c: 3}
+
+      // 아래와 같이 좀 더 심플하게 만들 수도 있다.
+      const object2 = (entries) => _.reduce((obj, [k, v]) => ((obj[k] = v), obj), {}, entries);
+      console.log("1:", object2(a));
+      console.log(object2(L.entries({ b: 2, c: 3 }))); // {b: 2, c: 3},
+
+      // 또한 Map 메서드에서도 object2 함수는 정상적으로 동작한다.
+      let m = new Map();
+      m.set("a", 10);
+      m.set("b", 20);
+      m.set("c", 30);
+      console.log(m); // {"a" => 10, "b" => 20, "c" => 30}
+      console.log(JSON.stringify({ a: 1, b: 1 })); // "{"a":1,"b":1}"
+      console.log(JSON.stringify(m)); // "{}", 원래는 Map 값은 stringify가 안됨
+      console.log(JSON.stringify(object2(m))); // "{"a":1,"b":20,"c":30}", object2로 감싸주면 가능
+      // object는 다형성이 높은 함수이다. 즉, 표준만 맞는 이터러블만 들어온다면 모두 객체로의 구현이 가능함
     </script>
   </body>
 </html>
