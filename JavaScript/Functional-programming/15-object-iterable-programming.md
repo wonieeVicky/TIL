@@ -144,7 +144,7 @@ _.go(obj1, L.keys, _.each(console.log)); // a, b, c
 여태까지 다양한 객체 형태를 제너레이터를 이용해 iterator로 만들어서 iterable programming을 구현해보았다. 위처럼 실제 만들어져있는 메서드를 이용할 뿐만 아니라 어떤 값이든 혹은 어떤 제너레이터든 iterator로 만들어 이터러블 프로그래밍을 할 수 있다.
 
 ```jsx
-const it1 = (function*(){
+const it1 = (function* () {
   yield 10;
   yield 20;
   yield 30;
@@ -157,13 +157,14 @@ console.log(it1.next()); // { value: 30, done: false }
 console.log(it1.next()); // { value: undefined, done: true }
 ```
 
-위처럼 어떠한 함수를 즉시 실햄함수를 만들어 값으로 사용할 수 있다. 
+위처럼 어떠한 함수를 즉시 실햄함수를 만들어 값으로 사용할 수 있다.
 이러한 함수에는 아래와 같이 조건을 추가할 수도 있다.
 
 ```jsx
-const it_2 = (function*(){
+const it_2 = (function* () {
   let i = -1;
-  while (++i < 5){ // 조건을 추가해준 제너레이터
+  while (++i < 5) {
+    // 조건을 추가해준 제너레이터
     yield 10;
     if (false) yield 20 + 30;
     yield 30;
@@ -176,17 +177,17 @@ console.log([...it_2]); // [10, 30, 10, 30, 10, 30, 10, 30, 10, 30]
 위 함수에 인자를 전달받도록 구현할수도 있겠다.
 
 ```jsx
-const g1 = function*(stop){
+const g1 = function* (stop) {
   let i = -1;
-  while (++i < stop){
+  while (++i < stop) {
     yield 10;
     if (false) yield 20 + 30;
     yield 30;
   }
-}
+};
 
 console.log([...g1(3)]); // [10, 30, 10, 30, 10, 30]
-console.log([...L.take(3,g1(3))]); // [10, 30, 10], 어디까지 평가할 것인가를 평가할 수 있음
+console.log([...L.take(3, g1(3))]); // [10, 30, 10], 어디까지 평가할 것인가를 평가할 수 있음
 
 _.go(
   g1(10),
@@ -203,5 +204,57 @@ _.go(
 // 제너레이터를 이용해 map, filter, reduce를 이용해 이터러블 프로그래밍을 다룰 수 있다.
 ```
 
-위 코드처럼 어떠한 함수도 어떠한 코드도, 값으로 다뤄질 수 있다는 것이 포인트! 
-어떤 상황에서든 제너레이터를 이용해 map,filter, reduce를 활용함으로서 이터러블 프로그래밍을 다룰 수 있는 것임. 따라서 여러 상황에서 이터러블 프로그래밍으로 구현할 수 있는 능력이 중요하겠다.
+위 코드처럼 어떠한 함수도 어떠한 코드도, 값으로 다뤄질 수 있다는 것이 포인트 👩🏻‍🏫
+어떤 상황에서든 map,filter, reduce 등의 제너레이터 함수를 활용함으로서 이터러블 프로그래밍을 다룰 수 있다.
+
+### Object
+
+```jsx
+const a = [
+  ["a", 1],
+  ["b", 2],
+  ["c", 3],
+]; // 해당 값을
+const b = { a: 1, b: 2, c: 3 }; // 아래 형태로 바꾸는 일을 한다.
+```
+
+위 2차원 배열을 b와 같은 객체로 변환하는 `Object`함수를 만들어보려고 한다.
+
+```jsx
+**const object = (entries) =>
+_.go(
+  entries,
+  L.map(([k, v]) => ({ [k]: v })),
+  _.reduce(Object.assign),
+  console.log
+);
+object(a); // {a: 1, b: 2, c: 3}**
+```
+
+위 함수는 reduce 함수 하나로만 구현이 가능하다.
+
+```jsx
+const object2 = (entries) => _.reduce((obj, [k, v]) => ((obj[k] = v), obj), {}, entries);
+console.log(object2(a)); // {a: 1, b: 2, c: 3}
+console.log(object2(L.entries({ b: 2, c: 3 }))); // {b: 2, c: 3}
+```
+
+object 함수는 또한 커스텀 메서드인 Map에서도 동작이 가능하다.
+
+```jsx
+let m = new Map();
+m.set("a", 10);
+m.set("b", 20);
+m.set("c", 30);
+console.log(m); // {"a" => 10, "b" => 20, "c" => 30}
+console.log(JSON.stringify({ a: 1, b: 1 })); // "{"a":1,"b":1}"
+console.log(JSON.stringify(m)); // "{}", Map 메서드의 값은 stringify가 안됨
+```
+
+하지만 object2 등의 제너레이터 함수로 감싸주면 그 안에서는 언제든지 구현이 가능하다.
+
+```jsx
+**console.log(JSON.stringify(object2(m))); // "{"a":1,"b":20,"c":30}", object2로 감싸주면 가능**
+```
+
+위처럼 **`object`는 다형성이 높은 함수이다. 표준만 맞는 이터러블만 들어온다면 모두 객체로의 구현이 가능함**
