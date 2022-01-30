@@ -186,9 +186,9 @@
       object1(a); // {a: 1, b: 2, c: 3}
 
       // 아래와 같이 좀 더 심플하게 만들 수도 있다.
-      const object2 = (entries) => _.reduce((obj, [k, v]) => ((obj[k] = v), obj), {}, entries);
-      console.log("1:", object2(a));
-      console.log(object2(L.entries({ b: 2, c: 3 }))); // {b: 2, c: 3},
+      const object = (entries) => _.reduce((obj, [k, v]) => ((obj[k] = v), obj), {}, entries);
+      console.log("1:", object(a));
+      console.log(object(L.entries({ b: 2, c: 3 }))); // {b: 2, c: 3},
 
       // 또한 Map 메서드에서도 object2 함수는 정상적으로 동작한다.
       let m = new Map();
@@ -198,8 +198,30 @@
       console.log(m); // {"a" => 10, "b" => 20, "c" => 30}
       console.log(JSON.stringify({ a: 1, b: 1 })); // "{"a":1,"b":1}"
       console.log(JSON.stringify(m)); // "{}", 원래는 Map 값은 stringify가 안됨
-      console.log(JSON.stringify(object2(m))); // "{"a":1,"b":20,"c":30}", object2로 감싸주면 가능
+      console.log(JSON.stringify(object(m))); // "{"a":1,"b":20,"c":30}", object2로 감싸주면 가능
       // object는 다형성이 높은 함수이다. 즉, 표준만 맞는 이터러블만 들어온다면 모두 객체로의 구현이 가능함
+      console.clear();
+    </script>
+
+    6. mapObject
+    <script>
+      // mapObject((a) => a + 10, { a: 1, b: 2, c: 3 }); // { a: 11, b: 12, c: 13}
+      // 아래와 같은 순서를 가진 사고를 가져보자.
+      // 1. [['a', 1], ['b', 2], ['c', 3]] 로 entries로 다룬다.
+      // 2. [['a', 11], ['b', 12], ['c', 13]] 로 값을 바꾼다.
+      // 3. {a: 11}, {b: 12}, {c: 13}
+      // 4. {a: 11, b: 12, c: 13}
+
+      // 기존의 함수 합성으로 위 문제를 쉽게 개선할 수 있다.
+      const mapObject = (f, obj) =>
+        _.go(
+          obj,
+          L.entries,
+          _.map(([k, v]) => [k, f(v)]), // [['a', 11], ['b', 12], ['c', 13]]
+          object, // {a: 11, b: 12, c: 13}
+          console.log
+        );
+      mapObject((a) => a + 10, { a: 1, b: 2, c: 3 });
     </script>
   </body>
 </html>
