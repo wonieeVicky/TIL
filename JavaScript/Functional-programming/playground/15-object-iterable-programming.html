@@ -55,7 +55,6 @@
         _.reduce((a, b) => a + b),
         console.log
       );
-      console.clear();
     </script>
 
     2. entries
@@ -94,7 +93,6 @@
       // 이터러블하지 않은 값을 이터러블화하도록 변경하는 함수를 만듦으로써
       // 이후 이터러블 프로그래밍으로 만들어나갈 수 있다는 사례를 보여주는 것임
       // 주어진 값이 어떤 형태이던지, 이터러블 프로그래밍으로 구현해 나갈 수 있다.
-      console.clear();
     </script>
 
     3. keys
@@ -106,7 +104,6 @@
       };
 
       _.go(obj1, L.keys, _.each(console.log)); // a, b, c
-      console.clear();
     </script>
 
     <!-- 4. 어떠한 값이든 이터러블 프로그래밍으로 다루기  -->
@@ -163,7 +160,6 @@
       ); // 10
       // 위처럼 어떠한 코드도 값으로 다뤄질 수 있다.
       // 제너레이터를 이용해 map, filter, reduce를 이용해 이터러블 프로그래밍을 다룰 수 있다.
-      console.clear();
     </script>
 
     5. object
@@ -200,7 +196,6 @@
       console.log(JSON.stringify(m)); // "{}", 원래는 Map 값은 stringify가 안됨
       console.log(JSON.stringify(object(m))); // "{"a":1,"b":20,"c":30}", object2로 감싸주면 가능
       // object는 다형성이 높은 함수이다. 즉, 표준만 맞는 이터러블만 들어온다면 모두 객체로의 구현이 가능함
-      console.clear();
     </script>
 
     6. mapObject
@@ -222,6 +217,50 @@
           console.log
         );
       mapObject((a) => a + 10, { a: 1, b: 2, c: 3 });
+      console.clear();
+    </script>
+
+    7. pick
+    <script>
+      const obj2 = { a: 1, b: 2, c: 3, d: 4, e: 5 };
+      // pick 함수는 선택된 key, value만 꺼내서 반환하는 함수이다.
+      // console.log(pick(["b", "c"], obj2)); // {b: 2, c: 3}
+
+      // 순회를 할 대상을 찾는다. obj를 순회할 것인가? ks를 순회할 것인가?
+      // 무엇이 더 좋은지는 상황에 따라 달라질 수 있다. obj의 길이가 적다면? ks의 길이가 길다면?
+      // 하지만 함수명의 성격으로 봤을 때 대체적으로 주어지는 obj보다
+      // 비교인자로 주어지는 ks의 길이가 더 짧을 가능성이 높음, 따라서 ks를 중심으로 순회한다.
+      const pick = (ks, obj) =>
+        _.go(
+          ks,
+          L.map((k) => [k, obj[k]]),
+          object
+        );
+      // const pick = (ks, obj) => object(_.map((k) => [k, obj[k]], ks));
+      console.log(pick(["b", "c"], obj2));
+
+      // 만약 없는 값을 찾는다면 아래와 같이 된다.
+      console.log(pick(["b", "c", "z"], obj2)); // {b: 2, c: 3, z: undefined}
+      // undefined라는 값이 그대로 존재해도 상관없는 경우는 그냥 두겠지만 이는 옳지않다.
+      // undefined는 런타임에서 최대한 배제하는 것이 좋기 때문이다.
+
+      var obj3 = { b: 2, c: 3, z: undefined };
+      JSON.stringify(obj3); // "{"b":2,"c":3}""
+
+      // 우선, undefined는 서버로 전달할 방법이 없다. undefined는 json에는 없는 값으로
+      // db에도 저장이 안되고, 서버로 전달도 되지 않으며, 서버에서 프론트엔드로 가져올수도 없음
+      // 따라서 undefined란 값은 어떤 로직의 구분자로만 사용하되
+      // 실제 값으로서 정의해서 사용하지 않는 것이 바람직하다.
+      // 따라서 pick 함수를 아래와 같이 만들 수 있음
+      const pick2 = (ks, obj) =>
+        _.go(
+          ks,
+          L.map((k) => [k, obj[k]]),
+          L.reject(([k, v]) => v === undefined),
+          object
+        );
+
+      console.log(pick2(["b", "c", "z"], obj2)); // {b: 2, c: 3}
     </script>
   </body>
 </html>
