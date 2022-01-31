@@ -354,3 +354,45 @@ const pick = (ks, obj) =>
 
 console.log(pick(["b", "c", "z"], obj2)); // {b: 2, c: 3}
 ```
+
+### indexBy
+
+`indexBy` 함수는 아래의 users와 같은 값을 key, value 쌍으로 만들어 데이터 조회 비용을 줄이기 위한 함수이다.
+
+```jsx
+const users = [
+  { id: 5, name: "AA", age: 35 },
+  { id: 10, name: "BB", age: 25 },
+  { id: 19, name: "CC", age: 32 },
+  { id: 23, name: "DD", age: 23 },
+  { id: 24, name: "EE", age: 33 },
+];
+
+console.log(_.indexBy((u) => u.id, users));
+/* { 5: { id: 5, name: "AA", age: 35 },
+    10: { id: 10, name: "BB", age: 25 },
+    19: { id: 19, name: "CC", age: 32 },
+    23: { id: 23, name: "DD", age: 23 },
+    24: { id: 24, name: "EE", age: 33 }}; */
+```
+
+위와 같이 변경했을 때 이점은 무엇인가? 위와 같이 변경하면 값을 모두 순회하는 것을 초기 한번만 진행 후 이후 데이터 조회가 간편해지는 장점을 지닌다. 데이터 조회를 할 일이 많은 데이터일 경우 `indexBy` 함수를 활용하는 것이 훨씬 더 효율적인 코드가 될 것이다.
+
+```jsx
+const users2 = _.indexBy((u) => u.id, users);
+console.log(users2[5]); // {id: 5, name: 'AA', age: 35}, 직접 find 메서드를 쓰지 않고 index key로 값을 찾음
+```
+
+`indexBy` 함수는 reduce 함수를 활용해서 만들 수 있다. (아래 로직을 여러번 생각해보자)
+
+```jsx
+_.indexBy = (f, iter) => _.reduce((obj, a) => ((obj[f(a)] = a), obj), {}, iter);
+
+const user2 = _.indexBy((u) => u.id, users);
+console.log(user2);
+/* { 5: { id: 5, name: "AA", age: 35 },
+    10: { id: 10, name: "BB", age: 25 },
+    19: { id: 19, name: "CC", age: 32 },
+    23: { id: 23, name: "DD", age: 23 },
+    24: { id: 24, name: "EE", age: 33 }}; */
+```

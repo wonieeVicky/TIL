@@ -292,11 +292,11 @@
       _.indexBy = (f, iter) => _.reduce((obj, a) => ((obj[f(a)] = a), obj), {}, iter);
       const user2 = _.indexBy((u) => u.id, users);
       console.log(user2);
-      // 5: {id: 5, name: 'AA', age: 35}
-      // 10: {id: 10, name: 'BB', age: 25}
-      // 19: {id: 19, name: 'CC', age: 32}
-      // 23: {id: 23, name: 'DD', age: 23}
-      // 24: {id: 24, name: 'EE', age: 33}
+      /* { 5: { id: 5, name: "AA", age: 35 },
+          10: { id: 10, name: "BB", age: 25 },
+          19: { id: 19, name: "CC", age: 32 },
+          23: { id: 23, name: "DD", age: 23 },
+          24: { id: 24, name: "EE", age: 33 }}; */
     </script>
   </body>
 </html>
