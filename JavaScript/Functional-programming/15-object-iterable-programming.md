@@ -235,7 +235,7 @@ object(a); // {a: 1, b: 2, c: 3}**
 
 ```jsx
 const object2 = (entries) => _.reduce((obj, [k, v]) => ((obj[k] = v), obj), {}, entries);
-console.log(object2(a)); // {a: 1, b: 2, c: 3}
+console.log(**object2**(a)); // {a: 1, b: 2, c: 3}
 console.log(object2(L.entries({ b: 2, c: 3 }))); // {b: 2, c: 3}
 ```
 
