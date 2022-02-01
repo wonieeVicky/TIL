@@ -297,6 +297,26 @@
           19: { id: 19, name: "CC", age: 32 },
           23: { id: 23, name: "DD", age: 23 },
           24: { id: 24, name: "EE", age: 33 }}; */
+      console.clear();
+    </script>
+
+    9. indexBy 된 값을 filter 하기
+    <script>
+      // 만약 나이가 30이상인 경우로 필터링하려면 아래와 같이 구현할 수 있다.
+      console.log(_.filter(({ age }) => age >= 30, users));
+      // 하지만 위처럼 indexBy로 정렬한 데이터의 경우 위와 같이 정렬하면 빈 배열이 반환됨
+      const users3 = _.indexBy((u) => u.id, users);
+      console.log(_.filter(({ age }) => age >= 30, users3)); // []
+      // 어떻게 개선할 수 있을까?
+      const users4 = _.go(
+        users3, // indexBy 된 값을 가져와서
+        L.entries, // 다시 배열로 변환한 뒤 [key, {id: "", name: "", age: ""}]
+        L.filter(([_, { age }]) => age >= 30), // 원하는 조건에 필터링
+        L.take(2), // 한 값 중 2개만 뽑아
+        object, // 다시 object로 변환하여 값 도출
+        console.log
+      );
+      console.log(users3[19]); // {id: 19, name: 'CC', age: 32}
     </script>
   </body>
 </html>
