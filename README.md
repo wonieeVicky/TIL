@@ -74,7 +74,7 @@
   12. [Proxy](https://github.com/wonieeVicky/TIL/blob/main/JavaScript/EcmaScript6/12-proxy.md)
   13. [Mini Project](https://github.com/wonieeVicky/TIL/blob/main/JavaScript/EcmaScript6/13-mini-project.md)
 
-- Functional Programming(Basic)
+- Functional Programming(기본)
 
   1. [함수형 자바스크립트 기본기](https://github.com/wonieeVicky/TIL/blob/main/JavaScript/Functional-programming/1-basic-for-**functional**-programming.md)
   2. [ES6에서의 순회와 이터러블/이터레이터 프로토콜](https://github.com/wonieeVicky/TIL/blob/main/JavaScript/Functional-programming/2-iterable-iterator-protocol.md)
@@ -88,12 +88,13 @@
   10. [비동기: 동시성 프로그래밍 2](https://github.com/wonieeVicky/TIL/blob/main/JavaScript/Functional-programming/10-simultaneous-programming-2.md)
   11. [비동기: 동시성 프로그래밍 3](https://github.com/wonieeVicky/TIL/blob/main/JavaScript/Functional-programming/11-simultaneous-programming-3.md)
 
-- Functional PRogramming(Application)
+- Functional PRogramming(심화)
 
   1. [이터러블 프로그래밍(리스트 프로세싱, Lisp)](https://github.com/wonieeVicky/TIL/blob/main/JavaScript/Functional-programming/12-iterable-programming-lisp.md)
   2. [명령형 습관 지우기 + reduce 절제하기](https://github.com/wonieeVicky/TIL/blob/main/JavaScript/Functional-programming/13-remove-imperative-programming-habits.md)
   3. [안전한 합성에 대하여](https://github.com/wonieeVicky/TIL/blob/main/JavaScript/Functional-programming/14-compose-function.md)
   4. [객체를 이터러블 프로그래밍으로 다루기](https://github.com/wonieeVicky/TIL/blob/main/JavaScript/Functional-programming/15-object-iterable-programming.md)
+  5. [사용자 정의 객체에 이터러블 프로그래밍 구현](https://github.com/wonieeVicky/TIL/blob/main/JavaScript/Functional-programming/16-oop-with-iterable-programming.md)
 
 ## TDD
 
