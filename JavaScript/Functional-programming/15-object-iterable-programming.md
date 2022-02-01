@@ -396,3 +396,35 @@ console.log(user2);
     23: { id: 23, name: "DD", age: 23 },
     24: { id: 24, name: "EE", age: 33 }}; */
 ```
+
+### indexBy 된 값을 filter 하기
+
+보통 배열 데이터에서 조건 필터링을 하려면 아래와 같이 한다.
+
+```jsx
+// 나이가 30이상인 경우로 필터링
+console.log(_.filter(({ age }) => age >= 30, users));
+```
+
+하지만 이미 `indexBy`로 특정 `key` 값에 정렬된 데이터의 경우 위와 같은 방법으로 정렬하면 빈 배열이 반환된다.
+
+```jsx
+const users3 = _.indexBy((u) => u.id, users);
+console.log(_.filter(({ age }) => age >= 30, users3)); // []
+```
+
+이를 어떻게 하면 개선할 수 있을까?
+
+```jsx
+const users4 = _.go(
+  users3, // indexBy 된 값을 가져와서
+  L.entries, // 다시 배열로 변환한 뒤 [key, {id: "", name: "", age: ""}]
+  L.filter(([_, { age }]) => age >= 30), // 원하는 조건에 필터링
+  L.take(2), // 한 값 중 2개만 뽑아
+  object, // 다시 object로 변환하여 값 도출
+  console.log
+);
+console.log(users3[19]); // {id: 19, name: 'CC', age: 32}
+```
+
+위 과정에서 지연평가를 도입하면 실제 필요한 만큼만 최소한으로 순회하여 결과를 도출할 수 있으므로 훨씬 바람직함
