@@ -44,6 +44,7 @@
       // console.log([...s]); // [10, 20, 30]
       const add = (a, b) => a + b;
       console.log(_.reduce(add, s)); // 60
+      console.clear();
     </script>
 
     ### 2. Model, Collection
@@ -92,12 +93,12 @@
       coll.add(new Model({ id: 3, name: "BB" }));
       coll.add(new Model({ id: 5, name: "CC" }));
 
-      console.log(coll);
+      // console.log(coll);
       /* [ 0: Model {_attrs: {id: 1, name: "AA"}},
         1: Model {_attrs: {id: 3, name: "BB"}},
         2: Model {_attrs: {id: 5, name: "CC"}} ] */
-      console.log(coll.at(2).get("name")); // C
-      console.log(coll.at(1).get("id")); // 3
+      // console.log(coll.at(2).get("name")); // C
+      // console.log(coll.at(1).get("id")); // 3
 
       // 만약 coll의 model을 순회하는 코드를 만들려면 아래와 같이 해야한다.
       _.go(
