@@ -153,3 +153,83 @@ _.go(
 //	 1: Model {_attrs: {id: 3, name: "bb"}},
 //   2: Model {_attrs: {id: 5, name: "cc"}} ]
 ```
+
+### Product, Products - 메서드를 함수형으로 구현하기
+
+앞서 만든 Model과 Collection 클래스를 상속받은 Product, Products 클래스를 만들어보면서 객체 지향 프로그래밍에 함수형 프로그래밍, 즉 이터러블 프로그래밍과의 조합성에 대해 어떻게 구현할 수 있는지 더 알아보자
+
+```jsx
+class Product extends Model {}
+class Products extends Collection {
+  // Product의 모든 값을 합산
+  totalPrice() {
+    // 1. 기본적인 방법
+    let total = 0;
+    this._models.forEach((product) => {
+      total += product.get("price");
+    });
+    return total;
+  }
+}
+
+const products = new Products();
+products.add(new Product({ id: 1, price: 10000 })); // 10000
+console.log(products.totalPrice());
+products.add(new Product({ id: 3, price: 25000 })); // 35000
+console.log(products.totalPrice());
+products.add(new Product({ id: 5, price: 35000 })); // 70000
+```
+
+Product의 모든 값을 합산하는 함수를 totalPrice라는 사용자 정의 함수로 넣었을 때 가장 기본적인 방법은 위와 같다. forEach로 각 값을 순회 및 합산하여 값을 도출하는 방식이다.
+
+이를 위와 같은 for문이나 i++ 등으로 순회하여 연산하는 것이 아닌 함수형 프로그래밍으로 구현할 수 있다.
+왜? Collection 함수에 Iterator 지원코드를 추가해두었기 때문!
+
+```jsx
+class Products extends Collection {
+  // Product의 모든 값을 합산
+  totalPrice() {
+    console.log([...this]); // [Model, Model, Model]
+    // 2. go 함수를 이용
+    return _.go(
+      this,
+      L.map((p) => p.get("price")),
+      _.reduce((a, b) => a + b)
+    );
+  }
+}
+```
+
+사실 위와 같은 코드는 간단하므로 굳이 `go 함수`로 감싸지 않아도 된다.
+
+```jsx
+class Products extends Collection {
+  getPrices() {
+    return _.map((p) => p.get("price"), this); // 경우에 따라 L.map 처리
+  }
+  totalPrice() {
+    // return _.reduce((a, b) => a + b, L.map((p) => p.get("price"), this);
+    const add = (a, b) => a + b; // 별도 분리
+    const addAll = _.reduce(add); // 별도 분리
+    return addAll(this.getPrices());
+  }
+}
+```
+
+위와 같이 하면 아래와 같은 결과값을 도출할 수도 있다.
+
+```jsx
+console.log(products.totalPrice()); // 70000
+
+// getPrices가 즉시평가일 경우(_.map)
+console.log(products.getPrices()); // [10000, 25000, 35000]
+
+// getPrices가 지연평가일 경우(L.map)
+const it = products.getPrices();
+console.log(it.next()); // {value: 10000, done: false}
+console.log(it.next()); // {value: 25000, done: false}
+console.log(it.next()); // {value: 35000, done: false}
+console.log(it.next()); // {value: undefined, done: true}
+```
+
+위와 같이 객체지향 프로그래밍과 이터러블 프로그래밍을 조합으로 더 좋은 코드를 구현할 수 있음 !
