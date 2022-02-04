@@ -42,8 +42,8 @@
       s.add(20);
       s.add(30);
       // console.log([...s]); // [10, 20, 30]
-      const add = (a, b) => a + b;
-      console.log(_.reduce(add, s)); // 60
+      // const add = (a, b) => a + b;
+      // console.log(_.reduce(add, s)); // 60
       console.clear();
     </script>
 
@@ -123,6 +123,61 @@
       /* [ 0: Model {_attrs: {id: 1, name: "aa"}},
         1: Model {_attrs: {id: 3, name: "bb"}},
         2: Model {_attrs: {id: 5, name: "cc"}} ] */
+      console.clear();
+    </script>
+
+    ### 3. Product, Products
+    <script>
+      // Model과 Collection 클래스를 상속받은 Product와 Products 클래스를 만들어보면서
+      // 그에 어울리는 메서드를 구현하면서 이터러블 프로그래밍과의 조합성에 대해 알아보자
+      // 어떻게 객체 지향 프로그래밍에서 함수형 프로그래밍이 어우러지는지 확인
+      class Product extends Model {}
+      class Products extends Collection {
+        getPrices() {
+          return L.map((p) => p.get("price"), this);
+        }
+        // Product의 모든 값을 합산
+        totalPrice() {
+          // 1. 기본적인 방법
+          // let total = 0;
+          // this._models.forEach((product) => {
+          //   total += product.get("price");
+          // });
+          // return total;
+          // console.log(this._models);
+
+          // 위처럼 for문, i++ 등을 통한 순회를 통한 연산이 아닌
+          // 이터러블 프로그래밍으로 구현할 수 있다.
+
+          // 2. go 함수를 이용
+          // return _.go(
+          //   this,
+          //   L.map((p) => p.get("price")),
+          //   _.reduce((a, b) => a + b)
+          // );
+
+          // 3. go 함수 제외
+          const add = (a, b) => a + b;
+          const addAll = _.reduce(add);
+          return addAll(this.getPrices());
+        }
+      }
+
+      const products = new Products();
+      products.add(new Product({ id: 1, price: 10000 })); // 10000
+      console.log(products.totalPrice());
+      products.add(new Product({ id: 3, price: 25000 })); // 35000
+      console.log(products.totalPrice());
+      products.add(new Product({ id: 5, price: 35000 })); // 70000
+      console.log(products.totalPrice());
+      // getPrices가 즉시평가일 경우(_.map)
+      console.log(products.getPrices()); // [10000, 25000, 35000]
+      // getPrices가 지연평가일 경우(L.map)
+      const it = products.getPrices();
+      console.log(it.next()); // {value: 10000, done: false}
+      console.log(it.next()); // {value: 25000, done: false}
+      console.log(it.next()); // {value: 35000, done: false}
+      console.log(it.next()); // {value: undefined, done: true}
     </script>
   </body>
 </html>
