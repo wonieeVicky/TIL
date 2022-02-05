@@ -1,0 +1,41 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Document</title>
+    <script src="./fx.js"></script>
+  </head>
+  <body>
+    ## 객체지향과 함께 사용하기 - 사용자 정의 객체를 이터러블 프로그래밍으로
+    <hr />
+    ### 1. range와 take의 재해석
+
+    <script>
+      _.go(
+        _.range(10), // 0부터 9까지의 배열
+        _.take(3), // 앞에서 3개만 자르기
+        _.each(console.log)
+      ); // 0, 1, 2
+
+      _.go(
+        L.range(10), // 0부터 9까지의 이터러블, 최대 10번 일어날 일, 10개의 배열을 만들겠다가 아닌 계획을 의미함
+        L.map(_.delay(1000)), // 특정 시점(1초) 뒤에 값을 넘겨준다.
+        L.filter((a) => a % 2),
+        L.take(3), // 최대 3개의 값을 필요로하고, 최대 3번의 일을 수행한다.
+        _.each(console.log)
+      ); // 1, 3, 5
+
+      // 이처럼 시각을 다르게보면 시점을 이터러블 프로그래밍 사고로 바라보면 더 많은 것을 할 수 잇다.
+      _.go(
+        L.range(1, 10),
+        L.map(_.delay(1000)),
+        L.filter((a) => a % 2),
+        L.map((_) => new Date()),
+        L.take(3),
+        _.each(console.log)
+      );
+      // Sat Feb 05 2022 23:42:01 GMT+0900 (한국 표준시)
+      // Sat Feb 05 2022 23:42:03 GMT+0900 (한국 표준시)
+      // Sat Feb 05 2022 23:42:05 GMT+0900 (한국 표준시)
+    </script>
+  </body>
+</html>
