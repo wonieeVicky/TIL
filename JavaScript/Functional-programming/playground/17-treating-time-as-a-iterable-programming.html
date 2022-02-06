@@ -33,9 +33,42 @@
         L.take(3),
         _.each(console.log)
       );
+      // L.take를 쓸면 스케줄러처럼 값이 모두 이후에 평가되도록 처리할 수 있음
+      // _.take를 쓰면 앞선 일들을 모두 모아낸 후 3개를 뽑아낼 수 있음 즉, 전략적으로 코드를 만들 수 있다.
+
       // Sat Feb 05 2022 23:42:01 GMT+0900 (한국 표준시)
       // Sat Feb 05 2022 23:42:03 GMT+0900 (한국 표준시)
       // Sat Feb 05 2022 23:42:05 GMT+0900 (한국 표준시)
+
+      console.clear();
+    </script>
+
+    ### 2. takewhile, takeUntil
+    <script>
+      // 아래처럼 어디까지 기능을 실행할 것에 따라 맞춰서 쓸 수 있음
+      _.go(
+        [1, 2, 3, 4, 5, 6, 7, 8, 0, 0, 0],
+        L.takeWhile((a) => a), // 값이 true일 때만 전달해주는 역할을 함
+        _.each(console.log)
+      ); // 1, 2, 3, 4, 5, 6, 7, 8
+
+      _.go(
+        [1, 2, 3, 4, 5, 6, 7, 8, 0, 0, 0],
+        L.takeUntil((a) => a), // 값이 true인 경우 멈추게된다.
+        _.each(console.log)
+      ); // 1
+
+      _.go(
+        [1, 2, 3, 4, 5, 6, 7, 8, 0, 0, 0],
+        L.takeUntil((a) => !a),
+        _.each(console.log)
+      ); // 1, 2, 3, 4, 5, 6, 7, 8, 0
+
+      _.go(
+        [0, false, undefined, null, 10, 20, 30],
+        _.takeUntil((a) => a),
+        _.each(console.log)
+      ); // 0, false, undefined, null, 10
     </script>
   </body>
 </html>
