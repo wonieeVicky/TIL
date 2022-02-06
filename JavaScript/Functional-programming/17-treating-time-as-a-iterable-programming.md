@@ -40,12 +40,52 @@ _.go(
   L.map(_.delay(1000)),
   L.filter((a) => a % 2),
   L.map((_) => new Date()),
-  L.take(3),
+  L.take(3), // 전략적으로 _.take, L.take를 나눠쓸 수 있음
   _.each(console.log)
 );
 // Sat Feb 05 2022 23:42:01 GMT+0900 (한국 표준시)
 // Sat Feb 05 2022 23:42:03 GMT+0900 (한국 표준시)
 // Sat Feb 05 2022 23:42:05 GMT+0900 (한국 표준시)
+
+// L.take를 쓸면 스케줄러처럼 값이 모두 이후에 평가되도록 처리할 수 있음
+// _.take를 쓰면 앞선 일들을 모두 모아낸 후 3개를 뽑아낼 수 있음 즉, 전략적으로 코드를 짤 수 있다.
 ```
 
 위 코드처럼 시점을 이터러블 프로그래밍 사고로 바라보면 시점에 따른 다양한 액션을 구현할 수 있으므로, 더 많은 로직을 구성하고 만드는 언어로서 핸들링할 수 있게 된다.
+
+### takeWhile, takeUntil
+
+`takewhile`, `takeUntil`은 동적으로 일어나는 일들을 더욱 효과적으로 제어할 수 있다.
+조건에 따라 함수들이 어떻게 일을 하는지 알아보자
+
+```jsx
+_.go(
+  [1, 2, 3, 4, 5, 6, 7, 8, 0, 0, 0],
+  L.takeWhile((a) => a), // 값이 true일 때만 전달해주는 역할을 함
+  _.each(console.log)
+); // 1, 2, 3, 4, 5, 6, 7, 8
+```
+
+`takeWhile`은 위처럼 값이 `true`일 때만 값을 전달해주는 역할을 수행한다.
+
+```jsx
+_.go(
+  [1, 2, 3, 4, 5, 6, 7, 8, 0, 0, 0],
+  L.takeUntil((a) => a), // 값이 true인 경우 멈추게된다.
+  _.each(console.log)
+); // 1
+
+_.go(
+  [1, 2, 3, 4, 5, 6, 7, 8, 0, 0, 0],
+  L.takeUntil((a) => !a),
+  _.each(console.log)
+); // 1, 2, 3, 4, 5, 6, 7, 8, 0
+
+_.go(
+  [0, false, undefined, null, 10, 20, 30],
+  _.takeUntil((a) => a),
+  _.each(console.log)
+); // 0, false, undefined, null, 10
+```
+
+반면 `takeUntil`은 값이 `true`인 경우를 만나면 해당 값까지 반환한 뒤 멈추는 역할을 수행한다.
