@@ -13,9 +13,22 @@
   </head>
   <body>
     <svg class="svg" viewBox="0 0 1000 1000">
-      <rect x="10" y="10" width="20%" height="20%">
-        <!-- attributeName: 바꿀 속성 이름, dur: 얼마나 걸릴 건지, to: 목적, repeatCount: 반복횟수(indefinite 무한), fill: freeze(애니메이션 끝난 상태로 멈춤) -->
-        <animate attributeName="x" dur="1s" to="700" repeatCount="1" fill="freeze"></animate>
+      <defs>
+        <!-- prettier-ignore -->
+        <script>
+          window.addEventListener("DOMContentLoaded", () => {
+            const rectElem = document.querySelector(".rect");
+            const aniElem = document.querySelector(".ani");
+            rectElem.addEventListener("click", () => {
+              aniElem.beginElement();
+            });
+          });
+        </script>
+      </defs>
+
+      <rect class="rect" x="10" y="10" width="20%" height="20%">
+        <!-- attributeName: 바꿀 속성 이름, dur: 얼마나 걸릴 건지, to: 목적, repeatCount: 반복횟수(indefinite 무한), fill: freeze(애니메이션 끝난 상태로 멈춤), begin: 언제 시작할지(indefinite 시작X) -->
+        <animate class="ani" attributeName="x" dur="1s" to="700" repeatCount="1" fill="freeze" begin="indefinite"></animate>
       </rect>
     </svg>
   </body>

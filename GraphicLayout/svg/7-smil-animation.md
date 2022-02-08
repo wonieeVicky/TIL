@@ -35,3 +35,38 @@ SMIL 속성
 - fill: freeze(애니메이션 끝난 상태로 멈춤)
 
 ![](../../img/220208-1.gif)
+
+### SMIL 애니메이션 조작하기
+
+SMIL 애니메이션도 조작할 수 있다. 사각형을 클릭했을 때 애니메이션이 일어나도록 클릭이벤트를 만들어보자
+
+```html
+<!DOCTYPE html>
+<html>
+  <head>
+    <style>
+      body {
+        margin: 0;
+      }
+    </style>
+  </head>
+  <body>
+    <svg class="svg" viewBox="0 0 1000 1000">
+      <defs>
+        <script>
+          // 스크립트가 태그보다 앞서 있으므로 DOMContentLoaded로 처리해준다. window.addEventListener("DOMContentLoaded", () => { const
+          rectElem = document.querySelector(".rect"); const aniElem = document.querySelector(".ani"); rectElem.addEventListener("click", ()
+          => { aniElem.beginElement(); // 애니메이션 시작 }); });
+        </script>
+      </defs>
+
+      <rect class="rect" x="10" y="10" width="20%" height="20%">
+        <!-- begin: 언제 시작할지(indefinite 시작 X으로 설정) -->
+        <animate class="ani" attributeName="x" dur="1s" to="700" repeatCount="1" fill="freeze" begin="indefinite"></animate>
+      </rect>
+    </svg>
+  </body>
+</html>
+```
+
+위와 같이하면 실제 사각형을 클릭했을 때 x축으로 700만큼 이동하는 애니메이션이 실행된다.
