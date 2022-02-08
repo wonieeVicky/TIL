@@ -1,0 +1,22 @@
+﻿<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>SVG</title>
+    <style>
+      body {
+        margin: 0;
+      }
+    </style>
+  </head>
+  <body>
+    <svg class="svg" viewBox="0 0 1000 1000">
+      <rect x="10" y="10" width="20%" height="20%">
+        <!-- attributeName: 바꿀 속성 이름, dur: 얼마나 걸릴 건지, to: 목적, repeatCount: 반복횟수(indefinite 무한), fill: freeze(애니메이션 끝난 상태로 멈춤) -->
+        <animate attributeName="x" dur="1s" to="700" repeatCount="1" fill="freeze"></animate>
+      </rect>
+    </svg>
+  </body>
+</html>
