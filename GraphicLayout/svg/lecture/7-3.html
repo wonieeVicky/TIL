@@ -1,0 +1,23 @@
+﻿<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>SVG</title>
+    <style>
+      body {
+        margin: 0;
+      }
+    </style>
+  </head>
+  <body>
+    <svg class="svg" viewBox="0 0 1000 1000">
+      <rect class="rect" x="10" y="10" width="20%" height="20%">
+        <!-- to 대신 values 0 > 700 > 0 -->
+        <!-- keyTimes: 시작 0, 중간 0.5, 끝 1 (여러 지점을 설정할 수 있다.) -->
+        <animate class="ani" attributeName="x" dur="3s" values="0; 700; 0;" keyTimes="0; 0.5; 1" repeatCount="indefinite"></animate>
+      </rect>
+    </svg>
+  </body>
+</html>
