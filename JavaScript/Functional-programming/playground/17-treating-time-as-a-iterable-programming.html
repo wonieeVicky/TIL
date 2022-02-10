@@ -133,5 +133,59 @@
 
       // 위처럼 대기, 조건 등에 따른 일어날 일들에 대해 다양하게 다룰 수 있다.
     </script>
+
+    ### 4.아임포트 결제 누락 처리 스케줄러
+    <script>
+      const Impt = {
+        payments: {
+          1: [
+            { imp_id: 11, order_id: 1, amount: 15000 },
+            { imp_id: 12, order_id: 2, amount: 25000 },
+            { imp_id: 13, order_id: 3, amount: 10000 },
+          ],
+          2: [
+            { imp_id: 14, order_id: 4, amount: 25000 },
+            { imp_id: 15, order_id: 5, amount: 45000 },
+            { imp_id: 16, order_id: 6, amount: 15000 },
+          ],
+          3: [
+            { imp_id: 17, order_id: 7, amount: 20000 },
+            { imp_id: 18, order_id: 8, amount: 30000 },
+          ],
+          4: [],
+          5: [],
+          //...
+        },
+        getPayments: (page) => {
+          console.log(`http://..?page=${page}`);
+          return _.delay(1000, Impt.payments[page]);
+        },
+        cancelPayment: (imp_id) => Promise.resolve(`${imp_id}: 취소완료`),
+      };
+
+      const DB = {
+        getOrders: (idx) => _.delay(100, [{ id: 1 }, { id: 3 }, { id: 7 }]),
+      };
+
+      async function job() {
+        // 결제된 결제모듈 측 payments를 가져온다.
+        // page 단위로 가져오는데, (한번에 3개 이상 가져올 수 없다고 가정)
+        // 결제 데이터가 있을 때까지 모두 가져와서 하나로 합친다. (몇 page까지 데이터가 담겨있는지 알 수 없음)
+        const payments = await _.go(
+          L.range(1, Infinity), // 언제까지 할진 모르지만 1부터 쭉 계속 해보겠다.
+          L.map(Impt.getPayments),
+          L.takeUntil(({ length }) => length < 3), // 배열이 max인 3보다 낮은 경우까지만 가져온다. 불필요한 http://..?page=4 호출을 하지 않음!
+          _.flat
+        );
+
+        console.log(payments);
+        // http://..?page=1
+        // http://..?page=2
+        // http://..?page=3
+        // (8) [{…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}
+      }
+
+      job();
+    </script>
   </body>
 </html>
