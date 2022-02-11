@@ -182,6 +182,7 @@ _.go(
 
 - 결제된 내역 가져오기
   아래와 같이 가상으로 현재 결제 상황을 담은 정보가 있다고 하자.
+
   ```jsx
   const Impt = {
     payments: {
@@ -210,7 +211,9 @@ _.go(
     cancelPayment: (imp_id) => Promise.resolve(`${imp_id}: 취소완료`),
   };
   ```
+
   getPayments와 같은 일종의 sdk가 있고, 이를 실행하였을 때 정보를 반환하도록 기능을 제공한다고 해보자
+
   ```jsx
   Impt.getPayments(2).then(console.log);
   // http://..?page=2
@@ -220,7 +223,9 @@ _.go(
   Impt.cancelPayment(11);
   // Promise {<fulfilled>: '11: 취소완료'}
   ```
+
   그리고 가맹점에서 사용하고 있는 데이터베이스 모듈도 있다. getOrders sdk로 승인된 결제 데이터베이스를 확인할 수 있다.
+
   ```jsx
   const DB = {
     getOrders: (idx) => _.delay(100, [{ id: 1 }, { id: 3 }, { id: 7 }]),
@@ -230,9 +235,11 @@ _.go(
   // Promise {<pending>}
   // (3) [{…}, {…}, {…}]
   ```
+
   위 sdk를 바탕으로 결제된 결제 모듈 즉, Payments 정보를 가져오려고 한다.
   page 단위로 가져오는데, 한번에 3개 이상 가져올 수 없다고 가정하며(실제로는 100개)
   결제 데이터가 있을 때까지 모두 가져와서 하나로 합쳐준다. (즉, 몇 page까지 데이터가 담겨있는지 모름)
+
   ```jsx
   const payments = await _.go(
     L.range(1, Infinity), // 언제까지 할진 모르지만 1부터 쭉 계속 해보겠다.
@@ -247,4 +254,32 @@ _.go(
   // http://..?page=3
   // (8) [{…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}
   ```
+
   위에서 설명한 payments는 위 코드와 같이 async-await을 감싸 한번에 배열로 반환되도록 처리해줄 수 있다. (명료하고 깔끔하다..)
+
+- 가맹점 DB의 주문서 가져오기
+  `payments` 를 기준으로 결제가 실제로 완료된 가맹점 측 `order_id`를 추출할 필요가 있다.
+  ```jsx
+  async function job() {
+    const payments = await _.go(
+      L.range(1, Infinity),
+      L.map(Impt.getPayments),
+      L.takeUntil(({ length }) => length < 3),
+      _.flat
+    );
+
+    console.log(payments); // (8) [{…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}
+
+    // 결제가 실제로 완료된 가맹점 측 주문서 id를 추출
+    const orderIds = await _.go(
+      payments, // payments를 기준으로
+      _.map((p) => p.order_id), // order_id를 추출
+      DB.getOrders, // 가맹점 측 주문완료 id 가져오기
+      _.map(({ id }) => id)
+    ); // 실제 완료된 주문 id
+
+    console.log(orderIds); // [1, 3, 7]
+  }
+
+  job();
+  ```
