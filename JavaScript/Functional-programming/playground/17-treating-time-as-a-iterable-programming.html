@@ -194,19 +194,27 @@
 
         // console.log(order_ids); // [1, 3, 7]
 
-        // payments와 order_ids를 비교해서 실제로 결제가 정말 완료된 것만 남긴다.
-        // 가맹점 측에서 알 수 없다고 하는 정보들은 취소 API로 처리해준다.
-
+        // 결제 모듈의 payments와 가맹점의 주문서(order_ids)를 비교해서
+        // 결제를 취소해야 할 id를 뽑아 결제 취소 API를 진행 > 실제로 결제가 정말 완료된 것만 남긴다.
         await _.go(
           payments,
           L.reject((p) => order_ids.includes(p.order_id)), // order_id가 1, 3, 7이 아닌 배열만 남는다.
           L.map((p) => p.imp_id), // 실제 주문이 완료되지 않은 건수를 가져옴 [12, 14, 15, 16, 18]
           L.map(Impt.cancelPayment), // 해당 주문건 취소
-          _.each(console.log)
+          _.each(console.log) // [12, 14, 15, 16, 18]: 취소완료 - 로그 반환
         );
       }
 
-      job();
+      // 5초에 한 번만 다시 재귀함수로 job 함수 실행
+      // 만일, job 함수가 종료가 5초보다 더 걸리면(즉, 데이터 추출 및 취소에 시간이 오래 걸릴 경우) job이 끝난 뒤 바로 실행한다.
+      (function recur() {
+        // job().then(recur); // 1차원 적인 - 재귀처리(계속 무한반복 된다.)
+        // Prmoise all은 Math.max() 함수와 동일한 시간복잡도를 가진다. 매우 간단하게 스케줄러를 구현할 수 있는 것임
+        Promise.all([_.delay(8000, undefined), job()]).then(recur);
+      })();
+
+      // 위 코드는 매우 선언적으로 구현되어 있으므로 별도의 테스트 케이스가 필요가 없다.
+      // if문 분기, 시간 체크 등에 조건이 부합하는지 확인하지 않아도 되기 때문.. 복잡해지는 코드가 필요가 없다.
     </script>
   </body>
 </html>
