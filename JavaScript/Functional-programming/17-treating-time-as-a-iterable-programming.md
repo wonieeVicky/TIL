@@ -259,6 +259,7 @@ _.go(
 
 - 가맹점 DB의 주문서 가져오기
   `payments` 를 기준으로 결제가 실제로 완료된 가맹점 측 `order_id`를 추출할 필요가 있다.
+
   ```jsx
   async function job() {
     const payments = await _.go(
@@ -283,3 +284,55 @@ _.go(
 
   job();
   ```
+
+  - 비교 후 결제 취소 API 실행
+
+    이제 결제 모듈의 payments 정보와 가맹점의 주문서(order_ids)를 비교해서 결제를 취소해야 할 id를 추출한 뒤 취소 API를 실행해본다. 즉, 실제 결제가 완료된 결과만 남기는 과정이다.
+
+    ```jsx
+    async function job() {
+      const payments = await _.go(
+        L.range(1, Infinity),
+        L.map(Impt.getPayments),
+        L.takeUntil(({ length }) => length < 3),
+        _.flat
+      );
+
+      const order_ids = await _.go(
+        payments,
+        _.map((p) => p.order_id),
+        DB.getOrders,
+        _.map(({ id }) => id)
+      );
+
+      // 결제 미완료 건 취소 처리
+      await _.go(
+        payments,
+        L.reject((p) => order_ids.includes(p.order_id)), // order_id가 1, 3, 7이 아닌 배열만 남는다.
+        L.map((p) => p.imp_id), // 실제 주문이 완료되지 않은 건수를 가져옴 [12, 14, 15, 16, 18]
+        L.map(Impt.cancelPayment), // 해당 주문건 취소
+        _.each(console.log) // [12, 14, 15, 16, 18]: 취소완료 - 로그 반환
+      );
+    }
+
+    job();
+    ```
+
+- 반복 실행하기
+  다음으로 Job은 연속적으로 실행되도록 해야한다. 이는 재귀함수로 구현해볼 수 있다.
+  ```jsx
+  (function recur() {
+    job().then(recur);
+  })();
+  ```
+  1차원적인 재귀처리를 하는 함수로 위와 같이 구동하면, 성공, 실패 혹은 대기 조건없이 무한반복을 하게된다. 여기에서 나아가 5초에 한번씩 재귀함수로 job 함수가 실행되고 만일 job 함수의 종료가 5초보다 더 걸리게 될 경우(즉, 데이터 추출 및 취소에 시간이 오래 걸릴 경우) 대기 없이 바로 job 함수가 실행되도록 처리하면 어떨까?
+  ```jsx
+  (function recur() {
+    // Prmoise all은 Math.max() 함수와 동일한 시간복잡도를 가진다.
+    // 매우 간단하게 스케줄러를 구현할 수 있는 것임
+    Promise.all([_.delay(8000, undefined), job()]).then(recur);
+  })();
+  ```
+  위와 같이 처리할 수 있다. `Promise.all`은 두 가지의 값이 모두 만족해야 다음 함수를 실행시키는 메서드로 해당 인자에 대기시간 5초와 job함수 완료여부를 넣어두었을 때, 해당 조건이 모두 만족했을 때 다음 재귀를 실행시키게 되는 구조이다. 이는 매우 효율적이고 간단한 스케줄러의 형태이다!!
+  `Promise.all`은 `Math.max` 함수와 동일한 시간복잡도를 가진 간단한 함수로, 기존에 스케줄러를 만들기 위해 적용했던 if문이나 시간체크 함수를 덕지덕지 붙이지 않고, 간단히 스케줄러를 수행시킬 수 있다는 점이 매우 효율적인 점이며, 별도의 테스트 케이스 필요없이 선언적 형태로 코드를 구현할 수 있다는 점에서 이터러블 프로그래밍의 장점을 잘 알 수 있는 코드라고 할 수 있겠다.
+  위와 같은 방법으로 시간을 이터러블로 핸들링할 수 있음. 여러번 보자!
