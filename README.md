@@ -514,3 +514,4 @@
    - [SVG 효과](https://github.com/wonieeVicky/TIL/blob/main/GraphicLayout/svg/5-svg-effect.md)
    - [SVG Stroke](https://github.com/wonieeVicky/TIL/blob/main/GraphicLayout/svg/6-svg-stroke.md)
    - [SMIL 애니메이션](https://github.com/wonieeVicky/TIL/blob/main/GraphicLayout/svg/7-smil-animation.md)
+   - [아이콘 폰트 만들기](https://github.com/wonieeVicky/TIL/blob/main/GraphicLayout/svg/8-generate-icon-fonts.md)
