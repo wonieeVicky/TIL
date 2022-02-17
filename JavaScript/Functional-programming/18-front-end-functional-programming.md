@@ -176,3 +176,128 @@ _.go(
 위와 같이 코드를 선언적으로 하나씩 처리해나갈 수 있다..!
 
 ![예쁘게 잘 그려진다..!](../../img/220214-1.png)
+
+### 아이템 지우기
+
+이번에는 이미지를 하나씩 삭제하는 버튼을 만들고, 이벤트를 달아 삭제 해보자.
+먼저 이미지 컨테이너 내 삭제 버튼을 추가해주어야 한다.
+
+```jsx
+Images.tmpl = (imgs) => `
+  <div class="images">
+    ${_.strMap(
+      (img) => `
+        <div class="image">
+          <div class="box"><img src="${img.url}" alt=""></div>
+          <div class="name">${img.name}</div>
+          <div class="remove">x</div>
+        </div>
+      `,
+      imgs
+    )}
+  </div>
+`;
+```
+
+원하는 기능은 모든 remove 버튼 엘리먼트에 삭제 기능을 붙여주는 것이다.
+먼저, 모든 remove 태그를 담는 것부터 시작한다. 이미 만들어놓은 `$.qs` 함수는 하나의 태그만 가져올 수 있었다. 따라서 여러 태그를 끌고올 수 있는 `$.qsa` 함수를 만들어준다.
+
+```jsx
+$.qs = document.querySelector.bind(document);
+$.qs = document.querySelectorAll.bind(document);
+```
+
+그런데 위 두 함수의 한계점은 document에서만 검색해올 수 있다는 것이다.
+특정 엘리먼트를 기준으로 찾기 위해 조금 더 리팩토링하면 아래와 같다.
+
+```jsx
+$.qs = (sel, parent = document) => parent.querySelector(sel); // 하나만 찾음
+$.qsa = (sel, parent = document) => parent.querySelectorAll(sel); // 여러개 찾음
+```
+
+parent의 값이 없을 때에는 document로 적용되도록 처리되었다.
+위 함수를 적용하면 같이 처리하면 body 안의 .image 태그를 아래와 같은 함수로 가지고 올 수 있게된다.
+
+```jsx
+_.go(Images.fetch(), Images.tmpl, $.el, $.append($.qs("body")), (el) => $.qsa(".image", el), console.log);
+// NodeList(90 [div.image, ...]
+```
+
+위 함수에 커링을 적용하고 싶다. 하지만 인자가 가변인 상태에서는 curry를 이용할 수 없음.
+그래서 아래와 같이 `$.find`와 `$.findAll`라는 별도의 함수를 만들어 처리해준다.
+
+```jsx
+// 부모와 부모 안으로부터 자식을 찾아 사용하도록 설정
+$.find = _.curry($.qs);
+$.findAll = _.curry($.qsa);
+
+// codes..
+
+_.go(
+  Images.fetch(),
+  Images.tmpl,
+  $.el,
+  $.append($.qs("body")),
+  $.findAll(".remove"), // 이렇게 적용해줄 수 있음!
+  console.log
+);
+// NodeList(90 [div.image, ...]
+```
+
+이제 각각의 NodeList 엘리먼트에 삭제를 실행하는 클릭이벤트를 걸어준다.
+각 엘리먼트는 이터러블 객체인 상태이므로 아래와 같이 코드를 적을 수 있다.
+
+```jsx
+_.go(
+  // ..
+  $.findAll(".remove"),
+  _.each((el) =>
+    el.addEventListener("click", (e) =>
+      _.go(
+        e.currentTarget,
+        (el) => el.closest(".image"),
+        (el) => el.parentNode.removeChild(el)
+      )
+    )
+  )
+);
+```
+
+위 코드는 메서드 중심으로 적혀 있으므로 이를 파이프라인 안에서의 함수 합성으로 표현해보자.
+
+```jsx
+//  (el) => el.closest(".image"),
+$.closest = _.curry((sel, el) => el.closest(sel)); // closest 를 가져오는 curry 함수 생성
+$.remove = (el) => el.parentNode.removeChild(el);
+
+_.go(
+  // ..
+  $.findAll(".remove"),
+  _.each((el) => el.addEventListener("click", (e) => _.go(e.currentTarget, $.closest(".image"), $.remove)))
+);
+```
+
+각각 $.closest 함수와 $.remove 함수를 구현하여 파이프라인 표현을 개선할 수 있었다.
+이 밖에도 \_.each 코드의 경우 많이 중복사용될 수 있는 함수이므로 별도로 분리해줄 수 있다.
+
+```jsx
+// 두번째 인자가 이터러블이 아닌 경우 엘리먼트 하나에만 적용되도록 처리하기 위해
+// _.isIterable(els) ? els : [els] 형태로 변환 -> each가 적용된다.
+$.on = (event, f)
+		=> (els)
+		=> _.each((el)
+		=> el.addEventListener(event, f), _.isIterable(els) ? els : [els]);
+```
+
+위와 같이 처리하면 파이프라인 함수는 아래와 같이 정리된다.
+
+```jsx
+_.go(
+  Images.fetch(),
+  Images.tmpl,
+  $.el,
+  $.append($.qs("body")),
+  $.findAll(".remove"),
+  $.on("click", (e) => _.go(e.currentTarget, $.closest(".image"), $.remove))
+);
+```
