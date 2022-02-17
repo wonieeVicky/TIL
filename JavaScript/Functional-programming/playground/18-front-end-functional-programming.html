@@ -123,13 +123,22 @@
     <!-- ### 2. 이미지 목록 그리기 -->
     <script>
       const $ = {};
-      $.qs = document.querySelector.bind(document);
+
+      $.qs = (sel, parent = document) => parent.querySelector(sel); // 하나만 찾음
+      $.qsa = (sel, parent = document) => parent.querySelectorAll(sel); // 여러개 찾음
+
+      $.find = _.curry($.qs);
+      $.findAll = _.curry($.qsa);
+
       $.el = (html) => {
         const wrap = document.createElement("div"); // html 덩어리를 mappging할 div 생성
         wrap.innerHTML = html;
         return wrap.children[0];
       };
       $.append = _.curry((parent, child) => parent.appendChild(child));
+      $.closest = _.curry((sel, el) => el.closest(sel));
+      $.remove = (el) => el.parentNode.removeChild(el);
+      $.on = (event, f) => (els) => _.each((el) => el.addEventListener(event, f), _.isIterable(els) ? els : [els]);
     </script>
     <script>
       // 첫 문자를 대문자로 표현?
@@ -154,13 +163,22 @@
               <div class="image">
                 <div class="box"><img src="${img.url}" alt=""></div>
                 <div class="name">${img.name}</div>
+                <div class="remove">x</div>
               </div>
             `,
             imgs
           )}
         </div>
       `;
-      _.go(Images.fetch(), Images.tmpl, $.el, $.append($.qs("body")), console.log);
+
+      _.go(
+        Images.fetch(),
+        Images.tmpl,
+        $.el,
+        $.append($.qs("body")),
+        $.findAll(".remove"),
+        $.on("click", (e) => _.go(e.currentTarget, $.closest(".image"), $.remove))
+      );
     </script>
   </body>
 </html>
