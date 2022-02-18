@@ -301,3 +301,237 @@ _.go(
   $.on("click", (e) => _.go(e.currentTarget, $.closest(".image"), $.remove))
 );
 ```
+
+### 커스텀 confirm 창과 Promise
+
+이번에는 경고창을 만들어보고자 한다.
+먼저 네이티브 경고창을 만들어보면 아래와 같이 간단히 만들 수 있다.
+
+```jsx
+_.go(
+  Images.fetch(),
+  Images.tmpl,
+  $.el,
+  $.append($.qs("body")),
+  $.findAll(".remove"),
+  $.on("click", (e) => {
+    if (confirm("정말 삭제하시겠습니까?")) {
+      _.go(e.currentTarget, $.closest(".image"), $.remove);
+    }
+  })
+);
+```
+
+위와 같은 방식으로는 빠르게 기능 구현을 할 수 있지만, 컨펌창을 수정하는 것들을 불가능하다.
+경고창을 만들어서 적용해보도록 하자
+
+```jsx
+const Ui = {}; // Ui 객체 생성
+Ui.confirm = (msg) =>
+  _.go(
+    `
+    <div class="confirm">
+      <div class="body">
+        <div class="msg">${msg}</div>
+        <div class="buttons">
+          <button type="button" class="cancel">취소</button>
+          <button type="button" class="ok">확인</button>
+        </div>
+      </div>
+    </div>
+  `,
+    $.el,
+    $.append($.qs("body")),
+    _.tap(console.log), // 현재 el :: <div class="confirm">..</div>
+    $.find(".ok"),
+    $.on("click", (e) => _.go(e.currentTarget, $.closest(".confirm"), $.remove)),
+    console.log // 현재 el :: [button.ok]
+  );
+
+Ui.confirm("정말 삭제하시겠습니까?");
+```
+
+![](../../img/220218-1.png)
+
+위 로직으로 팝업을 생성하여 [확인] 버튼을 클릭하면 팝업이 닫히는 효과를 구현해줄 수 있다. 하지만 문제가 있음.
+[확인]버튼 다음에 [취소]버튼을 동작시키려면 전달되는 엘리먼트가 `button.cancel`여야 하지만 위 구조에서는 `button.ok`이기 때문이다.
+따라서 위와 같은 클릭 이벤트를 별도의 이벤트로 바인딩 한 후 상속받는 엘리먼트는 기존의 `div.confirm`을 유지하도록 `_.tap` 함수를 사용해 리팩토링할 수 있다.
+
+```jsx
+Ui.confirm = (msg) =>
+  _.go(
+    `
+  <div class="confirm">
+    <div class="body">
+      <div class="msg">${msg}</div>
+      <div class="buttons">
+        <button type="button" class="cancel">취소</button>
+        <button type="button" class="ok">확인</button>
+      </div>
+    </div>
+  </div>
+`,
+    $.el,
+    $.append($.qs("body")),
+    // _.tap 함수로 클릭이벤트를 감싸준다.
+    _.tap(
+      $.find(".ok"),
+      $.on("click", (e) => _.go(e.currentTarget, $.closest(".confirm"), $.remove))
+    ),
+    _.tap(
+      $.find(".cancel"),
+      $.on("click", (e) => _.go(e.currentTarget, $.closest(".confirm"), $.remove))
+    ),
+    console.log // <div class="confirm"></div>
+  );
+```
+
+다음으로 해당 함수를 구현하는 f 함수가 있다고 쳤을 때 실행시키면 결과는 아래와 같다.
+
+```jsx
+function f() {
+  Ui.confirm("정말 삭제하시겠습니까?");
+  console.log("hi!");
+}
+f(); // Ui.confirm 창 생성 후 바로 hi 콘솔이 찍힌다.
+```
+
+위와 같이 동작하면 Ui.confirm이 생성되는 것과 상관없이 hi가 콘솔에 찍힌다.
+만약 기존 네이티브 confirm을 이용할 경우 hi 로그는 confirm창을 닫아야 실행되어 로그에 찍히게 된다.
+
+```jsx
+function f() {
+  confirm("정말 삭제하시겠습니까?");
+  console.log("hi!");
+}
+f(); // confirm 창 on/off 뒤 실행
+```
+
+`Ui.confirm`이 위 네이티브 `confirm` 창과 동일하게 동작하도록 만들기 위해서는 아래 코드처럼 Promise를 감싸서 처리하는 방법으로 구현할 수 있다.
+
+```jsx
+Ui.confirm = (msg) =>
+  new Promise((resolve) =>
+    _.go(
+      `
+    <div class="confirm">
+      <div class="body">
+        <div class="msg">${msg}</div>
+        <div class="buttons">
+          <button type="button" class="cancel">취소</button>
+          <button type="button" class="ok">확인</button>
+        </div>
+      </div>
+    </div>
+  `,
+      $.el,
+      $.append($.qs("body")),
+      _.tap(
+        $.find(".ok"),
+        // remove 후 resolve 반환
+        $.on("click", (e) => _.go(e.currentTarget, $.closest(".confirm"), $.remove, resolve))
+      ),
+      _.tap(
+        $.find(".cancel"),
+        // remove 후 resolve 반환
+        $.on("click", (e) => _.go(e.currentTarget, $.closest(".confirm"), $.remove, resolve))
+      )
+    )
+  );
+
+async function f() {
+  await Ui.confirm("정말 삭제하시겠습니까?"); // 확인, 취소 버튼을 눌렀을 떄 아래 hi가 찍힌다.
+  console.log("hi!");
+}
+```
+
+위 코드를 기존 네이티브로 구현한 코드에 반영하면 아래와 같다.
+
+```jsx
+_.go(
+  Images.fetch(),
+  Images.tmpl,
+  $.el,
+  $.append($.qs("body")),
+  $.findAll(".remove"),
+  $.on("click", async (e) => {
+    if (await Ui.confirm("정말 삭제하시겠습니까?")) {
+      _.go(e.currentTarget, $.closest(".image"), $.remove); // Uncaught (in promise) TypeError: Cannot read properties of null (reading 'closest')
+    }
+  })
+);
+```
+
+위와 같이 설정 후 `remove` 버튼을 클릭하면 에러가 발생한다!
+바로 `async ~ await` 으로 인해 이벤트 객체인 `e.currentTarget`이 `null`이 되었기 떄문..
+이는 어떤 로직 중에서 해당 값이 `null`로 변환된 것이므로 이러한 값 변화를 방어하기 위해 전달되는 e객체를 구조분해해서 얕은 복사를 해주면 된다.
+
+```jsx
+_.go(
+  Images.fetch(),
+  Images.tmpl,
+  $.el,
+  $.append($.qs("body")),
+  $.findAll(".remove"),
+  $.on("click", async ({ currentTarget }) => {
+    // currentTarget을 구조분해
+    if (await Ui.confirm("정말 삭제하시겠습니까?")) {
+      _.go(currentTarget, $.closest(".image"), $.remove);
+    }
+  })
+);
+```
+
+위처럼 처리하면 [확인] 동작이 잘 이루어진다. 헌데 [취소] 동작도 확인과 동일하게 아이템이 삭제되므로
+Promise 반환 값에 true, false로 전달인자를 추가하는 방식으로 개선해준다.
+
+```jsx
+Ui.confirm = (msg) =>
+  new Promise((resolve) =>
+    _.go(
+      `
+  <div class="confirm">
+    <div class="body">
+      <div class="msg">${msg}</div>
+      <div class="buttons">
+        <button type="button" class="cancel">취소</button>
+        <button type="button" class="ok">확인</button>
+      </div>
+    </div>
+  </div>
+`,
+      $.el,
+      $.append($.qs("body")),
+      _.tap(
+        $.find(".ok"),
+        // resolve 전달인자에 true
+        $.on("click", (e) => _.go(e.currentTarget, $.closest(".confirm"), $.remove, (_) => resolve(true)))
+      ),
+      _.tap(
+        $.find(".cancel"),
+        // resolve 전달인자에 false
+        $.on("click", (e) => _.go(e.currentTarget, $.closest(".confirm"), $.remove, (_) => resolve(false)))
+      )
+    )
+  );
+```
+
+마지막으로 파이프라인 함수를 좀 더 간단히 리팩토링하여 완성하면 아래와 같이 구현할 수 있다.
+
+```jsx
+_.go(
+  Images.fetch(),
+  Images.tmpl,
+  $.el,
+  $.append($.qs("body")),
+  $.findAll(".remove"),
+  $.on(
+    "click",
+    // currentTarget을 ct로 줄인 뒤 문장 표현 제거
+    async ({ currentTarget: ct }) =>
+      (await Ui.confirm("정말 삭제하시겠습니까?")) && _.go(ct, $.closest(".image"), $.remove)
+  )
+);
+```
+
+---
