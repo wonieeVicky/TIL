@@ -17,7 +17,7 @@
         left: 0;
         right: 0;
         bottom: 0;
-        background: rgba(0, 0, 0, 0.2);
+        background: rgba(167, 93, 93, 0.2);
         z-index: 2;
       }
       .confirm .body {
@@ -177,8 +177,40 @@
         $.el,
         $.append($.qs("body")),
         $.findAll(".remove"),
-        $.on("click", (e) => _.go(e.currentTarget, $.closest(".image"), $.remove))
+        $.on(
+          "click",
+          async ({ currentTarget: ct }) =>
+            (await Ui.confirm("정말 삭제하시겠습니까?")) && _.go(ct, $.closest(".image"), $.remove)
+        )
       );
+
+      const Ui = {};
+      Ui.confirm = (msg) =>
+        new Promise((resolve) =>
+          _.go(
+            `
+          <div class="confirm">
+            <div class="body">
+              <div class="msg">${msg}</div>
+              <div class="buttons">
+                <button type="button" class="cancel">취소</button>
+                <button type="button" class="ok">확인</button>
+              </div>
+            </div>
+          </div>
+        `,
+            $.el,
+            $.append($.qs("body")),
+            _.tap(
+              $.find(".ok"),
+              $.on("click", (e) => _.go(e.currentTarget, $.closest(".confirm"), $.remove, (_) => resolve(true)))
+            ),
+            _.tap(
+              $.find(".cancel"),
+              $.on("click", (e) => _.go(e.currentTarget, $.closest(".confirm"), $.remove, (_) => resolve(false)))
+            )
+          )
+        );
     </script>
   </body>
 </html>
