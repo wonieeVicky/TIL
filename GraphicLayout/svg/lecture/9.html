@@ -25,6 +25,17 @@
           transform: scaleY(0.01);
         }
       }
+      @keyframes ell-ani {
+        0% {
+          stroke-dashoffset: -713;
+        }
+        50% {
+          stroke-dashoffset: 0;
+        }
+        100% {
+          stroke-dashoffset: 713;
+        }
+      }
       .react-mon {
         position: absolute;
         top: 0;
@@ -46,6 +57,19 @@
         fill: none;
         stroke: #61dafb;
         stroke-width: 15px;
+        opacity: 0.3;
+      }
+      .cls-eff {
+        opacity: 1;
+        stroke-dasharray: 713;
+        stroke-dashoffset: -713;
+        animation: ell-ani 0.7s infinite ease-in-out;
+      }
+      .cls-eff-2 {
+        animation-delay: 0.1s;
+      }
+      .cls-eff-3 {
+        animation-delay: 0.2s;
       }
     </style>
   </head>
@@ -56,9 +80,32 @@
           <ellipse class="eye" cx="163.5" cy="145.92" rx="28" ry="14" fill="#fff" />
         </mask>
       </defs>
-      <ellipse class="cls-1" cx="163.5" cy="145.92" rx="156" ry="60" />
-      <ellipse class="cls-1" cx="384" cy="384" rx="156" ry="60" transform="matrix(.5 -.87 .87 .5 -361.05 286.47)" />
-      <ellipse class="cls-1" cx="384" cy="384" rx="60" ry="156" transform="rotate(-30 -170.504 676.413)" />
+      <g>
+        <ellipse class="cls-1" cx="163.5" cy="145.92" rx="156" ry="60" />
+        <ellipse class="cls-1 cls-eff cls-eff-1" cx="163.5" cy="145.92" rx="156" ry="60" />
+      </g>
+      <g>
+        <ellipse class="cls-1" cx="384" cy="384" rx="156" ry="60" transform="matrix(.5 -.87 .87 .5 -361.05 286.47)" />
+        <ellipse
+          class="cls-1 cls-eff cls-eff-2"
+          cx="384"
+          cy="384"
+          rx="156"
+          ry="60"
+          transform="matrix(.5 -.87 .87 .5 -361.05 286.47)"
+        />
+      </g>
+      <g>
+        <ellipse class="cls-1" cx="384" cy="384" rx="60" ry="156" transform="rotate(-30 -170.504 676.413)" />
+        <ellipse
+          class="cls-1 cls-eff cls-eff-3"
+          cx="384"
+          cy="384"
+          rx="60"
+          ry="156"
+          transform="rotate(-30 -170.504 676.413)"
+        />
+      </g>
       <circle cx="163.5" cy="145.92" r="31" fill="#61dafb" />
       <ellipse class="eye" cx="163.5" cy="145.92" rx="28" ry="14" fill="#fff" />
       <g mask="url(#eye-mask)">
@@ -66,6 +113,8 @@
       </g>
     </svg>
 
-    <script></script>
+    <script>
+      document.querySelector(".cls-eff").getTotalLength(); // 712.134
+    </script>
   </body>
 </html>
