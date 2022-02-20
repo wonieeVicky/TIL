@@ -253,3 +253,49 @@ document.querySelector(".cls-eff").getTotalLength(); // 712.134
 `transform`에 부여한 `rotate3D` 메서드의 경우 인자로 x, y, z 축 비율과 회전각도를 전달하여 구현한다.
 
 ![실제 구현이 어떻게 되는지는 도형의 변화를 하나씩 변화시켜가면서 확인해보자](../../img/220220-1.gif)
+
+### 마우스를 따라다니며 움직이는 몬스터 만들기
+
+마우스를 따라다니는 애니메이션의 경우 svg와는 크게 상관없으나 직접 한번 구현해본다.
+
+```jsx
+// 1. 전역변수로의 제한을 위해 즉시실행 함수로 처리
+(() => {
+  const reactMonElem = document.querySelector(".react-mon");
+  // 2. 마우스 위치를 따라다니도록 해야하니까 가운데를 기준으로 계산된 마우스 위치를 targetPos로 한다.
+  const targetPos = { x: 0, y: 0 };
+  const easeValue = 0.05;
+  const reactMonInfo = {
+    x: 0,
+    y: 0,
+  };
+
+  // 3. 마우스가 움직일 때마다 현재 마우스의 위치(e.client)에서
+  // 브라우저 화면의 절반만큼을 빼준 위치로 targetPos를 변경한다 몬스터 위치가 화면 정가운데에 있기 때문
+  window.addEventListener("mousemove", (e) => {
+    targetPos.x = e.clientX - innerWidth * 0.5;
+    targetPos.y = e.clientY - innerHeight * 0.5;
+  });
+
+  let dx;
+  let dy;
+  function render() {
+    // 4. 목표 위치(targetPos)에서 현재 위치(reactmon)를 뺀 값
+    dx = targetPos.x - reactMonInfo.x;
+    dy = targetPos.y - reactMonInfo.y;
+    // 5. 점점 이동하는 거리값이 줄어들게 함으로써 부드러운(linear) 효과를 줄 수 있음
+    reactMonInfo.x = reactMonInfo.x + dx * easeValue;
+    reactMonInfo.y = reactMonInfo.y + dy * easeValue;
+    reactMonElem.style.transform = `translate3d(${reactMonInfo.x}px, ${reactMonInfo.y}px, 0px)`;
+    requestAnimationFrame(render);
+  }
+
+  render();
+})();
+```
+
+1. 전역변수로 제한하기 위해 마우스 애니메이션은 즉시실행 함수로 감싸준다.
+2. 마우스 위치를 따라다니도록 구현해야하는데 그 기준점이 되어주는 객체값을 targetPos라는 변수로 둔다.
+3. 마우스가 움직일 때마다(mousemove) targetPos 값을 수정해주는데, 이때 실제 마우스 위치값을 넣는 것이 아닌 브라우저 화면의 절반만큼을 빼준 위치값을 넣는다. 몬스터의 처음 시작점이 화면의 정가운데에 존재하기 때문이다.
+4. dx, dy는 리액트몬이 이동해야하는 값을 의미하며, 목표위치(targetPos)에서 리액트몬이 있는 현재 위치를 뺀 값을 의미함
+5. 실제 리액트몬이 이동할 값은 dx, dy 값을 easeValue 만큼 곱하여 분할한 값을 translate3d 애니메이션으로 부여한다 점점 이동하느 거리값이 줄어드는 효과를 주게 되므로 이로써 부드러운 효과를 줄 수 있다.
