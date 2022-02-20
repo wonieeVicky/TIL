@@ -192,3 +192,64 @@ document.querySelector(".cls-eff").getTotalLength(); // 712.134
 ```
 
 ![위와 같이 적용하면 아래와 같은 애니메이션이 구현된다..!](../../img/220219-1.gif)
+
+### 타원 3차원 회전
+
+이제 타원이 회전하는 애니메이션을 구현해본다!
+현재 타원은 2개의 태그로 묶여있기 때문에 겹쳐진 타원이 동시에 움직여야하는 특징을 가지고 있음 따라서 스타일은 그룹(g)태그에 주도록 한다.
+
+```html
+<svg class="react-mon" viewBox="0 0 327 291.84">
+  <defs>
+    <!-- codes... -->
+  </defs>
+  <g class="ells ells-1">
+    <!-- codes... -->
+  </g>
+  <g class="ells ells-2">
+    <!-- codes... -->
+  </g>
+  <g class="ells ells-3">
+    <!-- codes... -->
+  </g>
+  <!-- codes... -->
+</svg>
+```
+
+위 ells, ells-n 클래스에 부여할 애니메이션과 css는 아래와 같음
+
+```css
+@keyframes rotate-ani-1 {
+  100% {
+    /* rotate3D : 3차원 애니메이션 구현(x축 비율, y축 비율, z축 비율, 회전각도) */
+    transform: rotate3D(0, 1, 0, 360deg);
+  }
+}
+@keyframes rotate-ani-2 {
+  100% {
+    transform: rotate3D(2, 1.22, 0, 360deg);
+  }
+}
+@keyframes rotate-ani-3 {
+  100% {
+    transform: rotate3D(-2, 1.22, 0, 360deg);
+  }
+}
+/* codes.. */
+.ells {
+  transform-origin: 50% 50%;
+}
+.ells-1 {
+  animation: rotate-ani-1 5s linear infinite;
+}
+.ells-2 {
+  animation: rotate-ani-2 5s linear infinite;
+}
+.ells-3 {
+  animation: rotate-ani-3 5s linear infinite;
+}
+```
+
+`transform`에 부여한 `rotate3D` 메서드의 경우 인자로 x, y, z 축 비율과 회전각도를 전달하여 구현한다.
+
+![실제 구현이 어떻게 되는지는 도형의 변화를 하나씩 변화시켜가면서 확인해보자](../../img/220220-1.gif)
