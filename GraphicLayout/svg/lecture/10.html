@@ -1,0 +1,69 @@
+﻿<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Interactive Web</title>
+    <!-- <link rel=""stylesheet" href="css/reset.css" /> -->
+    <style>
+      body {
+        margin: 0;
+        padding: 5px;
+      }
+      .box-container {
+        display: flex;
+      }
+      .box {
+        width: 100px;
+        height: 100px;
+        background: rgba(255, 255, 0, 0.7);
+        border: 2px solid black;
+      }
+      .box:hover {
+        /* transform: scale(2) rotate(15deg); */
+        /* transform: skewY(30deg); */
+        /* transform: translate(30px, 10px); */
+        /* transform: translateX(-30px) translateY(-10px); */
+        /* transform-origin: 기준 점을 바꾼다. */
+        /* transform-origin: right top; */
+        /* left top */
+        /* transform-origin: 0% 0%; */
+        /* right bottom */
+        /* transform-origin: 100% 100%; */
+        /* center center */
+        /* transform-origin: 50% 50%; */
+        transform-origin: 100% 100%;
+        transform: rotate(15deg);
+      }
+    </style>
+  </head>
+  <body>
+    <h1>CSS Transform</h1>
+    <p>
+      Lorem ipsum dolor sit, amet consectetur adipisicing elit. Minima illo hic quos qui voluptate suscipit quo
+      perspiciatis neque officia cumque. Enim, eos debitis voluptatem ullam officia maiores vitae, ipsa tempore, facilis
+      iure esse omnis perspiciatis reiciendis distinctio nobis vel perferendis! Necessitatibus molestiae a veniam aut
+      pariatur maxime inventore deserunt. Odit consequuntur dolore ex magni atque sequi hic natus animi nemo officiis
+      est laboriosam consequatur porro enim, vero quibusdam? Iure tenetur nihil sunt necessitatibus vitae numquam
+      voluptatem deserunt recusandae pariatur voluptate quaerat, temporibus earum minima dolor suscipit obcaecati
+      voluptatibus nobis iste voluptatum ipsum ratione? Minima quisquam eos provident fugiat blanditiis nulla?
+    </p>
+    <div class="box-container">
+      <div class="box">A</div>
+      <div class="box">B</div>
+      <div class="box">C</div>
+      <div class="box">D</div>
+      <div class="box">E</div>
+    </div>
+    <p>
+      Lorem ipsum dolor sit, amet consectetur adipisicing elit. Minima illo hic quos qui voluptate suscipit quo
+      perspiciatis neque officia cumque. Enim, eos debitis voluptatem ullam officia maiores vitae, ipsa tempore, facilis
+      iure esse omnis perspiciatis reiciendis distinctio nobis vel perferendis! Necessitatibus molestiae a veniam aut
+      pariatur maxime inventore deserunt. Odit consequuntur dolore ex magni atque sequi hic natus animi nemo officiis
+      est laboriosam consequatur porro enim, vero quibusdam? Iure tenetur nihil sunt necessitatibus vitae numquam
+      voluptatem deserunt recusandae pariatur voluptate quaerat, temporibus earum minima dolor suscipit obcaecati
+      voluptatibus nobis iste voluptatum ipsum ratione? Minima quisquam eos provident fugiat blanditiis nulla?
+    </p>
+  </body>
+</html>
