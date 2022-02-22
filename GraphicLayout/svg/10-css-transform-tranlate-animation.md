@@ -157,3 +157,78 @@ transform은 변경 중심이 center이기 때문에 좌우 도형에 영향을 
 ![](../../img/220221-10.png)
 
 위와 같이 bottom right를 기준으로 15도 회전하는 효과를 도형에 부여하면 위와 같이 변경시킬수도 있다.
+
+### Transition
+
+CSS animation을 줄 수 있는 `transition` 효과에 대해 알아보자
+
+```css
+.box:hover {
+  transform: scale(2);
+}
+```
+
+위와 같은 `transform` 효과를 자연스럽게 구현하기 위해서 `transition`을 이용한다.
+
+```css
+.box {
+  /* code... */
+  transition: 1s;
+}
+```
+
+![위와 같이 손쉽게 좋은 성능으로 애니메이션을 구현할 수 있음](../../img/220222-1.gif)
+
+위와 같이 손쉽게 좋은 성능으로 애니메이션을 구현할 수 있음
+
+위 transition 효과를 크롬 개발자도구로 상세히 보면 그 내부 속성을 하나씩 알아볼 수 있다.
+
+![](../../img/220222-1.png)
+
+- trasition-duration은 재생시간을 의미. 1s이면, 1초동안 애니메이션이 동작한다.
+- timing-function은 가속도를 의미한다. (ease: 가속도(자연스러운, default), linear: 등속도(일정한))
+  해당 설정은 좌측 아이콘을 누르면 다양한 애니메이션 방정식을 설정해볼 수 있다.
+  ![위와 같이 방정식 곡선을 변경시켜서 띠용~ 하는 효과도 내줄 수 있다 ㅋ](../../img/220222-2.png)
+
+      ![](../../img/220222-2.gif)
+
+- trasition-delay는 애니메이션을 지연시키는 것을 의미한다.
+  ```css
+  .box {
+    /* code... */
+    transition: 1s 2s; /* transition-delay 속성을 2s로 준다. */
+  }
+  ```
+  ![2초 뒤에 애니메이션이 동작한다.](../../img/220222-3.gif)
+
+애니메이션은 transform에만 적용할 수 있는 것이 아니라 다양한 도형 설정 중 수치로 표현된 것들이 변하는 것에 모두 적용할 수 있다.
+
+```css
+.box {
+  /* code.. */
+  transition: 0.5s;
+}
+.box:hover {
+  width: 200px;
+}
+```
+
+![](../../img/220222-4.gif)
+
+위에서 transform 적용이 수치로 표현된 것들에만 적용된다는 것은 아래의 예를 의미한다.
+
+```css
+.box {
+  width: auto; /* width: auto;는 수치가 아님 */
+  height: 100px;****
+  background: rgba(255, 255, 0, 0.7);
+  border: 2px solid black;
+  transition: 2s;
+}
+.box:hover {
+  width: 200px;
+  background: red;
+}
+```
+
+![](../../img/220222-5.gif)
