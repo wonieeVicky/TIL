@@ -232,3 +232,100 @@ CSS animation을 줄 수 있는 `transition` 효과에 대해 알아보자
 ```
 
 ![](../../img/220222-5.gif)
+
+### Animation
+
+CSS에 애니메이션을 구현할 수 있는 방법은 transition 외에도 animation이 있다.
+
+```html
+<!DOCTYPE html>
+<html>
+  <head>
+    <style>
+      .box {
+        width: 100px;
+        height: 100px;
+        background: #fff000;
+        border: 2px solid #000;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Animation</h1>
+    <div class="box">BOX</div>
+  </body>
+</html>
+```
+
+![](../../img/220223-1.png)
+
+위와 같은 BOX가 하나 있다고 하자.
+위 BOX 텍스트를 도형의 정 가운데로 두려면 `display: flex;` 속성을 이용하면 된다.
+
+```css
+.box {
+  width: 100px;
+  height: 100px;
+  background: #fff000;
+  border: 2px solid #000;
+  /* 텍스트 중앙 정렬 */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+```
+
+![](../../img/220223-2.png)
+
+이제 이 BOX에 애니메이션 효과를 줘본다.
+애니메이션은 동작 중간에 변화르 시점을 잡을 수 있는 Keyframe 속성을 제공한다.
+
+```css
+@keyframes sample-ani {
+  0% {
+    transform: translate(0, 0);
+  }
+  50% {****
+    transform: translate(300px, 0);
+  }
+  100% {
+    transform: translate(300px, 100px);
+  }
+}
+.box {
+
+	/* codes.. */
+  animation: sample-ani 2s linear infinite;
+}
+```
+
+![](../../img/220223-1.gif)
+
+위 애니메이션 또한 크롬 개발자도구에서 상세 옵션을 확인하고 다양한 옵션으로의 테스트가 가능하다.
+
+![](../../img/220223-3.png)
+
+위 infinite로 값을 준 `animation-iteration-count` 옵션의 경우 정수로 실제 실행 횟수를 지정할 수 있다.
+만약 `animation-iteration-count: 3`일 경우 애니메이션이 3번 실행된 후 멈춘다. 또, `animation-direction` 속성으로 `alternate`를 주면 애니메이션이 끊기지않고 이어지는 효과를 줄 수 있다.
+
+```css
+.box {
+  /* codes.. */
+  /* animation-direction: alternate, reverse, alternate-reverse */
+  animation: sample-ani 3s linear infinite alternate;
+}
+```
+
+![](../../img/220223-2.gif)
+
+애니메이션이 끝난 시점에 초기 시점으로 돌아가는 특성을 바꾸고 싶으면 `animation-fill-mode`를 `forwards`로 주면 된다. 또 `animation-play-state` 속성으로 `running`이 아닌 `paused` 속성을 주면 마우스 hover 시에 애니메이션이 멈추도록 설정해 줄 수도 있다.
+
+```css
+.box {
+  /* codes.. */
+  animation: sample-ani 3s linear forwards;
+}
+.box:hover {
+  animation-play-state: paused; /* 마우스를 올리면 멈춘다 */
+}
+```
