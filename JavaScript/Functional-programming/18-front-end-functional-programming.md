@@ -534,4 +534,182 @@ _.go(
 );
 ```
 
----
+### 클래스를 대신 함수로 하는 추상화
+
+위와 비슷한 창을 만들어 함수형 프로그래밍적으로 함수를 추상화하는 패턴과 사례를 더 살펴보자
+위 Ui.confirm과 비슷한 역할을 하는 Ui.alert 기능이 생겼다고 하자.
+
+```jsx
+Ui.alert = (msg) =>
+  new Promise((resolve) =>
+    _.go(
+      `<div class="confirm">
+        <div class="body">
+          <div class="msg">${msg}</div>
+          <div class="buttons">
+            <button type="button" class="ok">확인</button>
+          </div>
+        </div>
+      </div>`,
+      $.el,
+      $.append($.qs("body")),
+      _.tap(
+        $.find(".ok"),
+        $.on("click", (e) => _.go(e.currentTarget, $.closest(".confirm"), $.remove, (_) => resolve(true)))
+      )
+    )
+  );
+Ui.alert("삭제되었습니다.");
+```
+
+위 함수와 `Ui.confirm`에는 동일한 코드가 중복되는 부분이 다량 발생한다. 특히 button의 갯수에 따라 중복된 코드가 늘어난다는 공통점을 가진다. 따라서, 이를 List로 넣어주는 데이터에 따라 동적으로 처리할 수 있는 `Ui.message` 함수를 새로 만들어 코드를 줄여볼 수 있다.
+
+```jsx
+Ui.message = ({ msg, btns }) =>
+  new Promise((resolve) =>
+    _.go(
+      `<div class="confirm">
+        <div class="body">
+          <div class="msg">${msg}</div>
+          <div class="buttons">
+            ${_.strMap((btn) => `<button type="button" class="${btn.type}">${btn.name}</button>`, btns)}
+          </div>
+        </div>
+      </div>`,
+      $.el,
+      $.append($.qs("body")),
+      ..._.map(
+        (btn) =>
+          _.tap(
+            $.find(`.${btn.type}`),
+            $.on("click", (e) => _.go(e.currentTarget, $.closest(".confirm"), $.remove, (_) => resolve(btn.value)))
+          ),
+        btns
+      )
+    )
+  );
+```
+
+위 공통 유틸함수를 활용하여 `Ui.confirm`과 `Ui.alert`를 리팩토링해보면 아래와 같다.
+
+```jsx
+Ui.confirm = (msg) =>
+  Ui.message({
+    msg,
+    btns: [
+      { name: "확인", value: true, type: "ok" },
+      { name: "취소", value: false, type: "cancel" },
+    ],
+  });
+Ui.confirm("삭제하시겠습니까?");
+
+Ui.alert = (msg) =>
+  Ui.message({
+    msg,
+    btns: [{ name: "확인", value: true, type: "ok" }],
+  });
+Ui.alert("삭제되었습니다.");
+```
+
+더 나아가 Ui.message 함수에 적용된 구조분해를 제거하면 아래와 같이 구현할 수도 있다.
+
+```jsx
+Ui.message = (btns, msg) =>
+  new Promise((resolve) =>
+    _.go(
+      `<div class="confirm">
+      <div class="body">
+        <div class="msg">${msg}</div>
+        <div class="buttons">
+          ${_.strMap((btn) => `<button type="button" class="${btn.type}">${btn.name}</button>`, btns)}
+        </div>
+      </div>
+    </div>`,
+      $.el,
+      $.append($.qs("body")),
+      ..._.map(
+        (btn) =>
+          _.tap(
+            $.find(`.${btn.type}`),
+            $.on("click", (e) => _.go(e.currentTarget, $.closest(".confirm"), $.remove, (_) => resolve(btn.value)))
+          ),
+        btns
+      )
+    )
+  );
+```
+
+그럼 Ui.confirm과 Ui.alert 함수도 아래와 같이 변경되어야 한다.
+
+```jsx
+Ui.confirm = (msg) =>
+  Ui.message(
+    [
+      { name: "확인", value: true, type: "ok" },
+      { name: "취소", value: false, type: "cancel" },
+    ],
+    msg
+  );
+
+Ui.alert = (msg) => Ui.message([{ name: "확인", value: true, type: "ok" }], msg);
+```
+
+그럼 위 구조에서 `Ui.message` 함수에 `_.curry`를 적용할 수 있게된다.
+
+```jsx
+Ui.message = _.curry(
+  (btns, msg) =>
+    new Promise((resolve) =>
+      _.go(
+        `<div class="confirm">
+        <div class="body">
+          <div class="msg">${msg}</div>
+          <div class="buttons">
+            ${_.strMap((btn) => `<button type="button" class="${btn.type}">${btn.name}</button>`, btns)}
+          </div>
+        </div>
+      </div>`,
+        $.el,
+        $.append($.qs("body")),
+        ..._.map(
+          (btn) =>
+            _.tap(
+              $.find(`.${btn.type}`),
+              $.on("click", (e) => _.go(e.currentTarget, $.closest(".confirm"), $.remove, (_) => resolve(btn.value)))
+            ),
+          btns
+        )
+      )
+    )
+);
+```
+
+위와 같이 currying을 적용해주면 아래와 같이 함수를 구현할 수 있게된다.
+
+```jsx
+Ui.confirm = Ui.message([
+  { name: "확인", value: true, type: "ok" },
+  { name: "취소", value: false, type: "cancel" },
+]);
+
+Ui.confirm("삭제하시겠습니까?");
+
+Ui.alert = Ui.message([{ name: "확인", value: true, type: "ok" }]);
+
+Ui.alert("삭제되었습니다");
+```
+
+또한 얼마든지 커스텀된 메시지 창을 만들어낼 수 있게된다.
+
+```jsx
+Ui.message(
+  [
+    { name: "확인", value: true, type: "ok" },
+    { name: "중간", value: false, type: "middle" },
+    { name: "취소", value: false, type: "cancel" },
+  ],
+  "삭제하시겠습니까?"
+);
+```
+
+위와 같이 함수형 프로그래밍을 활용하여 추상 클래스를 생성하여 자식 클래스를 생성하는 것과 같은 방식으로 코드 조각들을 만들어나갈 수 있다.
