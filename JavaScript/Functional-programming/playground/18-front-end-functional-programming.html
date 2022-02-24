@@ -185,32 +185,43 @@
       );
 
       const Ui = {};
-      Ui.confirm = (msg) =>
-        new Promise((resolve) =>
-          _.go(
-            `
-          <div class="confirm">
-            <div class="body">
-              <div class="msg">${msg}</div>
-              <div class="buttons">
-                <button type="button" class="cancel">취소</button>
-                <button type="button" class="ok">확인</button>
+      Ui.message = _.curry(
+        (btns, msg) =>
+          new Promise((resolve) =>
+            _.go(
+              `<div class="confirm">
+              <div class="body">
+                <div class="msg">${msg}</div>
+                <div class="buttons">
+                  ${_.strMap((btn) => `<button type="button" class="${btn.type}">${btn.name}</button>`, btns)}
+                </div>
               </div>
-            </div>
-          </div>
-        `,
-            $.el,
-            $.append($.qs("body")),
-            _.tap(
-              $.find(".ok"),
-              $.on("click", (e) => _.go(e.currentTarget, $.closest(".confirm"), $.remove, (_) => resolve(true)))
-            ),
-            _.tap(
-              $.find(".cancel"),
-              $.on("click", (e) => _.go(e.currentTarget, $.closest(".confirm"), $.remove, (_) => resolve(false)))
+            </div>`,
+              $.el,
+              $.append($.qs("body")),
+              ..._.map(
+                (btn) =>
+                  _.tap(
+                    $.find(`.${btn.type}`),
+                    $.on("click", (e) =>
+                      _.go(e.currentTarget, $.closest(".confirm"), $.remove, (_) => resolve(btn.value))
+                    )
+                  ),
+                btns
+              )
             )
           )
-        );
+      );
+
+      Ui.confirm = Ui.message([
+        { name: "확인", value: true, type: "ok" },
+        { name: "취소", value: false, type: "cancel" },
+      ]);
+
+      Ui.alert = Ui.message([{ name: "확인", value: true, type: "ok" }]);
+
+      // Ui.confirm("삭제되었습니다");
+      // Ui.alert("삭제되었습니다");
     </script>
   </body>
 </html>
