@@ -713,3 +713,130 @@ Ui.message(
 ```
 
 위와 같이 함수형 프로그래밍을 활용하여 추상 클래스를 생성하여 자식 클래스를 생성하는 것과 같은 방식으로 코드 조각들을 만들어나갈 수 있다.
+
+### 이미지 동시성 다루기
+
+이번에는 이미지의 로딩 시점을 다루는 동시성을 다루는 코드를 작성해본다.
+현재 구현된 목록 그리기는 저해상도 이미지를 활용하여 그려내고 있다. 만약 그리는 이미지의 해상도가 고해상도라면 이미지 로딩시점이 자연스럽게 않게 될 것이고, 이는 UX에 좋지 않다.
+
+따라서 이미지가 모두 로드된 후 화면에 그리거나 로드된 이미지를 순차적으로 보여주는 기능을 함수형 프로그래밍으로 구현해보면서 동시성을 어떻게 구현할 수 있는지 알아보자.
+
+여러가지 방법으로 구현할 수 있겠지만, 먼저 이미지 경로를 다른 곳에 담아서 호출하는 방식으로 구현할 수 있다.
+
+```jsx
+// 데이터 형식을 문자열로 변환하기 위한 tmpl 함수 생성
+Images.tmpl = (imgs) => `
+  <div class="images">
+    ${_.strMap(
+      (img) => `
+        <div class="image">
+          <div class="box">
+						<img src="" lazy-src="${img.url}" class="fade" alt="">
+					</div>
+          <div class="name">${img.name}</div>
+          <div class="remove">x</div>
+        </div>
+      `,
+      imgs
+    )}
+  </div>
+`;
+```
+
+```css
+.fade {
+  opacity: 0;
+}
+.fade-in {
+  opacity: 1;
+  transition: opacity 0.3s;
+}
+```
+
+위와 같이 `lazy-src` 속성을 만들어 `img.url`을 담아 구현하는 방법이 있다.
+위처럼 표현하면 우선 화면에는 아래와 같이 그려진다.
+
+![](../../img/220225-1.png)
+
+해당 이미지가 모두 로드된 시점에 src로 옮겨넣는 코드는 아래와 같이 표현할 수 있다.
+
+```jsx
+_.go(
+  Images.fetch(),
+  Images.tmpl,
+  $.el,
+  $.append($.qs("body")),
+  // <div class="images">...</div>
+  _.tap(
+    $.findAll("img"),
+    L.map(
+      (img) =>
+        new Promise((resolve) => {
+          img.onload = () => resolve(img);
+          img.src = img.getAttribute("lazy-src"); // img.src에 lazy-src 정보 넣기
+        })
+    ) // mapLazy {<suspended>}
+  )
+  /* codes.. */
+);
+```
+
+위 코드는 모두 L.map으로 지연평가되는 상태이므로 이를 load된 순으로 자연스럽게 노출되도록 하려면 아래에 `fade-in` 클래스를 추가해주면 된다.
+
+```jsx
+_.go(
+  Images.fetch(),
+  Images.tmpl,
+  $.el,
+  $.append($.qs("body")),
+  _.tap(
+    $.findAll("img"),
+    L.map(
+      (img) =>
+        new Promise((resolve) => {
+          img.onload = () => resolve(img);
+          img.src = img.getAttribute("lazy-src");
+        })
+    ),
+    _.each((img) => img.classList.add("fade-in")) // fade-in 효과 추가
+  )
+  /* codes.. */
+);
+```
+
+![](../../img/220225-1.gif)
+
+위 코드에서 fade-in 클래스를 추가하는 영역을 추상화해서 리팩토링해보면 아래와 같이 처리할 수도 있다.
+
+```jsx
+$.addClass = _.curry((name, el) => el.classList.add(name));
+
+_.go(
+  /* codes.. */
+		_.each($.addClass("fade-in"))
+  ),
+);
+```
+
+만약 이미지를 로드순으로 순차적으로 그리는 것이 아닌, 전체 이미지가 모두 로드된 후 화면을 그린다면 어떻게 하면 될까? 바로 모든 평가가 끝날 때까지 기다리는 코드를 추가하면 된다.
+
+```jsx
+_.go(
+  /* codes.. */
+  _.tap(
+    $.findAll("img"),
+    L.map(
+      (img) =>
+        new Promise((resolve) => {
+          img.onload = () => resolve(img);
+          img.src = img.getAttribute("lazy-src");
+        })
+    ),
+    C.takeAll, // 모든 엘리먼트의 평가를 모두 다 끝낸 후 다음을 진행하겠다.
+    _.each($.addClass("fade-in"))
+  )
+  /* codes.. */
+);
+```
+
+![](../../img/220225-2.gif)
