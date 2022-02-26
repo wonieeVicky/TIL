@@ -172,23 +172,35 @@
         </div>
       `;
 
-      _.go(
-        Images.fetch(),
-        Images.tmpl,
-        $.el,
-        $.append($.qs("body")),
+      Images.loader = (limit) =>
         _.tap(
           $.findAll("img"),
           L.map(
-            (img) =>
+            (img) => (_) =>
               new Promise((resolve) => {
                 img.onload = () => resolve(img);
                 img.src = img.getAttribute("lazy-src");
               })
           ),
-          C.takeAll, // 모든 엘리먼트의 평가를 미리 다 끝내겠다.
-          _.each($.addClass("fade-in"))
-        ),
+          (lazy) => {
+            let r = L.range(Infinity);
+            return _.go(
+              lazy,
+              _.groupBy((_) => Math.floor(r.next().value / limit)),
+              L.values,
+              L.map(L.map((f) => f())),
+              L.map(C.takeAll),
+              _.each(_.each($.addClass("fade-in")))
+            );
+          }
+        );
+
+      _.go(
+        Images.fetch(),
+        Images.tmpl,
+        $.el,
+        $.append($.qs("body")),
+        Images.loader(4),
         $.findAll(".remove"),
         $.on(
           "click",
@@ -196,6 +208,8 @@
             (await Ui.confirm("정말 삭제하시겠습니까?")) && _.go(ct, $.closest(".image"), $.remove)
         )
       );
+
+      _.groupBy((a) => Math.floor(a / 4), [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
 
       const Ui = {};
       Ui.message = _.curry(
