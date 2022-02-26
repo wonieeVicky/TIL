@@ -840,3 +840,139 @@ _.go(
 ```
 
 ![](../../img/220225-2.gif)
+
+### 동시성 부하 조절
+
+위 코드는 이미지가 모두 로드된 이후로 화면이 그려진다는 장점이 있지만, 이미지를 동시에 부르는 과정에서 지연이 발생하여 화면이 비어보이는 딜레이 현상이 있다. 따라서 이번에는 이미지를 동시에 부를 때 부하를 조절해서 더 자연스러운 화면을 만들어보려고 한다. 어떻게 자연스럽게 구현할 수 있을까? 바로 이미지를 n개씩 가져와서 그려주는 방법을 사용하면 순차적으로 화면에 레이아웃이 그려지므로 효과적으로 부하조절이 가능하다.
+
+그룹을 만들 때에는 `groupBy` 함수를 이용하여 구현할 수 있다.
+`groupBy` 함수는 아래와 같이 동작하는 함수이다.
+
+```jsx
+_.groupBy((a) => Math.floor(a / 4), [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
+// {0: Array(4), 1: Array(4), 2: Array(3)}
+// 0: (4) [0, 1, 2, 3]
+// 1: (4) [4, 5, 6, 7]
+// 2: (3) [8, 9, 10]
+
+// 위 값을 2차원 배열로도 만들 수 있다.
+_.values(_.groupBy((a) => Math.floor(a / 4), [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]));
+// (3) [Array(4), Array(4), Array(3)]
+// 0: (4) [0, 1, 2, 3]
+// 1: (4) [4, 5, 6, 7]
+// 2: (3) [8, 9, 10]
+```
+
+위 함수를 활용해 이미지 로드 시점의 함수를 리팩토링 해보면 아래와 같다.
+
+```jsx
+_.go(
+  /* codes.. */
+  _.tap(
+    $.findAll("img"),
+    L.map(
+      (img) =>
+        new Promise((resolve) => {
+          img.onload = () => resolve(img);
+          img.src = img.getAttribute("lazy-src");
+        })
+    ),
+    // n개씩 그룹을 만든 후 그룹 단위로 평가를 처리하는 방식으로 부하를 조절
+    (lazy) => {
+      // console.log(lazy); // mapLazy {<suspended>}
+      let r = L.range(Infinity); // 무한대로 value를 반환
+      return _.go(
+        lazy,
+        _.groupBy((_) => Math.floor(r.next().value / 4)), //
+        _.values,
+        console.log // 이미지가 평가된 상태로 들어온다.
+      );
+    }
+    /* codes.. */
+  )
+  /* codes.. */
+);
+
+// 0: (4) [img.fade, img.fade, img.fade, img.fade]
+// 1: (4) [img.fade, img.fade, img.fade, img.fade]
+// 2: (4) [img.fade, img.fade, img.fade, img.fade]
+// ..
+```
+
+위와 같이 할 경우 `console.log`에 이미 평가된 상태의 이미지가 들어온다. 위 `new Promise`에서 이미 이미지가 평가된 상태로 반환되기 때문. 따라서 위 `new Promise` 함수를 고차 함수로 만들어준다.
+
+```jsx
+_.go(
+  _.tap(
+    $.findAll("img"),
+    L.map(
+      (img) =>
+        (
+          _ // 고차 함수로 한번 더 감싼다.
+        ) =>
+          new Promise((resolve) => {
+            img.onload = () => resolve(img);
+            img.src = img.getAttribute("lazy-src");
+          })
+    ),
+    (lazy) => {
+      let r = L.range(Infinity);
+      return _.go(
+        lazy,
+        _.groupBy((_) => Math.floor(r.next().value / 4)), // 4개씩 그룹을 나눔
+        L.values,
+        L.map(L.map((f) => f())), // Promise 함수 실행
+        L.map(C.takeAll), // 4개 로드가 모두 완료되면
+        _.each(_.each($.addClass("fade-in"))) // 화면에 그린다.
+      );
+    }
+  )
+);
+// 0: (4) [ƒ, ƒ, ƒ, ƒ]
+// 1: (4) [ƒ, ƒ, ƒ, ƒ]
+// 2: (4) [ƒ, ƒ, ƒ, ƒ]
+```
+
+![](../../img/220226-1.gif)
+
+위 코드가 재사용성이 높다고 판단될 경우 Images.loader라는 객체 안으로 함수 분리를 할 수 도 있다.
+
+```jsx
+// 이미지 로더 별도분리(limit)
+Images.loader = (limit) =>
+  _.tap(
+    $.findAll("img"),
+    L.map(
+      (img) => (_) =>
+        new Promise((resolve) => {
+          img.onload = () => resolve(img);
+          img.src = img.getAttribute("lazy-src");
+        })
+    ),
+    (lazy) => {
+      let r = L.range(Infinity);
+      return _.go(
+        lazy,
+        _.groupBy((_) => Math.floor(r.next().value / limit)),
+        L.values,
+        L.map(L.map((f) => f())),
+        L.map(C.takeAll),
+        _.each(_.each($.addClass("fade-in")))
+      );
+    }
+  );
+
+_.go(
+  Images.fetch(),
+  Images.tmpl,
+  $.el,
+  $.append($.qs("body")),
+  Images.loader(4), // Images.loader 함수 적용 4개씩 그룹을 지어 로드한다.
+  $.findAll(".remove"),
+  $.on(
+    "click",
+    async ({ currentTarget: ct }) =>
+      (await Ui.confirm("정말 삭제하시겠습니까?")) && _.go(ct, $.closest(".image"), $.remove)
+  )
+);
+```
