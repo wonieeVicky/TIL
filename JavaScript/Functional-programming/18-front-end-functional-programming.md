@@ -1125,3 +1125,110 @@ C.takeAllWithLimit = _.curry((limit = Infinity, iter) =>
   )
 );
 ```
+
+### DOM을 다루는 고차함수
+
+마지막으로 하나 더 해보자. 삭제 모달에 `click event`를 추가하는 함수도 여러 곳에서 쓰일 수 있는 패턴이다.
+
+```jsx
+_.go(
+  Images.fetch(),
+  Images.tmpl,
+  $.el,
+  $.append($.qs("body")),
+  Images.loader(4),
+  // 하위 코드를 분리할 수 있다.
+  $.findAll(".remove"),
+  $.on(
+    "click",
+    async ({ currentTarget: ct }) =>
+      (await Ui.confirm("정말 삭제하시겠습니까?")) && _.go(ct, $.closest(".image"), $.remove)
+  )
+);
+```
+
+위 코드를 `Ui.remover`라는 함수로 분리할 수 있다.
+
+```jsx
+// 유저 목록, 글 목록 등을 모두 지울 수 있는 추상화 함수가 된다.
+Ui.remover = (btnSel, targetSel) =>
+  _.pipe(
+    $.findAll(btnSel),
+    $.on(
+      "click",
+      async ({ currentTarget: ct }) =>
+        (await Ui.confirm("정말 삭제하시겠습니까?")) && _.go(ct, $.closest(targetSel), $.remove)
+    )
+  );
+```
+
+위 함수를 기존 코드에 적용하면 아래와 같다.
+
+```jsx
+_.go(Images.fetch(), Images.tmpl, $.el, $.append($.qs("body")), Images.loader(4), Ui.remover(".remove", ".image"));
+```
+
+이처럼 Ui.remover로 엘리먼트를 전달받아 함수가 실행되게 함으로써 이미지 삭제 뿐만 아니라 유저목록, 글 목록 등을 모두 지울 수 있는 추상화된 remover 함수가 만들어지게 된다.
+
+그런데 Ui.remover 함수는 해당 엘리먼트만 지운다.
+만약 해당 업데이트를 서버에 request해야 한다면 어떻게 표현하면 될까?
+
+```jsx
+Ui.remover = (btnSel, targetSel, before = (a) => a, after = (a) => a) =>
+  _.pipe(
+    $.findAll(btnSel),
+    $.on(
+      "click",
+      async ({ currentTarget: ct }) =>
+        (await Ui.confirm("정말 삭제하시겠습니까?")) &&
+        _.go(ct, $.closest(targetSel), _.tap(before), $.remove, _.tap(after))
+    )
+  );
+```
+
+삭제 이벤트 전, 후에 before, after 함수를 넣어 처리해줄 수 있다.
+이때, 별도의 이벤트가 실행되는 것이므로 `_.tap` 함수를 적용하면 상속되는 엘리먼트를 방해하지 않고 처리할 수 있음. 위 내용을 실제 동작 함수에 적용시켜보면 아래와 같다.
+
+```jsx
+_.go(
+  Images.fetch(),
+  Images.tmpl,
+  $.el,
+  $.append($.qs("body")),
+  Images.loader(4),
+  Ui.remover(".remove", ".image", (_) => console.log("서버통신"), console.log)
+);
+```
+
+위처럼 하면 삭제 모달에서 [확인] 버튼을 눌렀을 때 `“서버통신"` 이라는 로그와 함께,
+삭제된 엘리먼트를 `console.log`로 확인할 수 있다.
+
+![](../../img/220228-1.png)
+
+또 실제 동작함수의 문맥상 `Ui.remover`는 `Images.loader` 전에 실행되는 것이 적당하므로 순서를 조정한다.
+
+```jsx
+_.go(
+  Images.fetch(),
+  Images.tmpl,
+  $.el,
+  $.append($.qs("body")),
+  Ui.remover(".remove", ".image", (_) => console.log("서버통신"), console.log),
+  Images.loader(4)
+);
+```
+
+위처럼 처리하면 기존 `Ui.remover`에 적용되어있는 `_.pipe` 함수 대신 `_.tap` 함수를 적용해주면 된다.
+
+```jsx
+Ui.remover = (btnSel, targetSel, before = (a) => a, after = (a) => a) =>
+  _.tap(
+    $.findAll(btnSel),
+    $.on(
+      "click",
+      async ({ currentTarget: ct }) =>
+        (await Ui.confirm("정말 삭제하시겠습니까?")) &&
+        _.go(ct, $.closest(targetSel), _.tap(before), $.remove, _.tap(after))
+    )
+  );
+```
