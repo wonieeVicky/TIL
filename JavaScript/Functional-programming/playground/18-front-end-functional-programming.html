@@ -186,17 +186,15 @@
           _.each(_.each($.addClass("fade-in")))
         );
 
-      // 어떠한 곳에서든 여러개의 커리를 동시에 평가하는 역할을 수행하는 추상화된 재사용성이 높은 함수가 된다.
-      C.takeAllWithLimit = _.curry((limit, iter) => {
+      _.groupBySize = _.curry((size, iter) => {
         let r = L.range(Infinity);
-        return _.go(
-          iter,
-          _.groupBy((_) => Math.floor(r.next().value / limit)),
-          L.values,
-          L.map(L.map((f) => f())),
-          L.map(C.takeAll)
-        );
+        return _.groupBy((_) => Math.floor(r.next().value / size), iter);
       });
+
+      // 어떠한 곳에서든 여러개의 커리를 동시에 평가하는 역할을 수행하는 추상화된 재사용성이 높은 함수가 된다.
+      C.takeAllWithLimit = _.curry((limit = Infinity, iter) =>
+        _.go(iter, _.groupBySize(), L.values, L.map(L.map((f) => f())), L.map(C.takeAll))
+      );
 
       _.go(
         Images.fetch(),
