@@ -193,24 +193,8 @@
 
       // 어떠한 곳에서든 여러개의 커리를 동시에 평가하는 역할을 수행하는 추상화된 재사용성이 높은 함수가 된다.
       C.takeAllWithLimit = _.curry((limit = Infinity, iter) =>
-        _.go(iter, _.groupBySize(), L.values, L.map(L.map((f) => f())), L.map(C.takeAll))
+        _.go(iter, _.groupBySize(4), L.values, L.map(L.map((f) => f())), L.map(C.takeAll))
       );
-
-      _.go(
-        Images.fetch(),
-        Images.tmpl,
-        $.el,
-        $.append($.qs("body")),
-        Images.loader(4),
-        $.findAll(".remove"),
-        $.on(
-          "click",
-          async ({ currentTarget: ct }) =>
-            (await Ui.confirm("정말 삭제하시겠습니까?")) && _.go(ct, $.closest(".image"), $.remove)
-        )
-      );
-
-      _.groupBy((a) => Math.floor(a / 4), [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
 
       const Ui = {};
       Ui.message = _.curry(
@@ -248,8 +232,26 @@
 
       Ui.alert = Ui.message([{ name: "확인", value: true, type: "ok" }]);
 
-      // Ui.confirm("삭제되었습니다");
-      // Ui.alert("삭제되었습니다");
+      // 유저 목록, 글 목록 등을 모두 지울 수 있는 추상화 함수가 된다.
+      Ui.remover = (btnSel, targetSel, before = (a) => a, after = (a) => a) =>
+        _.tap(
+          $.findAll(btnSel),
+          $.on(
+            "click",
+            async ({ currentTarget: ct }) =>
+              (await Ui.confirm("정말 삭제하시겠습니까?")) &&
+              _.go(ct, $.closest(targetSel), _.tap(before), $.remove, _.tap(after))
+          )
+        );
+
+      _.go(
+        Images.fetch(),
+        Images.tmpl,
+        $.el,
+        $.append($.qs("body")),
+        Ui.remover(".remove", ".image", (_) => console.log("서버통신"), console.log),
+        Images.loader(4)
+      );
     </script>
   </body>
 </html>
