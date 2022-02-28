@@ -1083,3 +1083,45 @@ Images.loader = (limit) =>
 ```
 
 매우 간단해졌다..!
+
+### 상위 스코프 변수를 사용하는 함수와 아닌 함수들 쪼개기
+
+`C.takeAllWithLimit` 함수를 조금 더 분리해보자
+
+```jsx
+C.takeAllWithLimit = _.curry((limit, iter) => {
+  let r = L.range(Infinity);
+  return _.go(
+    iter,
+    _.groupBy((_) => Math.floor(r.next().value / limit)),
+    L.values,
+    L.map(L.map((f) => f())),
+    L.map(C.takeAll)
+  );
+});
+```
+
+위 함수에서 변수 `r`은 `groupBy` 내부에서만 사용하는 한정된 변수이며, `n`개씩 그룹핑하는 역할을 담당한다.
+따라서 아래와 같이 분리할 수 있다.
+
+```jsx
+// groupBySize라는 함수 생성
+_.groupBySize = _.curry((size, iter) => {
+  let r = L.range(Infinity);
+  return _.groupBy((_) => Math.floor(r.next().value / size), iter);
+});
+```
+
+위 함수를 `C.takeAllWithLimit` 함수에 적용하면 아래와 같다.
+
+```jsx
+C.takeAllWithLimit = _.curry((limit = Infinity, iter) =>
+  _.go(
+    iter,
+    _.groupBySize(limit), // limit 사이즈별로 그룹을 나눈다. limit이 undefined일 경우 모두 로드된 후 화면에 그려진다.
+    L.values,
+    L.map(L.map((f) => f())),
+    L.map(C.takeAll)
+  )
+);
+```
