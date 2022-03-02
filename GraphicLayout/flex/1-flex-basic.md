@@ -26,7 +26,7 @@ Flex 속성들은
 
 이렇게 두 가지로 나뉨
 
-### 컨테이너에 적용하는 속성
+### 컨테이너에 적용하는 속성(방향)
 
 <aside>
 💡 main axis(메인 축) : flex item이 배치된 방향
@@ -97,5 +97,103 @@ cross axis(교차 축) : 메인축과 수직이 된 축
     /* 아래의 두 줄을 줄여 썻다 */
     /* flex-direction: row; */
     /* flex-wrap: nowrap; */
+  }
+  ```
+
+> 간단한 예제
+
+해상도 `600px` 이하에서 `flex-direction`이 `column`인 레이아웃을 배치하여 반응형을 구현한다고 한다면 아래와 같이 간단히 구현할 수 있음.
+
+```html
+<!DOCTYPE html>
+<html>
+  <head>
+    <style>
+      .flex-container {
+        display: flex;
+        flex-direction: column; /* 기존에는 column */
+      }
+      @media (min-width: 600px) {
+        .flex-container {
+          flex-direction: row; /* width가 600px 이상에서는 row */
+        }
+        .flex-item {
+          flex: 1;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="flex-container">
+      <div class="flex-item">AAAAA</div>
+      <div class="flex-item">BBBBBB</div>
+      <div class="flex-item">CCC</div>
+    </div>
+  </body>
+</html>
+```
+
+### 컨테이너에 적용하는 속성(정렬)
+
+<aside>
+💡 justify : 메인 축 방향으로 정렬
+align : 수직 축 방향으로 정렬
+
+</aside>
+
+- `justify-content`
+  메인축 방향으로 아이템을 정렬하는 속성임
+  ```css
+  .flex-container {
+    display: flex;
+    justify-content: flex-start;
+    /* justify-content: flex-end; */
+    /* justify-content: center; */
+    /* justify-content: space-between; */
+    /* justify-content: space-around; */
+    /* justify-content: space-evenly; */ /* 모든 여백이 균일, IE, Edge에서 직원이 안됨 */
+  }
+  ```
+- `align-items`
+  수직축 방향으로 아이템을 정렬하는 속성임
+  justify-content와 수직 방향의 정렬이라고 생각하면 됨
+  ```css
+  .flex-container {
+    height: 300px;
+    display: flex;
+    align-items: stretch; /* default */
+    /* align-items: flex-start; */
+    /* align-items: flex-end; */
+    /* align-items: center; */
+    /* align-items: baseline; */ /* text의 baseline을 의미함 */
+  }
+  ```
+
+> 배치를 `wrapper`의 정중앙에 놓으려면 `justify`와 `align` 속성을 사용하면 된다.
+
+```css
+.container {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  width: 30px;
+  height: 30px;
+}
+```
+
+- `align-content`
+  `flex-wrap: wrap`이 설정된 상태에서, 아이템들의 행이 2줄 이상이 되었을 때의 수직축 방향 정렬을 결정하는 속성
+  ```css
+  .flex-container {
+    display: flex;
+    flex-wrap: wrap;
+    align-content: stretch;
+    /* align-content: flex-start; */
+    /* align-content: flex-end; */
+    /* align-content: center; */
+    /* align-content: space-between; */
+    /* align-content: space-around; */
+    /* align-content: space-evenly; */
+    height: 300px;
   }
   ```
