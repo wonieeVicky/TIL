@@ -9,6 +9,8 @@
   "author": "Vicky",
   "license": "MIT",
   "dependencies": {
+    "axios": "^0.26.0",
+    "cheerio": "^1.0.0-rc.10",
     "csv-parse": "^4.4.6",
     "xlsx": "^0.18.3"
   }
