@@ -203,3 +203,70 @@ for (const [i, r] of records.entries()) {
 9 캐리비안의 해적 https://movie.naver.com/movie/bi/mi/basic.nhn?code=37148
 */
 ```
+
+### axios-cheerio 크롤링 구현
+
+위와 같이 xlsx, csv 파일을 파싱하는 것을 구현해보았다. 이제 위 파일들에 담긴 링크로 실제 페이지로 이동하여 크롤링하는 것을 구현해보자. axios-cheerio 조합으로 간단한 페이지를 가져올 수 있음. 우선 패키지를 설치한다.
+
+```bash
+> npm i axios cheerio
+```
+
+axios는 ajax 라이브러리이며, cheerio는 html을 파싱해주는 패키지이다.
+이를 크롤링 코드에 적용해보면 아래와 같다.
+
+```jsx
+const xlsx = require("xlsx");
+const axios = require("axios"); // ajax 라이브러리
+const cheerio = require("cheerio"); // html 파싱
+
+const workbook = xlsx.readFile("xlsx/data.xlsx");
+const ws = workbook.Sheets.영화목록;
+const records = xlsx.utils.sheet_to_json(ws);
+
+const crawler = async () => {
+  await Promise.all(
+    records.map(async (r) => {
+      const response = await axios.get(r.링크);
+      if (response.status === 200) {
+        // 응답이 성공한 경우
+        const html = response.data;
+        console.log(html);
+      }
+    })
+  );
+};
+
+crawler();
+```
+
+위와 같이 crawler 함수를 실행시키면, `html`이 `response.data`로 반환되는 것을 확인할 수 있다. 이러한 데이터를 바탕으로 한 영역의 데이터를 받아온다고 하면, 아래와 같이 추가해준다.
+
+```jsx
+// ..
+const crawler = async () => {
+  await Promise.all(
+    records.map(async (r) => {
+      const response = await axios.get(r.링크);
+      if (response.status === 200) {
+        const html = response.data;
+        const $ = cheerio.load(html); // cheerio로 html 적용
+        const text = $(".score.score_left .star_score").text(); // 가져오고자 하는 데이터 호출
+        console.log(r.제목, "평점:", text.trim());
+      }
+    })
+  );
+};
+
+crawler();
+// 타이타닉 평점: 9.41
+// 어벤져스 평점: 8.80
+// 반지의 제왕 평점: 9.30
+// 다크나이트 평점: 9.34
+// 캐리비안의 해적 평점: 9.07
+// 겨울왕국 평점: 9.13
+// 아바타 평점: 9.07
+// 트랜스포머 평점: 8.85
+// 매트릭스 평점: 9.40
+// 해리 포터 평점: 9.36
+```
