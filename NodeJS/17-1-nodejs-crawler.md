@@ -270,3 +270,44 @@ crawler();
 // 매트릭스 평점: 9.40
 // 해리 포터 평점: 9.36
 ```
+
+### Promise.all과 for of 문의 차이
+
+위 크롤링에서 주의해야할 점은 xlsx 파일 목록에 적힌 데이터의 순서대로 결과가 반환되는 것이 아니라는 사실이다. 즉 `Promise.all`은 동시에 진행되지만 순서가 보장되지 않는다는 특징을 가진다.
+
+만약 엑셀에 적힌 순서대로 데이터를 반환받고 싶다면 코드가 좀 달라져야 한다.
+
+```jsx
+// ..
+const crawler = async () => {
+  //  await Promise.all(records.map(async (r) => {})); 대신 for ~ of문 사용
+  for (const [i, r] of records.entries()) {
+    const response = await axios.get(r.링크);
+    if (response.status === 200) {
+      // 응답이 성공한 경우
+      const html = response.data;
+      const $ = cheerio.load(html);
+      const text = $(".score.score_left .star_score").text(); // tag는 무시하고 텍스트만 가져온다.
+      console.log(r.제목, "평점:", text.trim());
+    }
+  }
+};
+
+crawler();
+// 타이타닉 평점: 9.41
+// 아바타 평점: 9.07
+// 매트릭스 평점: 9.40
+// 반지의 제왕 평점: 9.30
+// 어벤져스 평점: 8.80
+// 겨울왕국 평점: 9.13
+// 트랜스포머 평점: 8.85
+// 해리 포터 평점: 9.36
+// 다크나이트 평점: 9.34
+// 캐리비안의 해적 평점: 9.07
+```
+
+위처럼 `for~of` 문과 `await`을 조합하면 엑셀에 적혀있는 순서가 보장된다.
+
+그렇다면 당연히 `for~of`가 더 좋으니 해당 방법을 이용해야하는 것 아닐까? 그럴수도 아닐수도 있다.
+`Promise.all`은 요청을 한번에 다 보내고 응답을 한번에 받아들일 수 있어서 굉장히 빠른 편
+속도와 순서를 trade-off를 적절히 판단하여 사용한다.
