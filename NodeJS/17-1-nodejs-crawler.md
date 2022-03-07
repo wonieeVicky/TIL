@@ -311,3 +311,104 @@ crawler();
 그렇다면 당연히 `for~of`가 더 좋으니 해당 방법을 이용해야하는 것 아닐까? 그럴수도 아닐수도 있다.
 `Promise.all`은 요청을 한번에 다 보내고 응답을 한번에 받아들일 수 있어서 굉장히 빠른 편
 속도와 순서를 trade-off를 적절히 판단하여 사용한다.
+
+### xlsx 패키지
+
+xlsx 패키지 사용방법을 조금 더 알아보자.
+먼저 정보를 가져오는 컬럼명을 `r.제목`, `r.링크`로 가져왔는데 이를 컬럼명을 넘버링으로 가져올 수 있다.
+
+![](../img/220307-1.png)
+
+즉, 위 이미지에서 `r.A`, `r.B`로 열정보를 가져올 수 있는 것임
+
+```jsx
+const xlsx = require("xlsx");
+
+const workbook = xlsx.readFile("xlsx/data.xlsx");
+const ws = workbook.Sheets.영화목록;
+const records = xlsx.utils.sheet_to_json(ws, { header: "A" });
+
+console.log(records);
+
+/*
+[
+  { A: '제목', B: '링크' },
+  {
+    A: '타이타닉',
+    B: 'https://movie.naver.com/movie/bi/mi/basic.nhn?code=18847'
+  },
+  {
+    A: '아바타',
+    B: 'https://movie.naver.com/movie/bi/mi/basic.nhn?code=62266'
+  },
+	// ..
+]
+```
+
+하지만 맨 첫번째 줄인 `{ A: '제목', B: '링크' }` 부분이 그대로 데이터에 들어오고 있다.
+이를 제거하기 위해 shift 함수를 적용해서 처리해줄 수도 있겠음 ㅎㅎ
+
+다음으로 엑셀에 전체 정보가 적힌 범위를 파싱하기 위한 방법을 확인해보자.
+
+```jsx
+const xlsx = require("xlsx");
+const axios = require("axios"); // ajax 라이브러리
+const cheerio = require("cheerio"); // html 파싱
+
+const workbook = xlsx.readFile("xlsx/data.xlsx");
+const ws = workbook.Sheets.영화목록;
+const records = xlsx.utils.sheet_to_json(ws, { header: "A" });
+
+console.log(ws["!ref"]); // A1:B11
+```
+
+위와 같이 `ws[”!ref”]`를 로깅해보면 `A1:B11`이 나온다. 전체 정보가 적힌 범위를 파싱한 것임
+하지만 웹크롤러는 `A2:B11`까지만 움직여야하므로 아래와 같이 바꿔주면 된다.
+
+```jsx
+const xlsx = require("xlsx");
+const axios = require("axios"); // ajax 라이브러리
+const cheerio = require("cheerio"); // html 파싱
+
+const workbook = xlsx.readFile("xlsx/data.xlsx");
+const ws = workbook.Sheets.영화목록;
+ws["!ref"] = ws["!ref"]
+  .split(":")
+  .map((v, i) => (i === 0 ? "A2" : v))
+  .join(":");
+// 혹은 ws["!ref"] = 'A2:B11'로 직접 변경 가능 ㅋ
+console.log(ws["!ref"]); // A2:B11
+
+const records = xlsx.utils.sheet_to_json(ws, { header: "A" });
+console.log(records);
+
+/*
+[
+  {
+    A: '타이타닉',
+    B: 'https://movie.naver.com/movie/bi/mi/basic.nhn?code=18847'
+  },
+  {
+    A: '아바타',
+    B: 'https://movie.naver.com/movie/bi/mi/basic.nhn?code=62266'
+  },
+	// ..
+]
+*/
+```
+
+위와 같이 `ws[”!ref”]` 값을 바꿔준 뒤 records를 조회해오면 A1영역이 제외되어 정확하게 정보를 불러오는 것을 확인할 수 있다. 이 밖에도 시트가 여러가지인 경우에는 어떻게 할까? `workbook`에서 제공하는 `SheetNames`라는 메서드를 이용한다.
+
+```jsx
+const xlsx = require("xlsx");
+
+const workbook = xlsx.readFile("xlsx/data.xlsx");
+console.log(workbook.SheetNames); // [ '영화목록', "Sheet1", "Sheet2", "Sheet3" ]
+
+for (const name of workbook.SheetNames) {
+  const ws = workbook.Sheets.name;
+  // 시트별로 따로 크롤링 할 수 있다!
+}
+```
+
+위처럼 `workbook.SheetNames`를 조회하여 `for~of`문으로 돌리면 각 시트별로 크롤링을 할 수 있게된다.
