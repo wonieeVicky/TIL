@@ -412,3 +412,67 @@ for (const name of workbook.SheetNames) {
 ```
 
 위처럼 `workbook.SheetNames`를 조회하여 `for~of`문으로 돌리면 각 시트별로 크롤링을 할 수 있게된다.
+
+### 크롤링한 정보 엑셀에 쓰기
+
+크롤링을 완료했다면 수집된 정보를 엑셀에 적어넣어야 한다. 해당 로직을 살펴보자.
+
+먼저 크롤링한 정보를 sheet에 추가하는 유틸함수를 xlsx 패키지에서 제공하므로 해당 유틸을 옮겨넣는다.
+
+`./add_to_sheet.js`
+
+제공되는 유틸함수이므로 사용에 집중한다.!
+
+```jsx
+const xlsx = require("xlsx");
+
+function range_add_cell(range, cell) {
+  var rng = xlsx.utils.decode_range(range);
+  var c = typeof cell === "string" ? xlsx.utils.decode_cell(cell) : cell;
+  if (rng.s.r > c.r) rng.s.r = c.r;
+  if (rng.s.c > c.c) rng.s.c = c.c;
+
+  if (rng.e.r < c.r) rng.e.r = c.r;
+  if (rng.e.c < c.c) rng.e.c = c.c;
+  return xlsx.utils.encode_range(rng);
+}
+
+module.exports = function add_to_sheet(sheet, cell, type, raw) {
+  sheet["!ref"] = range_add_cell(sheet["!ref"], cell);
+  sheet[cell] = { t: type, v: raw };
+};
+```
+
+`index.js`
+
+```jsx
+// ..
+const add_to_sheet = require("./add_to_sheet"); // add_to_sheet 호출
+
+const workbook = xlsx.readFile("xlsx/data.xlsx");
+const ws = workbook.Sheets.영화목록;
+const records = xlsx.utils.sheet_to_json(ws);
+
+const crawler = async () => {
+  add_to_sheet(ws, "C1", "s", "평점"); // C1(타이틀 영역)에 '평점'이라는 string 추가
+  for (const [i, r] of records.entries()) {
+    const response = await axios.get(r.링크);
+    if (response.status === 200) {
+      const html = response.data;
+      const $ = cheerio.load(html);
+      const text = $(".score.score_left .star_score").text();
+      const newCell = "C" + (i + 2); // 값을 넣을 cell을 지정
+      add_to_sheet(ws, newCell, "n", parseFloat(text.trim()));
+    }
+  }
+  xlsx.writeFile(workbook, "xlsx/result.xlsx"); // 해당 업데이트 파일을 result.xlsx로 저장
+};
+
+crawler();
+```
+
+위와 같이 writeFile을 처리하면 result.xlsx 파일에 평점 raw가 추가된 것을 확인할 수 있다.
+
+![](../img/220309-1.png)
+
+이를 좀 더 활용하면 주연, 감독, 리뷰 정보 등 필요한 정보를 업데이트할 수 있게 된다.
