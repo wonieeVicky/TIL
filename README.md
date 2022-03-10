@@ -347,6 +347,7 @@
 ## Node.js + 웹 크롤러
 
 - [웹 크롤링과 데이터 파싱](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/17-1-nodejs-crawler.md)
+- [puppeteer 사용하기](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/17-2-use-puppeteer.md)
 
 ## Node.js
 
