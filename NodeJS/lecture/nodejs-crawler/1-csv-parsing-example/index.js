@@ -1,28 +1,25 @@
-﻿const xlsx = require("xlsx");
-const axios = require("axios"); // ajax 라이브러리
-const cheerio = require("cheerio"); // html 파싱
-const add_to_sheet = require("./add_to_sheet");
+﻿const parse = require("csv-parse/lib/sync");
+const fs = require("fs");
+const puppeteer = require("puppeteer");
 
-const workbook = xlsx.readFile("xlsx/data.xlsx");
-const ws = workbook.Sheets.영화목록;
-const records = xlsx.utils.sheet_to_json(ws);
+const csv = fs.readFileSync("csv/data.csv");
+const records = parse(csv.toString("utf-8"));
 
 const crawler = async () => {
-  add_to_sheet(ws, "C1", "s", "평점"); // C1에 평점 raw를 string 값을 넣는다.
-  for (const [i, r] of records.entries()) {
-    const response = await axios.get(r.링크);
-    if (response.status === 200) {
-      // 응답이 성공한 경우
-      const html = response.data;
-      const $ = cheerio.load(html);
-      const text = $(".score.score_left .star_score").text();
-      console.log(r.제목, "평점:", text.trim());
-      const newCell = "C" + (i + 2);
-      add_to_sheet(ws, newCell, "n", parseFloat(text.trim()));
-    }
-  }
-  xlsx.writeFile(workbook, "xlsx/result.xlsx");
-  // await Promise.all(records.map(async (r) => {}));
+  const browser = await puppeteer.launch({ headless: false });
+  const page1 = await browser.newPage();
+  const page2 = await browser.newPage();
+  const page3 = await browser.newPage();
+  await page1.goto("https://github.com/wonieeVicky");
+  await page2.goto("https://www.naver.com");
+  await page3.goto("https://www.google.com");
+  await page1.waitForTimeout(1000); // 3초 대기
+  await page2.waitForTimeout(1000); // 1초 대기
+  await page3.waitForTimeout(1000); // 1초 대기
+  await page1.close(); // 페이지 Close
+  await page2.close(); // 페이지 Close
+  await page3.close(); // 페이지 Close
+  await browser.close(); // 브라우저 Close
 };
 
 crawler();
