@@ -197,3 +197,82 @@ align : 수직 축 방향으로 정렬
     height: 300px;
   }
   ```
+
+### 유연한 박스
+
+- `flex-basis`
+  flex 아이템의 기본 크기를 설정 (flex-direction이 row일 때는 너비, column일 대는 높이)
+  ```css
+  .flex-container {
+    display: flex;
+  }
+  .item {
+    flex-basis: 100px;
+  }
+  ```
+  ![원래 내용물이 100px보다 크면 그만큼 알아서 늘어난다. min-width가 100px인 느낌](../../img/220312-1.png)
+  원래 내용물이 100px보다 크면 그만큼 알아서 늘어난다. min-width가 100px인 느낌
+  그럼 그냥 width 값을 주면 안될까?
+  ```css
+  .flex-container {
+    display: flex;
+  }
+  .item {
+    width: 100px;
+  }
+  ```
+  ![100px보다 내용물이 많으면 늘어나지않고 그 아래로 떨어지게 된다.](../../img/220312-2.png)
+  100px보다 내용물이 많으면 늘어나지않고 그 아래로 떨어지게 된다.
+
+### 유연하게 늘리기
+
+- `flex-grow`
+  flex-grow는 아이템이 flex-basis의 값보다 커질 수 있는지를 결정하는 속성
+  기본적으로 숫자값이 들어가며 몇이든 일단 0보다 큰 값이 셋팅되면 해당 아이텐임 유연한 flexible box로 변하고 원래의 크기보다 커지며 빈공간을 메우게 된다.
+  ```jsx
+  .item {
+  	flex-grow: 0; /* 기본값 */
+  }
+  ```
+  ![](../../img/220312-3.png)
+  ```jsx
+  .item {
+  	flex-grow: 1;
+  }
+  ```
+  ![](../../img/220312-4.png)
+  flex-grow에 들어가는 숫자의 의미는 **아이템들의 flex-basis를 제외한 여백 부분을 flex-grow에 지정된 숫자의 비율로 나누어 가진다**고 생각하면 된다. 소수점 숫자를 넣어도 된다.
+  ```css
+  .item:nth-child(1) {
+    flex-grow: 1;
+  }
+  .item:nth-child(2) {
+    flex-grow: 2;
+  }
+  .item:nth-child(3) {
+    flex-grow: 1;
+  }
+  ```
+  ![](../../img/220312-5.png)
+
+### 유연하게 줄이기
+
+- `flex-shrink`
+  flex-shrink는 flex-grow와 쌍을 이루는 속성으로 아이템이 flex-basis 값보다 작아질 수 있는지를 결정함
+  flex-shrink에는 숫자값이 들어가는데, 몇이든 일단 0보다 큰 값이 세팅되면 해당 아이템이 유연한 flex-box로 변하고 flex-basis보다 작아진다.
+  ```css
+  .item:nth-child(1) {
+    /* flex-shrink: 1; */ /* 기본값 */
+    flex-shrink: 0; /* 아무리 줄어들게해도 크기의 변화가 일어나지 않는 고정폭의 컬럼을 만들 수 있다 */
+    width: 100px;
+  }
+  .item:nth-child(2) {
+    flex-grow: 1;
+  }
+  ```
+  ![컨테이너 폭이 100%일 때는 위와 같이 설정되고](../../img/220312-6.png)
+  컨테이너 폭이 100%일 때는 위와 같이 설정되고
+  ![컨테이너 폭이 250일 때 사이즈가 줄어들게 한다면, 1번쨰 item 박스의 경우 flex-shrink가 0이므로 컨테이너가 아무리 작아져도 찌그러지지 않고 폭이 100px를 유지하게 된다.](../../img/220312-7.png)
+  컨테이너 폭이 250일 때 사이즈가 줄어들게 한다면, 1번쨰 item 박스의 경우 flex-shrink가 0이므로 컨테이너가 아무리 작아져도 찌그러지지 않고 폭이 100px를 유지하게 된다.
+
+위 `flex-basis`, `flex-grow`, `flex-shrink`는 `flex`라는 하나의 축약으로 즐여쓸 수 있다.

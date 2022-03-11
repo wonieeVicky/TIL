@@ -1,0 +1,33 @@
+﻿<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>CSS Flex</title>
+    <link rel="stylesheet" href="default.css" />
+    <style>
+      .flex-container {
+        display: flex;
+        /* flex-direction: row; */
+      }
+      .item {
+        border: 1px solid #f90;
+      }
+      .item:nth-child(1) {
+        flex-shrink: 0; /* 아무리 줄어들게해도 크기의 변화가 일어나지 않는 고정폭의 컬럼을 만들 수 있다 */
+        width: 100px;
+      }
+      .item:nth-child(2) {
+        flex-grow: 1;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="flex-container">
+      <div class="item">AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA</div>
+      <div class="item">BBB</div>
+      <div class="item">CCCCCCC</div>
+    </div>
+  </body>
+</html>
