@@ -9,25 +9,33 @@
     <style>
       .flex-container {
         display: flex;
-        /* flex-direction: row; */
+        flex-wrap: wrap;
       }
-      .item {
-        border: 1px solid #f90;
+      .flex-item {
+        flex: 1 1 auto;
       }
-      .item:nth-child(1) {
-        flex-shrink: 0; /* 아무리 줄어들게해도 크기의 변화가 일어나지 않는 고정폭의 컬럼을 만들 수 있다 */
-        width: 100px;
+      .flex-item:nth-child(1) {
+        width: 20%;
       }
-      .item:nth-child(2) {
-        flex-grow: 1;
+      .flex-item:nth-child(2) {
+        width: 60%;
+      }
+      .flex-item:nth-child(3) {
+        width: 20%;
       }
     </style>
   </head>
   <body>
     <div class="flex-container">
-      <div class="item">AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA</div>
-      <div class="item">BBB</div>
-      <div class="item">CCCCCCC</div>
+      <div class="flex-item">
+        <p>
+          Lorem ipsum dolor sit amet consectetur, adipisicing elit. Explicabo eaque nemo minima voluptatum blanditiis,
+          voluptas amet. Ut voluptas amet quisquam, quis neque maiores atque temporibus adipisci voluptatum sunt
+        </p>
+      </div>
+      <div class="flex-item">BBB</div>
+      <div class="flex-item">CCCCCCC</div>
+      <div class="flex-item">DDDDDDDDDD</div>
     </div>
   </body>
 </html>
