@@ -15,11 +15,13 @@ const crawler = async () => {
         try {
           const page = await browser.newPage();
           await page.goto(r[1]);
-          const scoreEl = await page.$(".score.score_left .star_score");
-          if (scoreEl) {
-            const text = await page.evaluate((tag) => tag.textContent, scoreEl);
-            result[i] = [r[0], r[1], text.trim()]; // 순서 보장을 위해 result 배열의 인덱스로 정보를 저장
-          }
+          const text = await page.evaluate(() => {
+            const score = document.querySelector(".score.score_left .star_score");
+            if (score) {
+              return score.textContent;
+            }
+          });
+          result[i] = [r[0], r[1], text.trim()];
           await page.waitForTimeout(3000);
           await page.close();
           const str = stringify(result);
