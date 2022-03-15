@@ -267,7 +267,7 @@ const crawler = async () => {
 
 `result.csv`
 
-```jsx
+```
 타이타닉,https://movie.naver.com/movie/bi/mi/basic.nhn?code=18847,9.41
 아바타,https://movie.naver.com/movie/bi/mi/basic.nhn?code=62266,9.07
 매트릭스,https://movie.naver.com/movie/bi/mi/basic.nhn?code=24452,9.40
@@ -279,3 +279,156 @@ const crawler = async () => {
 다크나이트,https://movie.naver.com/movie/bi/mi/basic.nhn?code=62586,9.34
 캐리비안의 해적,https://movie.naver.com/movie/bi/mi/basic.nhn?code=37148,9.07
 ```
+
+### page.evaluate 사용하기
+
+`page.evaluate` 태그를 좀 다르게 사용해보자!
+만약 가져와야하는 엘리먼트가 여러개 일 경우 아래와 같이 처리하면 다소 코드가 더러워질 수 있다.
+
+```jsx
+const crawler = async () => {
+  try {
+		// ..
+    await Promise.all(
+      records.map(async (r, i) => {
+        try {
+					// ..
+          const scoreEl1 = await page.$(".score.score_left .star_score");
+          const scoreEl2 = await page.$(".score.score_left .star_score");
+          const scoreEl3 = await page.$(".score.score_left .star_score");
+          if (scoreEl1 && scoreEl2 && scoreEl3) {
+            const text1 = await page.evaluate((tag) => tag.textContent, scoreEl1);
+            const text2 = await page.evaluate((tag) => tag.textContent, scoreEl2);
+            const text3 = await page.evaluate((tag) => tag.textContent, scoreEl3);
+            // ..
+          }
+					// ..
+        }
+      })
+    );
+    await browser.close(); // 브라우저 Close
+  }
+};
+```
+
+따라서 위 코드를 아래와 같이 써줄 수 있다.
+
+```jsx
+// ..
+const crawler = async () => {
+  try {
+    // ..
+    await Promise.all(
+      records.map(async (r, i) => {
+        try {
+          const page = await browser.newPage();
+          await page.goto(r[1]);
+          // const 태그핸들러 = await page.$(선택자);
+          // document.querySelector(".score.score_left .star_score"); // error!
+          const text = await page.evaluate(() => {
+            // page.evaluate 함수 내부에서는 document.querySelector를 사용하여 돔 접근 가능
+            const score = document.querySelector(".score.score_left .star_score");
+            if (score) {
+              return score.textContent; // 필요한 정보만 반환
+            }
+          });
+          // ..
+        } catch (e) {
+          console.error(e);
+        }
+      })
+    );
+    await browser.close();
+  } catch (e) {
+    console.error(e);
+  }
+};
+
+crawler();
+```
+
+위처럼 처리하는 것이 좀 더 깔끔한 느낌을 줄 수 있다. 기능도 정상적으로 동작한다 :)
+
+### userAgent와 한 탭으로 크롤링하기
+
+작은 사이트의 경우 위 코드만으로도 크롤링이 가능하지만 쿠팡이나 큰 사이트의 경우 웹크롤러 감지에 민감하여 접근이 막힐 수 있다. 이를 방지하기 위해서는 최대한 ‘사람처럼' 행동하도록 크롤러를 수정해주는 것이 좋다. 그러기 위해서는 먼저 1) 한 탭에서 사이트를 여러 곳에 방문하고, 2) 방문 시 3초 이상의 시간적 여유를 두며, 3) 크롤러의 이름을 `크롤러`가 아닌 `일반 유저가 사용하는 브라우저`로 바꿔주는 것도 방법이 될 수 있다.
+
+```jsx
+// ..
+const crawler = async () => {
+  try {
+    const result = [];
+    const browser = await puppeteer.launch({ headless: process.env.NODE_ENV === "production" });
+    const page = await browser.newPage();
+		// setUserAgent로 유저 환경 변경 (navigator.userAgent로 정보를 가져온다.)
+    await page.setUserAgent(
+      "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/99.0.4844.51 Safari/537.36"
+    );
+    // 페이지를 돌아가면서 방문하도록 Promise.all에서 for문으로 변경한다.
+    for (const [i, r] of records.entries()) {
+      await page.goto(r[1]);
+      console.log(await page.evaluate("navigator.userAgent")); // Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/99.0.4844.51 Safari/537.36
+      const text = await page.evaluate(() => {
+        const score = document.querySelector(".score.score_left .star_score");
+        if (score) {
+          return score.textContent;
+        }
+      });
+			if(text){
+				result[i] = [r[0], r[1], text.trim()];
+	      await page.waitForTimeout(3000); // 3초간 방문한다.
+			}
+    }
+    await page.close();
+		// ..
+  }
+};
+```
+
+위처럼 코드를 변경하면 사이트에 순차적으로 3초간 방문하며 사이트를 크롤링할 수 있게된다. 이 밖에도 클라우드를 통해 여러 서버를 열어 크롤링을 빠르게 구현한 뒤 종료하는 것도 한 방법이 될 수 있다.
+
+그럼 위 코드로 csv 파일이 아닌 xlsx 파일을 생성해보자.
+
+```jsx
+const puppeteer = require("puppeteer");
+const add_to_sheet = require("./add_to_sheet");
+const xlsx = require("xlsx"); // xlsx 패키지 호출
+const workbook = xlsx.readFile("xlsx/data.xlsx");
+const ws = workbook.Sheets.영화목록; // 조회할 시트 가져오기
+const records = xlsx.utils.sheet_to_json(ws); // 시트를 json 형태로 변환
+
+const crawler = async () => {
+  try {
+    const browser = await puppeteer.launch({ headless: process.env.NODE_ENV === "production" });
+    const page = await browser.newPage();
+    await page.setUserAgent(
+      "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/99.0.4844.51 Safari/537.36"
+    );
+    add_to_sheet(ws, "C1", "s", "평점"); // sheet에 평점 column 추가
+    for (const [i, r] of records.entries()) {
+      await page.goto(r.링크);
+      const text = await page.evaluate(() => {
+        const score = document.querySelector(".score.score_left .star_score");
+        if (score) {
+          return score.textContent;
+        }
+      });
+      if (text) {
+        console.log(r.제목, "평점: ", text.trim());
+        const newCell = "C" + (i + 2);
+        add_to_sheet(ws, newCell, "n", parseFloat(text.trim())); // sheet에 평점 row 추가
+      }
+      await page.waitForTimeout(3000);
+    }
+    await page.close();
+    await browser.close();
+    xlsx.writeFile(workbook, "xlsx/result.xlsx"); // xlsx 파일로 export
+  } catch (e) {
+    console.error(e);
+  }
+};
+
+crawler();
+```
+
+위와 같이 xlsx 파일로 그에 맞는 코드를 수정해주면 원하는 xlsx 파일이 도출됨을 확인할 수 있다.
