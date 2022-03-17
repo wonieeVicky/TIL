@@ -24,12 +24,20 @@ fs.readdir("poster", (err) => {
 
 const crawler = async () => {
   try {
-    const browser = await puppeteer.launch({ headless: process.env.NODE_ENV === "production" });
+    const browser = await puppeteer.launch({
+      headless: process.env.NODE_ENV === "production",
+      args: ["--window-size=1920,1080"], //  브라우저 사이즈 설정
+    });
     const page = await browser.newPage();
+    // 페이지 사이즈 설정
+    await page.setViewport({
+      width: 1920,
+      height: 1080,
+    });
     await page.setUserAgent(
       "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/99.0.4844.51 Safari/537.36"
     );
-    add_to_sheet(ws, "C1", "s", "평점"); // sheet에 평점 column 추가
+    add_to_sheet(ws, "C1", "s", "평점");
     for (const [i, r] of records.entries()) {
       await page.goto(r.링크);
       const result = await page.evaluate(() => {
@@ -51,6 +59,14 @@ const crawler = async () => {
         add_to_sheet(ws, newCell, "n", parseFloat(result.score.trim())); // sheet에 평점 row 추가
       }
       if (result.img) {
+        // 스크린샷 저장 구현
+        // path 속성을 쓰면 저장 위치를 설정할 수 있다.
+        // fullPage 옵션에 따라 전체 페이지를 스크린샷으로 찍을 수 있다.
+        // clip 속성을 쓰면 원하는 위치만 스크린샷으로 찍을 수 있다. (왼쪽 상단 모서리 좌표(x, y), 너비(width), 높이(height) 값이 필요)
+        await page.screenshot({
+          path: `screenshot/${r.제목}.png`,
+          clip: { x: 100, y: 100, width: 300, height: 300 },
+        });
         // buffer가 연속적으로 들어있는 자료구조가 arraybuffer
         const imgResult = await axios.get(result.img.replace(/\?.+$/, ""), { responseType: "arraybuffer" });
         fs.writeFileSync(`poster/${r.제목}.jpg`, imgResult.data);
