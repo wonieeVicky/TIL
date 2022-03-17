@@ -113,3 +113,108 @@ crawler();
 ```
 
 위처럼 `axios`로 이미지 `src`를 파라미터를 제거하여 Request를 하면 해당 데이터를 `response.data`로 저장할 수 있다. 이를 `fs` 모듈로 `poster` 파일에 저장하면 각 영화 타이틀을 이름으로 한 포스터들이 저장된다.
+
+### 브라우저 사이즈 조절과 스크린샷
+
+페이지 자체를 스크린샷을 찍어보려고 한다. 그런데 스크릿샷을 찍으려고 하면 브라우저 사이즈가 작은 상태임을 알 수 있다. 이것부터 개선해보자.
+
+`index.js`
+
+```jsx
+const crawler = async () => {
+  try {
+    const browser = await puppeteer.launch({
+      headless: process.env.NODE_ENV === "production",
+      args: ["--window-size=1920,1080"], //  브라우저 사이즈 설정
+    });
+    const page = await browser.newPage();
+    // 페이지 사이즈 설정
+    await page.setViewport({
+      width: 1920,
+      height: 1080,
+    });
+    // ..
+  }
+	// ..
+};
+```
+
+위처럼 브라우저 사이즈는 `puppeteer`에 `args` 옵션으로 설정하고, 보여지는 페이지 사이즈는 `page` 변수에서 설정해주면 정상적으로 브라우저가 커져서 노출된다.
+
+그럼 이제 실제 스크린샷을 찍어보자.
+
+`index.js`
+
+```jsx
+// ..
+const crawler = async () => {
+  try {
+    // ..
+    for (const [i, r] of records.entries()) {
+      // ..
+      if (result.img) {
+        // 스크린샷 저장 구현
+        // path 속성을 쓰면 저장 위치를 설정할 수 있다.
+        // fullPage 옵션에 따라 전체 페이지를 스크린샷으로 찍을 수 있다.
+        await page.screenshot({
+          path: `screenshot/${r.제목}.png`,
+          fullPage: true,
+        });
+        // 포스터 저장 구현
+        const imgResult = await axios.get(result.img.replace(/\?.+$/, ""), { responseType: "arraybuffer" });
+        fs.writeFileSync(`poster/${r.제목}.jpg`, imgResult.data);
+      }
+      // ..
+    }
+    // ..
+  } catch (e) {
+    console.error(e);
+  }
+};
+
+crawler();
+```
+
+`page.screenshot()`으로 스크린샷을 찍을 수 있고, 위 `path`와 `fullPage` 옵션을 사용하면 전체 페이지가 스크린샷으로 찍힌 `png` 파일을 `screenshot` 폴더에 담을 수 있다.
+
+만약 이미지를 특정 영역만 저장하고 싶을 땐 어떻게 할까? `screenshot` 함수에 `clip` 옵션을 추가하면 된다.
+해당 옵션은 왼쪽 상단 모서리 좌표(x, y), 너비(width), 높이(height) 이렇게 총 4가지 값을 부여하면 된다.
+
+![](../img/220317-1.png)
+
+`index.js`
+
+```jsx
+// ..
+const crawler = async () => {
+  try {
+    // ..
+    for (const [i, r] of records.entries()) {
+      // ..
+      if (result.img) {
+        // 스크린샷 저장 구현
+        // path 속성을 쓰면 저장 위치를 설정할 수 있다.
+        // clip 속성을 쓰면 원하는 위치만 스크린샷으로 찍을 수 있다. (왼쪽 상단 모서리 좌표(x, y), 너비(width), 높이(height) 값이 필요)
+        await page.screenshot({
+          path: `screenshot/${r.제목}.png`,
+          // fullPage: true,
+          clip: { x: 100, y: 100, width: 300, height: 300 },
+        });
+        // 포스터 저장 구현
+        const imgResult = await axios.get(result.img.replace(/\?.+$/, ""), { responseType: "arraybuffer" });
+        fs.writeFileSync(`poster/${r.제목}.jpg`, imgResult.data);
+      }
+      // ..
+    }
+    // ..
+  } catch (e) {
+    console.error(e);
+  }
+};
+
+crawler();
+```
+
+위처럼 `clip` 옵션 설정 후 크롤링을 하면 아래와 같이 스크린샷이 저장되어 `screenshot` 폴더에 담긴다.
+
+![](../img/220317-2.png)
