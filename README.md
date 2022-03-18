@@ -349,6 +349,7 @@
 - [웹 크롤링과 데이터 파싱](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/17-1-nodejs-crawler.md)
 - [puppeteer 사용하기](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/17-2-use-puppeteer.md)
 - [axios와 cheerio를 활용한 이미지 다운로드](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/17-3-image-download-with-axios-and-cheerio.md)
+- [인피니트 스크롤링 크롤링](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/17-4-infinite-scrolling-with-crawler.md)
 
 ## Node.js
 
