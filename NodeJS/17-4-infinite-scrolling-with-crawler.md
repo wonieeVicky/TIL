@@ -102,10 +102,9 @@ const crawler = async () => {
       const imgEls = document.querySelectorAll(".ripi6");
       if (imgEls.length) {
         imgEls.forEach((v) => {
-          let src = v.querySelector("img.YVj9w").src;
+          let src = v.querySelector("img.YVj9w")?.src;
           src && imgs.push(src);
-          // 1. 해당 엘리먼트(.ripi6)의 부모로 옮겨가서 엘리먼트를 지워준다.
-          v.parentElement.removeChild(v);
+          v.innerHTML = "";
         });
       }
       // 세로로 100px 내려준다.
@@ -126,3 +125,53 @@ crawler();
 
 1. 지워줄 엘리먼트의 부모 엘리먼트에서 removeChild를 처리해주는 것에 주목하자
 2. waitForSelector 메서드는 특정 선택자를 기다린 뒤 이후에 코드를 실행시킬 수 있는 메서드이다. 단, 30초간 기다린 후 선택자를 못 찾으면 timeout 에러가 발생한다.
+
+### 스크롤을 조작해서 크롤링하기
+
+위처럼 스크롤을 조작해서 새롭게 이미지 태그를 가져오는 로직을 구현했다면,
+이를 원하는 수량만큼 재로드하여 img.src를 담을 수 있도록 반복문으로 구현을 해볼 차례이다.
+
+`index.js`
+
+```jsx
+const crawler = async () => {
+  try {
+    const browser = await puppeteer.launch({ headless: false });
+    const page = await browser.newPage();
+    await page.goto("https://unsplash.com");
+    let result = [];
+    // img srcs가 30개 모일 때까지 반복한다.
+    while (result.length <= 30) {
+      const srcs = await page.evaluate(() => {
+        window.scrollTo(0, 0); // 절대 좌표
+        let imgs = [];
+        const imgEls = document.querySelectorAll(".ripi6");
+        if (imgEls.length) {
+          imgEls.forEach((v) => {
+            let src = v.querySelector("img.YVj9w")?.src; // 엘리먼트 있을 때만 가져온다.
+            src && imgs.push(src);
+            v.innerHTML = ""; // imgEl 내부만 비워주는 방식으로 변경
+          });
+        }
+        window.scrollBy(0, 100); // 상대 좌표: 현재의 위치에서 스크롤 100px 이동
+        return imgs;
+      });
+      result = result.concat(srcs);
+      await page.waitForSelector(".ripi6");
+      console.log("새 이미지 태그 로드 완료");
+    }
+    console.log(result);
+    await page.close();
+    await browser.close();
+  } catch (e) {
+    console.error(e);
+  }
+};
+
+crawler();
+// 새 이미지 태그 로드 완료
+// 새 이미지 태그 로드 완료
+// ...
+```
+
+위처럼 `result.length`가 30개 즉, `img.src`가 30개가 모일 때까지 while문으로 반복 구현해서 이미지로드를 완료할 수 있다. 또한 모든 작업을 마친 뒤 page, browser를 종료해주는 코드도 추가해준다..!
