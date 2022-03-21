@@ -219,3 +219,12 @@ crawler();
 ```
 
 이미지 저장 포맷을 `jpeg`로 해준 것은 해당 이미지를 크롬 개발자 도구에서 확인했을 때. `response Header`에 있던 `content-Type`이 `image/jpeg` 로 되어있었기 때문임
+
+### puppeteer Q&A
+
+Selenium은 다양한 브라우저(safari, edge 등)에서 테스트를 해야할 때 많이 사용.
+단순 크롤링을 위해서는 puppeteer를 사용한다.
+
+> 💡 실무에서 이렇게 사용 !
+> puppeteer: 패치 전 사이트 로그인 페이지에서 돔 수집 후 싱크 임베드 테스트 → 문제여부 반환
+> Selenium: 패치 후 QA를 셀레니움을 수동으로 돌려서 사용
