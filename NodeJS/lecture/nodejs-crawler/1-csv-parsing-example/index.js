@@ -21,7 +21,7 @@ const crawler = async () => {
       const srcs = await page.evaluate(() => {
         window.scrollTo(0, 0); // 절대 좌표
         let imgs = [];
-        const imgEls = document.querySelectorAll(".ripi6");
+        const imgEls = document.querySelectorAll("figure");
         if (imgEls.length) {
           imgEls.forEach((v) => {
             let src = v.querySelector("img.YVj9w")?.src;
@@ -33,7 +33,7 @@ const crawler = async () => {
         return imgs;
       });
       result = result.concat(srcs);
-      await page.waitForSelector(".ripi6");
+      await page.waitForSelector("figure");
     }
     console.log(result);
     result.forEach(async (src) => {
