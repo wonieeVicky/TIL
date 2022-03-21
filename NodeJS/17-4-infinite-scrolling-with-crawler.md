@@ -175,3 +175,47 @@ crawler();
 ```
 
 위처럼 `result.length`가 30개 즉, `img.src`가 30개가 모일 때까지 while문으로 반복 구현해서 이미지로드를 완료할 수 있다. 또한 모든 작업을 마친 뒤 page, browser를 종료해주는 코드도 추가해준다..!
+
+### 크롤링 결과물 파일 생성
+
+이제 크롤링해온 이미지 링크 주소를 직업 axios로 요청하여 파일로 저장해본다.
+
+1. 이미지 파일을 저장할 `imgs` 폴더가 있는지 확인하고 없으면 생성해준 다음 2. result 배열의 데이터에 forEach로 GET Request를 보낸 뒤 3. 파라미터를 제외한 값을 imgs 폴더에 저장해준다.
+
+`index.js`
+
+```jsx
+const fs = require("fs");
+const axios = require("axios");
+const puppeteer = require("puppeteer");
+
+// 1. imgs 폴더 생성
+fs.readdir("imgs", (err) => {
+  if (err) {
+    console.error("imgs 폴더가 없어 imgs 폴더를 생성합니다.");
+    fs.mkdirSync("imgs");
+  }
+});
+
+const crawler = async () => {
+  try {
+    // Get Image srcs in result Array..
+    result.forEach(async (src) => {
+      // 2. 이미지 GET Request
+      const imgResult = await axios.get(src.replace(/\?.*$/, ""), {
+        responseType: "arraybuffer",
+      });
+      // 3. 이미지 저장
+      fs.writeFileSync(`imgs/${new Date().valueOf()}.jpeg`, imgResult.data);
+    });
+    await page.close();
+    await browser.close();
+  } catch (e) {
+    console.error(e);
+  }
+};
+
+crawler();
+```
+
+이미지 저장 포맷을 `jpeg`로 해준 것은 해당 이미지를 크롬 개발자 도구에서 확인했을 때. `response Header`에 있던 `content-Type`이 `image/jpeg` 로 되어있었기 때문임
