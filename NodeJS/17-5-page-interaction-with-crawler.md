@@ -39,3 +39,57 @@ crawler();
 ```
 
 위처럼하면 실제 크롤러가 페이스북에 로그인을 시도하는 것을 확인할 수 있다.
+
+### dotenv로 비밀번호 관리
+
+위 코드의 문제는 아이디와 비밀번호가 모두 코드 내에 들어있어 노출될 위험이 있다는 점이다. 이를 evaluate의 인자로 전달해주는 방식으로 비밀번호를 관리하는데 이를 dotenv로 관리해준다.
+
+이를 위해서 먼저 dotenv 패키지를 설치해준다.
+
+```bash
+> npm i dotenv
+```
+
+이후 `.env` 파일을 생성하여 거기에 개인정보를 저장해준다. 이 파일은 서버 업로드 시 권한을 최상위로 두거나 깃에 푸시하지 않도록 하여 개인정보가 공유되지 않도록 관리를 잘해주어야 한다.
+
+`.env`
+
+```bash
+EMAIL=chw_326@hanmail.net
+PASSWORD=1234
+```
+
+`index.js`
+
+```jsx
+// ..
+const dotenv = require("dotenv"); // dotenv 호출
+dotenv.config(); // dotenv 실행
+
+const crawler = async () => {
+  try {
+    // ..
+    await page.goto("https://facebook.com");
+    // process.env로 정보 호출
+    const id = process.env.EMAIL;
+    const password = process.env.PASSWORD;
+    // evaluate 함수는 자바스크립트의 Scope를 따르지 않으므로 인자로 넘김
+    await page.evaluate(
+      (id, password) => {
+        document.querySelector("#email").value = id;
+        document.querySelector("#pass").value = password;
+        document.querySelector("button[type=submit]").click();
+      },
+      id,
+      password
+    );
+    // ..
+  } catch (e) {
+    console.error(e);
+  }
+};
+
+crawler();
+```
+
+위와 같이 `dotenv.config();` 로 개인정보를 불러와준 뒤 id, password를 담는 부분에서 `process.env` 환경 변수로 id, password 값을 가져올 수 있다.
