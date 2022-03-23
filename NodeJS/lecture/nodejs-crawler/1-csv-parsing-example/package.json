@@ -13,6 +13,7 @@
     "cheerio": "^1.0.0-rc.10",
     "csv-parse": "^4.4.6",
     "csv-stringify": "^6.0.5",
+    "dotenv": "^16.0.0",
     "puppeteer": "^13.5.1",
     "xlsx": "^0.18.3"
   }
