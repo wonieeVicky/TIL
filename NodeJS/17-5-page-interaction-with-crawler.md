@@ -93,3 +93,52 @@ crawler();
 ```
 
 위와 같이 `dotenv.config();` 로 개인정보를 불러와준 뒤 id, password를 담는 부분에서 `process.env` 환경 변수로 id, password 값을 가져올 수 있다.
+
+### type, hover, click, keyboard
+
+기존에 크롤러에 주로 사용해왔던 puppeteer API는 `evaluate`인데 이외에도 다양한 API가 제공된다.
+
+`index.js`
+
+```jsx
+const crawler = async () => {
+  try {
+    // ..
+    await page.goto("https://facebook.com");
+    // evaluate 함수 대신..
+    await page.type("#email", process.env.EMAIL); // email 입력
+    await page.type("#pass", process.env.PASSWORD); // password 입력
+    await page.hover("button[type=submit]"); // 버튼 위에 mouse hover
+    await page.waitForTimeout(3000); // 3초 대기
+    await page.click("button[type=submit]"); // submit!
+  } catch (e) {
+    console.error(e);
+  }
+};
+
+crawler();
+```
+
+위처럼 `page.type`, `page.hover`, `page.click` 등의 이벤트로 로그인을 구현할 수 있다.
+
+![](../img/220324-1.png)
+
+다음 로그아웃을 구현하려고 하면 로그인 후 [권한요청] alert가 뜨고 허용을 클릭해야지만 실제 페이스북 돔에 접근이 가능해진다. 이는 어떻게 처리할 수 있을까? 해당 페이지에 접근했을 때 차단, 허용 뿐만 아니라 esc 키를 눌렀을 때도 사라지는 것을 확인할 수 있다. 따라서 즉 아래와 같이 추가해준다.
+
+```jsx
+const crawler = async () => {
+  try {
+    // ..
+    await page.click("button[type=submit]"); // submit!
+    await page.waitForTimeout(10000); // 10초 대기(로그인 후 화면 전환) - 네트워크에 따라 상황이 달라짐.
+    await page.keyboard.press("Escape"); // esc keypress
+  } catch (e) {
+    console.error(e);
+  }
+};
+
+crawler();
+```
+
+위처럼 [keyboard.press](http://keyboard.press) 함수로 esc 버튼을 누르는 동작을 수행할 수 있다.  
+이외에도 다양한 버튼 클릭이 제공되므로 [여기](https://github.com/puppeteer/puppeteer/blob/v1.12.2/lib/USKeyboardLayout.js)에서 필요한 정보를 찾아서 사용하면 된다.
