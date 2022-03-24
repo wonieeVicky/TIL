@@ -11,18 +11,14 @@ const crawler = async () => {
       height: 1080,
     });
     await page.goto("https://facebook.com");
-    const id = process.env.EMAIL;
-    const password = process.env.PASSWORD;
-    // evaluate 함수는 자바스크립트의 Scope를 따르지 않으므로 인자로 넘겨야 한다.
-    await page.evaluate(
-      (id, password) => {
-        document.querySelector("#email").value = id;
-        document.querySelector("#pass").value = password;
-        document.querySelector("button[type=submit]").click();
-      },
-      id,
-      password
-    );
+    await page.type("#email", process.env.EMAIL); // email 입력
+    await page.type("#pass", process.env.PASSWORD); // password 입력
+    await page.hover("button[type=submit]"); // 버튼 위에 mouse hover
+    await page.waitForTimeout(3000); // 3초 대기
+    await page.click("button[type=submit]"); // submit!
+    await page.waitForTimeout(10000); // 10초 대기(로그인 후 화면 전환) - 네트워크에 따라 상황이 달라짐.
+    await page.keyboard.press("Escape"); // esc keypress
+
     // await page.close();
     // await browser.close();
   } catch (e) {
