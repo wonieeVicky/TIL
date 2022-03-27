@@ -4,7 +4,10 @@ dotenv.config();
 
 const crawler = async () => {
   try {
-    const browser = await puppeteer.launch({ headless: false, args: ["--window-size=1920,1080"] });
+    const browser = await puppeteer.launch({
+      headless: false,
+      args: ["--window-size=1920,1080", "--disable-notifications"],
+    });
     const page = await browser.newPage();
     await page.setViewport({
       width: 1080,
@@ -16,8 +19,13 @@ const crawler = async () => {
     await page.hover("button[type=submit]"); // 버튼 위에 mouse hover
     await page.waitForTimeout(3000); // 3초 대기
     await page.click("button[type=submit]"); // submit!
-    await page.waitForTimeout(10000); // 10초 대기(로그인 후 화면 전환) - 네트워크에 따라 상황이 달라짐.
-    await page.keyboard.press("Escape"); // esc keypress
+    // await page.waitForTimeout(10000); // 10초 대기(로그인 후 화면 전환) - 네트워크에 따라 상황이 달라짐.
+    // waitForRequest 요청 대기, waitForResponse 응답 대기
+    await page.waitForResponse((response) => {
+      console.log("1:", response, response.url());
+      return response.url().includes("login");
+    });
+    // await page.keyboard.press("Escape"); // esc keypress
 
     // 로그아웃 구현
     await page.click("#userNavigationLabel");
