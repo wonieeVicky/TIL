@@ -171,3 +171,35 @@ crawler();
 ```
 
 위처럼 로그아웃 버튼이 존재하는 영역을 찾아간 뒤 로그인 버튼이 있을 떄 클릭하도록 하면 로그아웃이 정상적으로 동작됨(_현재는 위처럼 정적인 id 명이 모두 사라진 상태.. 이 부분은 마우스 클릭으로 이벤트를 처리해본다_)
+
+### waitForResponse
+
+기존까지는 대기를 `waitForTimeout` 메서드를 사용해 정적인 대기시간을 부여해줬다. 그런데 네트워크에 따라 상황이 달라질 수 있으므로 이를 response를 기다린 뒤 작업이 진행되도록 하는 것이 더 바람직하다.
+
+`index.js`
+
+```jsx
+// ..
+const crawler = async () => {
+  try {
+    // ..
+    await page.click("button[type=submit]"); // submit!
+    // 10초 대기(로그인 후 화면 전환) - 네트워크에 따라 상황이 달라짐.
+    // await page.waitForTimeout(10000);
+    // waitForRequest 요청 대기, waitForResponse 응답 대기
+    await page.waitForResponse((response) => {
+      console.log(response, response.url());
+      return response.url().includes("login");
+    });
+    // ..
+    // await page.close();
+    // await browser.close();
+  } catch (e) {
+    console.error(e);
+  }
+};
+
+crawler();
+```
+
+위처럼 `/login`이라는 API의 `response`가 반환되는지를 확인한 뒤 이후 이벤트를 진행하면 네트워크 상황에 의존적이지 않은 코드를 구현할 수 있게된다. response는 사이트 운영에 없어서는 안되는 이벤트이므로 이를 통해 더 정확한 시점 체크를 하는 것이 바람직함
