@@ -19,6 +19,12 @@ const crawler = async () => {
     await page.waitForTimeout(10000); // 10초 대기(로그인 후 화면 전환) - 네트워크에 따라 상황이 달라짐.
     await page.keyboard.press("Escape"); // esc keypress
 
+    // 로그아웃 구현
+    await page.click("#userNavigationLabel");
+    await page.waitForSelector("li.navSubmenu:last-child");
+    await page.waitForTimeout(3000); // 3초 대기
+    await page.click("li.navSubmenu:last-child");
+
     // await page.close();
     // await browser.close();
   } catch (e) {
