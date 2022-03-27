@@ -142,3 +142,32 @@ crawler();
 
 위처럼 [keyboard.press](http://keyboard.press) 함수로 esc 버튼을 누르는 동작을 수행할 수 있다.  
 이외에도 다양한 버튼 클릭이 제공되므로 [여기](https://github.com/puppeteer/puppeteer/blob/v1.12.2/lib/USKeyboardLayout.js)에서 필요한 정보를 찾아서 사용하면 된다.
+
+### 페이스북 로그아웃
+
+이제 페이스북 로그아웃을 구현해보자. 로그아웃 태그를 찾아가는 과정과 waitForTimeout등을 이용해서 인간처럼 행동하는 크롤러를 구현하면 된다.
+
+`index.js`
+
+```jsx
+// ..
+const crawler = async () => {
+  try {
+    // ..
+    // 로그아웃 구현
+    await page.click("#userNavigationLabel");
+    await page.waitForSelector("li.navSubmenu:last-child");
+    await page.waitForTimeout(3000); // 3초 대기
+    await page.click("li.navSubmenu:last-child");
+
+    // await page.close();
+    // await browser.close();
+  } catch (e) {
+    console.error(e);
+  }
+};
+
+crawler();
+```
+
+위처럼 로그아웃 버튼이 존재하는 영역을 찾아간 뒤 로그인 버튼이 있을 떄 클릭하도록 하면 로그아웃이 정상적으로 동작됨(_현재는 위처럼 정적인 id 명이 모두 사라진 상태.. 이 부분은 마우스 클릭으로 이벤트를 처리해본다_)
