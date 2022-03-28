@@ -17,24 +17,105 @@ const crawler = async () => {
     await page.type("#email", process.env.EMAIL); // email 입력
     await page.type("#pass", process.env.PASSWORD); // password 입력
     await page.hover("button[type=submit]"); // 버튼 위에 mouse hover
-    await page.waitForTimeout(3000); // 3초 대기
-    await page.click("button[type=submit]"); // submit!
-    // await page.waitForTimeout(10000); // 10초 대기(로그인 후 화면 전환) - 네트워크에 따라 상황이 달라짐.
+    await page.waitForTimeout(3000);
+    await page.click("button[type=submit]"); // login submit!
+
     // waitForRequest 요청 대기, waitForResponse 응답 대기
     await page.waitForResponse((response) => {
-      console.log("1:", response, response.url());
       return response.url().includes("login");
     });
-    // await page.keyboard.press("Escape"); // esc keypress
+    await page.waitForTimeout(1000);
+    await page.keyboard.press("Escape"); // esc keypress
+    await page.waitForTimeout(1000);
+
+    await page.evaluate(() => {
+      (() => {
+        const box = document.createElement("div");
+        box.classList.add("mouse-helper");
+        const styleElement = document.createElement("style");
+        styleElement.innerHTML = `
+          .mouse-helper {
+            pointer-events: none;
+            position: absolute;
+            z-index: 10000000;
+            top: 0;
+            left: 0;
+            width: 20px;
+            height: 20px;
+            background: white;
+            border: 1px solid red;
+            border-radius: 10px;
+            margin-left: -10px;
+            margin-top: -10px;
+            transition: background .2s, border-radius .2s, border-color .2s;
+          }
+          .mouse-helper.button-1 {
+            transition: none;
+            background: rgba(0,0,0,0.9);
+          }
+          .mouse-helper.button-2 {
+            transition: none;
+            border-color: rgba(0,0,255,0.9);
+          }
+          .mouse-helper.button-3 {
+            transition: none;
+            border-radius: 4px;
+          }
+          .mouse-helper.button-4 {
+            transition: none;
+            border-color: rgba(255,0,0,0.9);
+          }
+          .mouse-helper.button-5 {
+            transition: none;
+            border-color: rgba(0,255,0,0.9);
+          }
+          `;
+        document.head.appendChild(styleElement);
+        document.body.appendChild(box);
+        document.addEventListener(
+          "mousemove",
+          (event) => {
+            box.style.left = event.pageX + "px";
+            box.style.top = event.pageY + "px";
+            updateButtons(event.buttons);
+          },
+          true
+        );
+        document.addEventListener(
+          "mousedown",
+          (event) => {
+            updateButtons(event.buttons);
+            box.classList.add("button-" + event.which);
+          },
+          true
+        );
+        document.addEventListener(
+          "mouseup",
+          (event) => {
+            updateButtons(event.buttons);
+            box.classList.remove("button-" + event.which);
+          },
+          true
+        );
+        function updateButtons(buttons) {
+          for (let i = 0; i < 5; i++) box.classList.toggle("button-" + i, !!(buttons & (1 << i)));
+        }
+      })();
+    });
 
     // 로그아웃 구현
-    await page.click("#userNavigationLabel");
-    await page.waitForSelector("li.navSubmenu:last-child");
-    await page.waitForTimeout(3000); // 3초 대기
-    await page.click("li.navSubmenu:last-child");
+    await page.mouse.move(1040, 30); // 로그아웃 hover하러 이동
+    await page.waitForTimeout(1000);
+    await page.mouse.click(1040, 30); // 로그아웃 돔 hover
+    await page.waitForTimeout(1000);
+    await page.mouse.move(1040, 410); // 로그아웃
+    await page.waitForTimeout(1000);
+    await page.mouse.click(1040, 410); // 로그아웃
+    await page.waitForTimeout(2000);
 
-    // await page.close();
-    // await browser.close();
+    // 브라우저 종료
+    await page.close();
+    await browser.close();
   } catch (e) {
     console.error(e);
   }
