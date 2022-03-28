@@ -203,3 +203,137 @@ crawler();
 ```
 
 위처럼 `/login`이라는 API의 `response`가 반환되는지를 확인한 뒤 이후 이벤트를 진행하면 네트워크 상황에 의존적이지 않은 코드를 구현할 수 있게된다. response는 사이트 운영에 없어서는 안되는 이벤트이므로 이를 통해 더 정확한 시점 체크를 하는 것이 바람직함
+
+### 마우스 조작하기
+
+우선 마우스 조작하기 전에 화면에 마우스가 움직이는 것이 보이지 않으므로 시각화해보도록 한다.
+
+`index.js`
+
+```jsx
+const crawler = async () => {
+  try {
+    // ..
+    await page.goto("https://facebook.com");
+    // 마우스 시각화
+    await page.evaluate(() => {
+      (() => {
+        const box = document.createElement("div");
+        box.classList.add("mouse-helper");
+        const styleElement = document.createElement("style");
+        styleElement.innerHTML = `
+          .mouse-helper {
+            pointer-events: none;
+            position: absolute;
+            z-index: 100000;
+            top: 0;
+            left: 0;
+            width: 20px;
+            height: 20px;
+            background: rgba(0,0,0,.4);
+            border: 1px solid white;
+            border-radius: 10px;
+            margin-left: -10px;
+            margin-top: -10px;
+            transition: background .2s, border-radius .2s, border-color .2s;
+          }
+          .mouse-helper.button-1 {
+            transition: none;
+            background: rgba(0,0,0,0.9);
+          }
+          .mouse-helper.button-2 {
+            transition: none;
+            border-color: rgba(0,0,255,0.9);
+          }
+          .mouse-helper.button-3 {
+            transition: none;
+            border-radius: 4px;
+          }
+          .mouse-helper.button-4 {
+            transition: none;
+            border-color: rgba(255,0,0,0.9);
+          }
+          .mouse-helper.button-5 {
+            transition: none;
+            border-color: rgba(0,255,0,0.9);
+          }
+          `;
+        document.head.appendChild(styleElement);
+        document.body.appendChild(box);
+        document.addEventListener(
+          "mousemove",
+          (event) => {
+            box.style.left = event.pageX + "px";
+            box.style.top = event.pageY + "px";
+            updateButtons(event.buttons);
+          },
+          true
+        );
+        document.addEventListener(
+          "mousedown",
+          (event) => {
+            updateButtons(event.buttons);
+            box.classList.add("button-" + event.which);
+          },
+          true
+        );
+        document.addEventListener(
+          "mouseup",
+          (event) => {
+            updateButtons(event.buttons);
+            box.classList.remove("button-" + event.which);
+          },
+          true
+        );
+        function updateButtons(buttons) {
+          for (let i = 0; i < 5; i++) box.classList.toggle("button-" + i, !!(buttons & (1 << i)));
+        }
+      })();
+    });
+    // ..
+  } catch (e) {
+    console.error(e);
+  }
+};
+
+crawler();
+```
+
+위 코드를 넣어 `puppeteer` 브라우저에 마우스 스타일을 추가해주면 아래와 같이 좌표에 따라 마우스가 움직이는 것을 확인할 수 있다.
+
+![](../img/220328-1.gif)
+
+이를 기반으로 로그아웃을 마우스 움직임으로 처리하면 아래와 같다.
+
+`index.js`
+
+```jsx
+// ..
+const crawler = async () => {
+  try {
+    // login success..
+    await page.evaluate(() => {
+      (() => {
+        // mouse styles ..
+      })();
+    });
+
+    // 로그아웃 구현
+    await page.mouse.move(1040, 30); // 로그아웃 hover하러 이동
+    await page.waitForTimeout(1000);
+    await page.mouse.click(1040, 30); // 로그아웃 돔 hover
+    await page.waitForTimeout(1000);
+    await page.mouse.move(1040, 410); // 로그아웃
+    await page.waitForTimeout(1000);
+    await page.mouse.click(1040, 410); // 로그아웃
+    await page.waitForTimeout(2000);
+
+    // 브라우저 종료
+  } catch (e) {
+    console.error(e);
+  }
+};
+```
+
+로그인 후 페이지가 새로고침된 뒤 마우스에 스타일을 부여해야 보고자하는 마우스 위치를 직접 확인할 수 있다.
+위처럼 잡아서 하는건 굉장히 짜치는(?) 일이므로 가장 최후의 수단으로 사용해본다 ㅎ
