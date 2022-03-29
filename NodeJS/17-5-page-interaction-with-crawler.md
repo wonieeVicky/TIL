@@ -337,3 +337,72 @@ const crawler = async () => {
 
 로그인 후 페이지가 새로고침된 뒤 마우스에 스타일을 부여해야 보고자하는 마우스 위치를 직접 확인할 수 있다.
 위처럼 잡아서 하는건 굉장히 짜치는(?) 일이므로 가장 최후의 수단으로 사용해본다 ㅎ
+### focus와 대문자 입력
+
+기존의 page.type으로 해서 특정 돔에 텍스트를 넣을 수 있었다. 물론 해당 텍스트란에 대문자도 입력 가능함
+
+```jsx
+await page.type("#email", "VICKY"); // email 입력
+```
+
+그러나 만약 브라우저와 상호작용을 하거나 문자를 하나씩 입력해야할 경우에는 Shift 키를 누르면서 타이핑하는 방식을 크롤러로 직접 구현하는 방법으로 만들어볼 수 있다.
+
+`index.js`
+
+```jsx
+const puppeteer = require("puppeteer");
+const dotenv = require("dotenv");
+dotenv.config();
+
+const crawler = async () => {
+  try {
+    // ..
+
+    // 대문자 입력
+    // input box에 cursor focusing
+    await page.click("#email"); // 혹은 page.focus('#email'); - 될 수도, 안될 수도!
+    await page.keyboard.down("ShiftLeft");
+    await page.keyboard.press("KeyV");
+    await page.keyboard.press("KeyI");
+    await page.keyboard.press("KeyC");
+    await page.keyboard.press("KeyK");
+    await page.keyboard.press("KeyY");
+    await page.keyboard.up("ShiftLeft");
+		// #email input에 VICKY 입력
+		// ..
+  } catch (e) {
+    console.error(e);
+  }
+};
+
+crawler();
+```
+
+위처럼하면 브라우저에 VICKY가 대문자로 잘 타이핑 되는걸 확인할 수 있다. 만약 `ShiftLeft`를 누르지 않은 상태로 KeyVICKY를 누를 경우 소문자로 입력된다.
+
+```jsx
+const puppeteer = require("puppeteer");
+const dotenv = require("dotenv");
+dotenv.config();
+
+const crawler = async () => {
+  try {
+    // ..
+
+    // 대문자 입력
+    // input box에 cursor focusing
+    await page.click("#email"); // 혹은 page.focus('#email'); - 될 수도, 안될 수도!
+    await page.keyboard.press("KeyV");
+    await page.keyboard.press("KeyI");
+    await page.keyboard.press("KeyC");
+    await page.keyboard.press("KeyK");
+    await page.keyboard.press("KeyY");
+		// #email input에 vicky 입력
+		// ..
+  } catch (e) {
+    console.error(e);
+  }
+};
+
+crawler();
+```
