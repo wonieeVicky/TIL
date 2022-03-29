@@ -13,6 +13,17 @@ const crawler = async () => {
       width: 1080,
       height: 1080,
     });
+
+    page.on("dialog", async (dialog) => {
+      console.log(dialog.type(), dialog.message());
+      await dialog.accept("https://github.com/wonieeVicky");
+    });
+
+    await page.evaluate(() => {
+      const data = prompt("주소를 입력하세요");
+      location.href = data;
+    });
+
     await page.goto("https://facebook.com");
     await page.type("#email", process.env.EMAIL); // email 입력
     await page.type("#pass", process.env.PASSWORD); // password 입력
