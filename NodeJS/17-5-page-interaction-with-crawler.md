@@ -337,6 +337,7 @@ const crawler = async () => {
 
 로그인 후 페이지가 새로고침된 뒤 마우스에 스타일을 부여해야 보고자하는 마우스 위치를 직접 확인할 수 있다.
 위처럼 잡아서 하는건 굉장히 짜치는(?) 일이므로 가장 최후의 수단으로 사용해본다 ㅎ
+
 ### focus와 대문자 입력
 
 기존의 page.type으로 해서 특정 돔에 텍스트를 넣을 수 있었다. 물론 해당 텍스트란에 대문자도 입력 가능함
@@ -368,8 +369,8 @@ const crawler = async () => {
     await page.keyboard.press("KeyK");
     await page.keyboard.press("KeyY");
     await page.keyboard.up("ShiftLeft");
-		// #email input에 VICKY 입력
-		// ..
+    // #email input에 VICKY 입력
+    // ..
   } catch (e) {
     console.error(e);
   }
@@ -397,12 +398,121 @@ const crawler = async () => {
     await page.keyboard.press("KeyC");
     await page.keyboard.press("KeyK");
     await page.keyboard.press("KeyY");
-		// #email input에 vicky 입력
-		// ..
+    // #email input에 vicky 입력
+    // ..
   } catch (e) {
     console.error(e);
   }
 };
 
 crawler();
+```
+
+### alert, confirm, prompt 대응
+
+만약 사이트 진입 시 `alert`가 떠서 크롤러가 움직일 수 없다면 어떻게 해야하나?
+puppeteer API 중 page.on 이벤트를 사용해서 개선한다.
+
+`index.js`
+
+```jsx
+// ..
+const crawler = async () => {
+  try {
+    // ..
+
+    // dialog에 dismiss 이벤트 추가
+    page.on("dialog", async (dialog) => {
+      console.log(dialog.type(), dialog.message());
+      await dialog.dismiss();
+    });
+    // alert 창 생성
+    await page.evaluate(() => {
+      alert("이 창이 꺼져야 다음으로 넘어간다!");
+      location.href = "https://facebook.com";
+    });
+
+    // ..
+  } catch (e) {
+    console.error(e);
+  }
+};
+```
+
+위처럼 `alert` 창이 생성되기 전에 해당 dialog에 이벤트를 걸어두어야 정상적으로 동작한다.
+이외로 true와 false가 있는 `confirm` 창은 아래와 같이 핸들링할 수 있다.
+
+```jsx
+// ..
+const crawler = async () => {
+  try {
+    // ..
+
+    page.on("dialog", async (dialog) => {
+      console.log(dialog.type(), dialog.message());
+      await dialog.accept(); // true로 처리
+      // await dialog.dismiss(); // false로 처리
+    });
+
+    await page.evaluate(() => {
+      if (confirm("이 창이 꺼져야 다음으로 넘어간다!")) {
+        location.href = "https://github.com/wonieeVicky"; // 이 쪽으로 넘어감!
+      } else {
+        location.href = "https://facebook.com";
+      }
+    });
+
+    // ..
+  } catch (e) {
+    console.error(e);
+  }
+};
+```
+
+prompt 창은 아래와 같이 정보를 입력할 수 있다.
+
+```jsx
+// ..
+const crawler = async () => {
+  try {
+    // ..
+
+    page.on("dialog", async (dialog) => {
+      console.log(dialog.type(), dialog.message());
+      await dialog.accept("https://github.com/wonieeVicky");
+    });
+
+    await page.evaluate(() => {
+      const data = prompt("주소를 입력하세요");
+      location.href = data; // https://github.com/wonieeVicky로 이동
+    });
+
+    // ..
+  } catch (e) {
+    console.error(e);
+  }
+};
+```
+
+만약 각 `confirm`이나 `alert`에 각각 다른 동작을 하고 싶다면 아래와 같이 `dialog` 안에 있는 `message`에 따라 분기 처리를 할 수 있다.
+
+```jsx
+// ..
+const crawler = async () => {
+  try {
+    // ..
+
+    page.on("dialog", async (dialog) => {
+      if (dialog.message() === "끄세요") {
+        await dialog.dismiss();
+      } else if (dialog.message() === "ok") {
+        await dialog.accept();
+      }
+    });
+
+    // ..
+  } catch (e) {
+    console.error(e);
+  }
+};
 ```
