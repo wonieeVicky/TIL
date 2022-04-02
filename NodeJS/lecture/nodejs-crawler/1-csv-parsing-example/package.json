@@ -14,7 +14,9 @@
     "csv-parse": "^4.4.6",
     "csv-stringify": "^6.0.5",
     "dotenv": "^16.0.0",
+    "mysql2": "^2.3.3",
     "puppeteer": "^13.5.1",
+    "sequelize": "^6.17.0",
     "xlsx": "^0.18.3"
   }
 }
