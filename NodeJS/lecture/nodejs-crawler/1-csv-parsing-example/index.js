@@ -1,8 +1,11 @@
 ﻿const puppeteer = require("puppeteer");
 const dotenv = require("dotenv");
+
+const db = require("./models");
 dotenv.config();
 
 const crawler = async () => {
+  await db.sequelize.sync(); // db 연결
   try {
     // prettier-ignore
     let browser = await puppeteer.launch({ headless: false, args: ["--window-size=1920,1080", "--disable-notifications"] });
