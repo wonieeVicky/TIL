@@ -150,3 +150,110 @@ crawler();
 ```
 
 위처럼 하면 기존에 사용하던 나의 Ip와 다른 프록시 ip를 알 수 있게됨 (현재 크로미움에서는 `err_proxy_connection_failed`를 뿌리고 있는데 이 부분은 자체적으로 사이트에서 막은 것으로 보임)
+
+### 데이터베이스 연동하기
+
+위처럼 ip 목록을 크롤링으로 직접 가져왔지만 실무에서는 해당 프록시 주소를 DB에 저장해서 사용한다. 이 뿐만아니라 상품 정보를 긁어오는 크롤링을 만들 때에도 긁어오는 상품 정보를 데이터베이스에 저장한 뒤 사용하게 됨.
+
+따라서 크롤러에 데이터베이스를 연동하는 작업을 배워보도록 하자!
+node 기반의 javascript 크롤러이므로 데이터베이스는 `sequelize`를 사용한다.
+
+```bash
+> npm i sequelize mysql2
+> npm i -g sequelize-cli
+```
+
+db가 어떻게 연동되어서 동작하는지를 확인하고자 하므로 어떤 것을 사용해도 상관없음. (sequelize를 사용하려면 mysql2(mysql connector) 패키지를 함께 설치해줘야 한다. mysql2 라이센스에 우리 소스코드도 따라가면 된다.)
+이후 MySQL 워크벤치를 열어 내 localhost 내부에 스키마를 새로 생성해준다.
+
+![](../img/220402-1.png)
+
+이후 크롤러 프로젝트(index.js)가 있는 폴더에서 sequelize-init으로 db 관련 폴더가 생성되도록 추가해준다.
+
+```bash
+> sequelize init
+```
+
+위처럼 `init`으로 `sequelize`가 자동 생성되도록 해주면 해당 폴더에 `config`, `migrations`, `models`, `seeders` 폴더가 자동으로 생성됨
+
+그리고 아래와 같이 몇가지 db 설정을 해준다.
+
+`config/config.js`
+
+`.env` 파일에 `SEQUELIZE_PASSWORD` 추가한 뒤 처리
+
+```jsx
+require("dotenv").config();
+
+module.exports = {
+  development: {
+    username: "root",
+    password: process.env.SEQUELIZE_PASSWORD,
+    database: "nodejs-nodebird",
+    host: "127.0.0.1",
+    dialect: "mysql",
+  },
+  // ..
+};
+```
+
+`models/proxy.js`
+
+```jsx
+module.exports = (sequelize, Sequelize) => {
+  return sequelize.define("proxy", {
+    ip: {
+      type: Sequelize.STRING(30),
+      allowNull: false,
+    },
+    type: {
+      type: Sequelize.STRING(20),
+      allowNull: false,
+    },
+    latency: {
+      type: Sequelize.FLOAT.UNSIGNED,
+      allowNull: false,
+    },
+  });
+};
+```
+
+`models/index.js`
+
+```jsx
+const Sequelize = require("sequelize");
+const env = process.env.NODE_ENV || "development";
+const config = require("../config/config")[env];
+const db = {};
+
+const sequelize = new Sequelize(config.database, config.username, config.password, config);
+
+db.Proxy = require("./proxy")(sequelize, Sequelize);
+
+db.sequelize = sequelize;
+db.Sequelize = Sequelize;
+
+module.exports = db;
+```
+
+위처럼 설정해준 뒤 크롤러 코드에 db 연결 코드를 붙여주면 완성!
+
+`index.js`
+
+```jsx
+// ..
+const db = require("./models");
+
+const crawler = async () => {
+  await db.sequelize.sync(); // db 연결
+  try {
+    // ..
+  } catch (e) {
+    // ..
+  }
+};
+```
+
+위처럼 저장 후 `npm start`로 코드를 실행시키면 mysql db가 자동으로 연결되면서 crawler 스키마 내부 테이블에 정상적으로 테이블이 생성된 것을 확인할 수 있다.
+
+![crawler-Tables-proxies](../img/220402-2.png)
