@@ -257,3 +257,68 @@ const crawler = async () => {
 위처럼 저장 후 `npm start`로 코드를 실행시키면 mysql db가 자동으로 연결되면서 crawler 스키마 내부 테이블에 정상적으로 테이블이 생성된 것을 확인할 수 있다.
 
 ![crawler-Tables-proxies](../img/220402-2.png)
+
+### 크롤링 결과물 데이터베이스에 저장하기
+
+실제 크롤링 결과물로 나오는 Proxy 정보를 db.Proxy에 저장해볼 차례이다.
+
+`index.js`
+
+```jsx
+// ..
+
+const crawler = async () => {
+  await db.sequelize.sync(); // db 연결
+  try {
+    // ..
+    const filtered = proxies.filter((v) => v.type.startsWith("HTTP")).sort((p, c) => p.latency - c.latency);
+    // 1. db Proxy에 프록시 정보 저장
+    await Promise.all(
+      filtered.map(async (v) => {
+        return db.Proxy.create({
+          ip: v.ip,
+          type: v.type,
+          latency: v.latency,
+        });
+      })
+    );
+    await page.close();
+    await browser.close();
+
+    // 2. 가장 빠른 latency를 가져온다.
+    const fastestProxy = await db.Proxy.findOne({
+      order: [["latency", "ASC"]],
+    });
+
+    // 3. 브라우저 restart
+    console.log(`restart ip: ${fastestProxy.ip}`); // restart ip: 175.196.182.56:80}
+    browser = await puppeteer.launch({
+      headless: false,
+      args: [
+        "--window-size=1920,1080",
+        "--disable-notifications",
+        `--proxy-server=${fastestProxy.ip}`,
+        "--ignore-certificate-errors",
+        "--ignore-certificate-errors-spki-list ",
+      ],
+    });
+
+    // codes..
+    await page.close();
+    await browser.close();
+    await db.sequelize.close(); // 4. db connection 닫기
+  } catch (e) {
+    console.error(e);
+  }
+};
+
+crawler();
+```
+
+1. `Promise.all` 내부로 프록시 정보를 저장하는 코드를 추가해준 뒤 브라우저를 종료한다.
+
+   ![워크벤치에서 crawler db의 tables를 보면 정상적으로 데이터가 적재된 것을 확인할 수 있다.](../img/220403-1.png)
+
+2. DB에서 가장 빠른 `latency`를 `findOne` 메서드로 찾아온다.
+3. 해당 정보를 `puppeteer.launch` 내 `args` 옵션으로 추가해주면 `ip`가 정상적으로 변경됨
+4. 모든 작업이 완료되면 `db.sequelize.close();` 로 db connection을 종료해준다.
