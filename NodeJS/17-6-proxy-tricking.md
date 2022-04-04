@@ -322,3 +322,85 @@ crawler();
 2. DB에서 가장 빠른 `latency`를 `findOne` 메서드로 찾아온다.
 3. 해당 정보를 `puppeteer.launch` 내 `args` 옵션으로 추가해주면 `ip`가 정상적으로 변경됨
 4. 모든 작업이 완료되면 `db.sequelize.close();` 로 db connection을 종료해준다.
+
+### 브라우저 여러 개 사용하기
+
+puppeteer에서는 브라우저를 여러 개 사용할 수 있는 API도 제공한다. 만약 크롤러를 통해 가지고 온 proxy 정보를 여러 개의 브라우저를 띄워 사용하게 되면 더 많은 일을 효율적으로 수행할 수 있게된다.
+
+`index.js`
+
+```jsx
+// ..
+
+const crawler = async () => {
+  await db.sequelize.sync(); // db 연결
+  try {
+    // ..
+    await Promise.all(
+      filtered.map(async (v) => {
+        // upsert는 없으면 create 있으면 override
+        return db.Proxy.upsert({
+          ip: v.ip,
+          type: v.type,
+          latency: v.latency,
+        });
+      })
+    );
+    await page.close();
+    await browser.close();
+
+    // 빠른 latency 순으로 배열을 가져온다. findAll
+    const fastestProxies = await db.Proxy.findAll({
+      order: [["latency", "ASC"]],
+    });
+
+    // 브라우저 restart
+    browser = await puppeteer.launch({
+      headless: true,
+      args: [
+        "--window-size=1920,1080",
+        "--disable-notifications",
+        `--proxy-server=${fastestProxies[0].ip}`,
+        "--ignore-certificate-errors",
+        "--ignore-certificate-errors-spki-list ",
+      ],
+    });
+    const browser2 = await puppeteer.launch({
+      headless: true,
+      args: [
+        "--window-size=1920,1080",
+        "--disable-notifications",
+        `--proxy-server=${fastestProxies[1].ip}`,
+        "--ignore-certificate-errors",
+        "--ignore-certificate-errors-spki-list ",
+      ],
+    });
+    const browser3 = await puppeteer.launch({
+      headless: true,
+      args: [
+        "--window-size=1920,1080",
+        "--disable-notifications",
+        `--proxy-server=${fastestProxies[2].ip}`,
+        "--ignore-certificate-errors",
+        "--ignore-certificate-errors-spki-list ",
+      ],
+    });
+
+    const page1 = await browser.newPage();
+    const page2 = await browser2.newPage();
+    const page3 = await browser3.newPage();
+
+    await page1.goto("https://github.com/wonieeVicky");
+    await page2.goto("https://github.com/wonieeVicky");
+    await page3.goto("https://github.com/wonieeVicky");
+
+    await db.sequelize.close(); // db connection 닫기
+  } catch (e) {
+    console.error(e);
+  }
+};
+
+crawler();
+```
+
+위처럼 처리하면 browser를 여러개 띄워서 크롤링을 할 수 있다. 단, 이렇게 하나의 서버에서 여러 개의 브라우저를 띄우는 것은 메모리를 많이 먹게 되므로 여러개의 서버를 띄워 해당 서버에서 하나의 브라우저만 실행되도록 하는 것이 더 바람직할 수 있다. 때에 따라 알맞게 사용하도록 하자!
