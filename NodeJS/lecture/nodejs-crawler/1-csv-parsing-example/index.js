@@ -32,7 +32,8 @@ const crawler = async () => {
     // db Proxy에 프록시 정보 저장
     await Promise.all(
       filtered.map(async (v) => {
-        return db.Proxy.create({
+        // upsert는 없으면 create 있으면 override
+        return db.Proxy.upsert({
           ip: v.ip,
           type: v.type,
           latency: v.latency,
@@ -42,27 +43,56 @@ const crawler = async () => {
     await page.close();
     await browser.close();
 
-    // 가장 빠른 latency를 가져온다.
-    const fastestProxy = await db.Proxy.findOne({
+    // 가장 빠른 latency 순으로 배열을 가져온다.
+    const fastestProxies = await db.Proxy.findAll({
       order: [["latency", "ASC"]],
     });
+
     // 브라우저 restart
-    console.log(`restart ip: ${fastestProxy.ip}`);
     browser = await puppeteer.launch({
       headless: false,
       args: [
         "--window-size=1920,1080",
         "--disable-notifications",
-        `--proxy-server=${fastestProxy.ip}`,
+        `--proxy-server=${fastestProxies[0].ip}`,
         "--ignore-certificate-errors",
         "--ignore-certificate-errors-spki-list ",
       ],
     });
-    page = await browser.newPage();
-    await page.goto("https://whatismyipaddress.com/");
-    await page.waitForTimeout(10000);
-    await page.close();
-    await browser.close();
+    const browser2 = await puppeteer.launch({
+      headless: false,
+      args: [
+        "--window-size=1920,1080",
+        "--disable-notifications",
+        `--proxy-server=${fastestProxies[1].ip}`,
+        "--ignore-certificate-errors",
+        "--ignore-certificate-errors-spki-list ",
+      ],
+    });
+    const browser3 = await puppeteer.launch({
+      headless: false,
+      args: [
+        "--window-size=1920,1080",
+        "--disable-notifications",
+        `--proxy-server=${fastestProxies[2].ip}`,
+        "--ignore-certificate-errors",
+        "--ignore-certificate-errors-spki-list ",
+      ],
+    });
+
+    const page1 = await browser.newPage();
+    const page2 = await browser2.newPage();
+    const page3 = await browser3.newPage();
+
+    await page1.goto("https://whatismyipaddress.com/");
+    await page2.goto("https://whatismyipaddress.com/");
+    await page3.goto("https://whatismyipaddress.com/");
+
+    // page = await browser.newPage();
+    // await page.goto("https://whatismyipaddress.com/");
+    // await page.waitForTimeout(10000);
+    // await page.close();
+    // await browser.close();
     await db.sequelize.close(); // db connection 닫기
   } catch (e) {
     console.error(e);
