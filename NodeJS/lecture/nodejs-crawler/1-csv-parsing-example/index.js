@@ -27,6 +27,24 @@ const crawler = async () => {
     });
     // 혹시 나타날 검은 배경화면 없어지도록 ESC 버튼 클릭
     await page.keyboard.press("Escape");
+
+    await page.waitForSelector("[data-pagelet^=FeedUnit_]");
+    const newPost = await page.evaluate(() => {
+      const firstFeed = document.querySelector("[data-pagelet^=FeedUnit_]");
+      const name =
+        firstFeed.querySelector(".qzhwtbm6.knvmm38d h4") &&
+        firstFeed.querySelector(".qzhwtbm6.knvmm38d h4").textContent;
+      const content =
+        firstFeed.querySelector("[data-ad-comet-preview=message]") &&
+        firstFeed.querySelector("[data-ad-comet-preview=message]").textContent;
+      const postId = firstFeed.dataset.pagelet.split("_").slice(-1)[0]; // 배열의 마지막 고르기
+      return {
+        name,
+        content,
+        postId,
+      };
+    });
+    console.log(newPost);
   } catch (e) {
     console.error(e);
   }
