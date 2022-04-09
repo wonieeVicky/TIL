@@ -99,3 +99,57 @@ crawler();
 ```
 
 배열의 마지막 원소를 가져오는 건 `.slice(-1)[0];` 으로 처리하며, 각종 클래스명은 수시로 바뀔 수 있으므로 그때 상황에 맞는 태그를 최적화해서 가져오는 것으로 한다!
+
+### 이미지 태그, 좋아요, 광고글 분석 후 좋아요 요정되기
+
+이미지 태그, 좋아요 태그, 광고글을 분석하는 것도 모두 위처럼 실제 페이스북 사이트에서 태그분석을 해서 동작을 시켜야 한다. 위 코드에 이어 이미지 태그를 newPost 변수에 담는 것과 광고글이 아닌 글에 좋아요를 눌러 좋아요 요정이 되보록 한다!
+
+`index.js`
+
+```jsx
+// ..
+const crawler = async () => {
+  try {
+    // ..
+    await page.waitForSelector("[data-pagelet^=FeedUnit_]");
+    const newPost = await page.evaluate(() => {
+      const firstFeed = document.querySelector("[data-pagelet^=FeedUnit_]");
+      // name, content, postId ..
+      const img =
+        firstFeed.querySelectorAll("img[class^=i09qtzwb]") && firstFeed.querySelectorAll("img[class^=i09qtzwb]").src;
+      return {
+        name,
+        img,
+        content,
+        postId,
+      };
+    });
+    await page.waitForTimeout(1000);
+
+    // 좋아요 요정되기
+    const likeBtn = await page.$("[data-pagelet^=FeedUnit_]:first-child ._666k a");
+    await page.evaluate((like) => {
+      const sponsor = document.querySelector("").textContent.includes("광고=============");
+      if (like.getAttribute("aria-pressed") === "false" && !sponsor) {
+        like.click(); // aria-pressed 속성이 false이고 광고글이 아니면 좋아요를 누른다.
+      } else if (like.getAttribute("aria-pressed") === "false" && sponsor) {
+        like.click(); // 광고글에 좋아요 누른 경우 좋아요를 취소한다.
+      }
+    }, likeBtn);
+    await page.waitForTimeout(1000);
+
+    // 크롤러 동작이 완료되면 해당 피드 삭제
+    await page.evaluate(() => {
+      const firstFeed = document.querySelector("[data-pagelet^=FeedUnit_]:first-child");
+      firstFeed.parentNode.removeChild(firstFeed);
+    });
+    await page.waitForTimeout(1000);
+  } catch (e) {
+    console.error(e);
+  }
+};
+
+crawler();
+```
+
+페이스북의 경우 크롤링 등을 막기 위해 각종 태그 구조와 클래스명이 수시로 변하고, textContent도 순수 텍스트가 아닌 형태로 반환되므로, 그때그때 특징에 맞게 크롤러를 커스텀하여 사용해야 한다.
