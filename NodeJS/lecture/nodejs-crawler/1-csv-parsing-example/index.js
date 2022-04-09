@@ -37,14 +37,34 @@ const crawler = async () => {
       const content =
         firstFeed.querySelector("[data-ad-comet-preview=message]") &&
         firstFeed.querySelector("[data-ad-comet-preview=message]").textContent;
+      const img =
+        firstFeed.querySelectorAll("img[class^=i09qtzwb]") && firstFeed.querySelectorAll("img[class^=i09qtzwb]").src;
       const postId = firstFeed.dataset.pagelet.split("_").slice(-1)[0]; // 배열의 마지막 고르기
       return {
         name,
+        img,
         content,
         postId,
       };
     });
     console.log(newPost);
+    await page.waitForTimeout(1000);
+    const likeBtn = await page.$("[data-pagelet^=FeedUnit_]:first-child ._666k a");
+    await page.evaluate((like) => {
+      const sponsor = document.querySelector("").textContent.includes("광고=============");
+      if (like.getAttribute("aria-pressed") === "false" && !sponsor) {
+        like.click(); // aria-pressed 속성이 false이고 광고글이 아니면 좋아요를 누른다.
+      } else if (like.getAttribute("aria-pressed") === "false" && sponsor) {
+        like.click(); // 광고글에 좋아요 누른 경우 좋아요를 취소한다.
+      }
+    }, likeBtn);
+    await page.waitForTimeout(1000);
+    // 크롤러 동작이 완료되면 해당 피드는 삭제한다.
+    await page.evaluate(() => {
+      const firstFeed = document.querySelector("[data-pagelet^=FeedUnit_]:first-child");
+      firstFeed.parentNode.removeChild(firstFeed);
+    });
+    await page.waitForTimeout(1000);
   } catch (e) {
     console.error(e);
   }
