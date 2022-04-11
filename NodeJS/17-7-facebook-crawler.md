@@ -153,3 +153,127 @@ crawler();
 ```
 
 페이스북의 경우 크롤링 등을 막기 위해 각종 태그 구조와 클래스명이 수시로 변하고, textContent도 순수 텍스트가 아닌 형태로 반환되므로, 그때그때 특징에 맞게 크롤러를 커스텀하여 사용해야 한다.
+
+### 반복 작업 수행하기
+
+크롤링은 위에서 처리한 것처럼 일일히 다 필요한 정보를 찾아와야 한다. 이러한 과정이 노가다처럼 느껴진다면, 1. 화면을 스크린샷으로 찍어 인공지능으로 필요한 정보를 긁어오는 방법으로 구현할 수 있긴 함(그럼 인공지능도 공부해야 한다 ㅋ) 2. 사람과 유사하지 않은 속도로 어떤 정보를 처리한다면(예를 들어 좋아요 버튼을 누르는) 페이스북 같은 사이트에서는 해당 동작을 감지하여 계정을 차단시켜버리기도 한다. 따라서 최대한 적절히 사람과 같은 행동을 하도록 구현하는 것이 좋다. 3. 크롤러 서비스를 퍼블릭 클라우드(예를 들면, 구글클라우드플랫폼이나 아마존 웹서비스 같은)에 올려서 사용하면 대기업은 크롤러임을 알아서 계정을 차단할 가능성이 높음 따라서 퍼플릭 클라우드에서는 크롤러를 돌리지 않는게 바람직하다.
+
+위 크롤링 코드를 20번 수행하는 크롤러 반복 작업을 while문으로 구현하면 아래와 같다.
+
+`index.js`
+
+```jsx
+// ..
+const crawler = async () => {
+  try {
+    // 20개 피드를 순회하는 크롤링 구현
+    let result = [];
+    while (result.length < 10) {
+      // ..
+      result.push(newPost);
+      // ..
+    }
+  } catch (e) {
+    console.error(e);
+  }
+};
+
+crawler();
+```
+
+위 긁어온 정보를 db에 저장해본다. facebook.js라는 models를 생성한 뒤 여기에 저장해준다.
+또한, 한 번 저장한 게시글이 재저장되지 않도록 처리해야한다.
+
+`index.js`
+
+```jsx
+// ..
+
+const crawler = async () => {
+  try {
+    // ..
+    let result = [];
+    while (result.length < 10) {
+      await page.waitForSelector("[data-pagelet^=FeedUnit_]");
+      const newPost = await page.evaluate(() => {
+        // 1. infinite scrolling에 막히지 않도록 추가
+        window.scrollTo(0, 0);
+        // ..
+      });
+      // 2. 중복된 피드(이미 좋아요를 누른!)는 데이터에 포함시키지 않는다.
+      const exist = await db.Facebook.findOnde({
+        where: { postId: newPost.postId },
+      });
+      if (!exist && postId.name) {
+        result.push(newPost);
+      }
+      //..
+      await page.evaluate(() => {
+        const firstFeed = document.querySelector("[data-pagelet^=FeedUnit_]:first-child");
+        firstFeed.parentNode.removeChild(firstFeed);
+        // 1. 지속적인 scrolling을 위해 추가
+        window.scrollBy(0, 200);
+      });
+      await page.waitForTimeout(1000);
+    }
+    // 4. facebook 테이블에 정보 저장
+    await Promise.all(
+      result.map((r) => {
+        return db.Facebook.create({
+          postId: r.postId,
+          media: r.media,
+          writer: r.name,
+          content: r.content,
+        });
+      })
+    );
+    await page.close();
+    await browser.close();
+  } catch (e) {
+    console.error(e);
+  }
+};
+
+crawler();
+```
+
+`models/facebook.js`
+
+```jsx
+module.exports = (sequelize, Sequelize) => {
+  return sequelize.define("facebook", {
+    postId: {
+      type: Sequelize.STRING(30),
+      allowNull: false,
+      unique: true, // id는 unique key여야 함
+    },
+    media: {
+      type: Sequelize.TEXT,
+      allowNull: true,
+    },
+    content: {
+      type: Sequelize.TEXT,
+      allowNull: false,
+    },
+    writer: {
+      type: Sequelize.STRING(30),
+      allowNull: false,
+    },
+  });
+};
+```
+
+`models/index.js`
+
+```jsx
+// ..
+
+db.Proxy = require("./proxy")(sequelize, Sequelize);
+db.Facebook = require("./facebook")(sequelize, Sequelize);
+
+// ..
+
+module.exports = db;
+```
+
+위처럼 수행하면 원하는 데이터 10개가 정상적으로 크롤링되고, 좋아요가 눌리는 행동을 수행할 수 있게된다!
