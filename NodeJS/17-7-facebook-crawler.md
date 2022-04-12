@@ -277,3 +277,37 @@ module.exports = db;
 ```
 
 위처럼 수행하면 원하는 데이터 10개가 정상적으로 크롤링되고, 좋아요가 눌리는 행동을 수행할 수 있게된다!
+
+### 크롤러로 페이스북 새 글 작성하기
+
+게시글 크롤링 뿐만 아니라 새 글을 작성할 수도 있다.
+
+`index.js`
+
+```jsx
+const puppeteer = require("puppeteer");
+
+const crawler = async () => {
+  try {
+    // 페이스북 접속 후 로그인 수행 codes..
+
+    // 게시글 만들기 클릭
+    await page.waitForSelector("textarea");
+    await page.click("textarea");
+    await page.waitForSelector("._5rpb > div");
+    await page.click("._5rpb > div");
+    await page.waitForTimeout(1000);
+    await page.keyboard.type("인간지능 크롤러봇 동작중 ...");
+    await page.waitForTimeout(2000);
+    await page.waitForSelector(".6c0o button[type=submit]");
+    await page.click(".6c0o button[type=submit]");
+  } catch (e) {
+    console.error(e);
+  }
+};
+
+crawler();
+```
+
+위처럼 글쓰기를 할 수 있는 태그를 적절히 분석해서 타이핑하고,
+크롤러 제한에 걸리지 않도록 사람처럼 동작시켜주면 된다.
