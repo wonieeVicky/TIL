@@ -16,28 +16,27 @@ const crawler = async () => {
       width: 1080,
       height: 1080,
     });
-    await page.goto("https://facebook.com");
+    await page.goto("https://instagram.com");
+    await page.waitForSelector("button:not([type=submit])"); // facebook으로 로그인
+    await page.click("button:not([type=submit])");
+    await page.waitForNavigation(); // facebook 로그인으로 넘어가는 것을 기다린다.
+
+    await page.waitForSelector("#email");
     await page.type("#email", process.env.EMAIL);
     await page.type("#pass", process.env.PASSWORD);
     await page.waitForTimeout(1000);
+    await page.waitForSelector("button[type=submit]");
     await page.click("button[type=submit]");
-    await page.waitForResponse((response) => {
-      // login 시점 체크
-      return response.url().includes("login");
-    });
-    // 혹시 나타날 검은 배경화면 없어지도록 ESC 버튼 클릭
-    await page.keyboard.press("Escape");
+    await page.waitForNavigation(); // instagram으로 넘어가는 것을 기다린다.
 
-    // 게시글 만들기 클릭
-    await page.waitForSelector("textarea");
-    await page.click("textarea");
-    await page.waitForSelector("._5rpb > div");
-    await page.click("._5rpb > div");
-    await page.waitForTimeout(1000);
-    await page.keyboard.type("인간지능 크롤러봇 동작중 ...");
-    await page.waitForTimeout(2000);
-    await page.waitForSelector(".6c0o button[type=submit]");
-    await page.click(".6c0o button[type=submit]");
+    // await page.waitForResponse((response) => {
+    //   // login 시점 체크
+    //   return response.url().includes("login");
+    // });
+    // // 혹시 나타날 검은 배경화면 없어지도록 ESC 버튼 클릭
+    // await page.keyboard.press("Escape");
+
+    // 페이지 전환을 기다려줘야 한다.
   } catch (e) {
     console.error(e);
   }
