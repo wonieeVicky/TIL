@@ -353,6 +353,7 @@
 - [크롤러로 페이지 상호 작용하기](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/17-5-page-interaction-with-crawler.md)
 - [프록시로 서버 속이기](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/17-6-proxy-tricking.md)
 - [페이스북 크롤링](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/17-7-facebook-crawler.md)
+- [인스타그램 크롤링](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/17-8-instagram-crawler.md)
 
 ## Node.js
 
