@@ -32,6 +32,23 @@ const crawler = async () => {
       await page.click("#loginbutton");
       await page.waitForNavigation(); // instagram으로 넘어가는 것을 기다린다.
     }
+
+    const newPost = await page.evaluate(() => {
+      const article = document.querySelector("article:first-child");
+      const postId =
+        article.querySelector("time").parentElement.parentElement &&
+        article.querySelector("time").parentElement.parentElement.href;
+      const name = article.querySelector("span a[href]").textContent;
+      const img = article.querySelector('img[class="FFVAD"]') && article.querySelector('img[class="FFVAD"]').src;
+      const content = article.querySelector('div[data-testid="post-comment-root"] > span:last-child').textContent;
+      return {
+        postId,
+        name,
+        img,
+        content,
+      };
+    });
+    console.log("newPost:", newPost);
   } catch (e) {
     console.error(e);
   }
