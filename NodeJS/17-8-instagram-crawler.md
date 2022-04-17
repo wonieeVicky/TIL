@@ -153,3 +153,81 @@ newPost: {
 ```
 
 위와 같이 동작 시키면 첫번째 게시글에 대한 정보가 잘 담기는 것을 확인할 수 있다.
+
+### 더보기 버튼 및 반복 크롤링
+
+우선 게시글에 content 부분이 더보기가 눌려지지 않아 제대로 긁어오지 못하는 이슈가 있다. 이를 개선!
+
+`index.js`
+
+```jsx
+// ..
+const crawler = async () => {
+  try {
+		// 더보기 버튼이 있으면 클릭한다.
+    const moreButton = await page.$('article div[data-testid="post-comment-root"] span > div[role="button"] > div');
+    if (moreButton) {
+      await page.evaluate((btn) => btn.click(), moreButton);
+    }
+
+    const newPost = await page.evaluate(() => {
+      // ..
+    });
+  }
+};
+
+/*
+newPost: {
+  postId: 'https://www.instagram.com/p/CcZm-WsLZQE/',
+  name: 'jangsk83',
+  img: 'https://scontent-ssn1-1.cdninstagram.com/v/t51.2885-15/278505321_1450598245356624_6891368153385308823_n.webp?stp=dst-jpg_e35&_nc_ht=scontent-ssn1-1.cdninstagram.com&_nc_cat=100&_nc_ohc=S8ep8WXnC40AX9QFpZB&edm=AIQHJ4wBAAAA&ccb=7-4&ig_cache_key=MjgxNzQ1NDQ0OTQwNTg0MDg5OQ%3D%3D.2-ccb7-4&oh=00_AT_1SFmDxdRJ1GTY6O483scSOf7lyzQoeQfOFz-qoXbzbA&oe=62625FC0&_nc_sid=7b02f1',
+  content: '지코 삼촌을 좋아하는 예준#지코 #준코'
+}
+*/
+```
+
+태그 분석을 통해 더보기 버튼 태그를 긁어와서 해당 엘리먼트가 있으면 모두 클릭해주도록 코드를 추가했다.
+
+다음으로는 while문을 이용해 10개의 게시글을 반복해서 가져오는 부분을 구현해본다.
+
+`index.js`
+
+```jsx
+//..
+
+const crawler = async () => {
+  try {
+    // login..
+    let result = [];
+    let prevPostId = "";
+    while (result.length < 10) {
+      const moreButton = await page.$('article div[data-testid="post-comment-root"] span > div[role="button"] > div');
+      if (moreButton) {
+        await page.evaluate((btn) => btn.click(), moreButton);
+      }
+      const newPost = await page.evaluate(() => {
+        // ..
+      });
+      // 중복되지 않은 게시글만 추가
+      if (newPost.postId !== prevPostId) {
+        console.log("newPost:", newPost);
+        // result에 없는 게시글만 넣어준다.
+        if (!result.find((v) => v.postId === newPost.postId)) {
+          result.push(newPost);
+        }
+      }
+      prevPostId = newPost.postId; // prevPostId 업데이트
+      await page.waitForTimeout(500);
+      await page.evaluate(() => {
+        window.scrollBy(0, 800); // scroll down
+      });
+    }
+  } catch (e) {
+    console.error(e);
+  }
+};
+
+crawler();
+```
+
+담기는 게시글이 중복되지 않도록 prevPostId 변수를 생성하여 다음 게시글로 넘어가기 전 계속 업데이트해주었다. 위처럼 10개의 글을 긁어오도록 스크롤다운 처리하면 virtual DOM에서도 충분히 게시글을 가져올 수 있다.
