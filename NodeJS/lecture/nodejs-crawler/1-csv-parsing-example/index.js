@@ -1,12 +1,12 @@
 ﻿const puppeteer = require("puppeteer");
 const dotenv = require("dotenv");
 
-// const db = require("./models");
+const db = require("./models");
 dotenv.config();
 
 const crawler = async () => {
   try {
-    // await db.sequelize.sync();
+    await db.sequelize.sync();
     const browser = await puppeteer.launch({
       headless: false,
       args: ["--window-size=1920,1080", "--disable-notifications"],
@@ -30,7 +30,7 @@ const crawler = async () => {
       await page.waitForTimeout(1000);
       await page.waitForSelector("#loginbutton");
       await page.click("#loginbutton");
-      await page.waitForNavigation(); // instagram으로 넘어가는 것을 기다린다.
+      await page.waitForNavigation();
     }
     let result = [];
     let prevPostId = "";
@@ -45,7 +45,7 @@ const crawler = async () => {
         const article = document.querySelector("article:first-child");
         const postId =
           article.querySelector("time").parentElement.parentElement &&
-          article.querySelector("time").parentElement.parentElement.href;
+          article.querySelector("time").parentElement.parentElement.href.split("/").slice(-2, -1)[0];
         const name = article.querySelector("span a[href]").textContent;
         const img = article.querySelector('img[class="FFVAD"]') && article.querySelector('img[class="FFVAD"]').src;
         const content = article.querySelector('div[data-testid="post-comment-root"] > span:last-child').textContent;
@@ -59,18 +59,41 @@ const crawler = async () => {
       });
       // 중복되지 않은 게시글만 추가하기
       if (newPost.postId !== prevPostId) {
-        console.log("newPost:", newPost);
+        // console.log("newPost:", newPost);
         // result에 없는 아이들만 넣어준다.
         if (!result.find((v) => v.postId === newPost.postId)) {
-          result.push(newPost);
+          const exist = await db.Instagram.findOne({ where: { postId: newPost.postId } });
+          // db에 존재하지 않으면 저장한다.
+          if (!exist) {
+            console.log(result);
+            result.push(newPost);
+          }
         }
       }
+      await page.waitForTimeout(500);
+      await page.evaluate(() => {
+        const article = document.querySelector("article:first-child");
+        const heartBtn = article.querySelector('svg[aria-label="좋아요"][height="24"]');
+        if (heartBtn) {
+          // heartBtn.parentElement.click();
+        }
+      });
       prevPostId = newPost.postId;
       await page.waitForTimeout(500);
       await page.evaluate(() => {
         window.scrollBy(0, 800); // scroll down
       });
     }
+    await Promise.all(
+      result.map((r) => {
+        return db.Instagram.create({
+          postId: r.postId,
+          media: r.img,
+          writer: r.name,
+          content: r.content,
+        });
+      })
+    );
   } catch (e) {
     console.error(e);
   }
