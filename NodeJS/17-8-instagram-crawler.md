@@ -231,3 +231,124 @@ crawler();
 ```
 
 담기는 게시글이 중복되지 않도록 prevPostId 변수를 생성하여 다음 게시글로 넘어가기 전 계속 업데이트해주었다. 위처럼 10개의 글을 긁어오도록 스크롤다운 처리하면 virtual DOM에서도 충분히 게시글을 가져올 수 있다.
+
+### 인스타 하트 클릭과 DB 저장
+
+인스타 하트 클릭과 DB 저장을 구현해본다.
+
+`index.js`
+
+```jsx
+const db = require("./models");
+
+const crawler = async () => {
+  try {
+    await db.sequelize.sync(); // db.sequelize 활성화
+    // login..
+    let result = [];
+    let prevPostId = "";
+    while (result.length < 10) {
+      const moreButton = await page.$('article div[data-testid="post-comment-root"] span > div[role="button"] > div');
+      if (moreButton) {
+        await page.evaluate((btn) => btn.click(), moreButton);
+      }
+      const newPost = await page.evaluate(() => {
+        const article = document.querySelector("article:first-child");
+        // postId 뒷부분만 잘라내기
+        const postId =
+          article.querySelector("time").parentElement.parentElement &&
+          article.querySelector("time").parentElement.parentElement.href.split("/").slice(-2, -1)[0];
+        // ..
+
+        return {
+          postId,
+          name,
+          img,
+          content,
+        };
+      });
+
+      if (newPost.postId !== prevPostId) {
+        if (!result.find((v) => v.postId === newPost.postId)) {
+          // db에 존재하지 않으면 저장한다.
+          const exist = await db.Instagram.findOne({ where: { postId: newPost.postId } });
+          if (!exist) {
+            result.push(newPost);
+          }
+        }
+      }
+
+      // 좋아요 구현
+      await page.evaluate(() => {
+        const article = document.querySelector("article:first-child");
+        const heartBtn = article.querySelector('svg[aria-label="좋아요"][height="24"]');
+        if (heartBtn) {
+          heartBtn.parentElement.click();
+        }
+      });
+
+      prevPostId = newPost.postId;
+      await page.waitForTimeout(500);
+      await page.evaluate(() => {
+        window.scrollBy(0, 800);
+      });
+    }
+
+    // DB 저장
+    await Promise.all(
+      result.map((r) => {
+        return db.Instagram.create({
+          postId: r.postId,
+          media: r.img,
+          writer: r.name,
+          content: r.content,
+        });
+      })
+    );
+  } catch (e) {
+    console.error(e);
+  }
+};
+
+crawler();
+```
+
+위처럼 좋아요 클릭 구현과 게시글 db 저장 기능까지 코드를 추가해본다.
+db 저장할 instagram db model은 아래와 같이 설정해준다.
+
+`models/instagram.js`
+
+```jsx
+module.exports = (sequelize, Sequelize) => {
+  return sequelize.define("instagram", {
+    postId: {
+      type: Sequelize.STRING(80),
+      allowNull: false,
+      unique: true,
+    },
+    media: {
+      type: Sequelize.TEXT,
+      allowNull: true,
+    },
+    content: {
+      type: Sequelize.TEXT,
+      allowNull: false,
+    },
+    writer: {
+      type: Sequelize.STRING(30),
+      allowNull: false,
+    },
+  });
+};
+```
+
+`models/index.js`
+
+```jsx
+// ..
+db.Proxy = require("./proxy")(sequelize, Sequelize);
+db.Facebook = require("./facebook")(sequelize, Sequelize);
+db.Instagram = require("./instagram")(sequelize, Sequelize);
+
+// ..
+```
