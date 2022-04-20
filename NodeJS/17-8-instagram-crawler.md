@@ -352,3 +352,37 @@ db.Instagram = require("./instagram")(sequelize, Sequelize);
 
 // ..
 ```
+
+### 인스타그램 검색
+
+이번에는 간단하게 인스타그램 검색을 구현해본다.
+인스타그램은 페이스북과 달리 엘리먼트 사용이 정확한 편이라 태그 분석 및 활용이 그나마 자유로운 편임.
+이를 활용해서 여러가지 크롤링을 해볼 수도 있겠다!
+
+`search.js`
+
+```jsx
+const crawler = async () => {
+  try {
+    // login..
+
+    await page.waitForSelector('input[aria-label="입력 검색"]');
+    await page.click('input[aria-label="입력 검색"]');
+    await page.keyboard.type("맛집");
+    await page.waitForSelector(".fuqBx");
+    await page.waitForTimeout(2000); // 관련 검색어 가져오는데 시간 필요
+    const href = await page.evaluate(() => {
+      return document.querySelector(".fuqBx a:first-child").href;
+    });
+    await page.goto(href); // 페이지 이동
+
+    // ..
+  } catch (e) {
+    console.error(e);
+  }
+};
+
+crawler();
+```
+
+위처럼 처리하면 원하는 검색어에 담겨있는 정보를 크롤링할 수 있음!
