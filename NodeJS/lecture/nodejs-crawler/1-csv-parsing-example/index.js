@@ -94,6 +94,10 @@ const crawler = async () => {
         });
       })
     );
+
+    console.log(result.length);
+    await page.close();
+    await browser.close();
   } catch (e) {
     console.error(e);
   }
