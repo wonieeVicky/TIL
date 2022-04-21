@@ -386,3 +386,52 @@ crawler();
 ```
 
 위처럼 처리하면 원하는 검색어에 담겨있는 정보를 크롤링할 수 있음!
+
+### 인스타그램 댓글 가져오기
+
+기존 인스타그램 게시글 크롤러에 인스타그램 댓글도 가져오도록 고쳐보자
+
+`index.js`
+
+```jsx
+const crawler = async () => {
+  try {
+    // login ..
+    let result = [];
+    let prevPostId = "";
+    while (result.length < 10) {
+      // ..
+      const newPost = await page.evaluate(() => {
+        const article = document.querySelector("article:first-child");
+        const postId =
+          article.querySelector("time").parentElement.parentElement &&
+          article.querySelector("time").parentElement.parentElement.href.split("/").slice(-2, -1)[0];
+        const name = article.querySelector("span a[href]").textContent;
+        const img = article.querySelector('img[class="FFVAD"]') && article.querySelector('img[class="FFVAD"]').src;
+        const content = article.querySelector('div[data-testid="post-comment-root"] > span:last-child').textContent;
+
+				// comment element
+        const commentTag = article.querySelectorAll("ul li:not(:first-child");
+        let comments = [];
+        commentTag.forEach((c) => {
+          const name = c.querySelector(".C4VMK h3") && c.querySelector(".C4VMK h3").textContent;
+          const comment = c.querySelector(".C4VMK > span") && c.querySelector(".C4VMK > span").textContent;
+          comments.push({ name, comment }); // comments 배열에 내용 추가
+        });
+
+        return {
+          postId,
+          name,
+          img,
+          content,
+          comments
+        };
+      });
+      //..
+    }
+    //..
+  }
+};
+```
+
+위처럼 처리하여 원하는 정보를 추가해볼 수 있다 :)
