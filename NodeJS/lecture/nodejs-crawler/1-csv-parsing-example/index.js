@@ -49,12 +49,21 @@ const crawler = async () => {
         const name = article.querySelector("span a[href]").textContent;
         const img = article.querySelector('img[class="FFVAD"]') && article.querySelector('img[class="FFVAD"]').src;
         const content = article.querySelector('div[data-testid="post-comment-root"] > span:last-child').textContent;
+        const commentTag = article.querySelectorAll("ul li:not(:first-child");
+
+        let comments = [];
+        commentTag.forEach((c) => {
+          const name = c.querySelector(".C4VMK h3") && c.querySelector(".C4VMK h3").textContent;
+          const comment = c.querySelector(".C4VMK > span") && c.querySelector(".C4VMK > span").textContent;
+          comments.push({ name, comment });
+        });
 
         return {
           postId,
           name,
           img,
           content,
+          comments,
         };
       });
       // 중복되지 않은 게시글만 추가하기
