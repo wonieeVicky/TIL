@@ -126,4 +126,49 @@ const crawler = async () => {
 };
 ```
 
-위처럼 puppeteer.createBrowserFetcher 함수를 실행하여 원하는 버전을 다운로드받아 적용하면 유튜브 화면이 정상적으로 노출되는 것을 확인할 수 있다! 버전 문제가 발생할 수 있으며, 어떻게 개선해나가는지 방법을 이해하도록 해보자
+위처럼 puppeteer.createBrowserFetcher 함수를 실행하여 원하는 버전을 다운로드받아 적용하면 유튜브 화면이 정상적으로 노출되는 것을 확인할 수 있다!
+버전 문제가 발생할 수 있으며, 어떻게 개선해나가는지 방법을 이해하도록 해보자
+
+### 로그인 및 waitUntil로 로딩 기다리기
+
+유튜브는 사이트를 웹 컴포넌트를 사용하여 구축했음. 따라서 일반 div, span 태그 등의 기본적 마크업 언어가 아닌 본인들만의 태그를 만들어서 섞어서 사이트를 구성함.
+
+![](../img/220427-1.png)
+
+웹 컴포넌트는 컴포넌트를 단위별로 서비스 특징에 맞춰 커스텀 개발한 것이라고 보면된다.
+또 크롤링 시 로그인 버튼의 디자인이 바뀐다거나 하는 이슈가 있으니 선택자를 잘 골라서 개발해야 한다.
+
+유튜브 태그를 분석하여 로그인 영역 엘리먼트를 가져왔다면, 이제 로그인을 구현해본다.
+오늘은 `waitUntil`이라는 메서드로 모든 네트워크가 완료된 이후에 크롤러가 실행되도록 만들어본다!
+
+`index.js`
+
+```jsx
+//..
+
+const crawler = async () => {
+  try {
+    // ..
+    await page.goto("https://youtube.com", {
+      // page 전환되자마자 이벤트 실행되지 않도록 모든 이벤트를 기다리도록 커스텀
+      // 유튜브 동영상 로딩할 때에는 networkidle0을 쓰면 안됨: 계속 스트림 네트워크 발생
+      // networkidle0: 모든 네트워크가 다 호출되었을 때 실행
+      // networkidle2: 2개 네트워크가 마무리 되지 않아도 허용 후 크롤러 실행
+      // domcontentloaded: 돔 호출 완료 시
+      waitUntil: "networkidle0",
+    });
+
+    await page.waitForSelector("#buttons ytd-button-renderer:last-child a");
+    await page.click("#buttons ytd-button-renderer:last-child a");
+
+    // await page.close();
+    // await browser.close();
+  } catch (e) {
+    console.error(e);
+  }
+};
+
+crawler();
+```
+
+위처럼 waitUntil 메서드를 `page.goto`함수의 인자로 넣어주면 네트워크 진행 후 크롤러가 실행되도록 상세히 설정할 수 있다. (돔 로딩이 완료되었을떄, 미완료 네트워크가 n개 남았을 때 등등)
