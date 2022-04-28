@@ -32,6 +32,26 @@ const crawler = async () => {
       waitUntil: "networkidle2", // 2개정도의 네트워크는 마무리되지 않아도 실행하겠다.
     });
 
+    await page.waitForSelector("#identifierId");
+    await page.type("#identifierId", process.env.EMAIL); // email type
+    await page.waitForSelector("#identifierNext");
+    await page.click("#identifierNext"); // 다음 창으로 넘어가기
+
+    await page.waitForSelector('input[type="password"]');
+    // await page.type('input[type="password"]', process.env.PASSWORD); // error 발생! 아래 방법으로 우회
+    await page.evaluate((password) => {
+      document.querySelector('input[type="password"]').value = password;
+    }, process.env.PASSWORD);
+
+    await page.waitForTimeout(3000);
+    await page.waitForSelector("#passwordNext");
+    await page.click("#passwordNext"); // 다음 창으로 넘어가기
+
+    await page.waitForNavigation({
+      waitUntil: "networkidle2", // 2개정도의 네트워크는 마무리되지 않아도 실행하겠다.
+    });
+    console.log("youtube main!");
+
     // await page.close();
     // await browser.close();
   } catch (e) {
