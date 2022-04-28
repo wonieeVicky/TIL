@@ -223,4 +223,29 @@ const crawler = async () => {
 로그인 과정에서 비밀번호 입력창에서 해당 엘리먼트를 잘 찾아오지 못하는 발생했다.
 이럴 땐 기존 방법을 우회하여 evaluate 함수로 직접 해당 인풋에 타이핑하여 값을 넣어주는 방식으로 구현한다.
 
-모든 건 안되는 건 없으니 방법을 찾아서 적용해보면 좋다 :)
+모든 건 안되는 건 없으니 방법을 찾아서 적용해보면 좋다 :) 구글 로그인 유지도 함께 적용해보자.
+
+```jsx
+// ..
+const crawler = async () => {
+  try {
+    // ..
+		// 로그인 정보 userDataDir에 적용
+    const browser = await puppeteer.launch({
+			// ..
+      userDataDir: "/Users/uneedcomms/Library/Application Support/Google/Chrome/Default", // login 쿠키 삽입 - 첫 시도는 직접 로그인
+    });
+
+	  // 유튜브 진입
+		// 만약 로그인 존재하는 #avatar-btn이 없으면
+    if (!(await page.$("#avatar-btn"))) {
+      // 로그인 시도 ..
+      await page.waitForNavigation({ waitUntil: "networkidle2" });
+    } else {
+      console.log("이미 로그인 됨");
+    }
+  }
+};
+```
+
+로그인 쿠키가 없을 경우 if문 분기 처리하여 로그인 로직을 가둔 뒤, else에 유튜브에서 할 일을 적어넣는다.
