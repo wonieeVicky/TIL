@@ -171,4 +171,56 @@ const crawler = async () => {
 crawler();
 ```
 
-위처럼 waitUntil 메서드를 `page.goto`함수의 인자로 넣어주면 네트워크 진행 후 크롤러가 실행되도록 상세히 설정할 수 있다. (돔 로딩이 완료되었을떄, 미완료 네트워크가 n개 남았을 때 등등)
+위처럼 waitUntil 메서드를 `page.goto`함수의 인자로 넣어주면 네트워크 진행 후 크롤러가 실행되도록 상세히 설정할 수 있다.
+(돔 로딩이 완료되었을떄, 미완료 네트워크가 n개 남았을 때 등등)
+
+### 구글 로그인 구현
+
+구글 로그인은 API가 제공되어 굳이 크롤링을 하지 않아도 되지만 다양한 환경에서 크롤링을 구현해보면 좋으므로 한번 도전해본다.
+
+`index.js`
+
+```jsx
+// ..
+const crawler = async () => {
+  try {
+    // ..
+		// 로그인 버튼 클릭
+    await page.waitForSelector("#buttons ytd-button-renderer:last-child a");
+    await page.click("#buttons ytd-button-renderer:last-child a");
+    await page.waitForNavigation({
+      waitUntil: "networkidle2", // 네트워크 상황 체크
+    });
+
+		// 아이디 입력
+    await page.waitForSelector("#identifierId");
+    await page.type("#identifierId", process.env.EMAIL); // email type
+    await page.waitForSelector("#identifierNext");
+    await page.click("#identifierNext"); // 다음 페이지 넘어가기
+
+		// 비밀번호 입력
+    await page.waitForSelector('input[type="password"]');
+    // await page.type('input[type="password"]', process.env.PASSWORD);
+		// 위 코드 error 발생! 아래 방법으로 우회
+    await page.evaluate((password) => {
+      document.querySelector('input[type="password"]').value = password;
+    }, process.env.PASSWORD);
+
+    await page.waitForTimeout(3000);
+    await page.waitForSelector("#passwordNext");
+    await page.click("#passwordNext"); // 다음 창으로 넘어가기
+
+    await page.waitForNavigation({
+      waitUntil: "networkidle2",
+    });
+    console.log("youtube main!");
+
+		// ..
+  }
+};
+```
+
+로그인 과정에서 비밀번호 입력창에서 해당 엘리먼트를 잘 찾아오지 못하는 발생했다.
+이럴 땐 기존 방법을 우회하여 evaluate 함수로 직접 해당 인풋에 타이핑하여 값을 넣어주는 방식으로 구현한다.
+
+모든 건 안되는 건 없으니 방법을 찾아서 적용해보면 좋다 :)
