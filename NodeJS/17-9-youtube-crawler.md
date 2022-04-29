@@ -249,3 +249,49 @@ const crawler = async () => {
 ```
 
 로그인 쿠키가 없을 경우 if문 분기 처리하여 로그인 로직을 가둔 뒤, else에 유튜브에서 할 일을 적어넣는다.
+
+### 유튜브 동영상 다운로드
+
+이번엔 유튜브 동영상을 다운로드 받아본다!
+
+유튜브 동영상의 경우 ytdl-core라는 패키지를 써서 다운로드받는다.
+
+```jsx
+> npm i ytdl-core
+```
+
+`index.js`
+
+```jsx
+// ..
+const fs = require("fs"); // 파일 저장을 위해 호출
+const ytdl = require("ytdl-core"); // 영상 다운을 위해 호출
+
+const crawler = async () => {
+  try {
+    // ..
+		// 실시간 인기 영상 페이지로 이동
+    await page.goto("https://www.youtube.com/feed/trending", {
+      waitUntil: "networkidle0",
+    });
+    await page.waitForSelector("ytd-video-renderer");
+		// 첫번째 게시물 클릭
+    await page.click("ytd-video-renderer");
+
+		// 아래와 같이 기본 정보 가져올 수 있음
+    const url = await page.url(); // 현 페이지 주소
+    // const title = await page.title(); // 현 페이지 제목
+
+		// 페이지 전체 정보를 getInfo 메서드로 가져올 수 있음
+    const info = await ytdl.getInfo(url);
+
+    // stream을 통해서 다른 작업 동시 수행 - 1mb 단위 등으로 스트림 단위 조절 가능
+    ytdl(url).pipe(fs.createWriteStream(`${info.title.replace(/\u20A9/g, "")}.mp4`)); // 원 표시 제거
+
+    // await page.close();
+    // await browser.close();
+  }
+};
+```
+
+위처럼 실시간 인기 영상 페이지로 이동한 뒤 저장에 필요한 현 페이지 주소 및 타이틀 등을 파싱해오는 작업을 한다. 실제 영상 다운로드는 ytdl 객체의 pipe 함수를 사용해서 가져오며 한번에 영상을 일괄로 받아올 경우 다른 일을 함께 수행하지 못하므로 `createWriteStream`으로 영상을 분할해서 다운받아준다.
