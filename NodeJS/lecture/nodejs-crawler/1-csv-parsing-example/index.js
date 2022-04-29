@@ -1,5 +1,7 @@
 ﻿const puppeteer = require("puppeteer");
 const dotenv = require("dotenv");
+const fs = require("fs");
+const ytdl = require("ytdl-core");
 
 // const db = require("./models");
 dotenv.config();
@@ -48,6 +50,22 @@ const crawler = async () => {
     } else {
       console.log("이미 로그인 됨");
     }
+
+    await page.goto("https://www.youtube.com/feed/trending", {
+      waitUntil: "networkidle0",
+    });
+    await page.waitForSelector("ytd-video-renderer");
+    await page.click("ytd-video-renderer"); // 첫번째 게시물 클릭
+
+    const url = await page.url(); // 현 페이지 주소
+    const title = await page.title(); // 현 페이지 제목
+    console.log(url, title); // https://www.youtube.com/watch?v=osa7x8qUVec
+
+    const info = await ytdl.getInfo(url); // page info 받아오기
+    console.log(info);
+
+    // stream을 통해서 다른 작업 동시 수행 - 1mb 단위 등으로 스트림 단위 조절 가능
+    ytdl(url).pipe(fs.createWriteStream(`${info.title.replace(/\u20A9/g, "")}.mp4`)); // 원 표시 제거
 
     // await page.close();
     // await browser.close();
