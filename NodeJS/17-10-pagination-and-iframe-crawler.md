@@ -83,3 +83,60 @@ const crawler = async () => {
 ```
 
 위처럼 처리하면 ‘마우스’로 검색된 10개의 페이지 상품들을 크롤링해올 수 있게된다!
+
+### 깃허브 크롤링
+
+깃헙도 검색할 수 있다. 오픈 소스코드들을 검색할 수 있음
+깃헙은 SPA로 되어있어서, 페이지네이션 시 아마존과는 다른 방식으로 구현해야 한다.
+
+`github.js`
+
+```jsx
+const puppeteer = require("puppeteer");
+
+const crawler = async () => {
+  try {
+    const browser = await puppeteer.launch({
+      headless: false,
+      args: ["--window-size=1920,1080", "--disable-notifications", "--no-sandbox"],
+    });
+    const page = await browser.newPage();
+    await page.setViewport({
+      width: 1080,
+      height: 1080,
+    });
+    const keyword = "crawler";
+    await page.goto(`https://github.com/search?q=${keyword}`, {
+      waitUntil: "networkidle0",
+    });
+    let result = [];
+    let pageNum = 1;
+		// while 문으로 10페이지까ㅣㅈ 반복
+    while (pageNum < 10) {
+      const r = await page.evaluate(() => {
+        const tags = document.querySelectorAll(".repo-list-item");
+        const result = [];
+        tags.forEach((t) => {
+					// 태그분석하여 데이터 넣어주기
+          result.push({
+            name: t && t.querySelector("h3") && t.querySelector("h3").textContent.trim(),
+            star: t && t.querySelector(".muted-link") && t.querySelector(".muted-link").textContent.trim(),
+            lang:
+              t &&
+              t.querySelector(".text-gray.flex-auto") &&
+              t.querySelector(".text-gray.flex-auto").textContent.trim(),
+          });
+        });
+        return result;
+      });
+      result.push(r);
+			// 데이터 크롤링 완료 후 다음 페이지 클릭을 아래와 같이 구현한다.
+      await page.waitForSelector(".next_page");
+      await page.click(".next_page");
+      pageNum++;
+    }
+    console.log(result.length);
+    console.log(result[0]);
+  }
+};
+```
