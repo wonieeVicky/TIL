@@ -86,9 +86,6 @@ const crawler = async () => {
 
 ### 깃허브 크롤링
 
-깃헙도 검색할 수 있다. 오픈 소스코드들을 검색할 수 있음
-깃헙은 SPA로 되어있어서, 페이지네이션 시 아마존과는 다른 방식으로 구현해야 한다.
-
 `github.js`
 
 ```jsx
@@ -101,6 +98,9 @@ const crawler = async () => {
       args: ["--window-size=1920,1080", "--disable-notifications", "--no-sandbox"],
     });
     const page = await browser.newPage();
+		await page.setUserAgent(
+      "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.127 Safari/537.36"
+    );
     await page.setViewport({
       width: 1080,
       height: 1080,
@@ -137,6 +137,36 @@ const crawler = async () => {
     }
     console.log(result.length);
     console.log(result[0]);
+  }
+};
+```
+
+### 깃허브 페이지네이션
+
+위 코드에 부족한 점은 spa 페이지에서 response로 다음 페이지에 대한 정보를 성공적으로 반환받았음을 확인하는 코드가 없다는 것이다.  
+따라서 `waitForResponse` 메서드로 해당 response를 체크하여 반복문을 분기처리하도록 한다.
+
+`github.js`
+
+```jsx
+//..
+const crawler = async () => {
+  try {
+    // ..
+    let result = [];
+    let pageNum = 1;
+    while (pageNum < 10) {
+      // ..
+      pageNum++;
+
+      // 다음 페이지의 응답이 완료될 때까지 기다려준다.
+      await page.waitForResponse((response) => {
+        return response.url().startsWith(`https://github.com/search/count?p=${pageNum}`) && response.status() === 200;
+      });
+      await page.waitForTimeout(2000); // github 내 prevent crawler 방지를 위함
+    }
+  } catch (e) {
+    console.error(e);
   }
 };
 ```
