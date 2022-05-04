@@ -170,3 +170,28 @@ const crawler = async () => {
   }
 };
 ```
+
+### 트위터 로그인하기
+
+트위터에서 아이프레임을 크롤링해보도록 하자. 우선 로그인부터 구현한다.
+로그인은 굉장히 식은 죽 먹기가 됐다
+
+`twitter.js`
+
+```jsx
+const puppeteer = require("puppeteer");
+const dotenv = require("dotenv");
+dotenv.config();
+
+const crawler = async () => {
+  try {
+    // ..
+    await page.goto("https://twitter.com", { waitUntil: "networkidle0" });
+    await page.type(".LoginForm-username input", process.env.EMAIL);
+    await page.type(".LoginForm-password input", process.env.PASSWORD);
+    await page.waitForSelector('input[type="submit"]');
+    await page.click('input[type="submit"]');
+		// ..
+  }
+};
+```
