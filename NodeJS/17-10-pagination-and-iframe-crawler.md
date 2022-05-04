@@ -195,3 +195,48 @@ const crawler = async () => {
   }
 };
 ```
+
+### 트위터 태그 분석
+
+iframe은 다른 웹이라고 생각하면 이해가 쉽다.
+트위터 게시글 내 아이프레임에 내부에 있는 콘텐츠를 긁어오는 것을 구현해보고자 한다.
+
+`twitter.js`
+
+```jsx
+const crawler = async () => {
+  try {
+		// ..
+    await page.waitForNavigation();
+
+    while (await page.$(".js-stream-item")) {
+      const firstItem = await page.$(".js-stream-item:first-child");
+      if (await page.$(".js-macaw-cards-iframe-container")) {
+        await page.evaluate(() => {
+          window.scrollBy(0, 10);
+        });
+        console.log("iframe 발견");
+				// iframe response를 기다린다.
+        await page.waitForResponse((response) => {
+          console.log(response.url());
+          return response.url().startsWith("https://twitter.com/i/cards/tfw/v1/");
+        });
+        await page.waitForSelector(".js-stream-item:first-child iframe");
+        const iframe = await page.frames()[0];
+        const result = await iframe.evaluate(() => {
+          return {
+            title: document.querySelector("h2") && document.querySelector("h2").textContent,
+          };
+        });
+        console.log(result);
+      } else {
+        console.log("iframe 없음");
+				// iframe 없으면 해당 li 삭제
+        await page.evaluate((item) => item.parentNode.removeChild(item), firstItem);
+      }
+    }
+  }
+};
+```
+
+트위터는 아이프레임을 바로 호출하는 것이 아닌 스크롤을 살짝 내려야 아이프레임 정보를 가져온다. 따라서 li(`.js-stream-item`)이 있을 경우 해당 돔을 살짝 스크롤을 내려 iframe 을 호출해오는 것을 함께 구현해야 함
