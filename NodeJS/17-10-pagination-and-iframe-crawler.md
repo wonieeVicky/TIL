@@ -239,4 +239,46 @@ const crawler = async () => {
 };
 ```
 
-트위터는 아이프레임을 바로 호출하는 것이 아닌 스크롤을 살짝 내려야 아이프레임 정보를 가져온다. 따라서 li(`.js-stream-item`)이 있을 경우 해당 돔을 살짝 스크롤을 내려 iframe 을 호출해오는 것을 함께 구현해야 함
+트위터는 아이프레임을 바로 호출하는 것이 아닌 스크롤을 살짝 내려야 아이프레임 정보를 가져온다.  
+따라서 li(`.js-stream-item`)이 있을 경우 해당 돔을 살짝 스크롤을 내려 iframe 을 호출해오는 것을 함께 구현해야 함
+
+### 아이프레임 컨텐츠 가져오기
+
+위 코드에 이어 아이프레임 컨텐츠 가져오는 것을 완성해본다.
+
+`twitter.js`
+
+```jsx
+//..
+const crawler = async () => {
+  try {
+    // login..
+    while (await page.$(".js-stream-item")) {
+      const firstItem = await page.$(".js-stream-item:first-child");
+      if (await page.$(".js-stream-item:first-child .js-macaw-cards-iframe-container")) {
+				// 1. 찾고자하는 iframe id 가져오기
+        const tweetId = await page.evaluate((item) => item.dataset.itemId, firstItem);
+				// 2. 스크롤을 살짝 내린다.
+        await page.evaluate(() => window.scrollBy(0, 10));
+				// 3. iframe 기다림
+        await page.waitForSelector(".js-stream-item:first-child iframe");
+				// 4. 같은 tweetId를 가진 iframe 가져오기
+        const iframe = await page.frames().find((frame) => frame.url().includes(tweetId)); // 원하는 iframe 가져오기
+        if (iframe) {
+					// 5. iframe 콘텐츠 가져오기
+          const result = await iframe.evaluate(() => ({
+            title: document.querySelector("h2") && document.querySelector("h2").textContent,
+          }));
+          console.log(result); // 6. { title: '알리바바 미래호텔 모습' }
+        }
+      }
+      await page.evaluate((item) => item.parentNode.removeChild(item), firstItem);
+      await page.evaluate(() => window.scrollBy(0, 10));
+      await page.waitForSelector(".js-stream-item");
+      await page.waitForTimeout(2000);
+    }
+  }
+};
+```
+
+위 1~6의 순서를 통해 아이프레임 정보를 가져올 수 있다.
