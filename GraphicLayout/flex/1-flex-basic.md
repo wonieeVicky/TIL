@@ -488,3 +488,126 @@ align : 수직 축 방향으로 정렬
 ```
 
 ![](../../img/220507-1.gif)
+
+### 유용한 기법들(auto-margin)
+
+- margin-auto
+  이번에는 flex로 정렬된 엘리먼트를 살짝 다르게 배치해본다.
+  ![](../../img/220507-1.png)
+  만약 이러한 배치에서 C만 오른쪽으로 붙이고 싶다면 어떻게 해야할까?
+
+  ```html
+  <div class="flex-container">
+    <div class="flex-item">A</div>
+    <div class="flex-item">B</div>
+    <div class="flex-item">C</div>
+  </div>
+  ```
+
+  ```css
+  .flex-container {
+    display: flex;
+    /* width: 700px;
+    margin: auto; */ /* margin: auto;로 중앙 정렬 할 수 있음 */
+  }
+  .flex-item {
+    width: 150px;
+  }
+  .flex-item:last-child {
+    margin-left: auto; /* 남아있는 margin을 모두 사용해버린다. */
+  }
+  ```
+
+  ![요렇게 오른쪽으로 C가 붙게된다.](../../img/220507-2.png)
+
+- 고정폭 컬럼과 가변폭 컬럼 혼합
+  flex를 이용하면 고정폭 컬럼과 가변폭 컬럼을 혼합하여 사용하는 것이 매우 쉽다.
+  ```html
+  <div class="flex-container">
+    <div class="flex-item">Lorem, ipsum dolor sit amet consectetur adipisicing elit. Corrupti, molestiae.</div>
+    <div class="flex-item">
+      Lorem ipsum dolor sit amet consectetur adipisicing elit. Maiores ex cum tenetur ea commodi inventore nam doloribus
+      dolores sit saepe.
+    </div>
+    <div class="flex-item">Lorem ipsum dolor sit, amet consectetur adipisicing.</div>
+  </div>
+  ```
+  위의 돔에 아래와 같은 스타일이 적용되어 있다고 했을 때, 가로 크기를 줄이면 고정되지 않는다.
+  ```css
+  .flex-container {
+    display: flex;
+  }
+  .flex-item:nth-child(1) {
+    width: 150px;
+  }
+  .flex-item:nth-child(3) {
+    width: 200px;
+  }
+  ```
+  이유는 `flex-shrink`가 기본값 1로 설정되어 있기 때문이다. 줄어들게 하는 속성임.
+  따라서 이 폭이 유지되도록 flex-shrink를 0으로 고정해준다.
+  ```css
+  .flex-container {
+    display: flex;
+  }
+  .flex-item:nth-child(1) {
+    width: 150px;
+    flex-shrink: 0; /* flex: 0 0 auto; 같은 의미 */
+  }
+  .flex-item:nth-child(3) {
+    width: 200px;
+    flex-shrink: 0; /* flex: 0 0 auto; 같은 의미 */
+  }
+  ```
+  이렇게 처리하면 2번째 div만 반응형으로 크기가 바뀌며 첫번째, 세번째 div는 고정값을 유지한다.
+  그런데 어느 정도 가로 길이를 길게 하다보면 2번째 div도 커지지 않음. 이는 flex-grow가 0으로 설정되어 있기 때문이다.
+  ![](../../img/220507-3.png)
+  ```css
+  /* 위와 동일..  */
+  .flex-item:nth-child(2) {
+    flex-grow: 1;
+  }
+  ```
+  위와 같이 처리하면 2번째 div가 계속 나머지 공간을 채우도록 만들어줄 수 있다.
+  - 푸터 바닥에 붙이기
+    flex를 이용해서 푸터 div를 바닥에 붙이고 싶을 땐 어떻게 할까?
+    ```html
+    <div class="page">
+      <header class="header flex-item">header</header>
+      <section class="content">
+        Lorem ipsum, dolor sit amet consectetur adipisicing elit. Officia, ullam pariatur quas magnam voluptates dolore
+        qui laborum explicabo voluptate non eaque at ipsam minima optio autem, delectus blanditiis praesentium deserunt
+        omnis? Quidem, hic. Atque provident sed qui, fugit corporis culpa maiores nesciunt laudantium voluptates quia
+        deleniti, expedita recusandae.
+      </section>
+      <footer class="footer flex-item">footer</footer>
+    </div>
+    ```
+    위에서 살펴봤던 margin - auto 속성을 flex-direction: column 타입으로 활용하면 된다.
+    ```css
+    .page {
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+    .content {
+      flex: 1 auto;
+      padding: 1.5rem;
+    }
+    ```
+    ![아래로 예쁘게 붙는다!](../../img/220507-4.png)
+  - IE 버그
+    IE에는 flex 코드에 에러가 발생한다. 따라서 아래와 같이 스타일을 추가해준다.
+    ```css
+    .page {
+      display: flex;
+      flex-direction: column;
+      /* min-height: 100vh; */
+      height: 100vh; /* IE에서는 min-height 대신 height로 */
+    }
+    .content {
+      overflow: auto; /* IE에서만 추가 */
+      flex: 1 auto;
+      padding: 1.5rem;
+    }
+    ```
