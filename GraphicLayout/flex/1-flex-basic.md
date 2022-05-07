@@ -438,3 +438,53 @@ align : 수직 축 방향으로 정렬
 ![](../../img/220313-5.png)
 
 위처럼 flex-grow를 auto로 설정해주면 떨어진 block이 유연한 박스 형태를 가지게 되는 것을 확인할 수 있음
+
+### 반응형 컬럼
+
+반응형 컬럼은 미디어 쿼리를 통해서 구현한다. 특정한 크기 이상에서는 컬럼배치를 다르게 하기 위해서는 `flex-direction`과 `flex-wrap`, `flex-grow` 속성을 활용하여 반응형을 구현할 수 있다.
+
+```html
+<div class="flex-container">
+  <div class="flex-item">AAAAAAAAAA</div>
+  <div class="flex-item">BB</div>
+  <div class="flex-item">CCCCCC</div>
+  <div class="flex-item">AAAAAAAAAA</div>
+  <div class="flex-item">BB</div>
+  <div class="flex-item">CCCCCC</div>
+  <div class="flex-item">AAAAAAAAAA</div>
+  <div class="flex-item">BB</div>
+  <div class="flex-item">CCCCCC</div>
+  <div class="flex-item">AAAAAAAAAA</div>
+  <div class="flex-item">BB</div>
+  <div class="flex-item">CCCCCC</div>
+  <div class="flex-item">CCCCCC</div>
+</div>
+```
+
+```css
+.flex-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+.flex-item {
+  flex: 1 auto;
+}
+@media (min-width: 600px) {
+  .flex-container {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+  .flex-item {
+    width: 50%; /* flex-basis: 50%; 같은 의미임 */
+    /* flex: 0 auto; */ /* flex-grow를 0으로 설정하면 홀수 컬럼 width가 50% 유지 */
+  }
+}
+@media (min-width: 900px) {
+  .flex-item {
+    width: 30%; /* flex-grow가 1이기 때문에 남은 영역은 알아서 늘어난다. */
+  }
+}
+```
+
+![](../../img/220507-1.gif)
