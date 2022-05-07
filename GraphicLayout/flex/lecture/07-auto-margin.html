@@ -1,0 +1,30 @@
+﻿<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>CSS Flex</title>
+    <link rel="stylesheet" href="default.css" />
+    <style>
+      .flex-container {
+        display: flex;
+        width: 700px;
+        margin: auto; /* margin: auto;로 중앙 정렬 할 수 있음 */
+      }
+      .flex-item {
+        width: 150px;
+      }
+      .flex-item:last-child {
+        margin-left: auto; /* 남아있는 margin을 모두 사용해버린다. */
+      }
+    </style>
+  </head>
+  <body>
+    <div class="flex-container">
+      <div class="flex-item">A</div>
+      <div class="flex-item">B</div>
+      <div class="flex-item">C</div>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,36 @@
+﻿<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>CSS Flex</title>
+    <link rel="stylesheet" href="default.css" />
+    <style>
+      .flex-container {
+        display: flex;
+      }
+      .flex-item:nth-child(1) {
+        width: 150px;
+        flex-shrink: 0; /* flex: 0 0 auto; 같은 의미 */
+      }
+      .flex-item:nth-child(2) {
+        flex-grow: 1;
+      }
+      .flex-item:nth-child(3) {
+        width: 200px;
+        flex-shrink: 0; /* flex: 0 0 auto; 같은 의미 */
+      }
+    </style>
+  </head>
+  <body>
+    <div class="flex-container">
+      <div class="flex-item">Lorem, ipsum dolor sit amet consectetur adipisicing elit. Corrupti, molestiae.</div>
+      <div class="flex-item">
+        Lorem ipsum dolor sit amet consectetur adipisicing elit. Maiores ex cum tenetur ea commodi inventore nam
+        doloribus dolores sit saepe.
+      </div>
+      <div class="flex-item">Lorem ipsum dolor sit, amet consectetur adipisicing.</div>
+    </div>
+  </body>
+</html>
