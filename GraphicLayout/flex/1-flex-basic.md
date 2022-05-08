@@ -611,3 +611,79 @@ align : 수직 축 방향으로 정렬
       padding: 1.5rem;
     }
     ```
+
+아래와 같은 돔이 있다고 했을 때 개별 아이템 속성으로 다양한 스타일을 부여할 수 있다.
+
+```html
+<div class="flex-container">
+  <div class="flex-item">AAAAAAAAAA</div>
+  <div class="flex-item">BB</div>
+  <div class="flex-item">CCCCCC</div>
+</div>
+```
+
+### 개별 아이템 속성 align-self
+
+이번에는 각 아이템을 정렬하는 속성에 대해 알아보자. `align-self`는 수직축을 중심으로 움직인다.
+
+`align-self`는 `align-items`보다 우선권이 있는 속성이다.
+
+```css
+.flex-container {
+  display: flex;
+  height: 100vh;
+  align-items: center;
+}
+.flex-item:nth-child(2) {
+  align-self: stretch; /* 2번째 아이템만 늘어난다. */
+}
+```
+
+![](../../img/220508-1.png)
+
+### 아이템 배치순서 order
+
+각 아이템들의 시각적 나열 순서를 order를 통해 결정할 수 있다.
+숫자가 작을수록 먼저 배치된다. html 구조가 바뀌지는 않으므로 접근성 면에서 문제가 될 수 있으므로 주의한다.
+시각적 나열 순서가 의미적으로 상관이 없는 콘텐츠에 사용하면 좋다.
+
+```css
+.flex-container {
+  display: flex;
+}
+.flex-item:nth-child(1) {
+  order: 3;
+}
+.flex-item:nth-child(2) {
+  order: 1;
+}
+.flex-item:nth-child(3) {
+  order: 2;
+}
+```
+
+![순서 변경이 이렇게 바뀐다.](../../img/220508-2.png)
+
+### z-index
+
+z-index로 z축 정렬을 할 수있다. z-index를 설정하지않으면 0이므로, 1으로 설정해도 위로 올라온다.
+
+```css
+.flex-container {
+  display: flex;
+}
+.flex-item {
+  opacity: 0.8;
+}
+.flex-item:nth-child(1) {
+  transform: scale(1.5);
+  z-index: 1;
+}
+.flex-item:nth-child(2) {
+  transform: scale(2);
+  z-index: 2;
+}
+.flex-item:nth-child(3) {
+  transform: scale(2.2);
+}
+```
