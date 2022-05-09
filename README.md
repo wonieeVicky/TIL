@@ -534,3 +534,4 @@
 2. Flex
 
    - [Flex 핵심 정리](https://github.com/wonieeVicky/TIL/blob/main/GraphicLayout/flex/1-flex-basic.md)
+   - [Flex UI 구현](https://github.com/wonieeVicky/TIL/blob/main/GraphicLayout/flex/2-flex-ui.md)
