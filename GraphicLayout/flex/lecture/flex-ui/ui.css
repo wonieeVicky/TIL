@@ -1,0 +1,27 @@
+﻿/* menu */
+.menu {
+  display: flex;
+}
+.menu-item {
+  background: gold;
+  transition: 0.5s;
+  width: 25%;
+  /* flex-grow: 1; */
+}
+.menu-item:hover {
+  background: crimson;
+  width: 35%;
+  /* flex-grow: 1.5; */
+}
+.menu-link {
+  display: block;
+  padding: 1em;
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #555;
+  text-decoration: none;
+  text-align: center;
+}
+.menu-link:hover {
+  color: white;
+}
