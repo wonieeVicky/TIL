@@ -25,3 +25,24 @@
 .menu-link:hover {
   color: white;
 }
+
+/* search */
+.search-form {
+  margin-top: 50px;
+  display: flex;
+  height: 40px; /* align-items: stretch 라서 중앙 정렬된다. */
+}
+.search-form input[type="search"] {
+  border: 0;
+  border-radius: 0.3em;
+  font-size: 1rem;
+  margin-right: 10px;
+  flex: 1;
+}
+.search-form input[type="submit"] {
+  border: 0;
+  border-radius: 0.3em;
+  font-size: 1rem;
+  background-color: gold;
+  width: 4em;
+}
