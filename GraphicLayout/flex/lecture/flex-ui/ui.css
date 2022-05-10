@@ -46,3 +46,13 @@
   background-color: gold;
   width: 4em;
 }
+
+/* bullet */
+.info-list-item {
+  display: flex;
+  margin: 0.5em 0;
+}
+.info-list-item::before {
+  content: "";
+  margin-right: 0.5em;
+}
