@@ -56,3 +56,21 @@
   content: "";
   margin-right: 0.5em;
 }
+
+/* user list - messge list */
+.user-item {
+  display: flex;
+  margin-bottom: 1.5em; /* rem은 html의 font-size를 기준으로 함 */
+}
+.user-photo {
+  flex-shrink: 0;
+  width: 50px;
+  height: 50px;
+  border: 2px solid #333;
+  border-radius: 50%;
+  background-color: gold;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 150%;
+  margin-right: 0.5em;
+}
