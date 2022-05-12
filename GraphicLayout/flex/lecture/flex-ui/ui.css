@@ -84,3 +84,22 @@
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+
+/* modal */
+.modal {
+  position: fixed;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.3);
+}
+.dialog {
+  background: white;
+  width: 50vw;
+  padding: 2em;
+  border-radius: 1em;
+}
