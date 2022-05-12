@@ -57,7 +57,7 @@
   margin-right: 0.5em;
 }
 
-/* user list - messge list */
+/* user list - message list */
 .user-item {
   display: flex;
   margin-bottom: 1.5em; /* rem은 html의 font-size를 기준으로 함 */
@@ -73,4 +73,14 @@
   background-position: center;
   background-size: 150%;
   margin-right: 0.5em;
+}
+
+/* user list - friend list */
+.friend-item {
+  align-items: center;
+}
+.user-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
