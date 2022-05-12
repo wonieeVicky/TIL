@@ -190,3 +190,175 @@ flex를 통해 앞에 불릿이 있고, 줄넘김이 되었을 떄 두번째 줄
 ```
 
 위 스타일에서 `.user-item`의 `margin-bottom`을 `em`으로 설정한 이유는 해당 태그의 `font-size`를 기준으로 상속받기 위해서임. 만약 `rem`을 쓰면 해당 태그의 `font-size`가 50px이어도 영향을 받지 않는다.
+
+### 유저리스트
+
+이번에는 동일한 메시지리스트인데, 콘텐츠 내용이 말줄임으로 표현되는 유저리스트를 만들어보려고 한다.
+
+![](../../img/220512-1.gif)
+
+```html
+<ul class="user-list message-list">
+  <li class="user-item friend-item">
+    <figure class="user-photo" style="background-image: url(../images/ilbuni.png)"></figure>
+    <p class="user-name">비키 비키 비키 비키 비키 비키 비키 비키 비키 비키 비키 비키 비키 비키 비키</p>
+  </li>
+  <li class="user-item friend-item">
+    <figure class="user-photo" style="background-image: url(../images/ilbuni.png)"></figure>
+    <p class="user-name">비키 비키 비키 비키 비키 비키 비키 비키 비키 비키 비키 비키 비키 비키 비키</p>
+  </li>
+  <li class="user-item friend-item">
+    <figure class="user-photo" style="background-image: url(../images/ilbuni.png)"></figure>
+    <p class="user-name">비키 비키 비키 비키 비키 비키 비키 비키 비키 비키 비키 비키 비키 비키 비키</p>
+  </li>
+</ul>
+```
+
+```css
+/* user list - friend list */
+.friend-item {
+  align-items: center;
+}
+.user-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+```
+
+위와 같이 간단하게 한줄 텍스트 처리를 할 수 있음
+
+### 모달
+
+이번에는 크기가 얼마이던지 가운데로 정렬되는 모달을 flex를 통해 구현해보고자 한다.
+
+![](../../img/220512-2.gif)
+
+```html
+<div class="modal">
+  <div class="dialog">
+    Lorem ipsum dolor sit amet consectetur adipisicing elit. Repudiandae ad delectus minima rem saepe, sunt aliquam
+    vitae, perferendis laborum impedit ipsa, et soluta facilis libero alias numquam ratione voluptatem quod doloribus
+    pariatur fuga quo? Sapiente, distinctio tempore cupiditate facere nobis nesciunt magnam cumque nemo quibusdam autem
+    ea rerum exercitationem temporibus.
+  </div>
+</div>
+```
+
+```css
+/* modal */
+.modal {
+  position: fixed;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.3);
+}
+.dialog {
+  background: white;
+  width: 50vw;
+  padding: 2em;
+  border-radius: 1em;
+}
+```
+
+`.modal` 클래스에 `display: flex` 속성을 주고 가운데 중앙 정렬 하는 방법으로 구현하면 된다. 간단쓰
+
+### 카드 리스트
+
+웹 어플리케이션에서 굉장히 많이 사용하는 카드레이아웃을 flex로 구현해보고자 한다.
+특히 콘텐츠 영역에 양이 다를 경우 카드 높낮이가 모두 다르게 노출되는 것과 달리 flex를 사용하면 모두 일정한 높이를 가지도록 만들 수 있다.
+
+```html
+<div class="card-list-con">
+  <ul class="card-list">
+    <li class="card-item">
+      <figure class="card-image" style="background-image: url(../images/ilbuni.png)"></figure>
+      <div class="card-desc">Lorem ipsum dolor, sit amet consectetur adipisicing elit. Atque, placeat!</div>
+    </li>
+    <li class="card-item">
+      <figure class="card-image" style="background-image: url(../images/ilbuni.png)"></figure>
+      <div class="card-desc">Lorem ipsum dolor,</div>
+    </li>
+    <li class="card-item">
+      <figure class="card-image" style="background-image: url(../images/ilbuni.png)"></figure>
+      <div class="card-desc">
+        Lorem ipsum dolor, sit amet consectetur adipisicing elit. Atque, placeat!Lorem ipsum dolor, sit amet consectetur
+        adipisicing elit. Atque, placeat!
+      </div>
+    </li>
+    <li class="card-item">
+      <figure class="card-image" style="background-image: url(../images/ilbuni.png)"></figure>
+      <div class="card-desc">Lorem ipsum dolor, sit amet consectetur adipisicing elit. Atque, placeat!</div>
+    </li>
+    <li class="card-item">
+      <figure class="card-image" style="background-image: url(../images/ilbuni.png)"></figure>
+      <div class="card-desc">Lorem ipsum dolor, sit amet consectetur adipisicing elit. Atque, placeat!</div>
+    </li>
+    <li class="card-item">
+      <figure class="card-image" style="background-image: url(../images/ilbuni.png)"></figure>
+      <div class="card-desc">Lorem ipsum dolor, sit amet consectetur adipisicing elit. Atque, placeat!</div>
+    </li>
+    <li class="card-item">
+      <figure class="card-image" style="background-image: url(../images/ilbuni.png)"></figure>
+      <div class="card-desc">Lorem ipsum dolor, sit amet consectetur adipisicing elit. Atque, placeat!</div>
+    </li>
+    <li class="card-item">
+      <figure class="card-image" style="background-image: url(../images/ilbuni.png)"></figure>
+      <div class="card-desc">Lorem ipsum dolor, sit amet consectetur adipisicing elit. Atque, placeat!</div>
+    </li>
+  </ul>
+</div>
+```
+
+```css
+/* cards list */
+.card-item {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 2rem;
+}
+.card-image {
+  height: 0;
+  padding-bottom: 80%; /* 이미지를 height의 80% 비율로 보여준다  */
+  background-color: lightgray;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
+}
+.card-image img {
+  display: none; /* figure background 이미지로 노출 */
+}
+.card-desc {
+  padding: 1em;
+  background: white;
+  flex: 1 1 auto;
+}
+
+@media (min-width: 600px) {
+  .card-list-con {
+    overflow-x: hidden;
+  }
+  .card-list {
+    display: flex;
+    flex-wrap: wrap;
+    margin: 0 -1rem; /* card간 간격조정은 padding으로, 양 끝은 margin으로 조정 */
+    /* card-item이 33.333%일 때 row에 item이 2개일 경우 가운데가 비는 형상 발생 */
+    /* justify-content: space-between; */
+  }
+  .card-item {
+    width: 50%;
+    padding: 0 1rem;
+  }
+}
+```
+
+![](../../img/220521-1.png)
+
+![](../../img/220521-2.png)
+
+![](../../img/220521-3.png)
