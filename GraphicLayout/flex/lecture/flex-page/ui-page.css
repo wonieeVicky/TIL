@@ -1,1 +1,30 @@
-﻿
+﻿.header {
+  display: flex;
+  justify-content: space-between; /* .search-form { margin-left: auto; } 로 해도 된다! */
+  height: 80px;
+  align-items: center;
+  padding: 0 1rem;
+}
+.search-form {
+  width: 300px;
+  max-width: 60%; /* 브라우저 창이 로고를 물어갈 경우 대비 */
+}
+
+section.primary {
+  padding: 1rem;
+}
+.secondary {
+  padding: 1rem;
+}
+.secondary-a {
+  background-color: white;
+}
+.secondary-b {
+  color: white;
+  background: #666;
+}
+
+.footer {
+  padding: 1rem;
+  text-align: center;
+}
