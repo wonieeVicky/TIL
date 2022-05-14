@@ -28,7 +28,6 @@
 
 /* search */
 .search-form {
-  margin-top: 50px;
   display: flex;
   height: 40px; /* align-items: stretch 라서 중앙 정렬된다. */
 }
@@ -134,13 +133,13 @@
   .card-list {
     display: flex;
     flex-wrap: wrap;
-    margin: 0 -1rem; /* card간 간격조정은 padding으로, 양 끝은 margin으로 조정 */
+    margin: 0 -0.5rem; /* card간 간격조정은 padding으로, 양 끝은 margin으로 조정 */
     /* card-item이 33.333%일 때 row에 item이 2개일 경우 가운데가 비는 형상 발생 */
     /* justify-content: space-between; */
   }
   .card-item {
     width: 50%;
-    padding: 0 1rem;
+    padding: 0 0.5rem;
   }
 }
 
