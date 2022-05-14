@@ -155,3 +155,40 @@ Flex UI에서 만든 컴포넌트들을 하나의 페이지로 모아서 반응�
 ```
 
 ![그럼 아래와 같은 레이아웃이 기본적으로 생성된다.](../../img/220513-2.png)
+
+### 전체적인 padding 레이아웃 잡기
+
+```css
+.header {
+  display: flex;
+  justify-content: space-between; /* .search-form { margin-left: auto; } 도 가능 */
+  height: 80px;
+  align-items: center;
+  padding: 0 1rem;
+}
+.search-form {
+  width: 300px;
+  max-width: 60%; /* 브라우저 창이 로고를 물어갈 경우 대비(호..?) */
+}
+section.primary {
+  padding: 1rem;
+}
+.secondary {
+  padding: 1rem;
+}
+.secondary-a {
+  background-color: white;
+}
+.secondary-b {
+  color: white;
+  background: #666;
+}
+.footer {
+  padding: 1rem;
+  text-align: center;
+}
+```
+
+`header`는 `justify-content`로 로고와 검색창 사이를 그리거나, `.search-form`에 `maring-left: auto;` 를 넣어 처리할 수도 있다. `.search-form`에 `max-width`는 창 크기가 줄어들어 여유가 없을 때 최대 60%로 처리하여 자연스럽게 처리될 수 있도록 함.
+
+![](../../img/220514-1.png)
