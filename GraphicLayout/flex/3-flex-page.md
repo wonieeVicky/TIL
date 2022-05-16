@@ -156,7 +156,7 @@ Flex UI에서 만든 컴포넌트들을 하나의 페이지로 모아서 반응�
 
 ![그럼 아래와 같은 레이아웃이 기본적으로 생성된다.](../../img/220513-2.png)
 
-### 전체적인 padding 레이아웃 잡기
+### 전체 레이아웃 내 여백 반영
 
 ```css
 .header {
@@ -191,4 +191,105 @@ section.primary {
 
 `header`는 `justify-content`로 로고와 검색창 사이를 그리거나, `.search-form`에 `maring-left: auto;` 를 넣어 처리할 수도 있다. `.search-form`에 `max-width`는 창 크기가 줄어들어 여유가 없을 때 최대 60%로 처리하여 자연스럽게 처리될 수 있도록 함.
 
-![](../../img/220514-1.png)
+### 모달 액션 css로 구현하기
+
+보통 모달 액션은 onclick 이벤트를 JavaScript 코드로 추가해 넣는다. 아래와 같이 말이다!
+
+```html
+<div class="page">
+  <!-- header -->
+  <header class="header">
+    <h1 class="website-title">Flex코딩</h1>
+    <form class="search-form">
+      <input type="search" />
+      <input type="submit" value="찾기" />
+    </form>
+    <div id="modal-switch">💟</div>
+  </header>
+</div>
+```
+
+```css
+.header {
+  display: flex;
+  height: 80px;
+  align-items: center;
+  padding: 0 1rem;
+}
+.search-form {
+  width: 300px;
+  max-width: 60%; /* 브라우저 창이 로고를 물어갈 경우 대비 */
+  margin-left: auto;
+}
+#modal-switch {
+  font-size: 2rem;
+}
+```
+
+위와 같이 변경 후 `#modal-switch` 태그에 클릭 이벤트를 추가하는 방식이 가장 기본적임. 하지만 `#modal-switch` 을 input으로 구현하면 css로도 클릭 이벤트를 구현할 수 있다.
+
+```html
+<body>
+  <input type="checkbox" id="modal-switch" />
+  <label for="modal-switch">
+    <span>modal 열고 닫기</span>
+  </label>
+  <!-- modal -->
+  <div class="modal">
+    <div class="dialog">
+      Lorem ipsum dolor sit amet consectetur adipisicing elit. Repudiandae ad delectus minima rem saepe, sunt aliquam
+      vitae, perferendis laborum impedit ipsa, et soluta facilis libero alias numquam ratione voluptatem quod doloribus
+      pariatur fuga quo? Sapiente, distinctio tempore cupiditate facere nobis nesciunt magnam cumque nemo quibusdam
+      autem ea rerum exercitationem temporibus.
+    </div>
+  </div>
+</body>
+```
+
+```css
+.search-form {
+  width: 300px;
+  max-width: 60%;
+  margin-left: auto; /* space-between 대신 적용 */
+  margin-right: 3rem; /* label[for="modal-switch"] 자리 만들기 */
+}
+.modal {
+  display: none;
+  top: 80px;
+}
+#modal-switch:checked ~ .modal {
+  /* 바로 다음 형제노드만 선택할 때는 + 사용 */
+  display: flex;
+}
+#modal-switch:checked ~ label[for="modal-switch"]:before {
+  content: "🌌"; /* 클릭했을 때 */
+}
+label[for="modal-switch"] {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  top: 1.3rem;
+  right: 1rem;
+  width: 40px;
+  height: 40px;
+}
+label[for="modal-switch"]:before {
+  content: "🌠";
+  font-size: 2rem;
+  line-height: initial;
+  cursor: pointer;
+}
+/* 스크린리더, SEO 이슈가 있어 display:none; 혹은 width:0; 미사용, overflow 속성 사용 */
+#modal-switch,
+label[for="modal-switch"] span {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  opacity: 0;
+  top: 0;
+}
+```
+
+![](../../img/220516-1.gif)
