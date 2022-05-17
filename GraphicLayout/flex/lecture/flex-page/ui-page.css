@@ -65,5 +65,44 @@ label[for="modal-switch"] span {
   height: 1px;
   overflow: hidden; /* 스크린리더, SEO 이슈가 있어 display:none; 혹은 width:0; 미사용! */
   opacity: 0;
-  top: 0;
+}
+
+@media (min-width: 1024px) {
+  .page {
+    display: flex;
+    flex-wrap: wrap;
+  }
+  .header,
+  .menu {
+    width: 100%;
+  }
+  .secondary {
+    width: 20%;
+  }
+  .secondary-a {
+    order: 1;
+  }
+  .primary {
+    width: 60%;
+    order: 2;
+  }
+  .secondary-b {
+    order: 3;
+  }
+  .footer {
+    order: 4;
+    border-top: 1px solid lightgray;
+    width: 100%;
+  }
+}
+/* 화면이 너무 커졌을 때 sidebar width를 고정하기 */
+@media (min-width: 1400px) {
+  .secondary {
+    width: 300px;
+  }
+  .primary {
+    width: calc(100% - 600px);
+    /* flex: 1 1 auto; */ /* flex를 썻을 때 간헐적으로 자리를 못찾는 이슈가 있어서 width로 사용 */
+    /* flex: auto; */
+  }
 }
