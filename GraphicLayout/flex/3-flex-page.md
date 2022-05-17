@@ -293,3 +293,52 @@ label[for="modal-switch"] span {
 ```
 
 ![](../../img/220516-1.gif)
+
+### 반응형 사이드바 구현
+
+창이 조금 커졌을 때 사이드바가 노출되도록 스타일을 변경해본다.
+해당 영역은 `primary`, `secondary-a`, `secondary-b` 가 `flex`로 배치되도록 구성해야하는데, 보통 해당 3개의 영역을 wrapper div로 감싸서 스타일 처리를 하는 방법을 썻다면, 이번에는 별도의 감싸는 태그 없이 3개의 태그에 flex 배치를 해보도록 한다.
+
+```css
+@media (min-width: 1024px) {
+  .page {
+    display: flex;
+    flex-wrap: wrap;
+  }
+  .header,
+  .menu {
+    width: 100%;
+  }
+  .secondary {
+    width: 20%;
+  }
+  .secondary-a {
+    order: 1;
+  }
+  .primary {
+    width: 60%;
+    order: 2;
+  }
+  .secondary-b {
+    order: 3;
+  }
+  .footer {
+    order: 4;
+    border-top: 1px solid lightgray;
+    width: 100%;
+  }
+}
+
+@media (min-width: 1400px) {
+  .secondary {
+    width: 300px; /* 화면이 너무 커졌을 때 sidebar width 고정 */
+  }
+  .primary {
+    width: calc(100% - 600px);
+    /* flex: 1 1 auto; */ /* flex를 썻을 때 자리를 못찾는 이슈 발생 > width로 사용 */
+    /* flex: auto; */
+  }
+}
+```
+
+![](../../img/220517-1.gif)
