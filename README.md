@@ -536,3 +536,7 @@
    - [Flex 핵심 정리](https://github.com/wonieeVicky/TIL/blob/main/GraphicLayout/flex/1-flex-basic.md)
    - [Flex UI 구현](https://github.com/wonieeVicky/TIL/blob/main/GraphicLayout/flex/2-flex-ui.md)
    - [반응형 Flex 페이지 구현](https://github.com/wonieeVicky/TIL/blob/main/GraphicLayout/flex/3-flex-page.md)
+
+3. Grid
+
+   - [Grid 핵심 정리](https://github.com/wonieeVicky/TIL/blob/main/GraphicLayout/grid/1-grid-basic.md)
