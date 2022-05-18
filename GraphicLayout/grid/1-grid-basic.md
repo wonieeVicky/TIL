@@ -18,3 +18,45 @@ NoNo! IE 10, 11에서도 구버전 스펙(새 창)을 지원하기 때문에 귀
 
 그리드는 파이어폭스 개발자 도구에서 레이아웃을 명확하게 보여주는 기능을 가지므로, 해당 실습은 파이어폭스에서 진행한다.
 ![](../../img/220517-2.png)
+
+### 용어 정리
+
+Grid 레이아웃을 만들기 위한 기본적인 HTML 구조는 Flex와 마찬가지로 컨테이너와 아이템만 있으면 된다.
+
+```html
+<div class="container">
+  <div class="item">A</div>
+  <div class="item">B</div>
+  <div class="item">C</div>
+  <div class="item">D</div>
+  <div class="item">E</div>
+</div>
+```
+
+```css
+.container {
+  display: grid;
+}
+```
+
+![](../../img/220518-1.png)
+
+- 그리드 컨테이너(Grid Container)
+  - 부모 요소인 div.container를 grid container(그리드 컨테이너)라고 부름
+  - display: grid를 적용하는 grid의 전체 영역. grid 컨테이너 안의 요소들이 grid 규칙의 영향을 받아 정렬
+- 그리드 아이템(Grid Item)
+  - 자식 요소인 div.item들을 grid item(그리드 아이템)이라고 부름
+  - grid 규칙에 의해 배치되는 요소
+- 그리드 트랙(Grid Track)
+  - grid의 행(Row) 또는 열(Column)
+- 그리드 셀(Grid Cell)
+  - grid의 한 칸을 가리킴 div 같은 실제 html 요소는 그리드 아이템, 이런 grid 아이템 하나가 들어가는 가상의 칸이라고 생각한다.
+  - 위 그림에서 그리드 셀은 9개를 의미함
+- 그리드 라인(Grid Line)
+  - Grid 셀을 구분하는 선
+- 그리드 번호(Grid Number)
+  - Grid 라인의 각 번호
+- 그리드 갭(Grid Gap)
+  - Grid 셀 사이의 간격
+- 그리드 영역(Grid Area)
+  - Grid 라인으로 둘러싸인 사각형 영역으로 그리드 셀의
