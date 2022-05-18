@@ -60,3 +60,120 @@ Grid 레이아웃을 만들기 위한 기본적인 HTML 구조는 Flex와 마찬
   - Grid 셀 사이의 간격
 - 그리드 영역(Grid Area)
   - Grid 라인으로 둘러싸인 사각형 영역으로 그리드 셀의
+
+### 그리드 기본 형태
+
+Grid도 Flex와 마찬가지로 Grid 컨테이너에 적용하는 속성과 Grid 아이템에 적용하는 속성으로 나뉜다.
+Grid 레이아웃을 실습하기에 앞서 `default.css`가 기본 고정 스타일로 추가되는데, 여기에 아래 스타일이 Flex 대신에 추가된다고 보면 된다.
+
+```css
+.grid-container {
+  padding: 10px;
+  background: lightgray;
+}
+.grid-item {
+  padding: 10px;
+  border: 3px solid rgb(50, 50, 40);
+  color: white;
+  background: #ff6937;
+}
+```
+
+- 그리드 형태 정의 : `grid-template-rows`, `grid-template-columns`
+
+  - 컨테이너에 grid 트랙의 크리들을 지정해주는 속성, 여러단위를 사용할 수 있고 섞어 사용 가능함
+  - `grid-template-columns`
+
+    ```css
+    .grid-container {
+      display: grid;
+      grid-template-columns: 100px 300px 200px;
+    }
+    ```
+
+    위와 같은 스타일은 아래와 같은 결과를 도출한다.
+
+    ![1열 100px, 2열 300px, 3열 200px로 배치된다.](../../img/220519-1.png)
+
+    ```css
+    .grid-container {
+      display: grid;
+      grid-template-columns: 1fr 1fr; /* fr: fraction, 비, 비율, 분수, 부분 */
+    }
+    ```
+
+    위 스타일은 아래와 같은 결과를 도출한다.
+
+    ![1:1 비율을 가진 컬럼 형성](../../img/220519-2.png)
+
+    ```css
+    .grid-container {
+      display: grid;
+      grid-template-columns: 1fr 500px 1fr;
+    }
+    ```
+
+    위 스타일은 아래와 같은 결과를 도출한다.
+
+    ```css
+    .grid-container {
+      display: grid;
+      /* grid-template-columns: 1fr 1fr 1fr 1fr 1fr; */
+      grid-template-columns: repeat(5, 1fr); /* 1fr을 5번 반복하겠다. */
+    }
+    ```
+
+    같은 속성값이 여러번 반복되면 repeat 을 써서 단축하여 작성할 수 있다.
+
+    ![1:1 비율을 가진 컬럼 형성](../../img/220519-3.png)
+
+    ```css
+    .grid-container {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr 2fr 1fr);
+    }
+    ```
+
+    repeat에 복수개의 속성을 부여할 수 있다.
+
+    ![1:2:1, 1:2:1, 1:2:1이 세 번 반복되어 노출](../../img/220519-4.png)
+
+  - `grid-template-rows`
+    - grid-template-columns에서 부여한 속성 모두 똑같이 사용 가능
+    ```css
+    .grid-container {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      grid-template-rows: 200px 200px 200px; /* rows 간 속성 */
+    }
+    ```
+    위 속성은 아래와 같은 결과를 도출한다.
+    ![200px씩 부여](../../img/220519-5.png)
+    ```css
+    .grid-container {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      grid-template-rows: 200px 200px; /* 200px 200px auto;와 같음*/
+    }
+    ```
+    row가 3개일 때 2개에 대한 속성만 부여할 경우 나머지는 기본 간격(auto)만 가져간다.
+    ![](../../img/220519-6.png)
+    ```css
+    .grid-container {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      grid-template-rows: repeat(3, 1fr);
+    }
+    ```
+    위와 같이 설정하면 아래와 같은 결과를 도출, 왜일까?
+    display: block;은 높이값을 따로 가지지않기 때문에 늘어나지 않음
+    ![](../../img/220519-7.png)
+    만약 꽉 채우고 싶다면 어떻게 해야할까?
+    별도의 height 값을 부여하면 됨. 이때 별도로 `grid-template-rows`를 부여하지 않아도 `height`값만 부여되면 해당 row 간격은 자동으로 늘어남. 참고!
+    ```css
+    .grid-container {
+      display: grid;
+      heigh: 50vh; /* grid-template-rows 별도 부여없어도 알아서 늘어난다. */
+    }
+    ```
+    ![](../../img/220519-8.png)
