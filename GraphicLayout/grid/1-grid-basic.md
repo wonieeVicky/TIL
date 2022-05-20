@@ -139,7 +139,9 @@ Grid 레이아웃을 실습하기에 앞서 `default.css`가 기본 고정 스�
     ![1:2:1, 1:2:1, 1:2:1이 세 번 반복되어 노출](../../img/220519-4.png)
 
   - `grid-template-rows`
+
     - grid-template-columns에서 부여한 속성 모두 똑같이 사용 가능
+
     ```css
     .grid-container {
       display: grid;
@@ -147,8 +149,10 @@ Grid 레이아웃을 실습하기에 앞서 `default.css`가 기본 고정 스�
       grid-template-rows: 200px 200px 200px; /* rows 간 속성 */
     }
     ```
+
     위 속성은 아래와 같은 결과를 도출한다.
     ![200px씩 부여](../../img/220519-5.png)
+
     ```css
     .grid-container {
       display: grid;
@@ -156,8 +160,10 @@ Grid 레이아웃을 실습하기에 앞서 `default.css`가 기본 고정 스�
       grid-template-rows: 200px 200px; /* 200px 200px auto;와 같음*/
     }
     ```
+
     row가 3개일 때 2개에 대한 속성만 부여할 경우 나머지는 기본 간격(auto)만 가져간다.
     ![](../../img/220519-6.png)
+
     ```css
     .grid-container {
       display: grid;
@@ -165,15 +171,74 @@ Grid 레이아웃을 실습하기에 앞서 `default.css`가 기본 고정 스�
       grid-template-rows: repeat(3, 1fr);
     }
     ```
+
     위와 같이 설정하면 아래와 같은 결과를 도출, 왜일까?
     display: block;은 높이값을 따로 가지지않기 때문에 늘어나지 않음
     ![](../../img/220519-7.png)
     만약 꽉 채우고 싶다면 어떻게 해야할까?
     별도의 height 값을 부여하면 됨. 이때 별도로 `grid-template-rows`를 부여하지 않아도 `height`값만 부여되면 해당 row 간격은 자동으로 늘어남. 참고!
+
     ```css
     .grid-container {
       display: grid;
       heigh: 50vh; /* grid-template-rows 별도 부여없어도 알아서 늘어난다. */
     }
     ```
+
     ![](../../img/220519-8.png)
+
+    ### 자동으로 채우기
+
+grid는 기본적으로 자신이 가지고 있는 콘텐츠 만큼 크기가 맞춰진다.
+
+![](../../img/220520-1.png)
+
+각 row 별로 높이가 똑같음. 만약 최소한 높이가 정해졌으면 좋겠다고 생각할 땐 어떻게할까?
+
+- 최솟값, 최댓값 설정: `minmax(min, max)`
+  ```css
+  .grid-container {
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(3, minmax(100px, auto));
+  }
+  ```
+  위와 같이 최솟값을 100px, 최댓값을 auto로 갖도록 설정하면 아래와 같은 결과를 가진다.
+  ![2번째 row는 100px를 넘어가므로 auto 값을 가진다.](../../img/220520-2.png)
+- 자동으로 채우기: `auto-fill`, `auto-fit`
+  이번에는 `repeat` 함수 내에서 값 대신에 쓸 수 있는 방법을 알아보자
+  `auto-fill`과 `auto-fit`은 `column`의 개수를 미리 정하지 않고 설정된 너비가 허용하는 한 최대한 셀을 채운다.
+  먼저 `auto-fill`을 보자
+  ```css
+  .grid-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(20%, auto));
+  }
+  ```
+  위 속성은 아래와 같은 결과를 도출한다.
+  ![](../../img/220520-3.png)
+  최소 20%의 너비를 가지도록 하면서 너비가 허용하는 한 최대한 셀을 채우도록 하면 위와 같은 레이아웃을 가진다. 만약 `minmax(25%, auto)`로 설정했다면 첫번째에 4칸만 올라가는 형태일 것이다.
+  위 속성을 사용해 별도의 미디어쿼리 없이 레이아웃을 구현할 수도 있다.
+  ```css
+  .grid-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, auto));
+  }
+  ```
+  ![](../../img/220520-1.gif)
+  다음은 auto-fit은 갯수가 모자랄 때, 나머지 여백을 채워주는 속성이다.
+  ```html
+  <div class="grid-container">
+    <div class="grid-item">A</div>
+    <div class="grid-item">B</div>
+    <div class="grid-item">C</div>
+  </div>
+  ```
+  ```css
+  .grid-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, auto));
+  }
+  ```
+  위와 같이 설정하면 grid-item이 200px을 가졌을 때 여백이 남을 경우 남은 공간을 각 div가 나눠갖는다.
+  ![](../../img/220520-4.png)
+  각 활용하는 용도가 다르므로 필요한 상황에 맞춰서 사용한다.
