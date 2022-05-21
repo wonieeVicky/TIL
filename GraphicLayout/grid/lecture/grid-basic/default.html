@@ -11,7 +11,8 @@
     .grid-container {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      grid-template-rows: repeat(3, minmax(100px, auto));
+      /* grid-template-rows: repeat(2, minmax(100px, auto)); */
+      grid-auto-rows: minmax(100px, auto);
       gap: 20px;
     }
   </style>
@@ -21,7 +22,12 @@
       <div class="grid-item">B</div>
       <div class="grid-item">C</div>
       <div class="grid-item">D</div>
-      <div class="grid-item">E</div>
+      <div class="grid-item">
+        Lorem ipsum dolor sit amet consectetur adipisicing elit. Eveniet asperiores rerum a. Atque pariatur eos hic
+        laboriosam sint corporis numquam magni molestias, veritatis voluptatem commodi. Eos reiciendis nihil maiores
+        facilis autem repellat, dolor sequi ea, cumque voluptatum temporibus libero ex labore ratione est qui
+        necessitatibus repudiandae quae ab eveniet sunt.
+      </div>
       <div class="grid-item">F</div>
       <div class="grid-item">G</div>
       <div class="grid-item">H</div>
