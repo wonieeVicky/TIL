@@ -268,3 +268,57 @@ grid는 기본적으로 자신이 가지고 있는 콘텐츠 만큼 크기가 �
 
   ![gap: 20px; (grid-gap: 20px; 도 동일한 결과 도출, 예전 버전)](../../img/220521-3.png)
   단, gap 속성은 IE에서 지원되지 않으므로 별도의 margin이나 공백용 셀을 만드는 방법으로 개선한다.
+
+### 그리드 자동 정의
+
+그리드 형태를 자동으로 정의하는 하는 grid-auto-columns, grid-auto-rows에 대해 알아보자.
+해당 속성은 통제를 벗어난 위치에 있는 트랙의 크기를 지정하는 속성이다.
+”통제를 벗어난"이라는 게 무슨 의미일까? 아래와 같은 돔과 스타일이 설정되어있다고 하자
+
+```html
+<div class="grid-container">
+  <div class="grid-item">A</div>
+  <div class="grid-item">B</div>
+  <div class="grid-item">C</div>
+  <div class="grid-item">D</div>
+  <div class="grid-item">
+    Lorem ipsum dolor sit amet consectetur adipisicing elit. Eveniet asperiores rerum a. Atque pariatur eos hic
+    laboriosam sint corporis numquam magni molestias, veritatis voluptatem commodi. Eos reiciendis nihil maiores facilis
+    autem repellat, dolor sequi ea, cumque voluptatum temporibus libero ex labore ratione est qui necessitatibus
+    repudiandae quae ab eveniet sunt.
+  </div>
+  <div class="grid-item">F</div>
+  <div class="grid-item">G</div>
+  <div class="grid-item">H</div>
+  <div class="grid-item">I</div>
+</div>
+```
+
+```css
+.grid-container {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(2, minmax(100px, auto));
+  gap: 20px;
+}
+```
+
+위 스타일은 아래의 결과를 도출한다.
+
+![](../../img/220521-4.png)
+
+`grid-template-rows`의 `repeat` 속성이 2이므로 G, H, I는 100px의 높이를 가지지 못하는 한계가 있다. 이러한 통제를 벗어난 요소에 그리드를 자동으로 정의해주는 속성이 grid-auto-rows(columns)이다.(인피니트 스크롤 등으로 끊임없이 요소에 같은 속성이 적용되어야 할 때 사용하면 좋음)
+
+```css
+.grid-container {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  /* grid-template-rows: repeat(2, minmax(100px, auto)); */
+  grid-auto-rows: minmax(100px, auto);
+  gap: 20px;
+}
+```
+
+따라서 위와 같이 grid-template-rows 속성을 grid-auto-rows로 변경하면 아래와 같이 도출된다.
+
+![](../../img/220521-5.png)
