@@ -322,3 +322,164 @@ grid는 기본적으로 자신이 가지고 있는 콘텐츠 만큼 크기가 �
 따라서 위와 같이 grid-template-rows 속성을 grid-auto-rows로 변경하면 아래와 같이 도출된다.
 
 ![](../../img/220521-5.png)
+
+### 각 셀의 영역 지정
+
+이번에는 지금까지의 속성과는 다르게 grid-item에 속성을 부여하는 것이다. 각 아이템에 각자의 스타일을 달리할 수 있다.
+
+![](../../img/220522-1.png)
+
+```css
+.grid-item {
+  grid-column-start: 1;
+  grid-column-end: 3;
+  grid-row-start: 1;
+  grid-row-end: 2;
+}
+/* 위 스타일은 아래 스타일과 동일한 스타일이다. */
+.grid-item {
+  grid-column: 1/3;
+  grid-row: 1/2;
+}
+```
+
+만약 아래와 같은 돔이 있다고 했을 때
+
+```html
+<div class="grid-container">
+  <div class="grid-item">A</div>
+  <div class="grid-item">B</div>
+  <div class="grid-item">C</div>
+  <div class="grid-item">D</div>
+  <div class="grid-item">
+    Lorem ipsum dolor sit amet consectetur adipisicing elit. Eveniet asperiores rerum a. Atque pariatur eos hic
+    laboriosam sint corporis numquam magni molestias, veritatis voluptatem commodi. Eos reiciendis nihil maiores facilis
+    autem repellat,
+  </div>
+  <div class="grid-item">F</div>
+  <div class="grid-item">G</div>
+  <div class="grid-item">H</div>
+  <div class="grid-item">I</div>
+</div>
+```
+
+아래의 스타일을 넣으면 사진과 같은 결과를 반환한다.
+
+```css
+.grid-container {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-auto-rows: minmax(50px, auto);
+  gap: 10px;
+}
+/* 첫번째 셀에 스타일 부여 */
+.grid-item:nth-child(1) {
+  grid-column-start: 1;
+  grid-column-end: 3;
+}
+```
+
+![첫 번째 셀에 grid-column-end가 3, 즉 3번째 column 시작점까지 늘어남](../../img/220522-2.png)
+
+```css
+.grid-item:nth-child(1) {
+  grid-column-start: 1;
+  grid-column-end: 3;
+  grid-row-start: 1;
+  grid-row-end: 4;
+}
+.grid-item:nth-child(4) {
+  /* grid-column: 3; 3/4 이면 한 칸이니까 3만 쓰거나 안써도 된다. */
+  grid-row: 3 / 5;
+}
+```
+
+![첫번째 셀에 grid-row가 4, 즉 4번째 row 시작점까지 늘어남, 4번째 셀 grid-row가 3/5, 즉 5번째 row 시작점까지 늘어남](../../img/220522-3.png)
+
+위처럼 start, end 포인트를 넣는 방법말고, start 포인트에서 점유하는 n칸을 지정해줄 수 있다.
+
+```css
+.grid-item:nth-child(4) {
+  grid-row: 3 / span 2; /* grid-row: 3 / 5와 같은 스타일임 */
+}
+```
+
+또한 .grid-item은 자신보다 이전의 자리를 탐(?)할 수도 있다.
+
+```css
+.grid-item:nth-child(4) {
+  grid-row: 2 / span 3;
+}
+```
+
+그러면 아래와 같이 C가 아래가 밀리면서 D가 C의 자리를 차지하게됨
+
+![](../../img/220523-4.png)
+
+밀리지 않도록 아래와 같이 처리해줘도 된다.
+
+```css
+.grid-item:nth-child(3) {
+  grid-column: 3;
+  grid-row: 2;
+}
+.grid-item:nth-child(4) {
+  grid-column: 3;
+  grid-row: 2 / span 3;
+  opacity: 0.5; /* 레이아웃 확인을 위해 추가 */
+  padding: 30px; /* 레이아웃 확인을 위해 추가 */
+}
+```
+
+![아래와 같이 서로의 영역이 겹치더라도 같은 공간을 점유하도록 처리할수도 있다. ](../../img/220523-5.png)
+
+위 grid-column, grid-row를 알았으니 이제 grid-auto-columns도 테스트 해볼 수 있다.
+아래와 같은 돔과 스타일이 설정되어 있다고 하자.
+
+```html
+<div class="grid-container">
+  <div class="grid-item">A</div>
+  <div class="grid-item">B</div>
+  <div class="grid-item">C</div>
+  <div class="grid-item">D</div>
+  <div class="grid-item">E</div>
+  <div class="grid-item">F</div>
+  <div class="grid-item">G</div>
+  <div class="grid-item">H</div>
+  <div class="grid-item">I</div>
+</div>
+```
+
+```css
+.grid-container {
+  display: grid;
+  grid-template-columns: 50px;
+  grid-auto-columns: 1fr 2fr;
+  gap: 1rem;
+}
+
+.grid-item:nth-child(1) {
+  grid-column: 2; /* 각 셀별로 시작위치 설정 */
+}
+.grid-item:nth-child(2) {
+  grid-column: 3; /* 각 셀별로 시작위치 설정 */
+}
+.grid-item:nth-child(3) {
+  grid-column: 4; /* 각 셀별로 시작위치 설정 */
+}
+.grid-item:nth-child(4) {
+  grid-column: 5; /* 각 셀별로 시작위치 설정 */
+}
+.grid-item:nth-child(5) {
+  grid-column: 6; /* 각 셀별로 시작위치 설정 */
+}
+.grid-item:nth-child(6) {
+  grid-column: 7; /* 각 셀별로 시작위치 설정 */
+}
+```
+
+위 설정은 아래의 결과를 도출해낸다.
+
+![](../../img/220523-6.png)
+
+첫번째 컬럼에 50px;이므로 1열에만 50px;이 부여되며 나머지 열은 모두 1fr 2fr을 순환 반복하게 된다.
