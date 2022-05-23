@@ -455,7 +455,7 @@ grid는 기본적으로 자신이 가지고 있는 콘텐츠 만큼 크기가 �
   display: grid;
   grid-template-columns: 50px;
   grid-auto-columns: 1fr 2fr;
-  gap: 1rem;
+  gap: * * 1rem * *;
 }
 
 .grid-item:nth-child(1) {
@@ -483,3 +483,104 @@ grid는 기본적으로 자신이 가지고 있는 콘텐츠 만큼 크기가 �
 ![](../../img/220523-6.png)
 
 첫번째 컬럼에 50px;이므로 1열에만 50px;이 부여되며 나머지 열은 모두 1fr 2fr을 순환 반복하게 된다.
+
+### 영역 이름으로 그리드 정의하기
+
+이번에는 각 영역(grid area)에 이름을 붙이고, 그 이름을 이용해 배치하는 방법에 대해 알아본다.
+`grid-template-areas`라는 속성이며, 매우 직관적인 방법이다.
+
+```css
+/* example */
+.container {
+  grid-template-areas:
+    "header header header"
+    " a main b "
+    " . . . "
+    "footer footer footer";
+}
+```
+
+위처럼 각자 차지하는 셀의 개수만큼 해당 위치에 이름을 써주면된다.
+각 셀마다 공백을 하나씩 넣어 구분하면 된다. header는 첫번째 row에서 3개의 column을 차지하므로 맨 위에 3번을 작성했다. 빈칸은 마침표 또는 “none”이라는 텍스트를 적어넣으면 되고, 마침표의 개수는 여러개를 써도 무방하다.
+
+그럼 각 영역의 이름은 어떻게 매칭할까? 바로 해당 아이템 요소에 grid-area 속성으로 이름을 지정해주면 된다.
+
+```css
+.header {
+  grid-area: header;
+}
+.sidebar-a {
+  grid-area: a;
+}
+.main-content {
+  grid-area: main;
+}
+.sidebar-b {
+  grid-area: b;
+}
+.footer {
+  grid-area: footer;
+}
+/* 이름값에 따옴표는 사용하지 않음 */
+```
+
+좀 더 상세히 보자. 아래와 같은 돔이 있다고 했을 때,
+
+```html
+<div class="grid-container">
+  <div class="header grid-item">Header</div>
+  <div class="sidebar-a grid-item">Sidebar A</div>
+  <div class="sidebar-b grid-item">Sidebar B</div>
+  <div class="main grid-item">Main</div>
+  <div class="footer grid-item">Footer</div>
+</div>
+```
+
+```css
+.grid-container {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: 1fr 3fr 1fr;
+  grid-template-areas:
+    "header header header"
+    "sidebar-a main sidebar-b"
+    "footer footer footer";
+}
+.header {
+  grid-area: header; /* 따옴표를 쓰지말자 */
+}
+.sidebar-a {
+  grid-area: sidebar-a;
+}
+.main {
+  grid-area: main;
+}
+.sidebar-b {
+  grid-area: sidebar-b;
+}
+.footer {
+  grid-area: footer;
+}
+```
+
+위와 같이 설정했을 때, 아래와 같은 레이아웃을 쉽게 구현할 수 있다.
+
+![](../../img/220524-1.png)
+
+단, IE에서는 grid-template-areas 속성을 미지원함. 참고하자 🥲
+
+만약 header 의 첫번째 열 영역에 로고가 들어가야해서 비워져야한다면 어떻게 해야할까?
+
+```css
+.grid-container {
+  /* ... */
+  grid-template-areas:
+    ". header header"
+    "sidebar-a main sidebar-b"
+    "footer footer footer";
+}
+```
+
+위처럼 .이나 none 등을 적어넣어서 해당 영역을 비워주면 된다.
+
+![](../../img/220524-2.png)
