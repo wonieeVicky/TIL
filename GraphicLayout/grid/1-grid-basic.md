@@ -584,3 +584,49 @@ grid는 기본적으로 자신이 가지고 있는 콘텐츠 만큼 크기가 �
 위처럼 .이나 none 등을 적어넣어서 해당 영역을 비워주면 된다.
 
 ![](../../img/220524-2.png)
+
+### 자동 배치 알고리즘
+
+`grid-auto-flow`는 아이템이 자동 배치되는 흐름을 결정하는 속성이다.
+
+```html
+<div class="grid-container">
+  <div class="grid-item">A</div>
+  <div class="grid-item">B</div>
+  <div class="grid-item">C</div>
+  <div class="grid-item">D</div>
+  <div class="grid-item">E</div>
+  <div class="grid-item">F</div>
+  <div class="grid-item">G</div>
+  <div class="grid-item">H</div>
+  <div class="grid-item">I</div>
+</div>
+```
+
+위와 같은 돔에 아래와 같은 스타일을 주었을 때 이미지는 아래와 같다.
+
+```css
+.container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(25%, auto));
+  grid-template-rows: repeat(5, minmax(50px, auto));
+  grid-auto-flow: row; /* column, dense */
+}
+.item:nth-child(2) {
+  grid-column: auto / span 3;
+}
+.item:nth-child(5) {
+  grid-column: auto / span 3;
+}
+.item:nth-child(7) {
+  grid-column: auto / span 2;
+}
+```
+
+![grid-auto-flow: row;](../../img/220524-3.png)
+
+![grid-auto-flow: column;](../../img/220524-4.png)
+
+![grid-auto-flow: dense;](../../img/220524-5.png)
+
+위 속성은 이미지의 크기가 모두 다른 레이아웃에서 유용하게 사용할 수 있는 속성이다. (잡지사 화보 이미지 배치 레이아웃 등에서 활용될 수 있다.)
