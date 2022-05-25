@@ -1,0 +1,34 @@
+﻿<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>CSS Grid</title>
+    <link rel="stylesheet" href="default.css" />
+  </head>
+  <style>
+    .grid-container {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 3px;
+      height: 20rem;
+    }
+    .grid-item:nth-child(2) {
+      place-self: center;
+    }
+  </style>
+  <body>
+    <div class="grid-container">
+      <div class="grid-item">A</div>
+      <div class="grid-item">B</div>
+      <div class="grid-item">C</div>
+      <div class="grid-item">D</div>
+      <div class="grid-item">E</div>
+      <div class="grid-item">F</div>
+      <div class="grid-item">G</div>
+      <div class="grid-item">H</div>
+      <div class="grid-item">I</div>
+    </div>
+  </body>
+</html>
