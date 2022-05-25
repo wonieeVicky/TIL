@@ -753,11 +753,11 @@ grid는 기본적으로 자신이 가지고 있는 콘텐츠 만큼 크기가 �
   ![align-self: end;](../../img/220525-23.png)
 - 개별 아이템 가로 정렬(justify-self)
   - 해당 아이템을 가로축 방향으로 정렬, 아이템에 적용
-  ```java
+  ```css
   .grid-item:nth-child(2) {
     justify-self: stretch; /* start, center, end */
-  	/* 언어설정이 오른쪽일 경우 start일 경우 오른쪽에 붙는다. */
-  	/* <html dir="rtl"> rtl은 right to left */
+    /* 언어설정이 오른쪽일 경우 start일 경우 오른쪽에 붙는다. */
+    /* <html dir="rtl"> rtl은 right to left */
   }
   ```
   ![justify-self: start;](../../img/220525-24.png)
@@ -774,3 +774,32 @@ grid는 기본적으로 자신이 가지고 있는 콘텐츠 만큼 크기가 �
   }
   ```
   ![](../../img/220525-27.png)
+
+### 순서 정하기
+
+- 배치 순서 order
+  - 각 아이테들의 시각적 나열 순서를 결정하는 속성, 작은 숫자일수록 먼저 배치된다.
+  - 시각적 순서일 뿐 HTML 자체의 구조가 바뀌는 것이 아니므로 접근성 측면에서 조심해야 한다.
+  - 시각 장애인분들이 사용하는 스크린 리더로 읽을 때 order를 이용해 순서를 바꾼 것은 의미가 없기 때문
+  ```css
+  .grid-item:nth-child(1) {
+    order: 3;
+  }
+  .grid-item:nth-child(2) {
+    order: 1;
+  }
+  .grid-item:nth-child(3) {
+    order: 2;
+  }
+  ```
+  ![](../../img/220526-1.png)
+- z-index
+  - z-index로 Z축 정렬을 할 수 있다. 숫자가 클수록 위로 올라온다.
+  ```css
+  .grid-item:nth-child(5) {
+    z-index: 1;
+    transform: scale(2);
+  }
+  /* z-index를 설정 안하면 0이므로, 1만 설정해도 나머지 아이템을 보다 위로 올라온다. */
+  ```
+  ![](../../img/220526-2.png)
