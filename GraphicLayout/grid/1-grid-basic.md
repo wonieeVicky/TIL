@@ -630,3 +630,147 @@ grid는 기본적으로 자신이 가지고 있는 콘텐츠 만큼 크기가 �
 ![grid-auto-flow: dense;](../../img/220524-5.png)
 
 위 속성은 이미지의 크기가 모두 다른 레이아웃에서 유용하게 사용할 수 있는 속성이다. (잡지사 화보 이미지 배치 레이아웃 등에서 활용될 수 있다.)
+
+### 정렬하기
+
+정렬하기를 배워보자 grid-container에 적용한다.
+
+- 세로 방향 정렬(align-items)
+  - 아이템들을 세로축 방향으로 정렬한다. 컨테이너에 적용한다.
+  ```css
+  .grid-container {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    height: 60vh;
+    align-items: stretch; /* start, center, end */
+  }
+  ```
+  ![align-items: stretch;](../../img/220525-1.png)
+  ![align-items: start;](../../img/220525-2.png)
+  ![align-items: center;](../../img/220525-3.png)
+  ![align-items: end;](../../img/220525-4.png)
+- 가로 방향 정렬(justify-items)
+  - 아이템들을 가로축 방향으로 정렬한다. 컨테이너에 적용한다.
+  ```css
+  .grid-container {
+    /* ... */
+    justify-items: stretch; /* start, center, end */
+  }
+  ```
+  ![justify-items: stretch;](../../img/220525-5.png)
+  ![justify-items: start;](../../img/220525-6.png)
+  ![justify-items: center;](../../img/220525-7.png)
+  ![justify-items: end;](../../img/220525-8.png)
+- place-items
+  - align-items와 justify-items를 같이 쓸 수 있는 단축 속성이다. 하나의 값만 쓰면 두 속성 모두에 적용
+  ```css
+  .grid-container {
+    /* ... */
+    place-items: center start;
+  }
+  ```
+  ![](../../img/220525-9.png)
+- 아이템 그룹 세로 정렬(align-content)
+  - grid 아이템들의 높이를 모두 합한 값이 grid 컨테이너의 높이보다 작을 때 grid 아이템을 통째로 정렬
+  ```css
+  .grid-container {
+    /* ... */
+    align-content: stretch; /* start, center, end, space-between, space-around, space-evenly */
+  }
+  ```
+  ![align-content: start;](../../img/220525-10.png)
+  ![align-content: center;](../../img/220525-11.png)
+  ![align-content: space-around](../../img/220525-12.png)
+  ![align-content: space-between;](../../img/220525-13.png)
+  ![align-content: space-evenly;](../../img/220525-14.png)
+- 아이템 그룹 가로 정렬(justify-content)
+  - grid 아이템들의 너비를 모두 합한 값이 grid 컨테이너의 너비보다 작을 때 grid 아이템을 통째로 정렬
+  ```css
+  .grid-container {
+    display: grid;
+    justify-content: stretch; /* start, center, end, space-between, space-around, space-evenly */
+  }
+  .grid-item:nth-child(1) {
+    grid-column: 1 / auto;
+  }
+  .grid-item:nth-child(2) {
+    grid-column: 2 / auto;
+  }
+  .grid-item:nth-child(3) {
+    grid-column: 3 / auto;
+  }
+  .grid-item:nth-child(4) {
+    grid-column: 4 / auto;
+  }
+  .grid-item:nth-child(5) {
+    grid-column: 5 / auto;
+  }
+  ```
+  ![justify-content: stretch;](../../img/220525-15.png)
+  ![justify-content: start;](../../img/220525-16.png)
+  ![justify-content: center;](../../img/220525-17.png)
+  ![justify-content: space-around;](../../img/220525-18.png)
+  ![justify-content: space-between;](../../img/220525-19.png)
+  ![justify-content: space-evenly;](../../img/220525-20.png)
+- place-content
+  - align-content와 justify-content를 같이 쓸 수 있는 단축 속성, 하나의 값만 쓰면 두 속성 모두에 적용
+  ```css
+  .grid-container {
+    display: grid;
+    place-content: space-between center;
+  }
+  .grid-item:nth-child(1) {
+    grid-column: 1 / auto;
+  }
+  .grid-item:nth-child(2) {
+    grid-column: 2 / auto;
+  }
+  .grid-item:nth-child(3) {
+    grid-column: 3 / auto;
+  }
+  .grid-item:nth-child(4) {
+    grid-column: 4 / auto;
+  }
+  .grid-item:nth-child(5) {
+    grid-column: 5 / auto;
+  }
+  ```
+- 개별 아이템 세로 정렬(align-self)
+  - 해당 아이템을 세로축 방향으로 정렬, 아이템에 적용
+  ```css
+  .grid-container {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 3px;
+    height: 20rem;
+  }
+  .grid-item:nth-child(2) {
+    align-self: stretch; /* start, center, end */
+  }
+  ```
+  ![align-self: start;](../../img/220525-21.png)
+  ![align-self: center;](../../img/220525-22.png)
+  ![align-self: end;](../../img/220525-23.png)
+- 개별 아이템 가로 정렬(justify-self)
+  - 해당 아이템을 가로축 방향으로 정렬, 아이템에 적용
+  ```java
+  .grid-item:nth-child(2) {
+    justify-self: stretch; /* start, center, end */
+  	/* 언어설정이 오른쪽일 경우 start일 경우 오른쪽에 붙는다. */
+  	/* <html dir="rtl"> rtl은 right to left */
+  }
+  ```
+  ![justify-self: start;](../../img/220525-24.png)
+  ![justify-self: center;](../../img/220525-25.png)
+  ![justify-self: end;](../../img/220525-26.png)
+- place-self
+  - align-self와 justify-self를 같이 쓸 수 있는 단축 속성, 하나의 값만 쓰면 두 속성 모두에 적용
+  ```css
+  .grid-container {
+    display: grid;
+  }
+  .grid-item:nth-child(2) {
+    place-self: center;
+  }
+  ```
+  ![](../../img/220525-27.png)
