@@ -1,0 +1,105 @@
+﻿.header {
+  display: flex;
+  height: 80px;
+  align-items: center;
+  padding: 0 1rem;
+}
+.search-form {
+  width: 300px;
+  max-width: 60%; /* 브라우저 창이 로고를 물어갈 경우 대비 */
+  margin-left: auto;
+  margin-right: 3rem;
+}
+
+section.primary {
+  padding: 1rem;
+}
+.secondary {
+  padding: 1rem;
+}
+.secondary-a {
+  background-color: white;
+}
+.secondary-b {
+  color: white;
+  background: #666;
+}
+
+.footer {
+  padding: 1rem;
+  text-align: center;
+}
+
+.modal {
+  display: none;
+  top: 80px;
+}
+
+/* 바로 다음 형제노드만 선택할 때는 + */
+#modal-switch:checked ~ .modal {
+  display: flex;
+}
+#modal-switch:checked ~ label[for="modal-switch"]:before {
+  content: "🌌";
+}
+label[for="modal-switch"] {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  top: 1.3rem;
+  right: 1rem;
+  width: 40px;
+  height: 40px;
+}
+label[for="modal-switch"]:before {
+  content: "🌠";
+  font-size: 2rem;
+  line-height: initial;
+  cursor: pointer;
+}
+#modal-switch,
+label[for="modal-switch"] span {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden; /* 스크린리더, SEO 이슈가 있어 display:none; 혹은 width:0; 미사용! */
+  opacity: 0;
+}
+
+@media (min-width: 1024px) {
+  .page {
+    display: grid;
+    grid-template-columns: 20% 1fr 20%; /* fr은 강제성이 없어서 퍼센트로 처리한다. */
+  }
+  .header {
+    grid-column: 1 / 4;
+    grid-row: 1 / 2;
+  }
+  .menu {
+    grid-column: 1 / 4;
+    grid-row: 2 / 3;
+  }
+  .primary {
+    grid-column: 2 / 3;
+    grid-row: 3 / 4;
+  }
+  .secondary-a {
+    grid-column: 1 / 2;
+    grid-row: 3 / 4;
+  }
+  .secondary-b {
+    grid-column: 3 / 4;
+    grid-row: 3 / 4;
+  }
+  .footer {
+    grid-column: 1 / 4;
+    grid-row: 4 / 5;
+  }
+}
+/* 화면이 너무 커졌을 때 sidebar width를 고정하기 */
+@media (min-width: 1400px) {
+  .page {
+    grid-template-columns: 300px 1fr 300px;
+  }
+}
