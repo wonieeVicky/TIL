@@ -71,29 +71,30 @@ label[for="modal-switch"] span {
   .page {
     display: grid;
     grid-template-columns: 20% 1fr 20%; /* fr은 강제성이 없어서 퍼센트로 처리한다. */
-    grid-template-areas:
-      "header header header"
-      "menu menu menu"
-      "secondary-a primary secondary-b"
-      "footer footer footer";
   }
   .header {
-    grid-area: header;
+    grid-column: 1 / 4;
+    grid-row: 1 / 2;
   }
   .menu {
-    grid-area: menu;
+    grid-column: 1 / 4;
+    grid-row: 2 / 3;
   }
   .primary {
-    grid-area: primary;
+    grid-column: 2 / 3;
+    grid-row: 3 / 4;
   }
   .secondary-a {
-    grid-area: secondary-a;
+    grid-column: 1 / 2;
+    grid-row: 3 / 4;
   }
   .secondary-b {
-    grid-area: secondary-b;
+    grid-column: 3 / 4;
+    grid-row: 3 / 4;
   }
   .footer {
-    grid-area: footer;
+    grid-column: 1 / 4;
+    grid-row: 4 / 5;
   }
 }
 /* 화면이 너무 커졌을 때 sidebar width를 고정하기 */
