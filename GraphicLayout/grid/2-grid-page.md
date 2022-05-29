@@ -88,3 +88,54 @@
 ```
 
 위와 같이 하면 기존 넘버링으로 처리하던 레이아웃과 동일한 레이아웃으로 구현됨! 직관적이다.
+
+### 카드리스트 Grid 기반으로 바꿔보기
+
+미디어쿼리를 이용하지 않고 Grid의 `auto-fill` 프로퍼티를 통해 카드리스트를 구현해보려고 한다. 따라서 아래의 flex 기반으로 미디어쿼리를 이용한 카드리스트 스타일은 삭제 처리한다.
+
+```css
+@media (min-width: 600px) {
+  .card-list-con {
+    overflow-x: hidden;
+  }
+  .card-list {
+    display: flex;
+    flex-wrap: wrap;
+    margin: 0 -0.5rem;
+  }
+  .card-item {
+    width: 50%;
+    padding: 0 0.5rem;
+  }
+}
+
+@media (min-width: 1200px) {
+  .card-item {
+    width: 33.33333%;
+  }
+}
+```
+
+이후 card-list에 아래와 같이 grid-template-columns 속성을 부여해준다.
+
+```css
+.card-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, auto));
+  gap: 2%;
+  margin-bottom: -2%;
+}
+.card-item {
+  background: white;
+}
+.card-image {
+  height: 0;
+  padding-bottom: 70%;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-color: lightgray;
+  background-size: cover;
+}
+```
+
+![](../../img/220529-1.gif)
