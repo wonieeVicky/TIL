@@ -104,47 +104,26 @@
 }
 
 /* cards list */
+.card-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, auto));
+  gap: 2%;
+  margin-bottom: -2%;
+}
 .card-item {
-  display: flex;
-  flex-direction: column;
-  margin-bottom: 2rem;
+  background: white;
 }
 .card-image {
   height: 0;
-  padding-bottom: 80%; /* 이미지를 height의 80% 비율로 보여준다  */
-  background-color: lightgray;
+  padding-bottom: 70%;
   background-repeat: no-repeat;
   background-position: center;
+  background-color: lightgray;
   background-size: cover;
 }
 .card-image img {
-  display: none; /* figure background 이미지로 노출 */
+  display: none;
 }
 .card-desc {
   padding: 1em;
-  background: white;
-  flex: 1 1 auto;
-}
-
-@media (min-width: 600px) {
-  .card-list-con {
-    overflow-x: hidden;
-  }
-  .card-list {
-    display: flex;
-    flex-wrap: wrap;
-    margin: 0 -0.5rem; /* card간 간격조정은 padding으로, 양 끝은 margin으로 조정 */
-    /* card-item이 33.333%일 때 row에 item이 2개일 경우 가운데가 비는 형상 발생 */
-    /* justify-content: space-between; */
-  }
-  .card-item {
-    width: 50%;
-    padding: 0 0.5rem;
-  }
-}
-
-@media (min-width: 1200px) {
-  .card-item {
-    width: 33.33333%;
-  }
 }
