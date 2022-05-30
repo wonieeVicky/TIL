@@ -163,3 +163,277 @@ input[name="sort-control"] {
 위와 같이 `grid-row`로 checked 시 특정 클래스의 요소에 스타일을 부여함으로써 원하는 레이아웃으로 배치할 수 있다. 위와 같은 레이아웃은 여러 랜덤 아이템을 정렬 기능으로 보여주고자 할 때 유용하게 쓰일 수 있음 🙂
 
 ![](../../img/220529-2.gif)
+
+### 3D 보드게임판
+
+3D 보드게임판을 그리드를 이용해 손쉽게 구현할 수 있다.
+
+```html
+<div class="game">
+  <div class="tile">
+    <input type="radio" name="tile" id="tile1" />
+    <label for="tile1">1</label>
+  </div>
+  <div class="tile">
+    <input type="radio" name="tile" id="tile2" />
+    <label for="tile2">2</label>
+  </div>
+  <div class="tile">
+    <input type="radio" name="tile" id="tile3" />
+    <label for="tile3">3</label>
+  </div>
+  <div class="tile">
+    <input type="radio" name="tile" id="tile4" />
+    <label for="tile4">4</label>
+  </div>
+  <div class="tile">
+    <input type="radio" name="tile" id="tile5" />
+    <label for="tile5">5</label>
+  </div>
+  <div class="tile">
+    <input type="radio" name="tile" id="tile6" />
+    <label for="tile6">6</label>
+  </div>
+  <div class="tile">
+    <input type="radio" name="tile" id="tile7" />
+    <label for="tile7">7</label>
+  </div>
+  <div class="tile">
+    <input type="radio" name="tile" id="tile8" />
+    <label for="tile8">8</label>
+  </div>
+  <div class="tile">
+    <input type="radio" name="tile" id="tile9" />
+    <label for="tile9">9</label>
+  </div>
+  <div class="tile">
+    <input type="radio" name="tile" id="tile10" />
+    <label for="tile10">10</label>
+  </div>
+  <div class="tile">
+    <input type="radio" name="tile" id="tile11" />
+    <label for="tile11">11</label>
+  </div>
+  <div class="tile">
+    <input type="radio" name="tile" id="tile12" />
+    <label for="tile12">12</label>
+  </div>
+  <div class="tile">
+    <input type="radio" name="tile" id="tile13" />
+    <label for="tile13">13</label>
+  </div>
+  <div class="tile">
+    <input type="radio" name="tile" id="tile14" />
+    <label for="tile14">14</label>
+  </div>
+  <div class="tile">
+    <input type="radio" name="tile" id="tile15" />
+    <label for="tile15">15</label>
+  </div>
+  <div class="tile">
+    <input type="radio" name="tile" id="tile16" />
+    <label for="tile16">16</label>
+  </div>
+  <div class="tile">
+    <input type="radio" name="tile" id="tile17" />
+    <label for="tile17">17</label>
+  </div>
+  <div class="tile">
+    <input type="radio" name="tile" id="tile18" />
+    <label for="tile18">18</label>
+  </div>
+  <div class="tile">
+    <input type="radio" name="tile" id="tile19" />
+    <label for="tile19">19</label>
+  </div>
+  <div class="tile">
+    <input type="radio" name="tile" id="tile20" />
+    <label for="tile20">20</label>
+  </div>
+</div>
+```
+
+총 20번 타일까지 존재하는 .game 컨테이너 돔을 위처럼 구현한다.
+각 타일별 스타일을 grid로 구현한 것인데, 아래와 같이 구현했다.
+
+```css
+body {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  perspective: 1000px;
+  color: black;
+  background: #fff000;
+}
+.game {
+  display: grid;
+  grid-template-rows: repeat(6, 11vmin); /* vmin: vh,vw 중 작은 수치를 잡아낸다. 높이가 작을 경우 11% * vh를 의미함 */
+  grid-template-columns: repeat(6, 11vmin);
+  gap: 1vw;
+  transform: rotateX(0deg) rotateZ(0deg);
+  transform-style: preserve-3d;
+  animation: starting 2s 0.5s forwards;
+}
+.tile {
+  /* overflow: hidden; */
+  /* overflow: hidden이 되어있으면 3D 효과 안됨 */
+  position: relative;
+  border: 3px solid black;
+  font-size: 2rem;
+  transform-style: preserve-3d;
+}
+.tile label {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  background: #fff;
+  transform-style: preserve-3d;
+  cursor: pointer;
+}
+.tile label:hover {
+  color: white;
+  background: dodgerblue;
+}
+.tile input {
+  position: absolute;
+  opacity: 0;
+}
+.tile input:checked + label {
+  color: white;
+  background: crimson;
+}
+.tile input:checked + label:before {
+  content: "";
+  position: absolute;
+  display: block;
+  width: 100px;
+  height: 100px;
+  background: url(images/ilbuni.png) no-repeat center;
+  background-size: contain;
+  border-radius: 50%;
+  animation: dongdong 0.22s infinite alternate;
+}
+.tile:nth-child(1) {
+  grid-row: 1;
+  grid-column: 1;
+  transform: rotate(135deg);
+  border-radius: 50%;
+}
+.tile:nth-child(2) {
+  grid-row: 1;
+  transform: rotate(180deg);
+}
+.tile:nth-child(3) {
+  grid-row: 1;
+  transform: rotate(180deg);
+}
+.tile:nth-child(4) {
+  grid-row: 1;
+  transform: rotate(180deg);
+}
+.tile:nth-child(5) {
+  grid-row: 1;
+  transform: rotate(180deg);
+}
+.tile:nth-child(6) {
+  grid-row: 1;
+  transform: rotate(225deg);
+  border-radius: 50%;
+}
+.tile:nth-child(7) {
+  grid-row: 2;
+  grid-column: 6;
+  transform: rotate(270deg);
+}
+.tile:nth-child(8) {
+  grid-row: 3;
+  grid-column: 6;
+  transform: rotate(270deg);
+}
+.tile:nth-child(9) {
+  grid-row: 4;
+  grid-column: 6;
+  transform: rotate(270deg);
+}
+.tile:nth-child(10) {
+  grid-row: 5;
+  grid-column: 6;
+  transform: rotate(270deg);
+}
+.tile:nth-child(11) {
+  grid-row: 6;
+  grid-column: 6;
+  transform: rotate(315deg);
+  border-radius: 50%;
+}
+.tile:nth-child(12) {
+  grid-row: 6;
+  grid-column: 5;
+}
+.tile:nth-child(13) {
+  grid-row: 6;
+  grid-column: 4;
+}
+.tile:nth-child(14) {
+  grid-row: 6;
+  grid-column: 3;
+}
+.tile:nth-child(15) {
+  grid-row: 6;
+  grid-column: 2;
+}
+.tile:nth-child(16) {
+  grid-row: 6;
+  grid-column: 1;
+  transform: rotate(45deg);
+  border-radius: 50%;
+}
+.tile:nth-child(17) {
+  grid-row: 5;
+  transform: rotate(90deg);
+}
+.tile:nth-child(18) {
+  grid-row: 4;
+  transform: rotate(90deg);
+}
+.tile:nth-child(19) {
+  grid-row: 3;
+  transform: rotate(90deg);
+}
+.tile:nth-child(20) {
+  grid-row: 2;
+  transform: rotate(90deg);
+}
+
+.tile:nth-child(1) label,
+.tile:nth-child(6) label,
+.tile:nth-child(11) label,
+.tile:nth-child(16) label {
+  border-radius: 50%;
+}
+```
+
+초기 게임판 init 시 동작하는 3D 애니메이션과 통통 튀는 인터렉티브 스타일은 anmation 요소로 구현한 것이다.
+
+```css
+@keyframes starting {
+  from {
+    transform: rotateX(0deg) rotateZ(0deg);
+  }
+  to {
+    transform: rotateX(60deg) rotateZ(240deg);
+  }
+}
+@keyframes dongdong {
+  from {
+    transform: translateZ(30px) rotateX(-90deg) scaleY(0.7);
+  }
+  to {
+    transform: translateZ(60px) rotateX(-90deg);
+  }
+}
+```
+
+![](../../img/220530-1.gif)
