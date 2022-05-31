@@ -491,10 +491,10 @@ body {
   border: 20px solid #222;
 }
 .message {
-  grid-column: 1 / 3; /* 칸을 2*2로 지정 */
-  grid-row: 1 / 3; /* 칸을 2*2로 지정 */
-  justify-self: center;
-  align-self: center;
+  grid-column: 1 / 3; /* 칸을 2 * 2로 지정 */
+  grid-row: 1 / 3; /* 칸을 2 * 2로 지정 */
+  justify-self: center; /* 2 * 2에서 가운데 정렬 */
+  align-self: center; /* 2 * 2에서 가운데 정렬 */
   /* font-size: 3rem; */
   /* font-size: 3.5vw; */
   font-size: calc(20px + 2.5vw);
