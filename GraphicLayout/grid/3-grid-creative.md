@@ -437,3 +437,74 @@ body {
 ```
 
 ![](../../img/220530-1.gif)
+
+### 그리드 기반 디자인을 코드로 옮기기
+
+이번 시간에는 그리드 레이아웃을 기반으로 디자인한 작업물을 그대로 코드로 옮기는 것을 구현해보고자 한다.
+보통 디자이너는 그리드를 기반으로 디자인을 하기 때문에 해당 작업이 좋은 경험이 될 수 있다.
+
+순서는 먼저 포토샵으로 디자인을 구현한 뒤 → 코드로 옮기는 순으로 진행한다.
+
+![](../../img/220531-1.png)
+
+위와 같이 포토샵에서 그리드 기반으로 디자인이 완료되었다는 가정하에 해당 레이아웃을 실제 코드로 구현해본다.
+
+```html
+<div class="page">
+  <div class="logo-container">
+    <div class="logo"></div>
+  </div>
+  <div class="message">
+    <p>Hello, CSS Grid!</p>
+  </div>
+  <footer class="footer">
+    <p>Lorem ipsum dolor sit amet consectetur adipisicing.</p>
+  </footer>
+</div>
+```
+
+위와 같이 간단하게 돔을 구현했다.
+
+```css
+body {
+  font-family: Roboto, sans-serif;
+  font-weight: 900;
+  color: #222;
+  background: url(images/lego.png) no-repeat white; /* 레고 이미지를 background로 넣어준다 */
+  background-position: calc(50% + 22vw) 0; /* 창 사이즈에 비례해서 움직이도록 처리 */
+  background-size: calc(300px + 40vw) auto; /* 고정크기 + 가변크기를 하면 기본 width는 보장된다. */
+}
+.page {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr); /* 3 * 3 격자 생성 */
+  grid-template-rows: repeat(3, 1fr); /* 3 * 3 격자 생성 (1fr > 33.3333vh도 가능) */
+  height: 100vh;
+}
+.logo-container {
+  grid-column: 1; /* .message와 같은 그리드 공간을 공유하므로 정확하게 명시 */
+  grid-row: 1; /* .message와 같은 그리드 공간을 공유하므로 정확하게 명시 */
+  padding: 30px;
+}
+.logo {
+  width: 100px;
+  height: 50px;
+  border: 20px solid #222;
+}
+.message {
+  grid-column: 1 / 3; /* 칸을 2*2로 지정 */
+  grid-row: 1 / 3; /* 칸을 2*2로 지정 */
+  justify-self: center;
+  align-self: center;
+  /* font-size: 3rem; */
+  /* font-size: 3.5vw; */
+  font-size: calc(20px + 2.5vw);
+  text-align: center;
+}
+.footer {
+  /* grid-column: 1 / 3; */
+  grid-column: 1 / span 2; /* 글자 개행이 되지 않도록 1-2칸 차지하도록 처리 */
+  grid-row: 3;
+  align-self: end; /* 맨 끝으로 가도록 처리 */
+  padding: 30px;
+}
+```
