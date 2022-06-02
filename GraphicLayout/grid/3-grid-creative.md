@@ -508,3 +508,36 @@ body {
   padding: 30px;
 }
 ```
+
+### 그리드 기반 디자인을 코드로 옮기기 - 반응형 구현
+
+```css
+.message {
+  /* styles... */
+  font-size: calc(20px + 2.5vw); /* 크기가 20px 이하로는 절대 안 작아진다. */
+}
+
+@media (orientation: portrait) {
+  /* landscape: 세로모드, portrait: 가로모드 */
+  body {
+    background-position: calc(50% + 27vw) 100%;
+    background-size: calc(450px + 40vw) auto;
+  }
+  .page {
+    grid-template-rows: repeat(4, 1fr);
+  }
+  .logo {
+    width: 70px;
+    height: 35px;
+    border-width: 15px;
+  }
+  .footer {
+    font-size: 0.8rem;
+    grid-row: 4;
+  }
+}
+```
+
+반응형 구현 시 max-width로 스타일을 분기하지 않고, 세로모드인지 가로모드인지를 체크하는 orientation 속성으로 스타일을 처리해주면 매우 깔끔하게 레이아웃을 구현할 수 있다. (작은 가로형에서도 동일한 레이아웃을 유지할 수 있음) 또, 필요에 따라 grid-template을 3에서 4로 바꿔 레이아웃을 운영하는 것도 좋은 방법이다 : )
+
+![](../../img/220602-1.gif)
