@@ -118,3 +118,64 @@ IE에서는 각 요소의 자리를 직접 다 지정해줘야한다는 불편�
 ```
 
 위처럼 `-ms-`타입의 속성을 추가해주면 크롬 브라우저와 동일한 레이아웃으로 적용되는 것을 확인할 수 있다.
+
+### repeat 속성 IE에서 적용하기
+
+아래와 같은 돔이 있다고 했을 떄,
+
+```html
+<div class="grid-container">
+  <div class="grid-item">A</div>
+  <div class="grid-item">B</div>
+  <div class="grid-item">C</div>
+  <div class="grid-item">D</div>
+  <div class="grid-item">E</div>
+  <div class="grid-item">F</div>
+  <div class="grid-item">G</div>
+  <div class="grid-item">H</div>
+  <div class="grid-item">I</div>
+</div>
+```
+
+IE환경에서 `.grid-container` 요소에 `display: -ms-grid;` 속성을 추가하면 아래와 같이 나타난다.
+
+```css
+.grid-container {
+  display: -ms-grid;
+  grid-template-columns: repeat(3, 1fr);
+}
+```
+
+![](../../img/220605-1.png)
+
+자동으로 레이아웃 배치가 되지않고 마지막 요소인 I가 z-index값이 제일 높으므로 겹쳐진 최상위에 존재하는 것임. 따라서 아래와 같은 속성을 추가한다.
+
+```css
+.grid-container {
+  /* codes.. */
+  -ms-grid-columns: 1fr 1fr 1fr;
+}
+.grid-item:nth-child(1) {
+  -ms-grid-column: 1;
+}
+.grid-item:nth-child(2) {
+  -ms-grid-column: 2;
+}
+.grid-item:nth-child(3) {
+  -ms-grid-column: 3;
+}
+```
+
+![](../../img/220605-2.png)
+
+그럼 위와 같이 그리드 레이아웃을 나눠가지게 된다.
+만약 저 1fr이 10개~20개 이상의 division에 필요한 속성이 될 경우 어떻게 써주면 될까?
+
+```css
+.grid-container {
+  -ms-grid-columns: (1fr) [3];
+  grid-template-columns: repeat(3, 1fr);
+}
+```
+
+`(1fr)[3];`속성 값은 repeat(3, 1fr)과 동일한 효과를 도출한다.
