@@ -132,17 +132,14 @@
 
 - 조건문
   아래와 같은 조건문이 있다고 하자.
-
   ```jsx
   if (toggle) {
   } else {
   }
   ```
-
   위 코드를 스벨트의 html 구조로 변경하면 아래와 같다.
   `App.svelte`
-
-  ```jsx
+  ```html
   <script>
   	let toggle = false;
   </script>
@@ -157,45 +154,154 @@
   	<div>No name!</div>
   {/if}
   ```
-
   위처럼 Svelte에서는 `#`이 문장의 시작을 의미하며, `:`이 중간 조건 삽입 시 사용된다.
   또 `/` 는 문장의 종료를 나타낸다.
-
 - 반복문
   배열을 순환하는 반복문들은 어떻게 작성할 수 있을까?
-
-  ```jsx
+  `App.svelte`
+  ```html
   <script>
-  	let fruits = ['Apple', 'Banana', 'Orange', 'Mango', 'Cherry']
+    let fruits = ["Apple", "Banana", "Orange", "Mango", "Cherry"];
   </script>
 
   <ul>
-  	{#each fruits as fruit}
-  		<li>{fruit}</li>
-  	{/each}
+    {#each fruits as fruit}
+    <li>{fruit}</li>
+    {/each}
   </ul>
   ```
-
   위와 같이 #로 시작하고 /로 마무리되는 each문에 반복문 코드를 넣어준다.
   해당 값을 갱신하기 위해선 아래와 같이 처리해줄 수 있다.
-
-  ```jsx
+  `App.svelte`
+  ```html
   <script>
-  	let fruits = ['Apple', 'Banana', 'Orange', 'Mango', 'Cherry']
-  	function	deleteFruit(){
-  		fruits = fruits.slice(1)
-  	}
+    let fruits = ["Apple", "Banana", "Orange", "Mango", "Cherry"];
+    function deleteFruit() {
+      fruits = fruits.slice(1);
+    }
   </script>
 
   <ul>
-  	{#each fruits as fruit}
-  		<li>{fruit}</li>
-  	{/each}
+    {#each fruits as fruit}
+    <li>{fruit}</li>
+    {/each}
   </ul>
-  <button on:click={deleteFruit}>
-  	Eat it!
-  </button>
+  <button on:click="{deleteFruit}">Eat it!</button>
   ```
-
   위처럼하면 과일이 첫번째 순서부터 하나씩 제거되는 것을 처리할 수 있다.
   ![](../img/220609-1.gif)
+
+### 이벤트 핸들링
+
+이번에는 이벤트 핸들링에 대해 알아본다.
+먼저 스벨트에서 이벤트 핸들링 콜백을 실행하려면 omMount를 svelte에서 Import 해줘야 한다.
+
+`App.svelte`
+
+```html
+<script>
+  import { onMount } from "svelte";
+  let isRed = false;
+  // 현재 컴포넌트가 준비되면 해당 콜백함수를 실행하겠다.
+  onMount(() => {
+    const box = document.querySelector(".box");
+    box.addEventListener("click", () => {
+      isRed = !isRed;
+    });
+  });
+</script>
+
+<div class="box" style="background-color: {isRed ? 'red' : 'orange'}">Box!</div>
+
+<style>
+  .box {
+    width: 300px;
+    height: 150px;
+    background-color: orange;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+</style>
+```
+
+위 코드는 onMount라는 svelte API로 콜백함수가 실행시켜 box 엘리먼트를 정상적으로 찾아 동작을 실행시키는 기능을 수행한다. 해당 코드는 svelte API통해 더욱 간결하게 만들 수 있다.
+
+`App.svelte`
+
+```html
+<script>
+	import { onMount } from "svelte";
+
+	let name = 'Vicky'
+	let isRed = false;
+
+	function enter() { name = 'enter' }
+	function leave() { name = 'leave' }
+</script>
+
+<h1>Hello {name}!</h1>
+<div
+	class="box"
+	style="background-color: {isRed ? 'red' : 'orange'}"
+	on:click={() => isRed = !isRed }
+	on:mouseenter={enter}
+	on:mouseleave={leave}
+>
+	Box!
+</div>
+
+<style>
+	.box {
+		width: 300px;
+		height: 150px;
+		cursor: pointer;
+		background-color: orange;
+		display:flex;
+		justify-content: center;
+		align-items: center;
+	}
+</style>
+```
+
+위처럼 익명함수로 전체 이벤트를 `on:`이벤트에 직접 바인딩해줘도 되고,
+별도의 함수로 생성하여 실행시키지 않도록 추가해주도록 바인딩 처리도 가능하다.
+
+![](../img/220609-2.gif)
+
+다른 예시로, 아래와 같은 input 이벤트가 있다고 하자
+
+```html
+<script>
+	let text = ''
+</script>
+
+<h1>
+	{text}
+</h1>
+
+<input
+			 type="text"
+			 on:input={(e) => { text = e.target.value }} />
+
+<button
+				on:click={() => { text = 'Vicky' }}>
+	Click
+</button>
+```
+
+해당 코드를 동작시키면 input에 추가되는 값에 따라 상단 h1 값이 변경된다. 또 Click 버튼을 클릭하면 상단 h1 값이 Vicky로 변화하는 것을 확인할 수 있다. 단, input 내부 데이터는 바뀌지 않는다.
+
+![](../img/220609-3.gif)
+
+왜일까? input의 text value가 양방향이 아닌 단방향으로만 처리되어 있기 때문이다.
+이를 양방향으로 처리해주기 위해서는 input에 value값을 text로 지정해주거나 `bind:` API를 추가해주면 된다.
+
+```html
+<input type="text" value={text} on:input={(e) => { text = e.target.value }} />
+
+<!-- 혹은 -->
+<input type="text" bind:value="{text}" />
+```
+
+![](../img/220609-4.gif)
