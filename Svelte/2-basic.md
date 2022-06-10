@@ -132,13 +132,16 @@
 
 - 조건문
   아래와 같은 조건문이 있다고 하자.
+
   ```jsx
   if (toggle) {
   } else {
   }
   ```
+
   위 코드를 스벨트의 html 구조로 변경하면 아래와 같다.
   `App.svelte`
+
   ```html
   <script>
   	let toggle = false;
@@ -154,11 +157,14 @@
   	<div>No name!</div>
   {/if}
   ```
+
   위처럼 Svelte에서는 `#`이 문장의 시작을 의미하며, `:`이 중간 조건 삽입 시 사용된다.
   또 `/` 는 문장의 종료를 나타낸다.
+
 - 반복문
   배열을 순환하는 반복문들은 어떻게 작성할 수 있을까?
   `App.svelte`
+
   ```html
   <script>
     let fruits = ["Apple", "Banana", "Orange", "Mango", "Cherry"];
@@ -170,9 +176,11 @@
     {/each}
   </ul>
   ```
+
   위와 같이 #로 시작하고 /로 마무리되는 each문에 반복문 코드를 넣어준다.
   해당 값을 갱신하기 위해선 아래와 같이 처리해줄 수 있다.
   `App.svelte`
+
   ```html
   <script>
     let fruits = ["Apple", "Banana", "Orange", "Mango", "Cherry"];
@@ -188,6 +196,7 @@
   </ul>
   <button on:click="{deleteFruit}">Eat it!</button>
   ```
+
   위처럼하면 과일이 첫번째 순서부터 하나씩 제거되는 것을 처리할 수 있다.
   ![](../img/220609-1.gif)
 
@@ -305,3 +314,205 @@
 ```
 
 ![](../img/220609-4.gif)
+
+### 컴포넌트
+
+Svelte의 컴포넌트 기능에 대해 알아보자.
+
+`App.svelte`
+
+```html
+<script>
+  let fruits = ["Apple", "Banana", "Cherry", "Orange", "Mango"];
+</script>
+
+<h2>Fruits</h2>
+<ul>
+  {#each fruits as fruit}
+  <li>{fruit}</li>
+  {/each}
+</ul>
+
+<h2>Fruits Reverse</h2>
+<ul>
+  {#each fruits.reverse() as fruit}
+  <li>{fruit}</li>
+  {/each}
+</ul>
+
+<h2>Fruits</h2>
+<ul>
+  {#each fruits as fruit}
+  <li>{fruit}</li>
+  {/each}
+</ul>
+```
+
+위 코드는 아래와 같은 결과를 도출한다.
+
+![](../img/220610-1.png)
+
+세번째 fruits가 두번째 fruits.reverse()에 영향을 함께 받고 있는 것을 확인할 수 있다.
+reverse()함수는 fruits 원본 함수를 뒤집어버리기 때문이다. 따라서 복사본을 사용해야 한다.
+두번째 Fruits Reverse를 얕은 복사하는 방식으로 개선한다.
+
+`App.svelte`
+
+```html
+<!-- codes... -->
+
+<h2>Fruits Reverse</h2>
+<ul>
+  <!-- 얕은 복사 -->
+  {#each [...fruits].reverse() as fruit}
+  <li>{fruit}</li>
+  {/each}
+</ul>
+
+<!-- codes... -->
+```
+
+그러면 아래와 같이 세번째 fruits가 영향을 받지 않는 것을 확인할 수 있다.
+
+![](../img/220610-2.png)
+
+세번째 fruits 영역을 마지막 두가지 과일만 보여주고 싶다면 아래와 같이 실행하면 된다!
+
+`App.svelte`
+
+```html
+<h2>Fruits slice -2</h2>
+<ul>
+  {#each fruits.slice(-2) as fruit}
+  <li>{fruit}</li>
+  {/each}
+</ul>
+```
+
+위처럼 전반적 구조를 봤을 때 `fruits` 라는 데이터를 반복해서 li 태그로 출력하는 반복 코드를 가지고 있다.
+반복된 이 코드를 별도의 Fruits 컴포넌트가 관리하도록 변경할 수 있는데 아래와 같다.
+
+`Fruits.svelte` 생성
+
+```html
+<script>
+  // Props
+  export let fruits;
+</script>
+
+<h2>Fruits</h2>
+<ul>
+  {#each fruits as fruit}
+  <li>{fruit}</li>
+  {/each}
+</ul>
+```
+
+- `fruits`라는 변수로 `App.svelte`에 존재하는 `fruits` 변수를 상속받는다.
+
+`App.svelte`
+
+```html
+<script>
+  import Fruits from "./Fruits.svelte";
+  let fruits = ["Apple", "Banana", "Cherry", "Orange", "Mango"];
+</script>
+
+<Fruits {fruits} />
+```
+
+- `App.svelte`에서 Fruits 컴포넌트 import
+- Fruits 컴포넌트로 `fruits` 데이터를 상속해준다.
+
+위처럼 설정하면 Fruits 리스트들이 정상적으로 생성되는 것을 확인할 수 있다.
+
+![](../img/220610-3.png)
+
+그렇다면 reverse된 배열과 끝에서 두가지의 과일을 꺼내는 것도 컴포넌트에서 동작하도록 구현해보자.
+
+`App.svelte`
+
+```html
+<Fruits {fruits} reverse />
+```
+
+reverse 옵션을 가진 Fruits 컴포넌트를 실행시켜준다.
+
+`Fruits.svelte`
+
+```html
+<script>
+  // Props
+  export let fruits;
+  export let reverse;
+
+  let name = "";
+  let computedFruits = [];
+  if (reverse) {
+    computedFruits = [...fruits].reverse();
+    name = "reverse";
+  } else {
+    computedFruits = fruits;
+  }
+</script>
+
+<h2>Fruits {name}</h2>
+<ul>
+  {#each computedFruits as fruit}
+  <li>{fruit}</li>
+  {/each}
+</ul>
+```
+
+위처럼 reverse 옵션에 따라 값이 변경되도록 분기처리해주면 아래와 같이 reverse된 리스트가 노출된다.
+
+![](../img/220610-4.png)
+
+slice 도 구현해보자.
+
+`App.svelte`
+
+```html
+<Fruits {fruits} slice="-2" /> <Fruits {fruits} slice="0, 3" />
+```
+
+위처럼 slice props 전달해준 뒤 Fruits 컴포넌트를 수정해준다.
+
+```html
+<script>
+  // Props
+  export let fruits;
+  export let reverse;
+  export let slice;
+
+  let name = "";
+  let computedFruits = [];
+
+  if (reverse) {
+    computedFruits = [...fruits].reverse();
+    name = "reverse";
+  } else if (slice) {
+    // slice = '-2' or '0,3';
+    // slice.split = ['-2'] or ['0', '3']
+    // ...slice.split = '-2' or '0', '3'
+    computedFruits = fruits.slice(...slice.split(","));
+    //	name = 'slice ' + slice
+    name = `slice ${slice}`;
+  } else {
+    computedFruits = fruits;
+  }
+</script>
+
+<h2>Fruits {name}</h2>
+<ul>
+  {#each computedFruits as fruit}
+  <li>{fruit}</li>
+  {/each}
+</ul>
+```
+
+slice props를 전개연산자로 처리하는 부분에 집중하자.
+
+![](../img/220610-5.png)
+
+적절히 reverse와 slice 가 처리된 것을 확인할 수 있당!
