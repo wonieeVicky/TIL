@@ -516,3 +516,96 @@ slice props를 전개연산자로 처리하는 부분에 집중하자.
 ![](../img/220610-5.png)
 
 적절히 reverse와 slice 가 처리된 것을 확인할 수 있당!
+
+### 스토어
+
+스벨트는 데이터 공유를 위해 스토어라는 개념을 제공한다.
+해당 개념을 배우기 앞서 데이터를 자식 컴포넌트에 내려주려면 아래와 같이 했을 것이다.
+
+`App.svelte`
+
+```html
+<script>
+  import Parent from "./Parent.svelte";
+  let name = "world";
+</script>
+
+<h1>Hello {name}!</h1>
+<Parent name="{name}" />
+```
+
+`Parent.svelte`
+
+```html
+<script>
+  import Child from "./Child.svelte";
+  export let name;
+</script>
+<div>Parent</div>
+<Child name="{name}" />
+```
+
+`Child.svelte`
+
+```html
+<script>
+  export let name;
+</script>
+<div>Child {name}</div>
+```
+
+위처럼 하면 `Child` 컴포넌트에 `name` 변수에 “world”가 정상적으로 출력된다.
+위 구조라면 `Parent` 컴포넌트는 데이터를 전달만 하는 입장이므로 불필요한 코드가 추가된 구조가 복잡하게 느껴진다.
+만약 자손 컴포넌트의 깊이가 깊어질수록 이러한 개념은 더욱 어렵게 다가올 것이다.
+
+이를 스벨트의 스토어 개념을 접목하면 아래와 같이 개선할 수 있다.
+
+`store.js`
+
+```jsx
+import { writable } from "svelte/store"; // readable, derived, get 메서드 제공
+
+// 스토어 데이터 생성
+export let storeName = writable("vicky"); // 초기값을 writable 함수 안에 부여
+```
+
+`App.svelte`
+
+```html
+<script>
+  import Parent from "./Parent.svelte";
+
+  import { storeName } from "./store.js";
+  // console.log(storeName); // 스토어 객체 데이터(set, update, subscribe 메서드 제공)
+  // console.log($storeName); // storeName 초기값 출력(Auto-subscription, 자동 구독)
+
+  let name = "world";
+  $storeName = name; // 변수에 값을 대입하려면 $(예약어)를 붙여야 한다.
+</script>
+
+<h1>Hello {name}!</h1>
+<Parent />
+```
+
+`Parent.svelte`
+
+```html
+<script>
+  // 기존 export 변수 코드 제거
+  import Child from "./Child.svelte";
+</script>
+<div>Parent</div>
+<Child />
+```
+
+`Child.svelte`
+
+```html
+<script>
+  import { storeName } from "./store.js"; // 스토어에서 데이터를 직접 가져온다.
+</script>
+<div>Child {$storeName}</div>
+```
+
+스벨트는 별도의 라이브러리로 스토어를 관리하도록 제공하는 것이 아닌 내부 기능으로 제공하므로 중요한 부분이다.
+메서드 별로 다양하게 학습해야 한다.
