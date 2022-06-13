@@ -609,3 +609,95 @@ export let storeName = writable("vicky"); // 초기값을 writable 함수 안에
 
 스벨트는 별도의 라이브러리로 스토어를 관리하도록 제공하는 것이 아닌 내부 기능으로 제공하므로 중요한 부분이다.
 메서드 별로 다양하게 학습해야 한다.
+
+### TODO 예제 만들기
+
+REPL로 간단한 TODO 예제를 만들어보는 것으로 기본 코드 구현을 마무리해보자
+
+`App.svelte`
+
+```html
+<script>
+  import { writable } from "svelte/store";
+  import Todo from "./Todo.svelte";
+
+  let title = "";
+  let todos = writable([]);
+  let id = 0;
+  function createTodo() {
+    // 빈 데이터는 입력되지 않도록 제한
+    if (!title.trim()) {
+      title = "";
+      return;
+    }
+    $todos.push({
+      id, // crypto-random-string, uuid 등으로 generate id 많이 사용
+      title,
+    });
+    $todos = $todos; // Svelte는 값 할당을 통해 반응성을 유지함(자기 자신에게 할당도 포함)
+    title = "";
+    id += 1;
+  }
+</script>
+
+<input bind:value={title} type="text" on:keydown={(e) => { e.key === 'Enter' && createTodo() }} />
+<button on:click="{createTodo}">Create Todo</button>
+
+{#each $todos as todo}
+<!-- todos를 양방향 데이터 바인딩 하는 방법으로 Todo 컴포넌트에서도 todos가 반응서을 가지도록 처리 가능 -->
+<!-- <Todo bind:todos={todos} {todo} /> -->
+
+<!-- todos를 $todos로 전달하지 않는 이유는 스토어 객체 자체로 전달하기 위함. $todos는 배열값 그 자체이므로 양방향 바인딩이 안된다. -->
+<Todo {todos} {todo} />
+{/each}
+```
+
+- 위 코드에서 가장 포인트는 `todos` 객체를 store 객체로 생성해준 부분이다. 해당 객체를 `store` 객체가 아닌 App 컴포넌트의 종속 변수로 처리하려고 하면, Todo 컴포넌트에 내려주는 todos 변수에 `bind:` 처리를 해줘야 양방향 바인딩이되어, 데이터 삭제 로직이 정상적으로 동작한다.
+- Todo 컴포넌트에 스토어 객체엔 todos를 $todos로 내려주지 않는 이유는 스토어 객체 자체로 전달하여 값 변경이 가능하도록 하기 위해서임. 만약 $todos로 내려주면 그 자체 배열 값을 내려주므로 양방향 데이터 바인딩이 처리되지 않음
+
+`Todo.svelte`
+
+```html
+<script>
+  export let todos;
+  export let todo;
+
+  let isEdit = false;
+  let title = "";
+
+  function onEdit() {
+    isEdit = true;
+    title = todo.title;
+  }
+  function offEdit() {
+    isEdit = false;
+  }
+  function updateTodo() {
+    todo.title = title;
+    offEdit();
+  }
+  function deleteTodo() {
+    // todos 값 할당 시 업데이트가 안되는 이슈가 있음 => bind 메서드를 추가하거나, store를 사용해서 개선할 수 있다.
+    $todos = $todos.filter((t) => t.id !== todo.id);
+    console.log($todos);
+  }
+</script>
+
+{#if isEdit}
+<div>
+  <input type="text" bind:value={title} on:keydown={(e) => {e.key === 'Enter' && updateTodo() }} />
+  <button on:click="{updateTodo}">OK</button>
+  <button on:click="{offEdit}">Cancel</button>
+</div>
+{:else}
+<div>
+  {todo.title}
+  <button on:click="{onEdit}">Edit</button>
+  <button on:click="{deleteTodo}">Delete</button>
+</div>
+{/if}
+```
+
+- onEdit, offEdit, updateTodo, deleteTodo 등의 이벤트 구현 부분을 확인해보자.
+- 위 코드에서 포인트는 deleteTodo 함수에서 $todos 값이 재할당되는 부분이다.
+  Svelte에서는 자기 자신 데이터에 값 재할당을 하는 과정으로 변수에 대한 반응성을 유지한다.
