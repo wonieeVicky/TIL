@@ -16,3 +16,66 @@
 - beforeUpdate : 화면이 바뀌기 전
 - afterUpdate : 화면이 바뀐 후
 - Tick (별도)
+
+### onMount, onDestroy
+
+라이프사이클의 가장 기본적은 onMount와 onDestroy API에 대해 알아보자. 이번 시간부터는 vscode의 svelte 프로젝트에서 직접 만들어본다.
+
+`App.svelte`
+
+```html
+<script>
+  import Something from "./Something.svelte";
+  let toggle = false;
+</script>
+
+<button on:click={() => (toggle = !toggle)}>Toggle</button>
+
+{#if toggle}
+  <Something />
+{/if}
+```
+
+`Something.svelte`
+
+```html
+<script>
+  // 하단 코드
+</script>
+
+<h1>Something...</h1>
+```
+
+```jsx
+import { onMount, onDestroy } from "svelte";
+
+const h1 = document.querySelector("h1");
+console.log(h1.innerText); // null, 컴포넌트가 화면에 렌더링 되지 않은 상태에서 찾았기 때문
+
+// 화면에 컴포넌트 렌더링 후 실행로직을 담는 라이프사이클
+onMount(() => {
+  console.log("Mounted!");
+
+  const h1 = document.querySelector("h1");
+  console.log(h1.innerText); // Something...
+
+  // onDestroy는 onMount 내부 return 함수로도 구현 가능
+  // 단, 내부 return 구조는 비동기가 없는 상황에서만 사용할 수 있다.
+  return () => {
+    console.log("Destroy in mount");
+  };
+});
+
+// 화면에 컴포넌트 연결이 해제되기 직전에 실행되는 라이프사이클
+onDestroy(() => {
+  console.log("Before Destroy");
+
+  const h1 = document.querySelector("h1");
+  console.log(h1.innerText); // Something... 연결이 해제되기 직전에 실행되므로 값이 담긴다.
+```
+
+- `onMount`는 화면에 컴포넌트가 렌더링된 후 실행로직을 담는 라이프사이클이다.
+  해당 컴포넌트 외부에서 엘리먼트를 찾으면 null로 반환됨을 주의하며, 해당 API 내부 return 함수로도 onDestroy를 구현할 수 있다.
+  단, 비동기 처리를 하는 함수의 경우 Promise 객체를 반환하여 return 함수가 정상적으로 실행되지 않을 수 있으므로 비동기 제외 함수만 입력해야한다.
+- `onDestroy`는 화면에 컴포넌트 연결이 해제되기 직전에 실행되는 라이프사이클이다.
+  onMount의 내부에서 실행되던 return 함수를 외부로 뺀 형태라고 보면되며, 가독성 면에서 유리한 구조이다.
