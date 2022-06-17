@@ -186,3 +186,157 @@ Something.....
 
 만약 `name += ".";` 와 같은 반응성을 가지는 데이터가 beforeUpdate, afterUpdate 함수 내부에 들어가게 되면
 무한루프에 빠질 수 있음. 반드시 넣어야 할 경우 조건문으로 무한 실행을 막는 코드를 넣어줘야 한다.
+
+### 라이프사이클 모듈화
+
+이번 시간에는 라이프사이클의 모듈화에 대해 알아본다. 라이프사이클을 모듈로 만들어 여러 곳에서 쓸 수 있도록 구현하는 과정을 의미한다. 이전까지는 라이프사이클 사용 시 직접 컴포넌트에 onMount, onDestroy API를 호출하여 작업했지만 라이프 사이클을 별도의 파일로 빼서 사용해볼 수 있다.
+
+`lifecycle.js`
+
+```jsx
+import { onMount, onDestroy, beforeUpdate, afterUpdate } from "svelte";
+
+export function lifecycle() {
+  onMount(() => {
+    console.log("onMount");
+  });
+
+  onDestroy(() => {
+    console.log("onDestroy");
+  });
+
+  beforeUpdate(() => {
+    console.log("beforeUpdate");
+  });
+
+  afterUpdate(() => {
+    console.log("afterUpdate");
+  });
+}
+```
+
+`App.svelte`
+
+```html
+<script>
+  import { lifecycle } from "./lifecycle";
+  lifecycle();
+</script>
+
+<h1>Hello Lifecycle!</h1>
+```
+
+위와 같이 lifecycle 모듈을 호출해와서 실행시켜주면 기존 컴포넌트 내 동작과 동일하게 콘솔이 찍히는 것을 확인할 수 있다. 하지만, 위 구현은 그닥 유용해보이지 않는다. 그래서 무엇을 더 활용해볼 수 있을지 공부해보자.
+
+`lifecycle.js`
+
+```jsx
+export function delayRender(delay = 3000) {
+  // ms
+  let render = false;
+
+  onMount(() => {
+    setTimeout(() => {
+      render = true;
+    }, delay);
+  });
+
+  return render;
+}
+```
+
+위와 같이 delay 초 뒤 변경되는 render 값에 따라 `App.Svelte`의 돔이 아래와 같이 그려지는 분기문이 추가되었다고 가정해보자
+
+`App.svelte`
+
+```html
+<script>
+  import { lifecycle, delayRender } from "./lifecycle";
+  let done = delayRender();
+</script>
+
+{#if done}
+<h1>Hello Lifecycle!</h1>
+{/if}
+```
+
+예측했던대로 해당 h1 태그는 보이지 않는다. 왜냐면 done이라는 객체 값, 즉 render 변수에 반응성이 없기 때문. 일반 변수가 반응성을 가지려면 컴포넌트 안에서 선언되어야 한다. 이는 즉, 2초 뒤 바뀌는 render 값에 대한 반응성이 없으므로 화면은 그려지지지 않는다고 이해할 수 있다.
+
+따라서 render 변수를 store 객체로 변경하는 과정을 통해 반응성을 부여할 수 있다.
+
+`lifecycle.js`
+
+```jsx
+import { writable } from "svelte/store";
+
+export function delayRender(delay = 3000) {
+  let render = writable(false); // 쓰기 가능한 형태의 스토어 객체 생성
+
+  onMount(() => {
+    setTimeout(() => {
+      // $render = true; // $render는 .svelte 확장자를 가진 컴포넌트 내부에서만 사용할 수 있으므로 사용 불가
+      // console.log(render); // set, update, subscribe
+      render.set(true);
+    }, delay);
+  });
+
+  return render;
+}
+```
+
+딘. onMount 내부에서 직접 $render를 상용할 수 없다. .svelte 확장자가 아닌 일반 Js 파일이기 때문! 따라서 writable에서 제공되는 set API를 활용해 반응성을 부여해준다.
+
+`App.svelte`
+
+```html
+<script>
+  import { lifecycle, delayRender } from "./lifecycle";
+  let done = delayRender();
+</script>
+
+{#if $done}
+<h1>Hello Lifecycle!</h1>
+{/if}
+
+<!-- beforeUpdate  -->
+<!-- onMount  -->
+<!-- afterUpdate  -->
+<!-- 화면 렌더링 후 -->
+<!-- beforeUpdate  -->
+<!-- afterUpdate  -->
+```
+
+위처럼 실행시켜준 뒤 스토어객체에 $를 붙여 분기조건을 만들면 정상적으로 동작함.
+별도의 자식 컴포넌트를 생성해도 정상적으로 동작하는지 확인해보자.
+
+`Something.svelte`
+
+```html
+<script>
+  import { delayRender } from "./lifecycle";
+  let done = delayRender(2000);
+</script>
+
+{#if $done}
+<h1>Something...</h1>
+{/if}
+```
+
+`App.svelte`
+
+```html
+<script>
+  import { lifecycle, delayRender } from "./lifecycle";
+  import Something from "./Something.svelte";
+  lifecycle();
+  let done = delayRender();
+</script>
+
+<Something />
+{#if $done}
+<h1>Hello Lifecycle!</h1>
+{/if}
+```
+
+위처럼 실행하면 Something 문구는 1초 뒤에 Hello Lifecycle은 3초 뒤에 잘 동작함.
+여기저기서 사용할 수 있는 간단한 라이프사이클 모듈이 만들어졌다 🙂
