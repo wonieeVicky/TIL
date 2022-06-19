@@ -340,3 +340,50 @@ export function delayRender(delay = 3000) {
 
 위처럼 실행하면 Something 문구는 1초 뒤에 Hello Lifecycle은 3초 뒤에 잘 동작함.
 여기저기서 사용할 수 있는 간단한 라이프사이클 모듈이 만들어졌다 🙂
+
+### tick
+
+이번에는 tick 이란 라이프사이클에 대해 알아본다.
+tick은 데이터가 갱신되고 나서 화면이 바뀌는 반응성을 가질 때까지 잠시 기다리도록 해주는 기능을 가진다.
+아래의 코드가 있다고 하자
+
+`App.svelte`
+
+```html
+<script>
+  let name = "world";
+
+  function handler() {
+    name = "Vicky";
+    const h1 = document.querySelector("h1");
+    console.log(h1.innerText); // Hello world 출력 - handler 함수가 종료되어야 화면이 갱신된다.
+  }
+</script>
+
+<h1 on:click="{handler}">Hello {name}!</h1>
+```
+
+위 소스를 실행시켜 h1을 클릭하면 `handler` 함수에 의해 `Hello world!` → `Hello Vicky!`로 잘 변경되는 것을 확인할 수 있다.
+하지만 위 `handler` 함수의 콘솔은 Hello Vicky 가 아닌 Hello world가 찍힌다. 왜일까?
+바로 스벨트는 `handler` 함수가 종료되는 시점에 화면이 갱신되기 때문이다.
+즉, `h1.innerText`를 읽는 시점에서는 화면이 갱신되기 이전이므로 Hello world가 출력된다.
+
+이를 제어하기 위해 tick 라이프사이클이 존재한다.
+
+```jsx
+import { tick } from "svelte";
+let name = "world";
+
+async function handler() {
+  name = "Vicky";
+  // tick은 어떤 데이터가 화면에 갱신될 떄까지 기다린 뒤 실행하는 역할을 한다.
+  await tick(); // Promise 객체를 반환함
+  const h1 = document.querySelector("h1");
+  console.log(h1.innerText); // Hello Vicky!
+}
+```
+
+위처럼 tick 함수를 통해 반응성을 기다려주면, 콘솔에 Hello Vicky가 정상적으로 출력된다.
+tick 함수는 `Promise`를 반환하므로 `async ~ await` 함수 형태로 사용해야 함을 참고하자!
+
+기존에 배웠던 onMount, onDestroy, beforeUpdate, afterUpdate 는 언제 실행되는지 정해진 라이프사이클이지만 tick은 실행 위치를 직접 정할 수 있으므로 자유로운 라이프사이클 함수인 것이 특징이다.
