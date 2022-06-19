@@ -1,14 +1,19 @@
 <script>
-  import { tick } from "svelte";
-  let name = "world";
-
-  async function handler() {
-    name = "Vicky";
-    // tick은 어떤 데이터가 화면에 갱신될 떄까지 기다린 뒤 실행하는 역할을 한다.
-    await tick(); // Promise 객체를 반환함
-    const h1 = document.querySelector("h1");
-    console.log(h1.innerText); // Hello Vicky!
-  }
+  let href = "https://github.com/wonieeVicky";
+  let name = "Vicky";
+  let value = "New input value!";
+  let isUpperCase = false;
 </script>
 
-<h1 on:click={handler}>Hello {name}!</h1>
+<!-- <a href="https://github.com/wonieeVicky">Vicky</a> -->
+<a {href}>{name}</a>
+
+<!-- <input type="text" value="Default value.." /> -->
+<!-- input 단방향 -->
+<input {value} on:input={(e) => (value = e.target.value)} />
+<!-- input 양방향 -->
+<!-- <input bind:value={value} /> -->
+<input bind:value />
+
+<!-- 보간법에서는 표현식도 직접 적어넣을 수 있다. 권장되는 방법 -->
+<div>{isUpperCase ? "DIV" : "div"}</div>
