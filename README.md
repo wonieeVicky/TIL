@@ -140,6 +140,7 @@
 1. [intro](https://github.com/wonieeVicky/TIL/blob/main/Svelte/1-intro.md)
 2. [Basic](https://github.com/wonieeVicky/TIL/blob/main/Svelte/2-basic.md)
 3. [Lifecycle](https://github.com/wonieeVicky/TIL/blob/main/Svelte/3-lifecycle.md)
+4. [보간법](https://github.com/wonieeVicky/TIL/blob/main/Svelte/4-interpolation.md)
 
 ## React
 
