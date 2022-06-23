@@ -1,24 +1,23 @@
 <script>
-  let user = {
-    name: "Vicky",
-    depth: {
-      a: "b",
-    },
-    numbers: [1, 2],
-  };
+  loop1: for (let i = 1; i < 4; i += 1) {
+    loop2: for (let k = 1; k < 4; k += 1) {
+      if (i === 2) {
+        break loop1;
+      }
+      console.log(i, k);
+    }
+    console.log("----------");
+  }
 
-  let numbers = user.numbers;
+  vicky: {
+    console.log("vicky");
+    break vicky;
+    console.log("wonny"); // wonny는 출력하지 않는다.
+  }
 
-  function assign() {
-    // user.name = "Wonny";
-    // user.depth.a = "c";
-    user.numbers.push(3);
-    numbers = numbers;
+  // Svelte 반응성 구문!
+  let count = 0;
+  $: {
+    console.log(count);
   }
 </script>
-
-<button on:click={assign}>Assign!</button>
-<h2>user name: {user.name}</h2>
-<h2>user depth a: {user.depth.a}</h2>
-<h2>user numbers: {user.numbers}</h2>
-<h2>numbers: {numbers}</h2>
