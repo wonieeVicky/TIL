@@ -385,3 +385,83 @@ async function assign() {
 ```
 
 스벨트의 반응성 구문이라는 것은 그 내부에 반응성을 가질 수 있는 데이터가 존재하고 그 데이터가 갱신되서 실제로 화면이 바뀌는 반응성이 일어나면 그때 해당되는 블럭이 실행된다는 것을 기억하자!
+
+### 반응성 구문 패턴 정리
+
+아래는 스벨트에서 사용하는 반응성 구문의 여러가지 사용 패턴이다.
+
+`App.svelte`
+
+```jsx
+<script>
+  let count = 0;
+
+  // 선언
+  $: double = count * 2; // double 별도 선언 불필요, let double 자동 처리
+
+  // 블록
+  $: {
+    console.log("block - count:", count);
+    console.log("block - double:", double);
+  }
+
+  // 함수 실행
+  $: count, log(); // count가 변경되면 실행, 반드시 함수를 실행해야 한다.
+
+  // 즉시 실행 함수(IIFE)
+  $: count,
+    (() => {
+      console.log("iife: Vicky!");
+    })();
+
+  // 조건문(If)
+  $: if (count > 0) {
+    console.log("if:", double);
+  }
+
+  // 반복문(For)
+  $: for (let i = 0; i < 3; i++) {
+    count; // 반응성 데이터를 for문 내에 둔다.
+    console.log("for:", i);
+  }
+
+  // 조건문(Switch)
+  $: switch (
+    count // 반응성 데이터를 switch 변수로 둔다
+  ) {
+    case 1:
+      console.log("switch: 1");
+      break;
+    default:
+      console.log("switch: default");
+  }
+
+  // 유효범위
+  $: {
+    function scope1() {
+      console.log("scope1");
+      function scope2() {
+        console.log("scope2");
+        function scope3() {
+          console.log("scope3", count);
+          console.log("---------");
+        }
+        scope3();
+      }
+      scope2();
+    }
+    scope1();
+  }
+
+  function log() {
+    console.log("fn: Vicky!");
+  }
+  function assign() {
+    count++;
+  }
+</script>
+
+<button on:click={assign}>Assign!</button>
+```
+
+다양한 패턴이 존재하므로 상황에 맞게 적절한 패턴을 차용하여 사용해본다.
