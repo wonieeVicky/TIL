@@ -1,23 +1,24 @@
 <script>
-  loop1: for (let i = 1; i < 4; i += 1) {
-    loop2: for (let k = 1; k < 4; k += 1) {
-      if (i === 2) {
-        break loop1;
-      }
-      console.log(i, k);
-    }
-    console.log("----------");
-  }
+  import { tick } from "svelte";
 
-  vicky: {
-    console.log("vicky");
-    break vicky;
-    console.log("wonny"); // wonny는 출력하지 않는다.
-  }
-
-  // Svelte 반응성 구문!
   let count = 0;
+  let double = 0;
+
   $: {
-    console.log(count);
+    double = count * 2; // count 가 반응성을 가지므로 count가 변경될 때 double의 값도 바뀌게 됨
+    console.log("double!");
+  }
+
+  // $: double = count * 2;
+  async function assign() {
+    count++;
+    console.time("timer");
+    await tick();
+    console.timeEnd("timer");
+    console.log(double);
   }
 </script>
+
+<button on:click={assign}>Assign!</button>
+<h2>{count}</h2>
+<h2>{double}</h2>
