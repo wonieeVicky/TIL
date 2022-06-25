@@ -308,3 +308,80 @@ $: {
 ```
 
 우선 위 코드에서 $ 모양이 한 코드 블록의 별칭이며 자바스크립트 기본 label 기능임을 사전에 인지하자.
+
+### 반응성 구문의 이해
+
+이번 시간에는 자바스크립트의 label을 사용해 스벨트의 반응성 구문을 구현하는 것에 대해 이해해보자.
+
+`App.svelte`
+
+```html
+<script>
+  let count = 0;
+  let double = 0;
+
+  $: {
+    double = count * 2; // count가 반응성 데이터이므로
+  }
+
+  function assign() {
+    count++;
+  }
+</script>
+
+<button on:click="{assign}">Assign!</button>
+<h2>{count}</h2>
+<h2>{double}</h2>
+```
+
+위 코드에서 Assign! 버튼을 누르면 `count`는 1씩, `double`은 count \* 2의 값으로 갱신된다. 그 이유는 스벨트의 라벨 내부에서 반응성을 가진 `count` 변수의 값이 변경되므로 해당 반응성 $ label도 동일하게 한번 실행되기 때문이다. 즉, `count` 가 반응성을 가지므로 `count`가 변경될 때 `double`의 값도 바뀌게 된다고 이해하면 좋다.
+
+해당 라벨문은 아래와 같이 적을 수도 있다.
+
+```jsx
+let count = 0;
+// let double = 0;
+// $: {
+//   double = count * 2;
+// }
+
+$: double = count * 2; // 변수 선언 없이 바로 label 안에서 사용 가능
+function assign() {
+  count++;
+  console.log(double); // 0, 2, 4, 6, 8
+}
+```
+
+이외에도 다양한 반응성 패턴이 존재한다. 그런데 위 `assign()` 함수를 실행시켰을 때 double 값은 0, 2, 4, 6, 8 이 담기는 것을 확인할 수 있다. 그 이유는 count의 값이 변경된 후 대기 로직이 처리되고 화면이 갱신되어야 반응성 구문(`$:`) 이 실행되기 때문이다.
+
+위와 같은 현상을 개선하기 위해서는 화면이 바뀔 때까지 기다려주는 tick 라이프사이클을 활용하면 된다.
+
+```jsx
+import { tick } from "svelte";
+
+let count = 0;
+let double = 0;
+
+$: {
+  double = count * 2;
+  console.log("double!");
+}
+
+// $: double = count * 2;
+async function assign() {
+  count++;
+  console.time("timer");
+  await tick();
+  console.timeEnd("timer");
+  console.log(double);
+}
+
+// double!
+// timer: 0.16796875 ms
+// 2
+// double!
+// timer: 0.261962890625 ms
+// 4
+```
+
+스벨트의 반응성 구문이라는 것은 그 내부에 반응성을 가질 수 있는 데이터가 존재하고 그 데이터가 갱신되서 실제로 화면이 바뀌는 반응성이 일어나면 그때 해당되는 블럭이 실행된다는 것을 기억하자!
