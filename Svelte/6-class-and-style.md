@@ -49,8 +49,8 @@ Svelte의 기본적인 클래스 속성 바인딩에 대해 알아보자!
 
 ```html
 <script>
-  let color = "tomato";
-  let white = "white";
+  let color = 'tomato'
+  let white = 'white'
 </script>
 
 <h2 style="background-color: {color}; color: {white};">Vicky!</h2>
@@ -71,3 +71,41 @@ Svelte의 기본적인 클래스 속성 바인딩에 대해 알아보자!
 ```
 
 객체 데이터를 바인딩 해줄 수도 있고, 속성 값 전체를 보간법으로 직접 넣을 수도 있음 :)
+
+### 클래스 바인딩 패턴 정리(class 지시어)
+
+클래스 바인딩을 하는 여러가지 패턴에 대해 알아본다. class 지시어와 연결 데이터를 어떻게 사용하느냐에 따라 다양한 방법이 사용된다.
+
+`App.svelte`
+
+```html
+<script>
+  let active = true
+  let test = true
+  let valid = false
+  let camelCase = true
+
+  function multi() {
+    return 'active multiple-class'
+  }
+</script>
+
+<div class={active ? 'active' : ''}>3항 연산자 보간</div>
+
+<div class:active={test}>Class 지시어(Directive) 바인딩</div>
+
+<!-- <div class:active={active}>Class 지시어 바인딩 단축 형태</div> -->
+<div class:active>Class 지시어 바인딩 단축 형태</div>
+
+<!-- camelCase dashCase, snackCase 등은 아래처럼 각각 처리할 수 있다.-->
+<!-- valid는 false이므로 추가되지 않음 -->
+<div class:active class:valid class:camelCase class:camel-case={camelCase}>다중(Mutiple) Class 지시어 바인딩</div>
+
+<!-- <div class="active multiple-class">함수 실행</div> 로 도출된다. -->
+<div class={multi()}>함수 실행</div>
+```
+
+- Class 지시어 바인딩 시 바인딩하는 값과 지시어가 같을 경우 생략할 수 있다.
+  `<div class:active={active}>` → `<div class:active>`
+- camelCase, dashCase, snackCase등 다양한 클래스 형태를 다중 class 지시어로 바인딩할 수 있다.
+- 함수를 넣어 클래스 값을 넣는 것도 가능.
