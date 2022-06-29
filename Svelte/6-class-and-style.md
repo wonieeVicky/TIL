@@ -49,8 +49,8 @@ Svelte의 기본적인 클래스 속성 바인딩에 대해 알아보자!
 
 ```html
 <script>
-  let color = 'tomato'
-  let white = 'white'
+  let color = "tomato";
+  let white = "white";
 </script>
 
 <h2 style="background-color: {color}; color: {white};">Vicky!</h2>
@@ -109,3 +109,115 @@ Svelte의 기본적인 클래스 속성 바인딩에 대해 알아보자!
   `<div class:active={active}>` → `<div class:active>`
 - camelCase, dashCase, snackCase등 다양한 클래스 형태를 다중 class 지시어로 바인딩할 수 있다.
 - 함수를 넣어 클래스 값을 넣는 것도 가능.
+
+### 스타일 유효범위(Hash)와 전역화(Global)
+
+Svelte의 유효범위(Scope, Hash)와 전역화(:global)에 대해 알아본다.
+
+`Fruits.svelte`
+
+```html
+<h2>Fruits.svelte</h2>
+<ul class="fruits">
+  <li>Apple</li>
+  <li>Banana</li>
+  <li>Cherry</li>
+</ul>
+```
+
+`App.svelte`
+
+```html
+<script>
+  import Fruits from "./Fruits.svelte";
+</script>
+
+<h2>App.svelte</h2>
+<ul class="fruits">
+  <li>Apple</li>
+  <li>Banana</li>
+  <li>Cherry</li>
+</ul>
+
+<Fruits />
+
+<style>
+  .fruits {
+    color: red;
+  }
+</style>
+```
+
+위와 같은 코드가 있다고 하자.
+하위에 .fruits 클래스의 텍스트를 red로 변경해주고 화면을 확인하면 아래와 같다.
+
+![](../img/220629-6.png)
+
+`Fruits.svelte` 내부의 ul 노드에는 해당 스타일이 적용되지 않은 것을 확인할 수 있음
+해당 컴포넌트 내부에만 스타일 코드가 유효하다! 이는 스타일 해쉬를 통해 스타일 유효범위를 설정하는데 ul 태그의 `svelte-pcucgp` 클래스를 스타일 해쉬라고 부른다. 이러한 해쉬 기호를 통해 유효범위를 만들고, 작성한 스타일이 외부 컴포넌트에 적용되는 것을 막을 수 있다.
+
+반대로 작성한 스타일이 외부의 컴포넌트에 적용되도록 하려면 어떻게 해야할까?
+바로 global 수식어로 스타일 코드를 감싸주면 된다.
+
+```html
+<style>
+  :global(.fruits) {
+    color: red;
+  }
+</style>
+```
+
+![](../img/220629-7.png)
+
+위처럼 전역 스타일로 처리됨에 따라 두 영역에 모두 red 컬러가 적용된 것을 확인할 수 있고, 특정 컴포넌트에만 적용되던 스타일 해쉬는 사라진 것을 확인할 수 있다. 이처럼 기본적으로 스타일은 해당 컴포넌트에만 적용되도록 유효범위가 설정되어 있으며, 글로벌 처리를 통해 전역에서 사용할 수 있도록 설정할 수 있음을 참고하자!
+
+그렇다면 실제 global 적용이 안된 스타일 코드는 어떻게 번들링될까?
+
+![](../img/220629-8.png)
+
+별도의 global로 처리되지 않은 스타일 코드는 css 일치 선택자를 통해 스타일 해쉬가 추가되어 `bundle.css` 로 저장되는 것을 확인할 수 있다. 이 밖에도 스타일 코드에는 작성되어 있으나 ,컴포넌트 내에 선택자와 매칭되는 요소가 없을 때에는 Svelte 컴파일러가 해당 선택자는 불 다요하 고하판단여하 S번 번들서 제외시키는 특징을 가진다.
+
+```html
+<h2>App.svelte</h2>
+<ul class="fruits">
+  <li>Apple</li>
+  <li>Banana</li>
+  <li>Cherry</li>
+</ul>
+
+<style>
+  :global(.fruits) {
+    color: red;
+  }
+  .vicky {
+    color: orange; /* .vicky 요소가 html에 미존재 */
+  }
+</style>
+```
+
+![.vicky 요소가 없으므로 bundle.css에도 .vicky { color: orange; } 생략됨](../img/220629-9.png)
+
+이와 같은 것이 편리해보이지만, 동적으로 클래스 부여가 되는 경우 해당 내용이 없어 난감할 수 있다.
+따라서 html 구조에 포함되지 않으나 동적으로 처리해야하는 스타일 코드의 경우 전역화를 통해 넣어주어야 한다.
+
+```html
+<h2>App.svelte</h2>
+<ul class="fruits">
+  <li>Apple</li>
+  <li>Banana</li>
+  <li>Cherry</li>
+</ul>
+
+<style>
+  :global(.fruits) {
+    color: red;
+  }
+  :global(.vicky) {
+    color: orange;
+  }
+</style>
+```
+
+위처럼 .vicky 스타일에 전역화를 해주면, 실제 엘리먼트가 없어도 bundle.css에 추가되는 것을 확인할 수 있다.
+
+![](../img/220629-10.png)
