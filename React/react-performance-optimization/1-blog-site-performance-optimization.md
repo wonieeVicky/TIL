@@ -87,3 +87,84 @@ Lighthouse이라는 개발자 도구에 대해 알아보자. 사용법은 매우
 - 페이지가 로드되는 화면을 순차적인 이미지로 보여준다.
 - 다음으로 Oppotunities는 리소스적인 즉, 로딩 성능 최적화에 대한 가이드를 제공하고 Diagnostics는 페이지의 실행관점, 즉, 렌더링 성능 최적화와 연관이 있는 가이드를 제공한다.
 - Passed Audits은 검사 시 통과한 항목에 대해 확인할 수 있다.
+
+### 이미지 사이즈 최적화
+
+이번에는 opportunities 항목을 자세히 분석해본다.
+
+![](../../img/220629-1.png)
+
+가장 먼저 이미지 사이즈 최적화 이슈를 확인할 수 있다. (Properly size images)
+우측 토글 버튼을 누르면 최적화가 필요한 이미지가 리스트로 노출된다.
+
+![](../../img/220629-2.png)
+
+문제가 되는 이미지는 블로그 우측의 tiny image이다. 실제 해당 이미지 사이즈를 확인해보면 아래와 같다.
+
+![](../../img/220629-3.png)
+
+실제 다운로드된 이미지는 1200\*1200px의 고해상도 이미지이지만, 실제 노출되는 이미지 사이즈는 120\*120px이다. 실제 필요한 사이즈보다 100배 가량 큰 이미지인 것이다. 그렇다면 120\*120px이미지로 불러와야할까? 노노.. 요즘 레티나 디스플레이 등의 성능 강화로 인해 보통 2배 크기로 불러오는 것이 좋다. (240\*240px)
+
+그런데 api로 받아오는 이미지를 어떻게 축소하여 최적화할 수 있을까?
+먼저, image CDN을 이용해서 최적화할 수 있다.
+
+> ⚠️ CDN(Contents Delivery Network)이란?
+> 물리적 거리의 한계를 극복하기 위해 소비자(사용자)와 가까운 곳에 컨텐츠 서버를 두는 기술
+
+image processing CDN은 기본 CDN 개념과는 살짝 다르다. 이미지를 사용자에게 보내기 전에 전처리 과정을 통해 가공하여 송출하는 방식을 의미한다. 아래와 같은 포맷으로 사용한다.
+
+```
+http://cdn.image.com?src=[img src]&width=200&height=100
+```
+
+실제 브런치 사이트의 경우도 image CDN을 사용하고 있는데, 포맷을 보면 아래와 같다.
+
+```
+https://img1.daumcdn.net/thumb/C240x0.fjpg/?fname=http://t1.daumcdn.net/brunch/service/user/eaka/image/OqblFWlX82j2Fraw-oNPi-Nbyro
+```
+
+위 포맷은 큰 이미지를 가로 240px에 맞춰 가공하여 내보내주도록 처리해주는 것을 확인할 수 있다.
+실제 서비스에서는 직접 이미지 cdn을 구축하여 사용하지만 간단하게 img CDN 솔루션(imgix 등)을 사용하여 편하게 사용할 수 있다.
+
+위 솔루션 사용은 실무에서 직접 적용해보는 것으로 하고, 실제 코드에서 어떻게 줄이는지 확인해보자.
+해당 이미지 영역을 노출하는 코드를 보면 아래와 같다.
+
+`index.js`
+
+```jsx
+/* 파라미터 참고: https://unsplash.com/documentation#supported-parameters */
+function getParametersForUnsplash({ width, height, quality, format }) {
+  return `?w=${width}&h=${height}&q=${quality}&fm=${format}&fit=crop`;
+}
+
+function Article(props) {
+  const createdTime = new Date(props.createdTime);
+  return (
+    <div className={"Article"}>
+      {/* codes.. */}
+      <div className={"Article__thumbnail"}>
+        {/* <img
+          src={props.image + getParametersForUnsplash({width: 1200, height: 1200, quality: 80, format: 'jpg'})}
+          alt='**thumbnail**'
+        /> */}
+        <img
+          src={props.image + getParametersForUnsplash({ width: 240, height: 240, quality: 60, format: "jpg" })}
+          alt="thumbnail"
+        />
+      </div>
+    </div>
+  );
+}
+
+export default Article;
+```
+
+이미지 경로를 넣는 영역에 `getParametersForUnsplash({width: 1200, height: 1200, quality: 80, format: 'jpg'})` 를 보면 실제 호출하는 이미지 크기를 설정하는 부분이 있는 것을 확인할 수 있음. `getParametersForUnsplash` 함수가 이미지 cdn 역할을 담당한다.
+
+해당 설정을 240\*240px로 줄이면 아래와 같이 이미지가 조정되어 들어오는 것을 확인할 수 있다.
+
+![](../../img/220629-4.png)
+
+위와 같이 개선 후 lighthouse를 재 실행하면 기존의 이미지 성능 저하 경고가 사라진 것을 확인할 수 있다.
+
+![](../../img/220629-5.png)
