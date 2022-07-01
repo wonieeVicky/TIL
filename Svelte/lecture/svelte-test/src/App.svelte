@@ -1,21 +1,23 @@
-<script>
-  import Fruits from "./Fruits.svelte";
-</script>
-
-<h2>App.svelte</h2>
-<ul class="fruits">
-  <li>Apple</li>
-  <li>Banana</li>
-  <li>Cherry</li>
-</ul>
-
-<Fruits />
+<div class="box" />
 
 <style>
-  :global(.fruits) {
-    color: red;
+  :global(body) {
+    padding: 60px;
   }
-  :global(.vicky) {
-    color: orange;
+  .box {
+    width: 100px;
+    height: 100px;
+    background: tomato;
+    border-radius: 10px;
+    animation: zoom 0.4s infinite alternate;
+  }
+  /* @ At-rules */
+  @keyframes -global-zoom {
+    0% {
+      transform: scale(1);
+    }
+    100% {
+      transform: scale(1.5);
+    }
   }
 </style>
