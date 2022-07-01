@@ -221,3 +221,61 @@ Svelte의 유효범위(Scope, Hash)와 전역화(:global)에 대해 알아본다
 위처럼 .vicky 스타일에 전역화를 해주면, 실제 엘리먼트가 없어도 bundle.css에 추가되는 것을 확인할 수 있다.
 
 ![](../img/220629-10.png)
+
+### @keyframes 전역화
+
+svelte에서 `@keyframes`를 전역화하는 방법에 대해 알아보자
+
+`App.svelte`
+
+```html
+<div class="box" />
+
+<style>
+  :global(body) {
+    padding: 60px;
+  }
+  .box {
+    width: 100px;
+    height: 100px;
+    background: tomato;
+    border-radius: 10px;
+    animation: zoom 0.4s infinite alternate;
+  }
+  /* @ At-rules */
+  @keyframes zoom {
+    0% {
+      transform: scale(1);
+    }
+    100% {
+      transform: scale(1.5);
+    }
+  }
+</style>
+```
+
+`@keyframes` 요소로 zoom을 생성한다. 해당 스타일을 번들링하면 .box 컴포넌트에만 유효한 `@keyframes` 스타일이 생성된 것을 확인 할 수 있음
+
+![](../img/220701-3.png)
+
+이를 전역화하려면 아래의 문법을 쓴다.
+
+```html
+<style>
+  /* @ At-rules */
+  @keyframes -global-zoom {
+    0% {
+      transform: scale(1);
+    }
+    100% {
+      transform: scale(1.5);
+    }
+  }
+</style>
+```
+
+![](../img/220701-4.png)
+
+위와 같이 수정한 후 bundle.css를 확인해보면 해시 기호없이 zoom `@keyframes`가 생성된 것을 확인할 수 있다. 이로써 다른 컴포넌트에서는 zoom `@keyframes`를 사용할 수 있게 되었다.
+
+정리하자면 일반적인 전역화는 `:global()` modifier로 처리하고, `@keyframes`의 경우 `-global-`을 붙여 전역화해주면 된다.
