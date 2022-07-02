@@ -182,3 +182,63 @@ export default Article;
 ![](../../img/220701-2.png)
 
 아래 이미지를 보면 페이지 로드 후 Article 컴포넌트에서 removeSpecialCharacter가 여러번 실행되는 것을 확인할 수 있다. 해당 이벤트는 한번 발생하는 이벤트이지만 사용하는 자원이 많아 중간중간 GC가 자원을 정리해주는 것을 확인할 수 있다.
+
+### bottleneck 코드 최적화
+
+이제 성능 저하를 일으키는 `Article` 컴포넌트를 뜯어볼 차례이다.
+
+`src/components/Article/index.js`
+
+```jsx
+/*
+ * 파라미터로 넘어온 문자열에서 일부 특수문자를 제거하는 함수
+ * (Markdown으로 된 문자열의 특수문자를 제거하기 위함)
+ * */
+function removeSpecialCharacter(str) {
+  const removeCharacters = ["#", "_", "*", "~", "&", ";", "!", "[", "]", "`", ">", "\n", "=", "-"];
+  let _str = str;
+  let i = 0,
+    j = 0;
+
+  for (i = 0; i < removeCharacters.length; i++) {
+    j = 0;
+    while (j < _str.length) {
+      if (_str[j] === removeCharacters[i]) {
+        _str = _str.substring(0, j).concat(_str.substring(j + 1));
+        continue;
+      }
+      j++;
+    }
+  }
+
+  return _str;
+}
+```
+
+Article이라는 컴포넌트에서 성능 누수를 발생시키는 removeSpecialCharacter 코드는 위와 같다. 특정 특수문자가 있는지 전체 판별하여 제거해주는 removeSpecialCharacter 함수는 for문과 while 문을 중첩하여 사용하기 때문에 누수가 발생된다. 우리는 이를 1. 특수문자를 효율적으로 제거하는 것과 2. 작업하는 양을 줄이는 방법을 사용해서 bottleneck 코드를 개선할 수 있다.
+
+1. 특수문자를 효율적으로 제거하기
+   1. Replace 함수와 정규식을 사용 ✅
+   2. 마크다운의 특수문자를 지워주는 라이브러리를 사용
+      1. remove-markdown 등..
+2. 작업하는 양 줄이기
+   1. 가져오는 데이터 양 자체를 줄이는 방법! (최장 90021자에 달하는 컨텐츠를 모두 담아오지 않도록 한다.)
+
+위 처리사항에 맞춰 아래와 같이 removeSpecialCharacter 함수를 수정해준다.
+
+```jsx
+/*
+ * 파라미터로 넘어온 문자열에서 일부 특수문자를 제거하는 함수
+ * (Markdown으로 된 문자열의 특수문자를 제거하기 위함)
+ * */
+function removeSpecialCharacter(str) {
+  let _str = str.substring(0, 300);
+  _str = _str.replace(/[\#\_\*\~\&\;\!\[\]\`\>\\n\=\-]/g, "");
+
+  return _str;
+}
+```
+
+이후 Performace 탭을 재실행시키면, 기존에 removeSpecialCharacter에서 발생하던 성능 누수 이슈가 사라진 것을 확인할 수 있다.
+
+![](../../img/220703-1.png)
