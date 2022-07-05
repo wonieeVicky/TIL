@@ -252,9 +252,9 @@ Performance 탭에 보면 .chunk.js 파일의 용량으로 인해 파일 로드 
 
 그러면 우린 이 파일을 어떻게 최적화하고 로드를 단축할 수 있을까? 그러기 위해서는 우린 해당 파일에 어떤 내용이 저장되는지 알아야한다. 이때 우리는 `webpack-bundle-analyzer`를 통해 번들링된 파일들이 어떻게 구성되어있는지를 확인할 수 있다.
 
-그런데 해당 패키지를 사용하려면 직접 웹팩을 구성해야하는데, 우리는 cli의 기본 웹팩을 사용하고 있으므로 cli를 eject 하거나 별도의 패키지를 깔아야 한다. 다행히 cli-bundle-analyzer를 통해 별도로 커스텀하지 않아도 특정 패키지를 추가할 수 있게 되었다!
+그런데 해당 패키지를 사용하려면 직접 웹팩을 구성해야하는데, 우리는 cli의 기본 웹팩을 사용하고 있으므로 cli를 eject 하거나 별도의 패키지를 깔아야 한다. 다행히 `cli-bundle-analyzer`를 통해 별도로 커스텀하지 않아도 특정 패키지를 추가할 수 있게 되었다!
 
-cra-bundle-analyzer에서 나온대로 패키지를 설치해본다.
+`cra-bundle-analyzer`에서 나온대로 패키지를 설치해본다.
 
 ```bash
 > npm install --save-dev cra-bundle-analyzer
