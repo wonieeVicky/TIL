@@ -69,3 +69,134 @@ async function toggle() {
 ```
 
 위와 같이 `input`에 `bind` 요소로 `this`를 주입해주면 별도의 요소를 검색하지 않고 `input` 요소를 참조하도록 만들어줄 수 있다. 이는 전체 돔을 검색하는 성능을 줄일 수 있도록 해주므로 직접 요소를 바인딩 하는 방법으로 성능을 최적화해주는 것이 바람직하다.
+
+### 입력 요소 바인딩(Properties, group) 패턴 정리
+
+Svelte의 여러가지 입력 요소 바인딩 패턴에 대해 알아보자
+
+```jsx
+let text = "";
+let number = 3;
+let checked = false;
+let fruits = ["Apple", "Banana", "Cherry"];
+let selectedFruits = [];
+let group = "Banana";
+let textarea = "";
+let select = "";
+let multipleSelect = ["Banana", "Cherry"];
+```
+
+위와 같은 변수가 있다고 했을 때 기본적인 input은 아래와 같은 이벤트 바인딩을 가질 수 있다.
+
+```html
+<!-- let text = ''; -->
+<section>
+  <h2>Text</h2>
+  <input type="text" bind:value="{text}" />
+</section>
+```
+
+input 요소는 양방향 데이터 바인딩을 한다. range input의 경우에도 동일하게 연결할 수 있다.
+
+```html
+<!-- let number = 3 -->
+<section>
+  <h2>Number/Range</h2>
+  <div>
+    <input type="number" bind:value="{number}" min="0" max="10" />
+  </div>
+  <div>
+    <input type="range" bind:value="{number}" min="0" max="10" />
+  </div>
+</section>
+```
+
+checkbox도 동일하며, label 태그를 감싸주면 텍스트 클릭 시에도 선택 on/off 처리된다.
+
+```html
+<!-- let checked = false; -->
+<section>
+  <h2>Checkbox</h2>
+  <input type="checkbox" bind:checked /> Agree?
+  <!-- label wrapping을 하면 label 클릭 시 checkbox 토글 됨 -->
+  <label><input type="checkbox" bind:checked /> Agree?(label wrapping)</label>
+</section>
+```
+
+체크박스 다중 선택 시에는 아래와 같이 구현할 수 있다.
+
+```html
+<!-- let fruits = ["Apple", "Banana", "Cherry"]; -->
+<!-- let selectedFruits = []; -->
+<section>
+  <h2>Checkbox 다중 선택</h2>
+  <strong>Selected: {selectedFruits}</strong>
+  {#each fruits as fruit}
+  <!-- bind:group으로 선택한 내용이 배열에 저장된다. -->
+  <label><input type="checkbox" value="{fruit}" bind:group="{selectedFruits}" /> {fruit}</label>
+  {/each}
+</section>
+```
+
+checkbox 다중 선택 시에는 목록 데이터와 값을 담는 배열 데이터가 필요하다.
+특히 each 문 안에서 데이터 바인딩 한 부분을 보면 `bind:value`가 아니므로 단방향 데이터 바인딩, 즉 단순하게 값을 받아 출력하는 용도로만 사용한다는 의미이다. 해당 input은 `bind:group`으로 묶어줌
+
+radio input 에 대해서도 알아본다.
+
+```html
+<!-- let group = "Banana"; -->
+<section>
+  <h2>Radio</h2>
+  <strong>Selected: {group}</strong>
+  <label> <input type="radio" value="Apple" bind:group /> Apple </label>
+  <label> <input type="radio" value="Banana" bind:group /> Banana </label>
+  <label> <input type="radio" value="Cherry" bind:group /> Cherry </label>
+</section>
+```
+
+다중 선택일 경우에는 checkbox, 단일 선택일 경우에는 radio input을 사용하며 group에 문자 데이터를 넣어줘야 한다.
+
+이 밖에 textarea도 동일한 데이터 바인딩 방식을 사용한다.
+
+```html
+<!-- let textarea = ""; -->
+<section>
+  <h2>Textarea</h2>
+  <pre>{textarea}</pre>
+  <textarea bind:value="{textarea}" />
+</section>
+```
+
+마지막으로 select input은 아래와 같다.
+
+```html
+<!-- let select = "Banana"; -->
+<section>
+  <h2>Select 단일 선택</h2>
+  <strong>Selected: {select}</strong>
+  <div>
+    <select bind:value="{select}">
+      <option disabled value="">Please select one!</option>
+      <option>Apple</option>
+      <option>Banana</option>
+      <option>Cherry</option>
+    </select>
+  </div>
+</section>
+
+<!-- let multipleSelect = ["Banana", "Cherry"]; -->
+<section>
+  <h2>Select 다중 선택(Multiple)</h2>
+  <strong>Selected: {multipleSelect}</strong>
+  <div>
+    <select multiple bind:value="{multipleSelect}">
+      <option disabled value="">Please select one!</option>
+      <option>Apple</option>
+      <option>Banana</option>
+      <option>Cherry</option>
+    </select>
+  </div>
+</section>
+```
+
+단일 선택 시에는 문자열 데이터를 바인딩하며, 다중 선택시에는 배열 데이터를 연결해주어야 한다.
