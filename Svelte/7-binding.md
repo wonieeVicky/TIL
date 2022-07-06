@@ -200,3 +200,54 @@ radio input 에 대해서도 알아본다.
 ```
 
 단일 선택 시에는 문자열 데이터를 바인딩하며, 다중 선택시에는 배열 데이터를 연결해주어야 한다.
+
+### 편집 가능 요소 바인딩(content editable)
+
+이번시간에는 html의 `contenteditable` 요소를 사용해서 데이터를 바인딩 해보도록 한다.
+`contenteditable` 요소는 일반 text로 보이지만 클릭시 해당 내용을 수정할 수 있는 속성으로 HTML에서 기본적으로 제공되는 기능이다.
+
+```html
+<div contenteditable>Hello world!</div>
+```
+
+![](../img/220706-1.gif)
+
+스벨트에서는 `contenteditable` html 요소에 바인딩할 수 있는 개념을 두가지를 제공한다.
+innerHTML과 textContent를 사용하는 방식인데 innerHTML은 내부 html 요소를 모두 보여주며, textContent는 HTML 구조를 제외한 텍스트만을 반환한다.
+
+```html
+
+<script>
+  let innerHTML = "";
+  let textContent = "Hello vicky!!";
+</script>
+
+<div contenteditable bind:innerHTML bind:textContent />
+
+<span>innerHTML</span>
+<div>{innerHTML}</div>
+
+<span>textContent</span>
+<div>{textContent}</div>
+
+<span>@html innerHTML</span>
+<div>{@html innerHTML}</div>
+
+<style>
+  div {
+    border: 1px solid orange;
+    margin-bottom: 10px;
+  }
+  span {
+    display: inline-block;
+    margin-bottom: 10px;
+    font-weight: bold;
+  }
+</style>
+```
+
+위 div에 innerHTML과 textContent를 bind하여 데이터를 노출하면 아래와 같이 도출된다. 
+
+![](../img/220706-2.gif)
+
+때에 따라 맞춰서 사용하면 좋겠다 🙂
