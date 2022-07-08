@@ -144,6 +144,7 @@
 5. [반응성](https://github.com/wonieeVicky/TIL/blob/main/Svelte/5-reactivity.md)
 6. [클래스와 스타일](https://github.com/wonieeVicky/TIL/blob/main/Svelte/6-class-and-style.md)
 7. [요소 바인딩](https://github.com/wonieeVicky/TIL/blob/main/Svelte/7-binding.md)
+8. [조건, 반복 그리고 키](https://github.com/wonieeVicky/TIL/blob/main/Svelte/8-condition-and-iteractions-and-keys.md)
 
 ## React
 
