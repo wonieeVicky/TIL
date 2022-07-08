@@ -1,24 +1,46 @@
 <script>
-  let innerHTML = "";
-  let textContent = "Hello vicky!!";
+  let count = 0;
 </script>
 
-<div contenteditable bind:innerHTML bind:textContent />
-<span>innerHTML</span>
-<div>{innerHTML}</div>
-<span>textContent</span>
-<div>{textContent}</div>
-<span>@html innerHTML</span>
-<div>{@html innerHTML}</div>
+<button on:click={() => (count += 1)}>증가!</button>
+<button on:click={() => (count -= 1)}>감소!</button>
 
-<style>
-  div {
-    border: 1px solid orange;
-    margin-bottom: 10px;
-  }
-  span {
-    display: inline-block;
-    margin-bottom: 10px;
-    font-weight: bold;
-  }
-</style>
+<h2>{count}</h2>
+
+<section>
+  <h2>if</h2>
+  {#if count > 3}
+    <div>count &gt; 3</div>
+  {/if}
+</section>
+
+<section>
+  <h2>if else</h2>
+  {#if count > 3}
+    <div>count &gt; 3</div>
+  {:else}
+    <div>count &lt;= 3</div>
+  {/if}
+</section>
+
+<section>
+  <h2>if else if</h2>
+  {#if count > 3}
+    <div>count &gt; 3</div>
+  {:else if count === 3}
+    <div>count === 3</div>
+  {:else}
+    <div>count &lt;= 3</div>
+  {/if}
+</section>
+
+<section>
+  <h2>다중 블록</h2>
+  {#if count > 3}
+    {#if count === 5}
+      count === 5
+    {:else}
+      count &gt; 3
+    {/if}
+  {/if}
+</section>
