@@ -387,3 +387,90 @@ export default App;
 ![](../../img/220709-4.png)
 
 페이지 이동에 따라 index.chunk.js 등으로 파일이 분할되어 조각조각 호출되는 것을 확인할 수 있다 🙂
+
+### 텍스트 압축 적용
+
+이제 LightHouse로 평가를 해보면 점수가 많이 올라가있는 것을 확인할 수 있다. 하지만 이는 아직 개발환경에서의 평가이므로 실제 프로덕션 단계에서의 평가는 약간의 차이가 있다. 예를들어 프로덕션에서는 추가적인 minify 작업 등을 통해 성능 상의 차이가 발생하는 것이다. 따라서 실제 서비스 환경에서 측정하는 것이 가장 적절한 평가치가 될 것이다.
+
+따라서 이번 시간에는 `npm run serve`통해 실제 프로덕션 제품을 빌드한 뒤 배포 주소에서 확인해본다. 당연히 단순 빌드만 한 것이기 때문에 성능 상 크게 차이는 발생하지 않는다.
+
+Lighthouse의 리포트를 보면 Enable text compression이라는 항목이 보인다. 이 항목은 서버에서 텍스트를 받을 때 압축된 텍스트를 받으라는 것을 의미한다. 이것은 무엇일까?
+
+웹페이지를 로드할 때에는 다양한 리소스들이 같이 다운받아진다. html, css, js 등 텍스트로 이루어진 파일들이다. 이 파일의 크기가 클수록 로딩 속도가 오래 걸리게 된다. 이를 개선하기 위해 앞서 code splitting을 해보았고, 이번에는 텍스트 압축을 적용해보려고 한다. 텍스트 압축은 간단히 파일 사이즈를 압축하는 것이라고 생각한다.
+
+![](../../img/220711-1.png)
+
+실제 api로 전닯받는 `/articles` network 내역을 보면 content-Encoding 이라는 항목에 gzip으로 텍스트 압축이 되어 정보를 전달받는 것을 확인할 수 있다. 그에 반해 기본적으로 우리가 이용하는 번들링된 파일에는 해당 처리가 되어 있지 않는 것을 확인할 수 있다.
+
+텍스트 압축(text compression)에는 웹 상에서 대표적으로 GZIP과 Deflate라는 압축 알고리즘을 사용한다. Deflate는 LZ77이라는 알고리즘 + 허프만코딩을 사용해 압축하며, GZIP은 블럭화 + 필터링 + 헤드와 checksum 및 내부적으로 Deflate를 사용하는 알고리즘을 채택한다. 따라서 GZIP은 Deflate보다 더 좋은 성능을 보여준다. 따라서 이 파일애도 텍스트 압축을 해주는 것이 좋겠다.
+
+```json
+"serve": "npm run build && node ./node_modules/serve/bin/serve.js -u -s build",
+```
+
+위 cli 명령어가 실제 실서버에 배포되는 명령어를 담은 것이므로 이를 수정해주면 될 것 같다. 위 커맨드에 담긴 다양한 명령어들에 대한 정보를 찾아보자!
+
+```bash
+> node ./node_modules/serve/bin/serve.js --help
+UPDATE AVAILABLE The latest version of `serve` is 13.0.4
+
+  serve - Static file serving and directory listing
+
+  USAGE
+
+      $ serve --help
+      $ serve --version
+      $ serve folder_name
+      $ serve [-l listen_uri [-l ...]] [directory]
+
+      By default, serve will listen on 0.0.0.0:5000 and serve the
+      current working directory on that address.
+
+      Specifying a single --listen argument will overwrite the default, not supplement it.
+
+  OPTIONS
+
+      --help                              Shows this help message
+
+      -v, --version                       Displays the current version of serve
+
+      -l, --listen listen_uri             Specify a URI endpoint on which to listen (see below) -
+                                          more than one may be specified to listen in multiple places
+
+      -d, --debug                         Show debugging information
+
+      -s, --single                        Rewrite all not-found requests to `index.html`
+
+      -c, --config                        Specify custom path to `serve.json`
+
+      -n, --no-clipboard                  Do not copy the local address to the clipboard
+
+      -u, --no-compression                Do not compress files
+
+      --no-etag                           Send `Last-Modified` header instead of `ETag`
+
+      -S, --symlinks                      Resolve symlinks instead of showing 404 errors
+
+      --ssl-cert                          Optional path to an SSL/TLS certificate to serve with HTTPS
+
+      --ssl-key                           Optional path to the SSL/TLS certificate's private key
+
+  ENDPOINTS
+
+      Listen endpoints (specified by the --listen or -l options above) instruct serve
+      to listen on one or more interfaces/ports, UNIX domain sockets, or Windows named pipes.
+```
+
+위 내용에 보면 -u 명령어가 text-compression을 막는 명령어임을 확인할 수 있다. 따라서 해당 명령어를 제거한 뒤 다시 빌드하여 실서버를 열어본다!.
+
+```json
+"serve": "npm run build && node ./node_modules/serve/bin/serve.js -s build",
+```
+
+위 방법은 cli를 사용하는 테스트 환경에서 적용하는 방법이며, 기본적인 실제 서비스에서는 다양한 서비스가 연계되어 여러 서버를 띄워 사용하므로 해당 파일이 배포되는 곳에서 직접 텍스트 압축을 실행해주어야 한다.
+
+![](../../img/220711-2.png)
+
+위처럼 번들링된 파일에 gzip 압축이 되어 있는 것을 확인할 수 있다. 그런데 css 파일 등에는 content-encoding 항목이 없는 것을 확인할 수 있다. 왜일까? 압축하는 데에도 시간이 걸리지만 압축을 푸는데에도 시간이 걸리기 때문에 모든 파일을 무분별하게 압축을 해서 전달하는 것은 비효율적이기 때문이다. 따라서 cli에서는 파일 크기가 2kb보다 클 경우에만 압축을 하고, 그것보다 낮은 파일의 경우 압축을 진행하지 않는다.
+
+이처럼 텍스트 인코딩은 빠르고 효율적으로 성능을 향상시킬 수 있는 방법이므로 실무에 아직 적용 전이라면 반드시 적용해보자~!
