@@ -140,3 +140,137 @@ let fruits = ["Apple", "Banana", "Cherry", "Orange", "Banana"];
 위처럼 fruits의 배열이 각자 고유의 값을 가진 id 값을 별도로 가지도록 구성하여 그려주면, 같은 값이 name으로 들어가도 중복되지 않는 Li 태그를 구성할 수 있게되며, 필요한 Ul 태그만 리렌더링되는 것을 확인할 수 있다.
 
 ![](../img/220710-3.gif)
+
+### 반복 블록 패턴 정리
+
+반복 블록을 사용해서 아이템을 출력하는 패턴에 대해 정리해보자.
+
+```jsx
+let fruits = [
+  { id: 1, name: "Apple" },
+  { id: 2, name: "Banana" },
+  { id: 3, name: "Cherry" },
+  { id: 4, name: "Apple" },
+  { id: 5, name: "Orange" },
+];
+```
+
+fruits 배열에 대한 반복 블록 기본 패턴을 구현해보고자 한다.
+
+```html
+<section>
+  <h2>기본</h2>
+  <!-- {#each 배열 as 속성} {/each} -->
+  {#each fruits as fruit}
+  <div>{fruit.name}</div>
+  {/each}
+</section>
+
+<section>
+  <h2>순서(index)</h2>
+  <!-- {#each 배열 as 속성, 순서} {/each} -->
+  {#each fruits as fruit, index}
+  <div>{index} / {fruit.name}</div>
+  {/each}
+</section>
+
+<section>
+  <h2>아이템 고유화(key)</h2>
+  <!-- {#each 배열 as 속성, 순서 (키)} {/each} -->
+  <!-- 실무에서는 소괄호를 열어 키를 제공하는 것이 필수사항임  -->
+  {#each fruits as fruit, index (fruit.id)}
+  <div>{index} / {fruit.name}</div>
+  {/each}
+</section>
+```
+
+위처럼 각 배열을 그대로 반복문으로 만들거나 상황에 따라 순서나 고유 key 값을 넣어 리스트를 구현할 수 있다. 보통 실무에서는 세번째 방법을 사용해 고유 키를 제공하는 것이 거의 필수적으로 채택하는 방법이므로 참고하자. (고유 키를 부여하면 다른 li 변경에 따른 불필요한 재실행을 막을 수 있다.)
+
+또한 구조분해도 스벨트에서 아래와 같이 사용할 수 있다.
+
+```html
+<section>
+  <h2>구조 분해(destructuring)</h2>
+  <!-- {#each 배열 as {id, name}} {/each} -->
+  {#each fruits as { id, name } (id)}
+  <div>{name}</div>
+  {/each}
+</section>
+```
+
+위 내용을 나머지 연산자를 적용하여 동일하게 구현할 수도 있다.
+
+```html
+<section>
+  <h2>나머지 연산자(rest)</h2>
+  <!-- {#each 배열 as {id, ...rest}} {/each} -->
+  {#each fruits as { id, ...rest } (id)}
+  <div>{rest.name}</div>
+  {/each}
+</section>
+```
+
+이 밖에 조건에 따른 UI 변경을 아래와 같이 할 수 있다.
+
+```jsx
+let todos = [];
+```
+
+```html
+<section>
+  <h2>빈 배열 처리(else)</h2>
+  <!-- {#each} {:else} {/each} -->
+  {#each todos as todo (todo.id)}
+  <div>{todo.name}</div>
+  {:else}
+  <div>아이템이 없어요!</div>
+  {/each}
+</section>
+```
+
+위와 같은 상태일 경우 빈배열이므로 아이템이 없다는 문구가 노출된다.
+이러한 상황을 위해서는 todos의 값이 undefined, null 등이면 안되고 반드시 빈배열이어야 한다.
+
+2차원 배열 구조는 아래와 같이 상세 배열을 펼쳐서 처리할 수 있다.
+
+```html
+<script>
+  let fruits2D = [
+    [1, "Apple"],
+    [2, "Banana"],
+    [3, "Cherry"],
+    [4, "Orange"],
+  ];
+</script>
+
+<section>
+  <h2>2차원 배열</h2>
+  <!-- {#each 배열 as [id, name]} {/each} -->
+  {#each fruits2D as [id, name] (id)}
+  <div>{name}</div>
+  {/each}
+</section>
+```
+
+마지막으로 객체 데이터에 대한 활용에 대해 알아보자.
+
+```jsx
+let user = {
+  name: "Vicky",
+  age: 33,
+  email: "hwfongfing@gmail.com",
+};
+```
+
+위 user 객체가 있을 때 이 값을 배열값으로 변환하는 Object.entries로 아래와 같이 반복 블록을 구현할 수 있다.
+
+```html
+<section>
+  <h2>객체 데이터</h2>
+  {#each Object.entries(user) as [key, value] (key)}
+  <div>{key}: {value}</div>
+  {/each}
+</section>
+```
+
+위 패턴들은 자바스크립트의 배열, 객체를 활용하여 구현하는 패턴이므로 스벨트만의 패턴이라고 보기는 어렵다. 다양한 활용방법에 대해 익히고 이를 실무에 적용해본다고 생각해보자 !

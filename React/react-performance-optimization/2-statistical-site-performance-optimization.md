@@ -44,6 +44,8 @@
 
 해당 애니메이션 동작을 자세히보면 동작이 좀 버벅이는 것을 확인할 수 있다. 현상을 좀 더 확실히 확인하기 위해서는 Performance 탭에서 CPU 설정은 6x slowdown으로 설정하여 Record를 하면 더 버벅이는 것을 확인할 수 있다. 왜이럴까? 실제 코드를 보면 아래 바 형태에 transition이 걸려있는 것이 대부분이다.
 
+---
+
 ```css
 .hweFEX {
   -webkit-transition: width 1.5s ease;
