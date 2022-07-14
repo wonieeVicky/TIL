@@ -274,3 +274,49 @@ let user = {
 ```
 
 위 패턴들은 자바스크립트의 배열, 객체를 활용하여 구현하는 패턴이므로 스벨트만의 패턴이라고 보기는 어렵다. 다양한 활용방법에 대해 익히고 이를 실무에 적용해본다고 생각해보자 !
+
+### 키 블록
+
+이번 시간에는 svelte의 키 블록에 대해 알아본다.
+
+`src/Count.svelte`
+
+```html
+<script>
+  let count = 0;
+  setInterval(() => (count += 1), 1000);
+</script>
+
+<h1>{count}</h1>
+```
+
+`src/App.svelte`
+
+```html
+<script>
+  import Count from "./Count.svelte";
+  let reset = false;
+</script>
+
+<Count />
+<button on:click={() => (reset = !reset)}>Reset!</button>
+```
+
+위와 같이 1초에 1씩 count가 증가하는 count가 동작하는 코드가 있다.
+위 코드에서 reset 버튼을 눌렀을 때 count가 0으로 reset되는 것을 구현하려면 어떻게 하면 좋을까?
+
+우리의 일반적인 구현방법으로는 Count라는 컴포넌트에 reset 데이터를 props으로 부여하여 조건에 따라 동작이 바뀌도록 하는 것이다.
+하지만 이 방법 말고 스벨트에서는 키 블록을 사용해 구현하는 방법을 제공한다.
+
+`src/App.svelte`
+
+```html
+{#key reset}
+  <Count />
+{/key}
+
+<button on:click={() => (reset = !reset)}>Reset!</button>
+```
+
+위 코드에서 키(Key) 블록의 역할은 연결된 데이터의 값이 변경될 때마다 내용을 파괴하고 다시 생성한다.
+위처럼 구현하면 간단히 reset 상태에 따라 해당 기능을 재시작할 수 있게됨 (성능면에서 컴포넌트를 파괴하고 재생성하는 과정이 효율적일까? 🤔)
