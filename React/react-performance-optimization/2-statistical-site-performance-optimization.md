@@ -107,3 +107,38 @@ Paint 과정
 
 위 transition에는 width값을 수정하고 있다. 이는 reflow를 발생시키는 속성이다.
 따라서 해당 애니메이션에서 쟁크현상이 발생할 경우 위 속성 영향도를 기준으로 현상을 개선할 수 있는 다른 방법으로 구현하는 것이 바람직하다. (tranform 사용 등)
+
+### 애니메이션 최적화
+
+이제 이 애니메이션을 최적화해본다. width를 직접 수정하는 방법이 아닌 다른 방법으로 해당 애니메이션을 구현하기 위해서는 어떤 것이 좋을까? Reflow나 repaint가 생략되는 transform의 scale 속성으로 해당 애니메이션 구현이 가능해보인다. scale은 비율로서 블록의 속성을 변경하는 것이다. 일반 막대그래프의 변형이므로 scaleX요소로 수정하면 가능할 것 같다.
+
+`src/components/Bar.js`
+
+```jsx
+// 기존 BarGraph transition property
+const BarGraph = styled.div`
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: ${({ width }) => width}%;
+  transition: width 1.5s ease;
+  height: 100%;
+  background: ${({ isSelected }) => (isSelected ? "rgba(126, 198, 81, 0.7)" : "rgb(198, 198, 198)")};
+  z-index: 1;
+`;
+
+// 변경 후 transform property
+const BarGraph = styled.div`
+  /* ... */
+  width: 100%;
+  transform: scaleX(${({ width }) => width / 100});
+  transform-origin: center left;
+  transition: transform 1.5s ease;
+`;
+```
+
+위와 같이 transform의 scaleX 속성으로 width 값을 주입하도록 변경한 뒤 애니메이션을 재동작해보면 훨씬 더 매끈하게 화면이 구현되는 것을 확인할 수 있다! 실제 성능 개선이 이루어진 것을 performance 탭에서도 확인할 수 있다.
+
+![애니메이션 수정 전,후 비교](../../img/220715-1.png)
+
+수정 전에는 계속 프레임이 들어오면서 메인스레드에서 reflow가 다량 발생하는 것을 볼 수 있다. transform은 메인스레드가 하는 일이 많이 줄어들고 나머지 동작 스타일은 gpu가 애니메이션을 렌더링하고 있음을 확인할 수 있다.
