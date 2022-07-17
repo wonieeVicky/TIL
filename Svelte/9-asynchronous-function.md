@@ -153,4 +153,154 @@ a()
   .then(() => d());
 ```
 
-위처럼 chain 형식으로 약속(promise)의 객체가 반환되고 then 메서드를 활용해 다음 함수를 리턴할 수 있게 된다. 이를 async ~ await 구문으로 더 간단히 구현할 수도 있다.
+위처럼 chain 형식으로 약속(promise)의 객체가 반환되고 then 메서드를 활용해 다음 함수를 리턴할 수 있게 된다.
+이를 async ~ await 구문으로 더 간단히 구현할 수도 있다.
+
+```jsx
+async function asyncFn() {
+  await a();
+  await b();
+  await c();
+  await d();
+}
+asyncFn();
+```
+
+Promise 생성자는 reject 메서드도 사용할 수 있다.
+
+```jsx
+let isError = true;
+function a() {
+  return new Promise((resolve, reject) => {
+    if (isError) {
+      reject("Sorry..");
+    }
+    setTimeout(() => {
+      console.log("a");
+      resolve();
+    }, 1000);
+  });
+}
+
+a()
+  .then(() => {
+    console.log("b");
+  })
+  .catch((e) => {
+    console.log(e);
+  })
+  .finally(() => {
+    console.log("Done");
+  });
+
+// Sorry..
+// Done
+// a
+```
+
+위처럼 조건인 isError가 true인 경우 reject 문이 실행되면서 catch 구문이 실행되고 reject 내부의 인자값이 그대로 로그에 찍히게 된다. 만약 reject 다음에 return을 추가해주면 a라는 콘솔로그가 안 찍히게 구현가능, finally 문은 동작 정상, 비정상 여부에 상관없이 무조건 실행되는 구문이다.
+
+이를 async ~ await 문으로는 아래와 같이 작성할 수 있음
+
+```jsx
+let isError = true;
+async function asyncFn() {
+  try {
+    await a();
+    console.log("b");
+  } catch (e) {¸
+    console.log(e);
+  } finally {
+    console.log('Done')
+  }
+}
+asyncFn();
+// Sorry..
+// Done
+// a
+```
+
+reject 내부 메서드에는 일반 문자 뿐만 아니라 에러 객체(new Error())를 사용할 수도 있다.
+
+```jsx
+let isError = true;
+function a() {
+  return new Promise((resolve, reject) => {
+    if (isError) {
+      reject(new Error('Sorry..'));
+    }
+  });
+}
+
+async function asyncFn() {
+  try {
+    await a();
+    console.log("b");
+  } catch (e) {¸
+    console.log(e.message);
+  } finally {
+    console.log('Done')
+  }
+}
+asyncFn();
+
+// Sorry..
+// Done
+```
+
+resolve도 마찬가지로 원하는 데이터를 아래와 같이 res 변수에 담아 전달해줄 수 있다.
+
+```jsx
+let isError = false;
+function a() {
+  // pending
+  return new Promise((resolve, reject) => {
+    if (isError) {
+      // reject
+      reject(new Error("Sorry.."));
+    }
+    setTimeout(() => {
+      // fulfilled
+      resolve("Vicky!");
+    }, 1000);
+  });
+}
+
+async function asyncFn() {
+  try {
+    const res = await a();
+    console.log(res);
+  } catch (e) {
+    console.log(e.message);
+  } finally {
+    console.log("Done");
+  }
+}
+asyncFn();
+
+// Vicky!
+// Done
+```
+
+위 코드를 then 구문에서는 이렇게 사용할 수 있다.
+
+```jsx
+a()
+  // fulfilled
+  .then((res) => {
+    console.log(res);
+  })
+  // rejected
+  .catch((e) => {
+    console.log(e);
+  })
+  .finally(() => {
+    console.log("Done");
+  });
+// Vicky!
+// Done
+```
+
+- 대기(pending): 이행하거나 거부되지 않은 초기 상태
+- 이행(fulfilled): 연산이 성공적으로 완료됨
+- 거부(rejected): 연산이 실패함
