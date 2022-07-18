@@ -142,3 +142,63 @@ const BarGraph = styled.div`
 ![애니메이션 수정 전,후 비교](../../img/220715-1.png)
 
 수정 전에는 계속 프레임이 들어오면서 메인스레드에서 reflow가 다량 발생하는 것을 볼 수 있다. transform은 메인스레드가 하는 일이 많이 줄어들고 나머지 동작 스타일은 gpu가 애니메이션을 렌더링하고 있음을 확인할 수 있다.
+
+### 컴포넌트 Lazy Loading(Code splitting)
+
+지난 시간에 했던 것처럼 cra-bundle-analyzer를 통해 번들 파일이 어떻게 구성되어 있는지 확인해본다.
+
+```bash
+> npm install --save-dev cra-bundle-analyzer
+```
+
+설치가 완료되면 아래 명령어로 analyzer를 실행시킨다.
+
+```bash
+> npx cra-bundle-analyzer
+```
+
+![](../../img/220718-1.png)
+
+해당 이미지를 보면 라이브러리를 담고있는 chunk 파일과 우리가 실제 구현한 소스코드가 담겨있는 chunk 파일이 담겨있다. 그런데 위 image-gallery 모듈은 초기 로드 시 필요한 라이브러리가 아니기 때문에 실행될 때 동작되도록 처리해본다.
+
+`/src/App.js`
+
+```jsx
+import React, { useState, Suspense, lazy } from "react";
+import styled from "styled-components";
+import Header from "./components/Header";
+import InfoTable from "./components/InfoTable";
+import SurveyChart from "./components/SurveyChart";
+import Footer from "./components/Footer";
+// import ImageModal from './components/ImageModal'
+
+const LazyImageModal = lazy(() => import("./components/ImageModal"));
+
+function App() {
+  const [showModal, setShowModal] = useState(false);
+
+  return (
+    <div className="App">
+      {/* code .. */}
+      <Suspense fallback={null}>
+        {showModal ? (
+          <LazyImageModal
+            closeModal={() => {
+              setShowModal(false);
+            }}
+          />
+        ) : null}
+      </Suspense>
+    </div>
+  );
+}
+
+export default App;
+```
+
+위와 같이 Suspence에 감싸서 ImageModal을 lazy loading 처리해주면 아래와 같이 번들 파일이 생성된다.
+기존 chunk 파일에서 image-gallery가 별도로 분리된 것을 확인할 수 있다.
+
+![](../../img/220718-2.png)
+
+프로젝트 사이즈가 커질수록 lazy-loading 기능을 잘 활용하면 좋다.
