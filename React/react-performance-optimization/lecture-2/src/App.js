@@ -1,15 +1,28 @@
-import React, { useState, Suspense, lazy } from 'react'
+import React, { useState, Suspense, useEffect } from 'react'
 import styled from 'styled-components'
 import Header from './components/Header'
 import InfoTable from './components/InfoTable'
 import SurveyChart from './components/SurveyChart'
 import Footer from './components/Footer'
-// import ImageModal from './components/ImageModal'
 
-const LazyImageModal = lazy(() => import('./components/ImageModal'))
+function lazyWithPreload(importFunction) {
+    const Component = React.lazy(importFunction)
+    Component.preload = importFunction
+    return Component
+}
+
+const LazyImageModal = lazyWithPreload(() => import('./components/ImageModal'))
 
 function App() {
     const [showModal, setShowModal] = useState(false)
+
+    // const handlerMouseEnter = () => {
+    //     const component = import('./components/ImageModal')
+    // }
+
+    useEffect(() => {
+        LazyImageModal.preload()
+    }, [])
 
     return (
         <div className='App'>
