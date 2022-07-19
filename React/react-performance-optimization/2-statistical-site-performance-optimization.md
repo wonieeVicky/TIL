@@ -159,7 +159,8 @@ const BarGraph = styled.div`
 
 ![](../../img/220718-1.png)
 
-해당 이미지를 보면 라이브러리를 담고있는 chunk 파일과 우리가 실제 구현한 소스코드가 담겨있는 chunk 파일이 담겨있다. 그런데 위 image-gallery 모듈은 초기 로드 시 필요한 라이브러리가 아니기 때문에 실행될 때 동작되도록 처리해본다.
+해당 이미지를 보면 라이브러리를 담고있는 chunk 파일과 우리가 실제 구현한 소스코드가 담겨있는 chunk 파일이 담겨있다.
+그런데 위 image-gallery 모듈은 초기 로드 시 필요한 라이브러리가 아니기 때문에 실행될 때 동작되도록 처리해본다.
 
 `/src/App.js`
 
@@ -202,3 +203,153 @@ export default App;
 ![](../../img/220718-2.png)
 
 프로젝트 사이즈가 커질수록 lazy-loading 기능을 잘 활용하면 좋다.
+
+### 컴포넌트 Preloading
+
+앞서 모달코드를 분리하고 필요할 때 로드하도록 개선했다. 이렇게하면 초기 소스에 모달 코드가 빠지므로 초기 파일 속도가 작아지고 이로인해 평가속도 또한 빨라진다는 장점을 가진다. 하지만 실제 모달을 띄웠을 때 모달 소스를 실행시키므로 모달을 띄웠을 때 동작에 delay가 발생하는 것을 확인할 수 있다.
+
+![](../../img/220719-1.png)
+
+위와 같이 모달을 클릭했을 때 Network에서 소스를 호출해오고 이후 evaluate script로 모달을 동작시키므로 지연이 발생하는 것이다. 초기 호출에 대한 성능은 개선되었으나 모달 동작 성능은 낮아졌다고 볼 수 있는데, 이는 어떻게 개선할 수 있을까?
+
+![](../../img/220719-2.png)
+
+이는 컴포넌트 preload로 개선할 수 있다. 버튼을 클릭하기 전에 모달과 관련된 파일을 미리 로드해놓는 것이다. 문제는 버튼을 유저가 언제 클릭했는지 알 수 없기 때문에 preload 타이밍을 언제로 할 것인지를 고려해봐야 한다.
+
+컴포넌트 Preload 타이밍
+
+1. 버튼 위에 마우스를 올려놨을 때
+
+   `App.js`
+
+   ```jsx
+   import React, { useState, Suspense, lazy } from "react";
+   // import ImageModal from './components/ImageModal'
+
+   const LazyImageModal = lazy(() => import("./components/ImageModal"));
+
+   function App() {
+     // onMouseEnter 이벤트 구현
+     const handlerMouseEnter = () => {
+       const component = import("./components/ImageModal");
+     };
+
+     return (
+       <div className="App">
+         {/* ... */}
+         <ButtonModal
+           onClick={() => {
+             setShowModal(true);
+           }}
+           onMouseEnter={handlerMouseEnter}
+         >
+           올림픽 사진 보기
+         </ButtonModal>
+         <Suspense fallback={null}>
+           {showModal ? (
+             <LazyImageModal
+               closeModal={() => {
+                 setShowModal(false);
+               }}
+             />
+           ) : null}
+         </Suspense>
+       </div>
+     );
+   }
+   export default App;
+   ```
+
+   ![버튼 위에 mouseEnter 시 해당 모달 소스가 import](../../img/220719-1.gif)
+
+2. 최초 페이지가 로드가 되고, 모든 컴포넌트의 마운트가 끝났을 때
+
+   `App.js`
+
+   만약 소스크기가 조금 클 경우 1 경우로 구현하더라도 지연현상을 피할 수 없다. 이는 2번 방법으로 개선한다.
+
+   ```jsx
+   import React, { useEffect, useState, Suspense, lazy } from "react";
+   // import ImageModal from './components/ImageModal'
+   const LazyImageModal = lazy(() => import("./components/ImageModal"));
+
+   function App() {
+     useEffect(() => {
+       const component = import("./components/ImageModal");
+     }, []);
+
+     return (
+       <div className="App">
+         {/* ... */}
+         <ButtonModal
+           onClick={() => {
+             setShowModal(true);
+           }}
+         >
+           올림픽 사진 보기
+         </ButtonModal>
+         <Suspense fallback={null}>
+           {showModal ? (
+             <LazyImageModal
+               closeModal={() => {
+                 setShowModal(false);
+               }}
+             />
+           ) : null}
+         </Suspense>
+       </div>
+     );
+   }
+   export default App;
+   ```
+
+   ![componentDidMount 후 모달 소스 import](../../img/220719-2.gif)
+
+우리가 지금은 단일 컴포넌트를 import 해줬지만 여러 컴포넌트를 Import 해야한다면 위 개선 로직이 번거롭게 느껴질 것이다.
+이는 아래와 같은 유틸함수로 개선할 수 있다.
+
+```jsx
+import React, { useEffect, useState, Suspense, lazy } from "react";
+// import ImageModal from './components/ImageModal'
+
+// lazyWithPreload 유틸함수 구현
+function lazyWithPreload(importFunction) {
+  const Component = React.lazy(importFunction);
+  Component.preload = importFunction;
+  return Component;
+}
+// LazyImageModal에 lazyWithPreload 함수 적용
+const LazyImageModal = lazyWithPreload(() => import("./components/ImageModal"));
+
+function App() {
+  const [showModal, setShowModal] = useState(false);
+
+  useEffect(() => {
+    // lazyWithPreload 의 preload 메서드 적용
+    LazyImageModal.preload();
+  }, []);
+
+  return (
+    <div className="App">
+      {/* ... */}
+      <ButtonModal
+        onClick={() => {
+          setShowModal(true);
+        }}
+      >
+        올림픽 사진 보기
+      </ButtonModal>
+      <Suspense fallback={null}>
+        {showModal ? (
+          <LazyImageModal
+            closeModal={() => {
+              setShowModal(false);
+            }}
+          />
+        ) : null}
+      </Suspense>
+    </div>
+  );
+}
+export default App;
+```
