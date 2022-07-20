@@ -353,3 +353,46 @@ function App() {
 }
 export default App;
 ```
+
+### 이미지 Preloading
+
+앞서 컴포넌트 preloading에 대해 구현해보았는데, 그래도 여전히 이미지가 들어오는 속도는 느린 상태이다. 이미지 Preloading도 구현하여 UX를 개선해보자!
+
+현재 구조는 이미지 모달을 클릭하여 이미지를 호출했을 때만 실제 호출이 된다. 이를 개선하기 위해서 javascript에서 제공하는 Image 객체를 사용한다.
+
+```jsx
+const img = new Image();
+img.src =
+  "https://stillmed.olympic.org/media/Photos/2016/08/20/part-1/20-08-2016-Football-Men-01.jpg?interpolation=lanczos-none&amp;resize=*:800";
+```
+
+실제 해당 이미지를 가져오는 src를 이미지 객체에 매핑시키면 이미지 로딩이 실행되는 것을 Network 창에서 확인할 수 있다. 이를 활용해 실제 코드에도 적용해보자.
+
+`/src/App.js`
+
+```jsx
+import React, { useEffect, useState, Suspense, lazy } from "react";
+// ..
+function App() {
+  const [showModal, setShowModal] = useState(false);
+
+  useEffect(() => {
+    LazyImageModal.preload();
+    // 모달 이미지 preload
+    const img = new Image();
+    img.src =
+      "https://stillmed.olympic.org/media/Photos/2016/08/20/part-1/20-08-2016-Football-Men-01.jpg?interpolation=lanczos-none&amp;resize=*:800";
+  }, []);
+
+  return <div className="App">{/* ... */}</div>;
+}
+
+export default App;
+```
+
+하지만 위 Image 객체는 동일한 src 값을 입력해도 똑같이 이미지 호출을 실행한다.
+때문에 해당 이미지 객체에 캐싱 처리를 해주는 것이 좋다. Network 창의 Disable cache 설정을 비활성화해주면 해당 이미지가 캐싱이 되는 것을 확인할 수 있음
+
+![](../../img/220720-1.png)
+
+전체 이미지에 대한 preload를 진행할 수 있으나 이는 전체 성능에 영향을 주므로 모달을 시작할 때 가장 먼저 발생하는 이미지만 최초 먼저 preload 해놓는 방식으로 구현한다.
