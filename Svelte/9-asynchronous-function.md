@@ -304,3 +304,62 @@ a()
 - 대기(pending): 이행하거나 거부되지 않은 초기 상태
 - 이행(fulfilled): 연산이 성공적으로 완료됨
 - 거부(rejected): 연산이 실패함
+
+### 영화 검색 API 예제 만들기
+
+영화 목록을 검색할 수 있는 기본적인 애플리케이션을 만들어본다. 해당 정보를 가져올 수 있는 [API 사이트](https://omdbapi.com/)로 이동한다. Usage 영역을 보면 사용법이 나오는데 해당 내용을 참고하여 API를 fetch하면 된다.
+
+해당 API 키를 문서 설명에 따라 발급받은 후 api fetch를 위해 의존성 라이브러리인 axios도 설치해준다.
+
+```bash
+> npm i -D axios
+```
+
+위 라이브러리를 devDependencies로 추가한 뒤 서버를 띄운다.
+
+```jsx
+<script>
+  import { apikey } from "./auth.ts";
+  import axios from "axios";
+  let title = "";
+  let movies = null;
+  let error = null;
+  let loading = false;
+
+  async function searchMovies() {
+    if (loading) return; // 중복 클릭 방지 용도로 조건 추가
+    movies = null;
+    error = null;
+    loading = true;
+    try {
+      const res = await axios.get(`http://www.omdbapi.com/?apikey=${apikey}&s=${title}`);
+      movies = res.data.Search;
+    } catch (err) {
+      error = err;
+    } finally {
+      loading = false;
+    }
+  }
+</script>
+
+<input type="text" bind:value={title} />
+<button on:click={searchMovies}>검색!</button>
+
+{#if loading}
+  <p style="color: royalblue;">Loading</p>
+{:else if error}
+  <p style="color: red;">{error.message}</p>
+{:else if movies}
+  <ul>
+    {#each movies as movie}
+      <li>{movie.Title}</li>
+    {/each}
+  </ul>
+{/if}
+```
+
+apiKey는 혹시 모르니 공유되지 않는 폴더에 별도의 값으로 저장한 뒤 호출하여 사용하고, 이외의 기능은 searchMovies 함수 내부에 구현한다. 아래 if 블록문 처럼 loading, error, movies 상태값에 따른 화면 분기를 다양하게 처리할 수 있으며, async ~ await 문법을 사용해 간단히 비동기 기능 처리를 구현할 수 있다.
+
+![](../img/220721-1.gif)
+
+---
