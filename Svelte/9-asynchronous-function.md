@@ -362,4 +362,143 @@ apiKey는 혹시 모르니 공유되지 않는 폴더에 별도의 값으로 저
 
 ![](../img/220721-1.gif)
 
----
+### Await 블록
+
+이번에는 Svelte에서 await 블록에 살펴보려고 한다.
+
+`App.svelte`
+
+```jsx
+<script>
+  let promise;
+
+  function fetchName() {
+    return new Promise((resolve, reject) => {
+      setTimeout(() => {
+        resolve("Vicky");
+      }, 2000);
+    });
+  }
+</script>
+
+<button
+  on:click={() => {
+    promise = fetchName();
+    console.log(promise); // promise 객체 반환
+  }}>Fetch Name!</button>
+```
+
+위처럼 버튼에 `fetchName` 함수를 클릭 이벤트로 바인딩 했다고 하자.
+위와 같은 상태에서 버튼을 누르면 해당 함수는 비동기이므로 promise 객체가 반환된다.
+
+따라서 resolve의 전달인자를 받아보려면 async ~ await을 적용해줘야한다.
+
+```jsx
+<button
+  on:click={async () => {
+    promise = await fetchName();
+    console.log(promise); // vicky
+  }}
+>
+  Fetch Name!
+</button>
+```
+
+이것이 우리가 배운 패턴이다. await을 promise 변수에 넣을 수도 있다.
+
+```jsx
+<button
+  on:click={async () => {
+    promise = fetchName();
+    console.log(await promise); // vicky
+    // 혹은 아래와 같이 쓸 수도 있다
+    promise.then((res) => {
+      console.log(res); // vicky
+    });
+  }}
+>
+  Fetch Name!
+</button>
+```
+
+위 코드를 async await 블록문을 만들어서 쓸 수도 있다.
+
+```jsx
+<button
+  on:click={async () => {
+    promise = fetchName();
+  }}>Fetch Name!</button>
+
+{#await promise}
+  <p>Loading...</p>
+{:then name}
+  <h1>{name}</h1>
+{/await}
+```
+
+위와 같이 처리한 뒤 버튼을 누르면 2초 간 Loading 텍스트가 노출된 후 Vicky가 정상적으로 실행됨.
+reject 문도 적용해보자.
+
+```jsx
+<script>
+  let isError = true;
+  let promise = new Promise((resolve) => resolve("Hmm.."));
+
+	// reject 되도록 수정
+  function fetchName() {
+    return new Promise((resolve, reject) => {
+      if (isError) {
+        reject(new Error("Sorry.."));
+      }
+      setTimeout(() => {
+        resolve("Vicky");
+      }, 2000);
+    });
+  }
+</script>
+
+<button
+  on:click={async () => {
+    promise = fetchName();
+  }}>Fetch Name!</button
+>
+
+{#await promise}
+  <!-- 대기(pending) -->
+  <p>Loading...</p>
+{:then name}
+  <!-- 이행(fulfilled) -->
+  <h1>{name}</h1>
+{:catch error}
+  <!-- 거부(reject) -->
+  <p>{error.message}</p>
+{/await}
+```
+
+위처럼 초기 promise 변수값도 promise 객체로 기본값을 넣어주면 초기 `undefined` 값이 아닌 `Hmm..` 값이 노출되도록 처리할 수 있다. promise 변수를 단축 형태로 아래와 같이 간단하게 적어줄 수도 있다 😀
+
+```jsx
+let promise = Promise.resolve("Hmm..");
+```
+
+만약 비동기 함수가 매우 빠르게 동작할 경우 Loading 화면을 보여주는 경우는 거의 없을 것이다. 또한 reject에 대한 반환처리가 없어도될 수 있다. 그렇다면 아래와 같이 간단하게 정리할 수 있음
+
+```jsx
+<script>
+  let promise = Promise.resolve("Hmm..");
+
+  function fetchName() {
+    return new Promise((resolve, reject) => {
+      setTimeout(() => resolve("Vicky"), 0);
+    });
+  }
+</script>
+
+<button on:click={async () => promise = fetchName()}>
+	Fetch Name!
+</button>
+
+{#await promise then name}
+  <h1>{name}</h1>
+{/await}
+```
