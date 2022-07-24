@@ -502,3 +502,93 @@ let promise = Promise.resolve("Hmm..");
   <h1>{name}</h1>
 {/await}
 ```
+
+### Await 블록으로 영화 검색 API 예제 리팩토링
+
+위에서 배운 Await 블록을 활용해 기존에 구현했던 영화 검색 API 예제를 리팩토링해본다.
+
+```html
+<script>
+  let promise = Promise.resolve([]);
+</script>
+
+<!-- 
+{#if loading}
+  <p style="color: royalblue;">Loading</p>
+{:else if error}
+  <p style="color: red;">{error.message}</p>
+{:else if movies}
+  <ul>
+    {#each movies as movie}
+      <li>{movie.Title}</li>
+    {/each}
+  </ul>
+{/if} 
+-->
+
+{#await promise}
+<p style="color: royalblue;">Loading</p>
+{:then movies}
+<ul>
+  {#each movies as movie}
+  <li>{movie.Title}</li>
+  {/each}
+</ul>
+{:catch error}
+<p style="color: red;">{error.message}</p>
+{/await}
+```
+
+기존에 if ~ else if 문으로 구현한 API Fetch 화면을 await 블록으로 위와 같이 변경해주었다.
+위처럼 처리하기 위해서는 promise 변수에 Promise 객체를 반환하는 초기값을 설정해주어야 한다.
+
+뿐만 아니라 동작하는 `searchMovies` 함수도 변경을 해줄 필요가 있다.
+
+```html
+<!--<button on:click={searchMovies}>검색!</button>-->
+<button
+  on:click={() => promise = searchMovies()}>검색!</button>
+```
+
+await 문을 동작시키는 객체가 promise 변수이므로 searchMovies 실행결과를 promise에 담아주도록 변경하며 searchMovies 도 promise 객체를 반환하도록 설정해준다.
+
+```jsx
+/*
+let movies = null;
+let error = null;
+let loading = false;
+*/
+
+/*
+async function searchMovies() {
+  if (loading) return; // 중복 클릭 방지 용도로 조건 추가
+  movies = null;
+  error = null;
+  loading = true;
+  try {
+    const res = await axios.get(`http://www.omdbapi.com/?apikey=${apikey}&s=${title}`);
+    movies = res.data.Search;
+  } catch (err) {
+    error = err;
+  } finally {
+    loading = false;
+  }
+}
+*/
+
+function searchMovies() {
+  // Promise 객체를 반환하도록 처리
+  return new Promise(async (resolve, reject) => {
+    try {
+      const res = await axios.get(`http://www.omdbapi.com/?apikey=${apikey}&s=${title}`);
+      resolve(res.data.Search); // success 시 resolve로 반환
+    } catch (err) {
+      reject(err); // fail 시 reject로 반환
+    } finally {
+      console.log("Done!");
+    }
+  });
+}
+```
+
+위처럼 Promise 객체를 반환하도록 각 함수 구조를 변경하고, 기존에 사용하던 movies, error, loading 객체도 삭제하면 좀 더 간결한 구조로 API Fetch 화면을 구현할 수 있게 된다!
