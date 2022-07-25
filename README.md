@@ -146,6 +146,7 @@
 7. [요소 바인딩](https://github.com/wonieeVicky/TIL/blob/main/Svelte/7-binding.md)
 8. [조건, 반복 그리고 키](https://github.com/wonieeVicky/TIL/blob/main/Svelte/8-condition-and-iteractions-and-keys.md)
 9. [비동기 처리](https://github.com/wonieeVicky/TIL/blob/main/Svelte/9-asynchronous-function.md)
+10. [사용자 입력 핸들링](https://github.com/wonieeVicky/TIL/blob/main/Svelte/10-user-input-handling.md)
 
 ## React
 
