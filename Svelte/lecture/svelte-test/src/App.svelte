@@ -1,52 +1,38 @@
 <script>
-  import { apikey } from "./auth.ts";
-  import axios from "axios";
-  let title = "";
-  let promise = Promise.resolve([]);
-
-  function searchMovies() {
-    return new Promise(async (resolve, reject) => {
-      try {
-        const res = await axios.get(`http://www.omdbapi.com/?apikey=${apikey}&s=${title}`);
-        resolve(res.data.Search);
-      } catch (err) {
-        reject(err);
-      } finally {
-        console.log("Done!");
-      }
-    });
+  let fruits = [
+    { id: 1, name: "Apple" },
+    { id: 2, name: "Banana" },
+    { id: 3, name: "Cherry" },
+  ];
+  function assign(fruit) {
+    fruit.name += "!";
+    fruits = fruits;
+    // $$invalidate(0, fruits);
   }
 </script>
 
-<input type="text" bind:value={title} />
-<button
-  on:click={() => {
-    promise = searchMovies();
-  }}>검색!</button
->
+<section>
+  {#each fruits as fruit (fruit.id)}
+    <div on:click={() => assign(fruit)}>
+      {fruit.name}
+    </div>
+  {/each}
+</section>
 
-{#await promise}
-  <p style="color: royalblue;">Loading</p>
-{:then movies}
-  <ul>
-    {#each movies as movie}
-      <li>{movie.Title}</li>
-    {/each}
-  </ul>
-{:catch error}
-  <p style="color: red;">{error.message}</p>
-{/await}
+<section>
+  {#each fruits as fruit (fruit.id)}
+    <div on:click={() => (fruit.name += "!")}>
+      {fruit.name}
+    </div>
+  {/each}
+  <!-- $$invalidate(0, each_value_1[fruit_index].name += "!", fruits) -->
+</section>
 
-<!-- 
-{#if loading}
-  <p style="color: royalblue;">Loading</p>
-{:else if error}
-  <p style="color: red;">{error.message}</p>
-{:else if movies}
-  <ul>
-    {#each movies as movie}
-      <li>{movie.Title}</li>
-    {/each}
-  </ul>
-{/if}
-  -->
+<section>
+  {#each fruits as { id, name } (id)}
+    <div on:click={() => (name += "!")}>
+      {name}
+    </div>
+  {/each}
+  <!-- $$invalidate(0, each_value[each_index].name += "!", fruits) -->
+</section>
