@@ -1,38 +1,13 @@
 <script>
-  let fruits = [
-    { id: 1, name: "Apple" },
-    { id: 2, name: "Banana" },
-    { id: 3, name: "Cherry" },
-  ];
-  function assign(fruit) {
-    fruit.name += "!";
-    fruits = fruits;
-    // $$invalidate(0, fruits);
+  let count = 0;
+  function increase() {
+    count += 1;
+  }
+  function current(e) {
+    console.log(e.currentTarget);
   }
 </script>
 
-<section>
-  {#each fruits as fruit (fruit.id)}
-    <div on:click={() => assign(fruit)}>
-      {fruit.name}
-    </div>
-  {/each}
-</section>
+<button on:click={increase} on:click={current} on:click={() => console.log("click!")}>Click me!</button>
 
-<section>
-  {#each fruits as fruit (fruit.id)}
-    <div on:click={() => (fruit.name += "!")}>
-      {fruit.name}
-    </div>
-  {/each}
-  <!-- $$invalidate(0, each_value_1[fruit_index].name += "!", fruits) -->
-</section>
-
-<section>
-  {#each fruits as { id, name } (id)}
-    <div on:click={() => (name += "!")}>
-      {name}
-    </div>
-  {/each}
-  <!-- $$invalidate(0, each_value[each_index].name += "!", fruits) -->
-</section>
+<h1>{count}</h1>
