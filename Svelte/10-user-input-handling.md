@@ -73,4 +73,61 @@ Svelte에서 사용자 입력 핸들링을 만들 때 인라인 핸들러 사용
 </section>
 ```
 
-위 코드는 전개 연산자를 통해 좀 더 개선시킨 버전이다. 빌드 파일로 보면 $$invalidate라는 코드로 실제 데이터가 갱신(반응성)이 되도록 구조가 만들어지는 것을 확인할 수 있다.
+위 코드는 전개 연산자를 통해 좀 더 개선시킨 버전이다.
+빌드 파일로 보면 $$invalidate라는 코드로 실제 데이터가 갱신(반응성)이 되도록 구조가 만들어지는 것을 확인할 수 있다.
+
+### 다중 이벤트 핸들러
+
+스벨트의 다중 이벤트 핸들러에 대해 알아보고자 한다. 아래 코드를 보자.
+
+`App.svelte`
+
+```html
+<script>
+  let count = 0;
+  function increase() {
+    count += 1;
+  }
+</script>
+
+<button on:click="{increase}">Click me!</button>
+
+<h1>{count}</h1>
+```
+
+버튼을 클릭했을 때 count의 값이 1씩 증가하는 함수를 button에 클릭 이벤트로 추가해주었다.
+만약 클릭 이벤트 동작 시 다른 이벤트를 함께 동작시키려면 어떻게 할 수 있을까?
+
+가장 간단한 방법은 중복해서 작성하는 방법이다.
+
+```html
+<script>
+  let count = 0;
+  function increase() {
+    count += 1;
+  }
+  function current(e) {
+    console.log(e.currentTarget);
+  }
+</script>
+
+<button on:click="{increase}" on:click="{current}">Click me!</button>
+```
+
+`on:click`함수가 두 번 작성된 것을 확인할 수 있음. 모두 다 잘 실행된다.
+
+```html
+<button
+	on:click={increase}
+	on:click={current}
+	on:click={() => console.log("click!")}
+>
+	Click me!
+</button>
+
+<!-- count + 1 증가 -->
+<!-- <button>Click me!</button> -->
+<!-- click! -->
+```
+
+물론 익명함수로 감싸서 여러개를 추가하는 방법도 가능하다.
