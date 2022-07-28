@@ -1,13 +1,28 @@
 <script>
-  import { onMount } from "svelte";
-
+  import User from "./User.svelte";
   import Vicky from "./Vicky.svelte";
-  let vicky;
 
-  onMount(() => {
-    console.log(vicky); // Vicky{$$: {}, $$set: f, $capture_stste: f, ...}
-    console.log(vicky.title); // Error: Props cannot be read directly ... -> 스벨트는 컴포넌트 내 데이터에 접근하는 것을 기본적으로 막는다.(accessors를 사용하면 접근가능)
-  });
+  let users = [
+    { name: "Vicky", age: 33, email: "hwfongfing@gmail.com" },
+    { name: "Wonny", age: 32, email: "fongfing@gmail.com" },
+    { name: "Evan", age: 31 },
+  ];
 </script>
 
-<Vicky title="Good!" bind:this={vicky} />
+<section>
+  {#each users as user}
+    <User name={user.name} age={user.age} email={user.email} />
+  {/each}
+</section>
+
+<section>
+  {#each users as { name, age, email }}
+    <User {name} {age} {email} />
+  {/each}
+</section>
+
+<section>
+  {#each users as user}
+    <User {...user} />
+  {/each}
+</section>
