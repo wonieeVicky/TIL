@@ -66,3 +66,65 @@ props와 HTML 속성이 중복되는 문제가 발생한다. 따라서 2개 이�
 위처럼 Vicky 컴포넌트에 vicky란 데이터를 양방향 데이터 바인딩을 해준 뒤 onMount 이벤트로 콘솔로그를 찍어보면 우리가 사용할 수 없는 컴포넌트 객체가 로그에 담기는 것을 확인할 수 있다. 또한 `vicky.title`로 데이터에 접근하는 것이 불가한 것을 확인할 수 있다.
 
 Svelte는 기본적으로 컴포넌트에 데이터에 직접 접근하는 것을 막는다. 하지만 `<svelte:options>`의 접속허용 속성인 `accessors`를 사용하면, 컴포넌트 내 일부 데이터에 접근할 수 있다. (나중에 더 알아본다.)
+
+### 부모에서 자식으로(Props)
+
+이번에는 Svelte에서 props를 이용해 데이터를 전달하는 패턴에 대해 몇가지 배워보고자 한다.
+
+`src/User.svelte`
+
+```html
+<script>
+  export let name;
+  export let age;
+  export let email = "None...";
+</script>
+
+<ul>
+  <li>{name}</li>
+  <li>{age}</li>
+  <li>{email}</li>
+</ul>
+```
+
+`src/App.svelte`
+
+```html
+<script>
+  import User from "./User.svelte";
+
+  let users = [
+    { name: "Vicky", age: 33, email: "hwfongfing@gmail.com" },
+    { name: "Wonny", age: 32, email: "fongfing@gmail.com" },
+    { name: "Evan", age: 31 },
+  ];
+</script>
+
+<section>
+  {#each users as user}
+  <User name="{user.name}" age="{user.age}" email="{user.email}" />
+  {/each}
+</section>
+```
+
+users 데이터를 바탕으로 User 컴포넌트를 노출시킨다고 하자. 기본적인 props 전달은 위와 같이 할 수 있다.
+데이터는 구조 분해를 통해 아래와 같이 간단히 사용할수도 있다.
+
+```html
+<section>
+  {#each users as { name, age, email }}
+  <User {name} {age} {email} />
+  {/each}
+</section>
+```
+
+가장 간단하게는 아래와 같이 작업해도 된다.
+단일 user 객체가 전개연산자로 넣게되면, 각 name, age, email이 각각 Props로 전달된다.
+
+```html
+<section>
+  {#each users as user}
+  <User {...user} />
+  {/each}
+</section>
+```
