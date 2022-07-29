@@ -1,28 +1,13 @@
 <script>
-  import User from "./User.svelte";
-  import Vicky from "./Vicky.svelte";
+  import Todo from "./Todo.svelte";
 
-  let users = [
-    { name: "Vicky", age: 33, email: "hwfongfing@gmail.com" },
-    { name: "Wonny", age: 32, email: "fongfing@gmail.com" },
-    { name: "Evan", age: 31 },
+  let todos = [
+    { id: 1, title: "Breakfast", done: false },
+    { id: 2, title: "Lunch", done: false },
+    { id: 3, title: "Dinner", done: false },
   ];
 </script>
 
-<section>
-  {#each users as user}
-    <User name={user.name} age={user.age} email={user.email} />
-  {/each}
-</section>
-
-<section>
-  {#each users as { name, age, email }}
-    <User {name} {age} {email} />
-  {/each}
-</section>
-
-<section>
-  {#each users as user}
-    <User {...user} />
-  {/each}
-</section>
+{#each todos as todo, index (todo.id)}
+  <Todo bind:todos {todo} {index} />
+{/each}
