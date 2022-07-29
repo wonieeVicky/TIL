@@ -128,3 +128,93 @@ users 데이터를 바탕으로 User 컴포넌트를 노출시킨다고 하자. 
   {/each}
 </section>
 ```
+
+### Props 양방향 바인딩
+
+props의 양방향 바인딩에 대해서도 알아보자.
+
+`./Todo.svelte`
+
+```html
+<script>
+  export let todo;
+  function deleteTodo() {
+    //
+  }
+</script>
+
+<div>
+  <input type="checkbox" bind:value="{todo.done}" />
+  {todo.title}
+  <button on:click="{deleteTodo}">X</button>
+</div>
+```
+
+`./App.svelte`
+
+```html
+<script>
+  import Todo from "./Todo.svelte";
+
+  let todos = [
+    { id: 1, title: "Breakfast", done: false },
+    { id: 2, title: "Lunch", done: false },
+    { id: 3, title: "Dinner", done: false },
+  ];
+</script>
+
+{#each todos as todo (todo.id)}
+<Todo {todo} />
+{/each}
+```
+
+위와 같이 Todo 자식 컴포넌트와 이를 호출한 App 컴포넌트가 있다.
+todo가 done이 되면 checkbox가 true가 되도록 처리된다. 위 Todo.svelte 컴포넌트 에서 deleteTodo 함수는 해당 데이터를 삭제해주는 기능을 하는데, 우리가 앞서 배웠던 스토어 객체를 사용하면 아래와 같이 사용할 수 있을 것이다.
+
+```jsx
+function deleteTodo() {
+  todos.splice(index, 1);
+  todos = todos;
+}
+```
+
+하지만 위 방법보다 더 간단하게 구현할 수 있는 방법이 있다.
+
+`App.svelte`
+
+```html
+{#each todos as todo, index (todo.id)}
+<Todo {todos} {todo} {index} />
+{/each}
+```
+
+`Todo.svelte`
+
+```jsx
+export let todos;
+export let todo;
+export let index;
+
+function deleteTodo() {
+  todos.splice(index, 1);
+  todos = todos;
+  console.log(todos);
+}
+```
+
+이렇게 App 컴포넌트에서 Todo 컴포넌트에 인자값으로 todos와 index 값을 추가하여 상속해주면 된다!
+그러면 해당 배열 데이터가 잘 삭제되는 것을 console.log로 확인할 수 있다!
+
+하지만 문제가 있다. 화면이 갱신되지않는다!
+App 컴포넌트가 Todo 컴포넌트의 변경사항에 대해 반응성을 가지지 못하기 때문이다!
+따라서 양방향 데이터 바인딩을 해줘야 한다.
+
+`App.svelte`
+
+```html
+{#each todos as todo, index (todo.id)}
+<Todo bind:todos {todo} {index} />
+{/each}
+```
+
+위와 같이 bind 메서드를 사용해 todos를 양방향 데이터 바인딩 해주면 데이터가 잘 갱신되는 것을 확인할 수 있다. 이 구조는 간단한 구조에서는 꽤 편하고 간단한 방법으로 보인다. 하지만 컴포넌트의 복잡도가 높을수록 어디에서 수정되는 지를 파악하기 어려울 수 있다. 따라서 구조에 따라 스토어를 도입하여 데이터를 변경처리해주는 것이 바람직할 수 있다.
