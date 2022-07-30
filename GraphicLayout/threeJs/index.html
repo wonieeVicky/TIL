@@ -6,5 +6,57 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Document</title>
   </head>
-  <body></body>
+  <body>
+    <canvas id="canvas" width="500" height="500"></canvas>
+    <script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+
+    <script type="importmap">
+      {
+        "imports": {
+          "three": "https://unpkg.com/three@0.141.0/build/three.module.js",
+          "GLTFLoader": "https://unpkg.com/three@0.141.0/examples/jsm/loaders/GLTFLoader.js"
+        }
+      }
+    </script>
+
+    <script type="module">
+      import { GLTFLoader } from "GLTFLoader";
+      import * as THREE from "three";
+
+      // 1. 장면을 만들고
+      let scene = new THREE.Scene();
+
+      // 2. 브라우저에 렌더링한다.
+      let renderer = new THREE.WebGLRenderer({
+        canvas: document.querySelector("#canvas"),
+        antialias: true,
+      });
+      renderer.outputEncoding = THREE.sRGBEncoding; // 똥색을 밝게 변경해준다.
+
+      // 3D model 보여줄 때 필요한 것들: 1. 카메라, 2. 조명, 3. 배경
+      // 1. 카메라
+      let camera = new THREE.PerspectiveCamera(25, 1); // PerspectiveCamera: 원근법 O, OrthographicCamera: 원근법 X
+      camera.position.set(0, -0.2, 7);
+
+      // 2. 조명
+      scene.background = new THREE.Color("white");
+      let light = new THREE.DirectionalLight(0xffff00, 10); // DirectionalLight, AmbientLight, PointLight
+      scene.add(light);
+
+      // 3. 배경
+
+      let loader = new GLTFLoader();
+      loader.load("shiba/scene.gltf", function (gltf) {
+        scene.add(gltf.scene);
+        function animate() {
+          requestAnimationFrame(animate);
+          // 1초에 60번 실행된다.
+          gltf.scene.rotation.y -= 0.01;
+          // gltf.scene.rotation.x -= 0.01;
+          renderer.render(scene, camera);
+        }
+        animate();
+      });
+    </script>
+  </body>
 </html>
