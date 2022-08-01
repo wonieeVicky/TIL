@@ -218,3 +218,100 @@ App 컴포넌트가 Todo 컴포넌트의 변경사항에 대해 반응성을 가
 ```
 
 위와 같이 bind 메서드를 사용해 todos를 양방향 데이터 바인딩 해주면 데이터가 잘 갱신되는 것을 확인할 수 있다. 이 구조는 간단한 구조에서는 꽤 편하고 간단한 방법으로 보인다. 하지만 컴포넌트의 복잡도가 높을수록 어디에서 수정되는 지를 파악하기 어려울 수 있다. 따라서 구조에 따라 스토어를 도입하여 데이터를 변경처리해주는 것이 바람직할 수 있다.
+
+### 자식에서 부모로(Event Dispatcher)
+
+앞서 부모에서 자식 컴포넌트로 속성(props) 전달하는 방법에 대해 알아보았다면, 자식에서 부모로 데이터를 전달하는 방법에 대해 알아보고자 한다.
+
+`Todo.svelte`
+
+```html
+<script>
+  export let todo;
+
+  function deleteTodo() {
+    //
+  }
+</script>
+
+<div>
+  <input type="checkbox" bind:value="{todo.done}" />
+  {todo.title}
+  <button on:click="{deleteTodo}">X</button>
+</div>
+```
+
+`App.svelte`
+
+```html
+<script>
+  import Todo from "./Todo.svelte";
+
+  let todos = [
+    { id: 1, title: "Breakfast", done: false },
+    { id: 2, title: "Lunch", done: false },
+    { id: 3, title: "Dinner", done: false },
+  ];
+</script>
+
+{#each todos as todo (todo.id)}
+<Todo {todo} />
+{/each}
+```
+
+지난 시간에서 살펴본 Todo 컴포넌트와 App 컴포넌트 구조이다.
+위 구조는 App 컴포넌트에서 Todo 컴포넌트에 todos 데이터를 부여하여 Todo 컴포넌트에서 값을 수정하도록 구성되었었다.
+
+이번에는 좀 다른 방법으로 App.svelte에서 todos를 수정하도록 처리해보고자 한다.
+즉 Todo 컴포넌트의 deleteTodo 함수를 실행시키면 지워달라는 명령만 부모 컴포넌트로 올려주는 로직을 만든다.
+
+`Todo.svelte`
+
+```jsx
+import { createEventDispatcher } from "svelte";
+export let todo;
+
+// createEventDispatcher는 new CustomEvent()를 통해 커스텀 이벤트를 생성.
+// 따라서 event.detail을 사용한다.
+const dispatch = createEventDispatcher();
+
+function deleteTodo() {
+  // custom dispatch 함수 생성, 첫번째 인수: 커스텀 이벤트명, 두번째 인수: 전달인자
+  dispatch("deleteMe", { todoId: todo.id });
+}
+```
+
+위와 같이 Todo 컴포넌트에서 App 컴포넌트로 삭제되었음을 알리기 위해 svelte에서 제공하는 `createEventDispatcher`를 사용해보고자 한다.
+위 함수는 자바스크립트 메서드인 `new CustomEvent()` 를 통해 커스텀 이벤트를 생성하는 것으로 상세 데이터는 `event.detail`에 전달되도록 설계되어 있다.
+
+위처럼 `dispatch` 변수에 `createEventDispatcher`를 생성한 뒤 `(커스텀 이벤트 명, 전달인자)`를 매개변수로 하여 `delelteTodo` 함수를 완성시킨 다음 App 컴포넌트에 아래와 같이 연결시켜 준다.
+
+`App.svelte`
+
+```html
+<script>
+  import Todo from "./Todo.svelte";
+
+  let todos = [
+    { id: 1, title: "Breakfast", done: false },
+    { id: 2, title: "Lunch", done: false },
+    { id: 3, title: "Dinner", done: false },
+  ];
+
+  function deleteTodo(event) {
+    const { todoId } = event.detail;
+    const index = todos.findIndex((t) => t.id === todoId);
+    todos.splice(index, 1);
+    todos = todos;
+  }
+</script>
+
+{#each todos as todo (todo.id)}
+<Todo {todo} on:deleteMe="{deleteTodo}" />
+{/each}
+```
+
+`App` 컴포넌트에 `Todo` 컴포넌트에서 정의한 커스텀 이벤트를 `on:deleteMe`로 연결해주면 App 컴포넌트에서 deleteTodo 이벤트를 실행할 수 있게 된다. (`Todo` 컴포넌트에서 알림 → `App` 컴포넌트에서 실행)
+위 `dispatch` 함수에 두번째 인자로 객체 데이터를 전달하였으므로 `event.detail`에서 데이터를 받아서 쓸 수 있고, 이로써 todos 데이터를 삭제할 수 있게 되었다.
+
+위 구조는 스벨트에서 자주 사용되는 로직이므로 자식 컴포넌트에서 부모 컴포넌트로 이벤트 전파하는 방법에 대해 잘 익혀둘 필요가 있다.
