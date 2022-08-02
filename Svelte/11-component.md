@@ -315,3 +315,118 @@ function deleteTodo() {
 위 `dispatch` 함수에 두번째 인자로 객체 데이터를 전달하였으므로 `event.detail`에서 데이터를 받아서 쓸 수 있고, 이로써 todos 데이터를 삭제할 수 있게 되었다.
 
 위 구조는 스벨트에서 자주 사용되는 로직이므로 자식 컴포넌트에서 부모 컴포넌트로 이벤트 전파하는 방법에 대해 잘 익혀둘 필요가 있다.
+
+### 기본/커스텀 이벤트 포워딩(Forwarding)
+
+이번에는 스벨트에서 이벤트 포워딩(Forwarding) 개념에 대해 알아보고자 한다. 아래 구조를 보자
+
+`Parent.svelte`
+
+```html
+<script>
+  import { createEventDispatcher } from "svelte";
+  const dispatch = createEventDispatcher();
+</script>
+
+<h2>Parent</h2>
+<button on:click={(event) => dispatch("click", { event })}>Parent Click!</button>
+```
+
+`App.svelte`
+
+```html
+<script>
+  import Parent from "./Parent.svelte";
+
+  function handler(event) {
+    const e = event.detail.event;
+    console.log(e.currentTarget); // <button>Parent Click!</button>
+  }
+</script>
+
+<Parent on:click="{handler}" />
+```
+
+Parent 컴포넌트에서 button 엘리먼트를 클릭했을 때, `createEventDispatcher` 이벤트로 App 컴포넌트에 클릭 이벤트를 전달하는 것을 확인할 수 있다. Parent에서는 dispatch의 두 번째인자로 event 객체를 전달해주었는데, 이로써 App 컴포넌트에서 `event` 객체를 사용할 수 있게 된다.
+
+위의 구조가 꽤나 복잡하게 느껴지는데, 이를 아래와 같이 간단히 구현할 수도 있다.
+
+`Parent.svelte`
+
+```html
+<!-- script 코드 모두 삭제 -->
+<h2>Parent</h2>
+<button on:click>Parent Click!</button>
+```
+
+`App.svelte`
+
+```html
+<script>
+  import Parent from "./Parent.svelte";
+
+  function handler(e) {
+    console.log(e.currentTarget); // <button>Parent Click!</button>
+  }
+</script>
+
+<Parent on:click="{handler}" />
+```
+
+위와 같이 간단히 변경해도 위 dispatch 로 구현한 함수와 똑같이 동작한다. 매우 심플!
+그렇다면 커스텀이벤트 포워딩도 동일할까?
+
+`Child.svelte`
+
+```html
+<script>
+  import { createEventDispatcher } from "svelte";
+  const dispatch = createEventDispatcher();
+</script>
+
+<h2>Child</h2>
+<button
+  on:click={() => {
+    dispatch("myEvent", { myName: "Vicky" });
+  }}>
+Child Click!
+</button>
+```
+
+위와 같이 Child 컴포넌트에 `createEventDispatcher`로 구현한 `myEvent` 커스텀 이벤트가 있다고 할 때, Child 컴포넌트가 위 Parent 컴포넌트 하위의 자식 컴포넌트라고 가정해보자.
+
+`Parent.svelte`
+
+```html
+<script>
+  import Child from "./Child.svelte";
+</script>
+
+<h2>Parent</h2>
+<button on:click>Parent Click!</button>
+<Child on:myEvent />
+```
+
+`myEvent` 커스텀 이벤트를 App 컴포넌트에서 구현하고자 할 경우 Parent 컴포넌트에서는 별도의 이벤트 메서드를 구현하지 않고 `on:myEvent`만 작성해주면 이를 App컴포넌트로 그대로 포워딩할 수 있게된다.
+
+`App.svelte`
+
+```html
+<script>
+  import Parent from "./Parent.svelte";
+
+  function handler(e) {
+    // ..
+  }
+
+  function myEventHandler(e) {
+    console.log(e.detail.myName);
+  }
+</script>
+
+<Parent on:click="{handler}" on:myEvent="{myEventHandler}" />
+```
+
+위 코드처럼 Parent 컴포넌트에서 포워딩한 `on:myEvent`를 App컴포넌트에서 위처럼 구현할 수 있게 되었다.
+
+만약 위와 같은 구조가 아닌 여러 개의 중첩 구조를 이용한다고 했을 때, 중간에 있는 모든 컴포넌트가 이벤트 포워딩 처리를 해줘야하므로 불필요한 코드가 늘어날 수 있다. 이때는 store를 통해서 구현하면 더 효율적이다.
