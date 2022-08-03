@@ -1,12 +1,12 @@
 ﻿<script>
-  export let title = "Hello!";
+  import { getContext, setContext } from "svelte";
 
-  let name = "Vicky";
-  let age = 33;
-  let email = "hwfongfing@gmail.com";
+  import Anderson from "./Anderson.svelte";
+  const pocketMoney = 10000;
+  setContext("pm", pocketMoney);
+
+  const pm = getContext("pm");
 </script>
 
-<h2>{title}</h2>
-<div>{name}</div>
-<div>{age}</div>
-<div>{email}</div>
+<h1 style="color:red">Vicky({pm})</h1>
+<ul><li><Anderson /></li></ul>
