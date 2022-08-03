@@ -430,3 +430,185 @@ Child Click!
 위 코드처럼 Parent 컴포넌트에서 포워딩한 `on:myEvent`를 App컴포넌트에서 위처럼 구현할 수 있게 되었다.
 
 만약 위와 같은 구조가 아닌 여러 개의 중첩 구조를 이용한다고 했을 때, 중간에 있는 모든 컴포넌트가 이벤트 포워딩 처리를 해줘야하므로 불필요한 코드가 늘어날 수 있다. 이때는 store를 통해서 구현하면 더 효율적이다.
+
+### ContextApi(getContext, setContext)
+
+이번에는 스벨트의 contextAPI인 getContext, setContext에 대해 알아본다.
+아래 코드를 보자
+
+`App.svelte`
+
+```html
+<script>
+  // Getter & Setter
+  // getContext & setContext
+  import Vicky from "./Vicky.svelte";
+  import Lewis from "./Lewis.svelte";
+  import Evan from "./Evan.svelte";
+</script>
+
+<h1>App()</h1>
+<div>
+  <Vicky />
+  <Lewis />
+  <Evan />
+</div>
+
+<style>
+  h1 {
+    font-size: 50px;
+  }
+  div {
+    padding-left: 50px;
+  }
+</style>
+```
+
+`Vicky.svelte`
+
+```html
+<script>
+  import Anderson from "./Andorson.svelte";
+</script>
+****
+
+<h1 style="color:red">Vicky</h1>
+<ul>
+  <li><Anderson /></li>
+</ul>
+```
+
+`Anderson.svelte`
+
+```html
+<script>
+  import Neo from "./Neo.svelte";
+  import Emily from "./Emily.svelte";
+</script>
+
+<h2>Anderson</h2>
+<ul>
+  <li><Neo /></li>
+  <li><Emily /></li>
+</ul>
+```
+
+`Lewis.svelte`, `Evan.svelte`, `Neo.svelte`, `Emily.svelte`
+
+```html
+<!-- Lewis, Evan, Neo, Emily() 각각 들어감 -->
+<h1>Lewis()</h1>
+```
+
+위와 같이 부모 자식 관계를 갖는 컴포넌트들이 있다. 위 컴포넌트의 관계는 아래의 구조를 가진다.
+
+![](../img/220803-1.png)
+
+만약 `Vicky` 컴포넌트에서 특정 변수값을 자식 컴포넌트인 `Neo`에게 내려줘야할 때, 우리는 `Anderson` 컴포넌트에 속성을 내려줌으로써 데이터 상속으로 구현한다. 이는 매우 비효율적이다.
+
+`Vicky.svelte`
+
+```html
+<script>
+  import { setContext } from "svelte";
+
+  import Anderson from "./Anderson.svelte";
+  const pocketMoney = 10000;
+  setContext("pm", pocketMoney);
+</script>
+
+<h1 style="color:red">Vicky()</h1>
+<ul>
+  <li><Anderson /></li>
+</ul>
+```
+
+setContext는 첫 번째 인수로 context 명과 뒤에 실제 담길 값을 넣어주면 된다.
+
+`Neo.svelte`
+
+```html
+<script>
+  import { getContext } from "svelte";
+  const pm = getContext("pm");
+</script>
+
+<h1>Neo({pm})</h1>
+```
+
+이를 우리는 `getContext`, `setContext`를 이용해 Anderson 컴포넌트를 거치지 않고 데이터를 공유하도록 위와 같이 구현할 수 있다.
+
+![Neo 컴포넌트에 pocketMoney가 잘 들어간다.](../img/220803-2.png)
+
+`Emily.svelte` , `Anderson.svelte`
+
+```html
+<script>
+  import { getContext } from "svelte";
+  const pm = getContext("pm");
+</script>
+
+<h1>Emily({pm})</h1>
+```
+
+동일하게 Emily, Anderson 컴포넌트에도 변경할 수 있다.
+이는 Context 데이터를 생성한 Vicky 컴포넌트에도 동일하게 적용할 수 잇다.
+
+`Vicky.svelte`
+
+```html
+<script>
+  import { getContext, setContext } from "svelte";
+
+  import Anderson from "./Anderson.svelte";
+  const pocketMoney = 10000;
+  setContext("pm", pocketMoney);
+
+  const pm = getContext("pm");
+</script>
+
+<h1 style="color:red">Vicky({pm})</h1>
+<ul>
+  <li><Anderson /></li>
+</ul>
+```
+
+![](../img/220803-3.png)
+
+위와 같이 `getContext`, `setContext` 메서드는 자기자신 및 자식 컴포넌트 간에 데이터 공유가 가능하도록 해준다.
+
+그럼 형제 컴포넌트와 부모 컴포넌트와의 데이터 공유도 가능할까? 아니다.
+
+`Lewis.svelte`
+
+```html
+<script>
+  import { getContext } from "svelte";
+  const pm = getContext("pm");
+</script>
+
+<h1>Lewis({pm})</h1>
+```
+
+Lewis와 Evan 컴포넌트에서는 undefined이 반환된다.
+
+`App.svelte`
+
+```html
+<script>
+  // getContext & setContext
+  import { getContext } from "svelte";
+  import Vicky from "./Vicky.svelte";
+  import Lewis from "./Lewis.svelte";
+  import Evan from "./Evan.svelte";
+
+  const pm = getContext("pm");
+</script>
+
+<h1>App({pm})</h1>
+<!-- codes... -->
+```
+
+![](../img/220803-4.png)
+
+즉 ContextAPI는 생성한 자기자신과 그 하위 컴포넌트 간의 데이터를 공유받는 개념임을 알 수 있다.
