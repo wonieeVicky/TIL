@@ -612,3 +612,145 @@ Lewis와 Evan 컴포넌트에서는 undefined이 반환된다.
 ![](../img/220803-4.png)
 
 즉 ContextAPI는 생성한 자기자신과 그 하위 컴포넌트 간의 데이터를 공유받는 개념임을 알 수 있다.
+
+### 모듈 상황(Module context)에서 데이터 정의
+
+이번에는 스벨트의 모듈 컨텍스트에서 데이터를 정의하는 방법에 대해 알아보고자 한다.
+
+`Fruit.svelte`
+
+```html
+<script>
+  export let fruit;
+  let count = 0;
+</script>
+
+<div
+  on:click={() => {
+    count += 1;
+    console.log(count);
+  }}
+>
+  {fruit}
+</div>
+```
+
+`App.svelte`
+
+```html
+<script>
+  import Fruit from "./Fruit.svelte";
+  let fruits = ["Apple", "Banana", "Cherry", "Mango", "Orange"];
+</script>
+
+<button on:click={() => {}}>Total count log!</button>
+
+{#each fruits as fruit}
+  <Fruit {fruit} />
+{/each}
+```
+
+위와 같은 컴포넌트 구조가 있다고 하자. Fruit 컴포넌트는 fruit라는 변수를 상속받아 데이터를 노출한다. 또한 해당 텍스트를 클릭하면 count 변수가 증가하고 해당 값이 콘솔에 찍히도록 작성되어져 있다.
+
+해당 구조로 텍스트를 클릭해보면 각 개별 텍스트마다 count가 1부터 증가하는 것을 볼 수 있다.
+
+![](../img/220804-1.gif)
+
+Cherry를 클릭 후 다시 Apple을 클릭한다면 콘솔에는 3이 찍히게 될 것이다. 각 컴포넌트별로 각 count 데이터를 가지고 있기 때문. 이 상황에서 만약 전체 클릭 수에 대해서 알고싶다면 어떻게 해야할까?
+
+각 Fruit 컴포넌트 별로 클릭한 count 변수 값을 알고 있어야 한다. 이때 모듈별로 데이터를 정의하는 방법을 활용하면 된다. 이는 아래와 같이 작성할 수 있다.
+
+`Fruit.svelte`
+
+```html
+<script context="module">
+  let count = 0;
+</script>
+
+<script>
+  export let fruit;
+</script>
+
+<div
+  on:click={() => {
+    count += 1;
+    console.log(count);
+  }}
+>
+  {fruit}
+</div>
+```
+
+위와 같이 script에 module 컨텍스트를 부여해준 영역에 count 변수를 정의한 뒤 다시 클릭해본다.
+
+![](../img/220804-2.gif)
+
+위 이미지를 보면 count 변수가 모든 컴포넌트를 아우르는 전역화 된 데이터로 사용되고 있음을 확인할 수 있다.
+즉 `<script context="module">` 의 개념은 각각의 Fruit 렌더링 시 초기화되는 부분은 `<script></script>`영역이다. 위 `<script context="module">` 부분은 App.svelte에서 컴포넌트를 가져와 사용하려고 하는 최초 시점 한번만 동작하는 데이터가 된다. (즉, 컴포넌트가 import되는 시점에 정의 및 선언된다)
+
+이는 아래와 같이 디버그 콘솔을 추가하면 쉽게 확인할 수 있다.
+
+`Fruit.svelte`
+
+```html
+<script context="module">
+  let count = 0;
+  console.log("Module context!");
+</script>
+
+<script>
+  export let fruit;
+  console.log("Each component init!");
+</script>
+
+<div
+  on:click={() => {
+    count += 1;
+    console.log(count);
+  }}
+>
+  {fruit}
+</div>
+```
+
+![](../img/220804-1.png)
+
+다만 한가지 주의해야 할 점이 있다. 컨텍스트 모듈에서 정의된 데이터는 반응성을 가질 수 없다.
+즉 데이터 갱신은 가능하나 화면을 갱신해줄 수 없는 것이다. 대신 모든 컴포넌트를 아우르는 전역화 된 데이터로 사용할 수 있다는 점이 포인트이다.
+
+그럼 이 count 데이터를 App 컴포넌트로 `내보내기` 하는 방법은 무엇일까? export를 사용하면 된다.
+
+`Fruit.svelte`
+
+```html
+<script context="module">
+  export let count = 0; // export 추가
+</script>
+
+<script>
+  export let fruit;
+</script>
+
+<div on:click={() => count += 1}>
+  {fruit}
+</div>
+```
+
+`App.svelte`
+
+```html
+<script>
+  import Fruit, { count } from "./Fruit.svelte"; // count 변수 가져오기 추가
+  let fruits = ["Apple", "Banana", "Cherry", "Mango", "Orange"];
+</script>
+
+<button on:click={() => console.log(count)}>Total count log!</button>
+<!-- codes.. -->
+```
+
+위와 같이 `export` 를 사용해 `count` 데이터를 내보내고, 이를 사용할 App 컴포넌트에서는 import 시 가져올 변수로 추가해주면 된다.
+`count`는 반응성을 가지지 못하므로 화면이 갱신되지는 않으나 `Total count log!` 버튼을 클릭했을 때 `count`값이 디버깅 시 기록되도록 구현할 수 있다.
+
+![](../img/220805-1.gif)
+
+이를 실무에서 활용할 수 있는 방법이 뭐가 있을까? 예제를 통해 알아보자
