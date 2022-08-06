@@ -754,3 +754,56 @@ Cherry를 클릭 후 다시 Apple을 클릭한다면 콘솔에는 3이 찍히게
 ![](../img/220805-1.gif)
 
 이를 실무에서 활용할 수 있는 방법이 뭐가 있을까? 예제를 통해 알아보자
+
+### 오디오 플레이어 예제
+
+이번에는 모듈 컨텍스트를 사용해 예제를 하나 구현해보고자 한다.
+
+`AudioPlayer.svelte`
+
+```html
+<script context="module">
+  const players = new Set();
+  export function stopAll() {
+    players.forEach((p) => p.pause()); // pause는 오디오 객체
+  }
+</script>
+
+<script>
+  import { onMount } from "svelte";
+  export let src;
+  let player;
+
+  onMount(() => [
+    // Like players.push(player)
+    players.add(player),
+  ]);
+</script>
+
+<div>
+  <!-- controls 옵션은 audio 객체를 관리할 수 있게한다. -->
+  <audio {src} bind:this="{player}" constrols>
+    <track kind="captions" />
+  </audio>
+</div>
+```
+
+`App.svelte`
+
+```html
+<script>
+  import AudioPlayer, { stopAll } from "./AudioPlayer.svelte";
+  let audioTracks = [
+    "https://sveltejs.github.io/assets/music/strauss.mp3",
+    "https://sveltejs.github.io/assets/music/holst.mp3",
+    "https://sveltejs.github.io/assets/music/satie.mp3",
+  ];
+</script>
+
+<button on:click="{stopAll}">Stop all!</button>
+{#each audioTracks as src}
+<AudioPlayer {src} />
+{/each}
+```
+
+AudioPlayer는 3번 반복되는 컴포넌트이다. 해당 Audio는 플레이 버튼을 누르면 각각 재생이 되고, Stop All 버튼을 누르면 모든 오디오가 멈추게 된다. AudioPlayer는 각각의 스벨트 컴포넌트이고, 그것을 script의 module 영역에서 전역화된 데이터로 한번에 제어함으로써 유연한 컴포넌트 운영이 가능해진다. 유용하니 기억해둘 것!
