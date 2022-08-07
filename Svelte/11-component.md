@@ -807,3 +807,131 @@ Cherry를 클릭 후 다시 Apple을 클릭한다면 콘솔에는 3이 찍히게
 ```
 
 AudioPlayer는 3번 반복되는 컴포넌트이다. 해당 Audio는 플레이 버튼을 누르면 각각 재생이 되고, Stop All 버튼을 누르면 모든 오디오가 멈추게 된다. AudioPlayer는 각각의 스벨트 컴포넌트이고, 그것을 script의 module 영역에서 전역화된 데이터로 한번에 제어함으로써 유연한 컴포넌트 운영이 가능해진다. 유용하니 기억해둘 것!
+
+### $$props와 $$restProps
+
+이번 시간에는 커스텀 한 input 컴포넌트를 만들어보려고 한다.
+
+`TextField.svelte`
+
+```html
+<div class="my-custom-input"><input type="text" /></div>
+
+<style>
+  .my-custom-input input {
+    border-radius: 100px;
+    padding: 10px 20px;
+  }
+</style>
+```
+
+`App.svelte`
+
+```html
+<script>
+  import TextField from "./TextField.svelte";
+
+  let id = "";
+  let pw = "";
+</script>
+
+<TextField />
+```
+
+TextField 컴포넌트는 별도의 스크립트를 가지지 않고 input을 렌더링해주고 있다.
+만약 App 컴포넌트에서 TextField로 id나 pw 정보를 value props로 내려준다고 가정해보자.
+이는 아래와 같이 쓸 수 있다.
+
+`App.svelte`
+
+```html
+<script>
+  import TextField from "./TextField.svelte";
+
+  let id = "";
+  let pw = "";
+</script>
+
+<TextField bind:value="{id}" />
+<TextField bind:value="{pw}" />
+```
+
+`TextField.svelte`
+
+```html
+<script>
+  export let value;
+</script>
+
+<div class="my-custom-input"><input bind:value type="text" /></div>
+```
+
+`bind:value`로 양방향 데이터 바인딩을 해주었다.
+
+만약 위 코드에서 input에 type과 placeholder 등의 데이터를 추가로 상속해준다고 하면 아래와 같이 구혈 할 수 있을 것이다.
+
+`TextField.svelte`
+
+```html
+<script>
+  export let value;
+  export let type;
+  export let placeholder;
+</script>
+
+<div class="my-custom-input"><input bind:value {type} {placeholder} /></div>
+```
+
+input 태그에 붙일 수 있는 html 속성은 매우 많다. 만약 커스텀 인풋을 만든다고 했을 때 인풋에 필요한 각 요소들을 모두 Props로 전달되도록 한다면 이는 매우 번거롭고 부담스러운 일이 될 것이다.
+
+이때 스벨트는 이러한 문제를 해결할 수 있도록 `$$props` 객체를 제공한다. 기본적으로 컴포넌트에 내장되어 있는 객체로 해당하는 컴포넌트가 바깥에서 받는 모든 props를 담고 있는 객체이다.
+
+`TextField.svelte`
+
+```html
+<script>
+  import App from "./App.svelte";
+
+  export let value;
+</script>
+
+<div class="my-custom-input"><input bind:value {...$$props} /></div>
+```
+
+`$$props`는 TextField 컴포넌트에서 위와 같이 적을 수 있다.
+위와 같이 하면 App.svelte에서 아래와 같이 각 컴포넌트마다 고유의 데이터가 반영되도록 데이터를 할당해도 잘 반영이 된다. 즉 각 props를 자식 컴포넌트에서 굳이 정의하지 않아도 알아서 해당 값이 반영되는 것이다.
+
+`App.svelte`
+
+```html
+<TextField bind:value="{id}" type="email" placeholder="ID를 넣어주세요." maxlength="10" required />
+<TextField bind:value="{pw}" type="password" placeholder="Passworld!" required />
+```
+
+하지만 모든 속성이 다 되는 것은 아니다.
+
+`App.svelte`
+
+```html
+<TextField bind:value="{id}" type="email" color="yellowgreen" placeholder="ID를 넣어주세요." maxlength="10" required />
+```
+
+color 속성은 input에 제공되는 기본 데이터 객체에 포함되지 않으므로 위와 같이 yellowgreen으로 설정한 뒤 TextField에서 color라는 변수로 정의해서 사용하면 잘 반영이 된다.
+
+하지만 이와 같이 value나 color는 직접 반영이 되지 않으므로 개별적으로 정의해줘야하는데 이때 사용할 수 있는 또다른 내장 객체가 있다. 바로 `$$restProps`이다.
+
+restProps는 명시한 props($$props)를 제외한 나머지 모든 암시적 props가 들어있다.
+
+`TestField.svetle`
+
+```html
+<script>
+  export let value;
+  export let color;
+  // export ...
+</script>
+
+<div class="my-custom-input"><input style="color: {color}" bind:value {...$$restProps} /></div>
+```
+
+위처럼 $$props와 $$restProps를 전개연산자를 통해 컴포넌트에 대입시켜서 처리하면 여러 차례 속성을 상속하는 과정없이 매끈하게 처리할 수 있다는 점을 참고하자.
