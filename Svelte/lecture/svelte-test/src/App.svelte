@@ -1,13 +1,9 @@
 <script>
-  import AudioPlayer, { stopAll } from "./AudioPlayer.svelte";
-  let audioTracks = [
-    "https://sveltejs.github.io/assets/music/strauss.mp3",
-    "https://sveltejs.github.io/assets/music/holst.mp3",
-    "https://sveltejs.github.io/assets/music/satie.mp3",
-  ];
+  import TextField from "./TextField.svelte";
+
+  let id = "";
+  let pw = "";
 </script>
 
-<button on:click={stopAll}>Stop all!</button>
-{#each audioTracks as src}
-  <AudioPlayer {src} />
-{/each}
+<TextField bind:value={id} type="email" color="yellowgreen" placeholder="ID를 넣어주세요." maxlength="10" required />
+<TextField bind:value={pw} type="password" color="red" placeholder="Passworld!" required />
