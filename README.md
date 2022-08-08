@@ -148,6 +148,7 @@
 9. [비동기 처리](https://github.com/wonieeVicky/TIL/blob/main/Svelte/9-asynchronous-function.md)
 10. [사용자 입력 핸들링](https://github.com/wonieeVicky/TIL/blob/main/Svelte/10-user-input-handling.md)
 11. [컴포넌트](https://github.com/wonieeVicky/TIL/blob/main/Svelte/11-component.md)
+12. [슬롯](https://github.com/wonieeVicky/TIL/blob/main/Svelte/12-slot.md)
 
 ## React
 
