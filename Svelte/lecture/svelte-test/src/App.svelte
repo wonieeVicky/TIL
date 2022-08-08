@@ -1,9 +1,9 @@
 <script>
-  import TextField from "./TextField.svelte";
-
-  let id = "";
-  let pw = "";
+  import Btn from "./Btn.svelte";
 </script>
 
-<TextField bind:value={id} type="email" color="yellowgreen" placeholder="ID를 넣어주세요." maxlength="10" required />
-<TextField bind:value={pw} type="password" color="red" placeholder="Passworld!" required />
+<Btn />
+<Btn>Submit!</Btn>
+<Btn block>Submit!</Btn>
+<Btn color="royalblue">Submit!</Btn>
+<Btn block color="red">Danger!</Btn>
