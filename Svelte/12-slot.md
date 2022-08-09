@@ -93,3 +93,103 @@
 ```
 
 위 `class={block ? "block" : ""}` 란 코드는 `class:block` 로 줄여서 작성할 수 있고, 나머지 color 변수는 조건문을 넣어 처리하면 된다.
+
+### 이름을 가지는 슬롯
+
+이번 시간에는 이름을 가지는 슬롯에 대해 배워본다.
+
+`Card.svelte`
+
+```html
+<div class="card">
+  <slot name="name">!!</slot>
+  <slot name="age">??</slot>
+  <slot name="email">&&</slot>
+</div>
+
+<style>
+  .card {
+    margin: 20px;
+    padding: 12px;
+    border: 1px solid gray;
+    border-radius: 10px;
+    box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.1);
+  }
+</style>
+```
+
+`App.svelte`
+
+```html
+<script>
+  import Card from "./Card.svelte";
+</script>
+
+<Card />
+<Card />
+```
+
+위와 같은 컴포넌트 구조가 있다고 하자. Card 컴포넌트는 3개의 slot을 가지며, 해당 슬롯은 각각의 name 속성이 정의되어 있다. 위 컴포넌트는 아래의 ui로 도출된다.
+
+![](../img/220809-1.png)
+
+이제 App 컴포넌트에 slot 데이터를 부여해본다.
+
+`App.svelte`
+
+```html
+<Card>
+  <div slot="age">85</div>
+</Card>
+<Card />
+```
+
+위와 같이 slot에 age값을 부여하면 결과는 아래와 같이 도출된다.
+
+![](../img/220809-2.png)
+
+이렇듯 이름을 가지는 슬롯은 컴포넌트의 컨텐트로 어떠한 내용을 작성했을 때 해당 컴포넌트에 여러개로 선언된 slot 중 어떤 것을 실행시킬 것인가를 설정해줄 수 있게된다.
+
+`App.svelte`
+
+```html
+<Card>
+  <div slot="age">85</div>
+  <h2 slot="name">Vicky</h2>
+</Card>
+<Card />
+```
+
+위와 같이 h2 데이터를 추가해주면 아래와 같이 결과가 반환된다.
+
+![](../img/220809-3.png)
+
+App 컴포넌트에서는 div 다음에 h2 태그를 넣었지만 실제 Card 컴포넌트에서는 slot의 순서가 name → age → email이기 때문에 노출은 name부터 된다. slot의 작성 순서대로 노출되는 것이다.
+
+![](../img/220809-4.png)
+
+만약 아래와 같이 작성되어 있을 떄, 두번째 name 슬롯인 fongfing에 h3 태그에 빨간색 color를 주고 싶다면 어떻게 해야할까?
+
+일반적으로 Card 컴포넌트의 style에 `h3 { color: red; }` 로 처리하면 될 것이라고 생각하지만 실제 Card 컴포넌트에 h3 태그가 직접 들어오지 않게 되므로 해당 스타일을 반영하지 못한다. 따라서 해당 스타일은 App.svelte에서 추가해줘야 적절히 반영된다.
+
+`App.svelte`
+
+```html
+<Card>
+  <div slot="age">85</div>
+  <h2 slot="name">Vicky</h2>
+  <div slot="email">hwfongfing@gmail.com</div>
+</Card>
+<Card>
+  <span slot="email">fongfing@uneedcomms.com</span>
+  <h3 slot="name">fongfing</h3>
+</Card>
+
+<style>
+  h3 {
+    color: red;
+  }
+</style>
+```
+
+![](../img/220809-5.png)
