@@ -5,10 +5,10 @@
 <Card>
   <div slot="age">85</div>
   <h2 slot="name">Vicky</h2>
-  <div slot="email">hwfongfing@gmail.com</div>
+  <div slot="email" let:domain let:hello>hwfongfing{domain} / {hello}</div>
 </Card>
 <Card>
-  <span slot="email">fongfing@uneedcomms.com</span>
+  <span slot="email" let:domain>fongfing{domain}</span>
   <h3 slot="name">fongfing</h3>
 </Card>
 

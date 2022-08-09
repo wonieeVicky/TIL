@@ -1,7 +1,11 @@
-﻿<div class="card">
-  <slot name="name">!!</slot>
+﻿<script>
+  let domain = "@xyz.com";
+</script>
+
+<div class="card">
+  <slot name="name" />
   <slot name="age">??</slot>
-  <slot name="email">&&</slot>
+  <slot name="email" {domain} hello="world" />
 </div>
 
 <style>
