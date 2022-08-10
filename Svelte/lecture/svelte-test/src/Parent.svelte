@@ -2,6 +2,8 @@
   import Child from "./Child.svelte";
 </script>
 
-<h2>Parent</h2>
-<button on:click>Parent Click!</button>
-<Child on:myEvent />
+<Child let:scoped>
+  <slot />
+  <slot name="named" slot="named-child" />
+  <slot name="scoped" slot="scoped-child" {scoped} />
+</Child>

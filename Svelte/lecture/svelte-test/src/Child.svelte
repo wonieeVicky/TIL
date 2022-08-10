@@ -1,11 +1,7 @@
 ﻿<script>
-  import { createEventDispatcher } from "svelte";
-  const dispatch = createEventDispatcher();
+  let scoped = "Scoped!";
 </script>
 
-<h2>Child</h2>
-<button
-  on:click={() => {
-    dispatch("myEvent", { myName: "Vicky" });
-  }}>Child Click!</button
->
+<slot name="scoped-child" {scoped} />
+<slot name="named-child" />
+<slot />
