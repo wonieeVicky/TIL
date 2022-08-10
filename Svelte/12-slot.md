@@ -369,3 +369,105 @@ name은 슬롯의 예약어이므로 변수로 사용할 수 없다.
 ```
 
 위처럼 `_name` 변수로 `scopeName`을 부여하면 변수를 보간법으로 사용할 수 있게되어 불필요한 코드 작성을 방지할 수 있게 되며, 작성 중 발생할 수 있는 오류를 미연에 방지할 수 있는 효과를 가진다. 이처럼 불필요한 코드를 줄일 수 있는 하나의 방법으로 slot을 선택하면 훨씬 효율적인 프로그래밍이 가능해진다.
+
+### 슬롯 포워딩(Forwarding)
+
+이번 시간에는 슬롯 포워딩에 대한 개념에 대해 알아보고자 한다.
+
+`App.svelte`
+
+```html
+<script>
+  import Parent from "./Parent.svelte";
+</script>
+
+<Parent>
+  <h2>Default slot..</h2>
+</Parent>
+```
+
+`Parent.svelte`
+
+```html
+<script>
+  import Child from "./Child.svelte";
+</script>
+
+<Child />
+<slot />
+```
+
+위와 같은 구조가 있다고 했을 때 App 컴포넌트에서 작성한 `<h2>Default slot..</h2>`를 Parent 컴포넌트에서 노출하려면 위와 같이 작성한다. 이 slot 데이터를 Child 컴포넌트에서 노출하기 위해선 슬롯 포워딩에 대한 개념을 알아야 한다.
+
+`Parent.svelte`
+
+```html
+<Child><slot /></Child>
+```
+
+`Child.svelte`
+
+```html
+<slot></slot>
+```
+
+위와 같이 구조를 변경해주면 Child 컴포넌트에서 해당 슬롯 데이터가 적절히 노출되는 것을 확인할 수 있다. 그렇다면 이름을 가진 슬롯은 어떻게 포워딩할 수 있을까?
+
+`App.svelte`
+
+```html
+<Parent>
+  <h2>Default slot..</h2>
+  <h3 slot="named">Named slot...</h3>
+</Parent>
+```
+
+`Parent.svelte`
+
+```html
+<Child>
+  <slot />
+  <slot name="named" slot="named-child" />
+</Child>
+```
+
+`Child.svelte`
+
+```html
+<slot name="named-child" /> <slot />
+```
+
+위와 같이 작성해줄 수 있다.
+
+App 컴포넌트: slot=named → Parent 컴포넌트: slot name=named
+Parent 컴포넌트: slot=named-child → Child 컴포넌트: slot name=named-child
+
+위와 같이 연결해주면 됨. 그럼 범위를 가진 슬롯은 어떻게 포워딩할까?
+
+`Child.svelte`
+
+```html
+<script>
+  let scoped = "Scoped!";
+</script>
+
+<slot name="scoped-child" {scoped} />
+```
+
+`Parent.svelte`
+
+```html
+<Child let:scoped>
+  <slot name="scoped" slot="scoped-child" {scoped} />
+</Child>
+```
+
+`App.svelte`
+
+```html
+<Parent let:scoped>
+  <h1 slot="scoped">Scoped slot... {scoped}</h1>
+</Parent>
+```
+
+위와 같이 scoped 범위 슬롯을 Child → Parent → App 컴포넌트 순으로 대입해주면 App 컴포넌트에서 scoped란 데이터를 사용할 수 있게 된다.
