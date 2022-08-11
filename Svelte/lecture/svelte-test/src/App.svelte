@@ -1,9 +1,20 @@
 <script>
-  import Parent from "./Parent.svelte";
+  import UserCard from "./UserCard.svelte";
 </script>
 
-<Parent let:scoped>
-  <h2>Default slot..</h2>
-  <h3 slot="named">Named slot...</h3>
-  <h1 slot="scoped">Scoped slot... {scoped}</h1>
-</Parent>
+<UserCard>
+  <h2 slot="name">VICKY</h2>
+  <div slot="age">33</div>
+  <div slot="email">hwfongfing@gmail.com</div>
+</UserCard>
+
+<UserCard>
+  <h2 slot="name">WONNY</h2>
+  <div slot="email">fongfing@uneedcomms.com</div>
+  <div>adfadf</div>
+</UserCard>
+
+<UserCard>
+  <h2 slot="name">TEDDY</h2>
+  <div>아무 말이나 적어본다.</div>
+</UserCard>
