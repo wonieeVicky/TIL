@@ -471,3 +471,162 @@ Parent 컴포넌트: slot=named-child → Child 컴포넌트: slot name=named-ch
 ```
 
 위와 같이 scoped 범위 슬롯을 Child → Parent → App 컴포넌트 순으로 대입해주면 App 컴포넌트에서 scoped란 데이터를 사용할 수 있게 된다.
+
+### $$slots
+
+이번엔 $$slots 객체에 대해 알아본다. 아래와 같은 컴포넌트 구조를 보자
+
+`UserCard.svelte`
+
+```html
+<div class="user-card">
+  <slot name="name" />
+  <hr />
+  <slot name="age" />
+  <hr />
+  <slot name="email" />
+</div>
+
+<style>
+  .user-card {
+    width: 300px;
+    margin: 20px 10px;
+    padding: 0 10px 20px;
+    border: 4px solid lightgray;
+    border-radius: 10px;
+    box-shadow: 8px 8px rgba(0, 0, 0, 0.03);
+    position: relative;
+  }
+  .user-card::after {
+    content: "";
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    background-color: lightgray;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+  }
+</style>
+```
+
+`App.svelte`
+
+```html
+<script>
+  import UserCard from "./UserCard.svelte";
+</script>
+
+<UserCard>
+  <h2 slot="name">VICKY</h2>
+  <div slot="age">33</div>
+  <div slot="email">hwfongfing@gmail.com</div>
+</UserCard>
+```
+
+위와 같은 구조라고 할 때 App 컴포넌트에서 각각의 slot name 속성에 맞는 데이터가 아래처럼 들어가게 될 것이다.
+
+![](../img/220811-1.png)
+
+그럼 여기에 UserCard 컴포넌트에 스크립트를 조금 추가해본다.
+
+`UserCard.svelte`
+
+```html
+<script>
+  console.log($$slots);
+</script>
+
+<div class="user-card">
+  <slot name="name" />
+  <hr />
+  <slot name="age" />
+  <hr />
+  <slot name="email" />
+</div>
+```
+
+위와 같이 `$$slots`를 콘솔로그에 찍어보면 Object에 아래와 같은 슬롯이 존재한다는 정보가 담겨있다.
+
+```
+age: true
+email: true
+name: true
+```
+
+즉, `$$slots`는 슬롯에 데이터가 삽입되고 있는 것을 확인할 수 있는 객체라고 할 수 있다.
+
+`App.svelte`
+
+```html
+<UserCard>
+  <h2 slot="name">WONNY</h2>
+  <div slot="email">fongfing@uneedcomms.com</div>
+</UserCard>
+```
+
+![](../img/220811-2.png)
+
+만약 위와 같은 데이터가 있다고 한다면 화면에는 위와 같이 노출되는데, 만약 age 슬롯이 없을 때 해당 hr라인을 없애주고 싶다면 아래와 같이 고쳐줄 수 있다.
+
+`UserCard.svelte`
+
+```html
+<div class="user-card">
+  <slot name="name" />
+  {#if $$slots.age}
+  <hr />
+  <slot name="age" />
+  {/if}
+  <hr />
+  <slot name="email" />
+</div>
+```
+
+if 분기로 `$$slots`의 age 데이터 유무를 판별하는 것이다.
+
+![](../img/220811-3.png)
+
+```
+email: true
+name: true
+```
+
+실제 위 컴포넌트의 `$$slots`를 콘솔로 찍어보면 위처럼 age 요소는 없는 상태로 반환되는 것을 확인할 수 있다.
+
+`App.svelte`
+
+```html
+<UserCard>
+  <h2 slot="name">TEDDY</h2>
+  <div>아무 말이나 적어본다.</div>
+</UserCard>
+```
+
+`UserCard.svelte`
+
+```html
+<div class="user-card">
+  <slot name="name" />
+  {#if $$slots.age}
+  <hr />
+  <slot name="age" />
+  {/if} {#if $$slots.email}
+  <hr />
+  <slot name="email" />
+  {/if}
+</div>
+```
+
+같은 방법으로 name 슬롯만 있을 경우도 if 분기를 추가하여 UI를 개선해주었다.
+
+![](../img/220811-4.png)
+
+`$$slots`를 다시 디버그 콘솔로 찍어보면 실제 사용되는 name 속성과 이름이 없는 slot 이라는 개념의 default라는 속성이 새로 추가되어 있는 것을 확인할 수 있다.
+
+```
+default: true
+name: true
+```
+
+`<div>아무 말이나 적어본다.</div>` 해당 데이터가 default로 들어가는 것이다.
