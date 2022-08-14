@@ -1,15 +1,18 @@
-﻿import { writable } from "svelte/store";
+﻿import { readable } from "svelte/store";
 
-export let count = writable(0, () => {
-  console.log("count 구독자가 1명 이상일 때!");
-  return () => {
-    console.log("count 구독쟈가 0명일 때..");
-  };
-});
+const userData = {
+  name: "Vicky",
+  age: 33,
+  email: "hwfongfing@gmail.com",
+  token: "Adkwenqa91s",
+};
 
-export let name = writable("Vicky", () => {
-  console.log("name 구독자가 1명 이상일 때!");
+export let user = readable(userData, (set) => {
+  console.log("user 구독자가 1명 이상일 때!");
+  delete userData.token; // token 속성을 삭제함
+  set(userData); // token을 제외한 userData를 저장함
+
   return () => {
-    console.log("name 구독쟈가 0명일 때..");
+    console.log("user 구독자가 0명일 때...");
   };
 });
