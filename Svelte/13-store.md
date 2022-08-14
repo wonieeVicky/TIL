@@ -240,3 +240,99 @@ export let name = writable("Vicky", () => {
 ![](../img/220812-3.gif)
 
 Svelte 컴포넌트에서는 스토어 자동 구독 방식을 사용하는 것이 더 권장된다. 하지만, svelte 컴포넌트가 아닌 곳에서는 자동 구독 방식을 사용할 수 없으므로 이때는 앞서 배운 수동 구독 방식으로 구현해야 한다.
+
+### 읽기 전용 스토어(readable)
+
+이번에는 스벨트의 읽기 전용 스토어에 대해 좀 더 자세히 알아본다.
+
+`App.svelte`
+
+```html
+<script>
+  import Readable from "./Readable.svelte";
+  let toggle = true;
+</script>
+
+<button on:click={() => (toggle = !toggle)}>Toggle</button>
+
+{#if toggle}
+  <Readable />
+{/if}
+```
+
+`store.js`
+
+```jsx
+import { readable } from "svelte/store";
+
+const userData = {
+  name: "Vicky",
+  age: 33,
+  email: "hwfongfing@gmail.com",
+  token: "Adkwenqa91s",
+};
+
+export let user = readable(userData);
+```
+
+`Readable.svelte`
+
+```html
+<script>
+  import { user } from "./store.js";
+
+  console.log(user); // { subscribe: f }
+  console.log($user); // { name: "Vicky". ... }
+</script>
+```
+
+위와 같은 구조가 있다. store 에는 `user` 객체가 들어있고 해당 객체를 `readable` 객체로 export 하고 있음. Readable 컴포넌트에서는 해당 `user` 데이터를 import 한 뒤 콘솔에 찍어보면 앞선 강의에서 배웠던 `Writable` 스토어 객체와는 달리 set, update가 미존재하고, `subscribe` 객체만 존재하는 것을 알 수 있다.
+
+`Readable.svelte`
+
+```jsx
+<script>
+  import { user } from "./store.js";
+
+  console.log(user); // { subscribe: f }
+  console.log($user);
+</script>
+
+<button on:click={() => ($user.name = "Wonny")}>Click!</button>
+<h2>{$user.name}</h2>
+
+// Uncaught TypeError: store.set is not a function
+```
+
+readable 객체 정보이기 때문에 $user 객체에 직접 변화를 주면 에러를 반환한다. 이 밖에도 readable 객체의 활용법에 대해 조금 더 알아보자. readable 객체에 두 번째인 수를 부여해본다.
+
+`store.js`
+
+```jsx
+export let user = readable(userData, () => {
+  console.log("user 구독자가 1명 이상일 때!");
+  return () => {
+    console.log("user 구독자가 0명일 때...");
+  };
+});
+```
+
+위처럼 추가 후 새로고침 → Toggle 버튼(Readable 컴포넌트 삭제)을 누르면 순차적으로 `user 구독자가 1명 이상일 때!` 와 `user 구독자가 0명일 때…` 가 노출되는 것을 확인할 수 있다. 여기까지는 Writable 스토어와 다른 것이 없다. Readable 컴포넌트는 두번째 인수의 매개변수에 set 값을 전달해줄 수 있다.
+
+`store.js`
+
+```jsx
+export let user = readable(userData, (set) => {
+  console.log("user 구독자가 1명 이상일 때!");
+  delete userData.token; // token 속성을 삭제함
+  set(userData); // token을 제외한 userData를 저장함
+
+  return () => {
+    console.log("user 구독자가 0명일 때...");
+  };
+});
+
+// { name: "Vicky", age: 33, email: "hwfongfing@gmail.com" }
+```
+
+위처럼 set을 통해 userData 객체의 초깃값을 한번 변경해줄 수 있음!
