@@ -336,3 +336,126 @@ export let user = readable(userData, (set) => {
 ```
 
 위처럼 set을 통해 userData 객체의 초깃값을 한번 변경해줄 수 있음!
+
+### 계산된 스토어(derived)
+
+이번에는 스벨트의 계산된 스토어를 만들어내는 derived에 대해 알아본다. derived는 유래된, 파생된 이란 뜻을 가지고 있는 단어이다. 아래 코드를 보자
+
+`App.svelte`
+
+```html
+<script>
+  import Derived from "./Derived.svelte";
+  let toggle = true;
+</script>
+
+<button on:click={() => (toggle = !toggle)}>Toggle</button>
+
+{#if toggle}
+  <Derived />
+{/if}
+```
+
+`Derived.svelte`
+
+```html
+<script>
+  import { count, double } from "./store";
+
+  console.log(double); // { subscribe: f }
+</script>
+
+<button on:click={() => ($count += 1)}>Click!</button>
+<h2>count: {$count}</h2>
+<h2>double: {$double}</h2>
+```
+
+`store.js`
+
+```jsx
+import { writable, derived } from "svelte/store";
+
+export let count = writable(1);
+// derived 스토어 생성 시 두 번째 함수의 매개변수에는 실제 사용하는 스토어 객체명을 그대로 사용하는 것이 좋다.
+// count라는 스토어 변수를 사용하고 있다는 것을 알려주기 위함
+export let double = derived(count, ($count) => {
+  return $count * 2;
+});
+```
+
+위 구조에서 count 변수는 숫자 1이 쓰기 가능한(writable) 변수로 설정되어있다. 다음 double 변수는 derived메서드를 사용해서 첫 번째 인수에 writable 변수를 넣고, 두번째에는 값 변경 로직을 추가하여 구현한다. Derived 컴포넌트에서 double 값을 콘솔로그로 찍었을 때, subscribe 메서드만 존재하는 것을 확인할 수 있는데, 이는 즉, derived 스토어는 기존의 스토어(writable or readable store)를 사용해서 읽기전용의 계산된 스토어로만 만들어낼 수 있다는 것을 알 수 있다.
+
+이번에는 count와 double 변수의 총합을 반환하는 total이라는 derived 변수를 만들어보자.
+
+`store.js`
+
+```jsx
+export let count = writable(1);
+export let double = derived(count, ($count) => $count * 2);
+// 인수가 두 개 들어갈 경우 배열의 인수로 넣어준다.
+export let total = derived([count, double], ([$count, $double]) => $count + $double);
+```
+
+`Derived.svelte`
+
+```html
+<script>
+  import { count, double, total } from "./store";
+</script>
+
+<button on:click={() => ($count += 1)}>Click!</button>
+
+<h1>total: {$total}</h1>
+<h2>count: {$count}</h2>
+<h2>double: {$double}</h2>
+```
+
+![](../img/220815-1.gif)
+
+위와 같이 두 개 이상의 스토어 변수를 매개변수로 받아 계산하는 `total` derived 변수를 생성하여 노출할 수 있다.
+
+`store.js`
+
+```jsx
+export let total = derived([count, double], ([$count, $double], set) => set($count + $double));
+```
+
+이 외에도 derived 스토어의 경우에도 두 번째 인수에 `set`을 실행시켜 값을 계산해줄 수도 있다.
+
+`store.js`
+
+```jsx
+export let total = derived([count, double], ([$count, $double], set) => {
+  console.log("total 구독자가 1명 이상일 때!");
+  set($count + $double);
+  return () => {
+    console.log("total 구독자가 0명일 때...");
+  };
+});
+```
+
+이 밖에도 total 함수 내부에 위와 같이 콘솔을 찍어보면 아래와 같이 값 변경 시마다 콘솔이 모두 로깅되는 것을 확인할 수 있다.
+
+![](../img/220815-2.gif)
+
+이는 derived 스토어를 구성하는 count와 double의 값이 변경됨에 따라 구독이 모두 초기화되었다가 값 변경 시 새로 구독 재정의 되는 과정을 반복하기 때문이다. 이러한 점을 참고하여 writable, readable과 잘 활용하여 사용한다.
+
+`store.js`
+
+```jsx
+export let initialValue = derived(count, ($count, set) => setTimeout(() => set($count + 1), 1000));
+```
+
+만약 위와 같이 derived 스토어가 1초 뒤에 실행되도록 설정되어 있다면 어떨까?
+
+![](../img/220815-3.gif)
+
+위 `initialValue` 값은 초기 화면에 `undefined`로 노출되었다가 클릭 시 1초 뒤에 값이 변경된다. 이 떄 해당 값의 초기값을 `undefined`가 아닌 별도의 값으로 설정해줄 수 있는데, 이는 세번째 인수에 넣어줄 수 있다.
+
+```jsx
+export let initialValue = derived(count, ($count, set) => setTimeout(() => set($count + 1), 1000), "최초 계산 중...");
+```
+
+![](../img/220815-4.gif)
+
+위와 같이 `최초 계산 중…` 이라는 변수를 세번째 인수로 넣어주면 값 변경 되기 이전에 ui를 제대로 안내할 수 있게 된다. 해당 기능을 활용해 화면 로딩 시 UI를 구현해줄 수도 있겠다.
