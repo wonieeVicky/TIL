@@ -1,10 +1,10 @@
 <script>
-  import Readable from "./Readable.svelte";
+  import Derived from "./Derived.svelte";
   let toggle = true;
 </script>
 
 <button on:click={() => (toggle = !toggle)}>Toggle</button>
 
 {#if toggle}
-  <Readable />
+  <Derived />
 {/if}
