@@ -459,3 +459,56 @@ export let initialValue = derived(count, ($count, set) => setTimeout(() => set($
 ![](../img/220815-4.gif)
 
 위와 같이 `최초 계산 중…` 이라는 변수를 세번째 인수로 넣어주면 값 변경 되기 이전에 ui를 제대로 안내할 수 있게 된다. 해당 기능을 활용해 화면 로딩 시 UI를 구현해줄 수도 있겠다.
+
+### 스토어 값 얻기(get)
+
+이번에는 readable store, writable store, derived store에서 값을 얻는 방법에 대해 알아본다.
+
+`store.js`
+
+```jsx
+import { writable, derived, readable } from "svelte/store";
+
+export let count = writable(1);
+export let double = derived(count, ($count) => $count * 2);
+export let user = readable({ name: "Vicky", age: 33, email: "hwfongfing@gmail.com" });
+```
+
+위와 같은 writable, derived, readable 스토어가 있다고 할 때 아래와 같이 구독할 수 있다.
+
+`App.svelte`
+
+```jsx
+<script>import {(count, double, user)} from "./store.js"; console.log($count); // 1</script>
+```
+
+위와 같이 $ 예약어를 사용하는 것은 count 변수를 구독하겠다는 것을 의미한다. 하지만 만약 이와 같은 과정이 번거롭고 간단하게 값만 확인하고 싶을 때는 아래와 같이 get 메서드로 값을 가져올 수 있다.
+
+`App.svelte`
+
+```jsx
+import { get } from "svelte/store";
+import { count, double, user } from "./store.js";
+
+console.log(get(count)); // 1
+console.log(get(double)); // 2
+console.log(get(user)); // { name: "Vicky", age: 33, email: "hwfongfing@gmail.com" }
+```
+
+위처럼 구독없이 값을 가져올 수 있다. get 메서드는 반드시 svelte 컴포넌트에서 사용해야하는 것은 아니다. 오히려 svelte 컴포넌트가 아닌 곳에서 더욱 효과적으로 사용될 수 있다.
+
+`store.js`
+
+```jsx
+import { writable, derived, readable, get } from "svelte/store";
+
+export let count = writable(1);
+export let double = derived(count, ($count) => $count * 2);
+export let user = readable({ name: "Vicky", age: 33, email: "hwfongfing@gmail.com" });
+
+console.log(get(count)); // 1
+console.log(get(double)); // 2
+console.log(get(user)); // { name: "Vicky", age: 33, email: "hwfongfing@gmail.com" }
+```
+
+위처럼 일반 js 파일에서도 get 메서드를 사용해 빠르게 값 읽기가 가능하다!
