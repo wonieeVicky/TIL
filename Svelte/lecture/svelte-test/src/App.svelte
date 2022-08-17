@@ -1,8 +1,8 @@
 <script>
-  import { get } from "svelte/store";
-  import { count, double, user } from "./store.js";
-
-  console.log(get(count)); // 1
-  console.log(get(double)); // 2
-  console.log(get(user)); // { name: "Vicky", age: 33, email: "hwfongfing@gmail.com" }
+  import { count } from "./count.js";
 </script>
+
+<h1>{$count}</h1>
+<button on:click={count.increment}>+</button>
+<button on:click={count.decrement}>-</button>
+<button on:click={count.reset}>reset</button>
