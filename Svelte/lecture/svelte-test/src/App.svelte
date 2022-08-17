@@ -1,8 +1,14 @@
 <script>
-  import { count } from "./count.js";
+  import { fruits } from "./fruits.js";
+  let value;
 </script>
 
-<h1>{$count}</h1>
-<button on:click={count.increment}>+</button>
-<button on:click={count.decrement}>-</button>
-<button on:click={count.reset}>reset</button>
+<input bind:value />
+<button on:click={() => fruits.setItem(value)}>Add Fruit!</button>
+<button on:click={() => console.log(fruits.getList())}>Log Fruit List!</button>
+
+<ul>
+  {#each $fruits as { id, name } (id)}
+    <li>{name}</li>
+  {/each}
+</ul>
