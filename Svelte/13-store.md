@@ -512,3 +512,94 @@ console.log(get(user)); // { name: "Vicky", age: 33, email: "hwfongfing@gmail.co
 ```
 
 위처럼 일반 js 파일에서도 get 메서드를 사용해 빠르게 값 읽기가 가능하다!
+
+### 커스텀 스토어 개념과 예제
+
+이번 시간에는 스토어 개념을 가지고 어떻게 커스텀 스토어를 가지는지를 확인해본다.
+먼저 아래 예제는 스벨트 공식 홈페이지에서 제공하는 예제이다.
+
+`count.js`
+
+```jsx
+import { writable } from "svelte/store";
+
+const { set, update, subscribe } = writable(0);
+
+export let count = {
+  set,
+  update,
+  subscribe,
+  increment: () => update((n) => n + 1),
+  decrement: () => update((n) => n - 1),
+  reset: () => set(0),
+};
+```
+
+위와 같이 count 라는 변수에 기본 writable 스토어의 메서드인 set, update, subscribe 와 함께 추가적으로 몇가지 커스텀 이벤트를 구성한 파일이 있다. 이것은 count라는 이름의 커스텀 스토어이다.
+
+이를 App 컴포넌트에서 import 하여 아래와 같이 사용한다.
+
+`App.svelte`
+
+```html
+<script>
+  import { count } from "./count.js";
+</script>
+
+<h1>{$count}</h1>
+<button on:click="{count.increment}">+</button>
+<button on:click="{count.decrement}">-</button>
+<button on:click="{count.reset}">reset</button>
+```
+
+다른 예제를 살펴보자.
+
+`fruits.js`
+
+```jsx
+import { writable, get } from "svelte/store";
+
+const _fruits = writable([
+  { id: 1, name: "Apple" },
+  { id: 2, name: "Banana" },
+  { id: 3, name: "Cherry" },
+]);
+
+export let fruits = {
+  ..._fruits, // set, update, subscribe..
+  getList: () => get(_fruits).map((f) => f.name),
+  setItem: (name) => {
+    _fruits.update(($f) => {
+      $f.push({ id: $f.length + 1, name });
+      return $f;
+    });
+  },
+};
+```
+
+위와 같이 `_fruits` 과일 목록을 외부용 데이터로 만든 `fruits` 메서드들이 있다. 전개연산자를 통해 `_fruits` 가 가지고 있는 기본 writable store 메서드를 상속받은 뒤 `getList`, `setItem` 등의 함수를 추가로 커스텀하여 작성하였다.
+
+`App.svelte`
+
+```jsx
+<script>
+  import { fruits } from "./fruits.js";
+  let value;
+</script>
+
+<input bind:value />
+<button on:click={() => fruits.setItem(value)}>Add Fruit!</button>
+<button on:click={() => console.log(fruits.getList())}>Log Fruit List!</button>
+
+<ul>
+  {#each $fruits as { id, name } (id)}
+    <li>{name}</li>
+  {/each}
+</ul>
+```
+
+위와 같이 `input`에 입력된 `value` 로 Add Fruit! 버튼을 클릭하면 해당 값이 하단 li 태그에 정상적으로 추가되며, Log Fruit List! 버튼을 눌렀을 때 변경된 값이 잘 디버깅되는 것을 확인할 수 있다.
+
+![](../img/220817-1.gif)
+
+이처럼 스토어는 다양하게 커스텀하여 사용할 수 있기 때문에, 실제 사용 시 활용도가 높음. 로직을 짤 때 잘 활용하면 좋을 것 같다.
