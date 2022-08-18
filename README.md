@@ -150,6 +150,7 @@
 11. [컴포넌트](https://github.com/wonieeVicky/TIL/blob/main/Svelte/11-component.md)
 12. [슬롯](https://github.com/wonieeVicky/TIL/blob/main/Svelte/12-slot.md)
 13. [스토어](https://github.com/wonieeVicky/TIL/blob/main/Svelte/13-store.md)
+14. [액션](https://github.com/wonieeVicky/TIL/blob/main/Svelte/14-action.md)
 
 ## React
 
