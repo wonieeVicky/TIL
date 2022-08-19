@@ -105,3 +105,81 @@ const hello = (node, options = {}) => {
 위처럼 update 함수 내에 opts 를 콘솔로그로 찍어보면 변경된 options 데이터가 들어오고 이를 실제 width 가 변경되도록 로직을 반영해주면 버튼 클릭 시 width 값이 변경되도록 처리할 수 있다.
 
 ![](../img/220818-2.gif)
+
+### 요소 Zoom In-Out 예제
+
+지난 시간에 배운 svelte 액션으로 간단한 예제를 구현해보자
+
+`App.svelte`
+
+```html
+<script>
+  function zoom(node) {
+    node.style.transition = "1s";
+    function zoomIn() {
+      node.style.transform = "scale(1.5)";
+    }
+    function zoomOut() {
+      node.style.transform = "scale(1)";
+    }
+    node.addEventListener("mouseenter", zoomIn);
+    node.addEventListener("mouseleave", zoomOut);
+
+    return {
+      destroy() {
+        node.removeEventListener("mouseenter", zoomIn);
+        node.removeEventListener("mouseleave", zoomOut);
+      },
+    };
+  }
+</script>
+
+<div use:zoom />
+
+<style>
+  div {
+    width: 100px;
+    height: 100px;
+    background-color: tomato;
+  }
+</style>
+```
+
+위처럼 작성된 코드가 있다고 했을 때, 위 zoom 함수는 기존 액션함수로 만들어져있다.
+mouseEnter 시와 mouseLeave 시에 대한 동작 코드가 적혀있고, 해당 엘리먼트가 사라질 때, 해당 이벤트도 사라지도록 처리했다.
+
+![](../img/220819-1.gif)
+
+이번에는 다른 이벤트도 연결해본다.
+
+`App.svelte`
+
+```html
+<script>
+  function zoom(node, scale = "1.5") {
+    node.style.transition = "1s";
+    function zoomIn() {
+      node.style.transform = `scale(${scale})`;
+    }
+    function zoomOut() {
+      node.style.transform = "scale(1)";
+    }
+    node.addEventListener("mouseenter", zoomIn);
+    node.addEventListener("mouseleave", zoomOut);
+
+    return {
+      destroy() {
+        node.removeEventListener("mouseenter", zoomIn);
+        node.removeEventListener("mouseleave", zoomOut);
+      },
+    };
+  }
+</script>
+
+<div use:zoom />
+<div use:zoom="{0.7}" />
+```
+
+위와 같이 zoom 함수에 scale 이라는 두번째 인자값을 주고, 해당 값으로 scale이 적용되도록 처리하였다. 기본값으로 1.5를 주지않으면 scale의 값이 undefined가 되니 이 점 참고하자.
+
+![](../img/220819-2.gif)
