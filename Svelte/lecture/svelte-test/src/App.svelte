@@ -1,35 +1,31 @@
 <script>
-  let toggle = true;
-  let width = 200;
-
-  const hello = (node, options = {}) => {
-    // console.log("init function !");
-    const { width = "100px", height = "100px", color = "tomato" } = options;
-    // console.log(node); // <div></div>
-    node.style.width = width;
-    node.style.height = height;
-    node.style.backgroundColor = color;
+  function zoom(node, scale = "1.5") {
+    node.style.transition = "1s";
+    function zoomIn() {
+      node.style.transform = `scale(${scale})`;
+    }
+    function zoomOut() {
+      node.style.transform = "scale(1)";
+    }
+    node.addEventListener("mouseenter", zoomIn);
+    node.addEventListener("mouseleave", zoomOut);
 
     return {
-      update: (opts) => {
-        console.log("update", opts);
-        node.style.width = opts.width;
+      destroy() {
+        node.removeEventListener("mouseenter", zoomIn);
+        node.removeEventListener("mouseleave", zoomOut);
       },
-      destroy: () => console.log("destroy"),
     };
-  };
+  }
 </script>
 
-<button on:click={() => (toggle = !toggle)}>Toggle!</button>
-<button on:click={() => (width += 20)}>Size up!</button>
+<div use:zoom />
+<div use:zoom={0.7} />
 
-<div use:hello />
-{#if toggle}
-  <div
-    use:hello={{
-      width: `${width}px`,
-      height: "70px",
-      color: "royalblue",
-    }}
-  />
-{/if}
+<style>
+  div {
+    width: 100px;
+    height: 100px;
+    background-color: tomato;
+  }
+</style>
