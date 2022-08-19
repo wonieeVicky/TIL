@@ -151,8 +151,9 @@
 12. [슬롯](https://github.com/wonieeVicky/TIL/blob/main/Svelte/12-slot.md)
 13. [스토어](https://github.com/wonieeVicky/TIL/blob/main/Svelte/13-store.md)
 14. [액션](https://github.com/wonieeVicky/TIL/blob/main/Svelte/14-action.md)
+15. [특별한 요소](https://github.com/wonieeVicky/TIL/blob/main/Svelte/15-special-element.md)
 
-## React
+## **React**
 
 1. React 웹 성능 최적화
 
