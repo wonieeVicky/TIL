@@ -1,31 +1,13 @@
 <script>
-  function zoom(node, scale = "1.5") {
-    node.style.transition = "1s";
-    function zoomIn() {
-      node.style.transform = `scale(${scale})`;
-    }
-    function zoomOut() {
-      node.style.transform = "scale(1)";
-    }
-    node.addEventListener("mouseenter", zoomIn);
-    node.addEventListener("mouseleave", zoomOut);
+  import Address from "./Address.svelte";
 
-    return {
-      destroy() {
-        node.removeEventListener("mouseenter", zoomIn);
-        node.removeEventListener("mouseleave", zoomOut);
-      },
-    };
-  }
+  let address = {
+    label: "대한민국",
+    children: [
+      { label: "경기도", children: [{ label: "수원" }, { label: "성남" }] },
+      { label: "강원도", children: [{ label: "속초" }, { label: "강릉" }] },
+    ],
+  };
 </script>
 
-<div use:zoom />
-<div use:zoom={0.7} />
-
-<style>
-  div {
-    width: 100px;
-    height: 100px;
-    background-color: tomato;
-  }
-</style>
+<Address {address} />
