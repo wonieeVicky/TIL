@@ -182,3 +182,81 @@ App 컴포넌트는 `components` 라는 데이터를 바탕으로 각 radio 인�
 selected 값에 components의 첫번째 요소를 초기값으로 할당하고, each 문에서 on:change 이벤트로 index 값을 더해주는 방법이다. 위와 같이 하면 components에 값이 담긴 순서대로 index가 하나씩 증가하여 노출되도록 해줄 수 있다.
 
 ![](../img/220820-3.gif)
+
+### window
+
+스벨트에는 svelte window 요소가 존재한다. 아래 예시를 보자
+
+`App.svelte`
+
+```html
+<script>
+  let key = "";
+
+  window.addEventListener("keydown", (event) => {
+    key = event.key;
+  });
+</script>
+
+<h1>{key}</h1>
+```
+
+위 코드는 keydown 이벤트 발생 시 누른 글자를 그대로 화면에 보여준다.
+
+![](../img/220820-4.gif)
+
+위 코드는 svelte의 window 요소를 사용해 아래와 같이 작성할 수 있다.
+
+`App.svelte`
+
+```html
+<script>
+  let key = "";
+</script>
+
+<svelte:window on:keydown={(e) => (key = e.key)} />
+<h1>{key}</h1>
+```
+
+위와 동일한 기능을 수행한다. 스벨트에서 제공하는 window 요소를 통해 window 객체를 직접사용하지 않아도 이벤트를 연결할 수 있도록 하는 것이다. 이 밖에도 다른 기능이 많다.
+
+`App.svelte`
+
+```html
+<script>
+  let key = "";
+  // readable property
+  let innerWidth; // viewport 크기
+  let innerHeight;
+  let outerWidth; // browser 크기
+  let outerHeight;
+  let online; // 현재 상태가 online 상태인지 여부
+  // writable property
+  let scrollX;
+  let scrollY;
+
+  // window.addEventListener("keydown", (event) => {
+  //   key = event.key;
+  // });
+</script>
+
+<svelte:window on:keydown={(e) => (key = e.key)} bind:innerWidth bind:innerHeight bind:outerWidth bind:outerHeight
+bind:online bind:scrollX bind:scrollY />
+<h1>{key}</h1>
+<div>innerWidth: {innerWidth}</div>
+<div>innerHeight: {innerHeight}</div>
+<div>outerWidth: {outerWidth}</div>
+<div>outerHeight: {outerHeight}</div>
+<div>online: {online}</div>
+<input type="number" bind:value="{scrollX}" />
+<input type="number" bind:value="{scrollY}" />
+<div class="for-scroll" />
+
+<style>
+  .for-scroll {
+    height: 2000px;
+  }
+</style>
+```
+
+![](../img/220820-5.gif)
