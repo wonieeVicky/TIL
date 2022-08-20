@@ -1,13 +1,20 @@
 <script>
-  import Address from "./Address.svelte";
+  import Jinny from "./Jinny.svelte";
+  import Wonny from "./Wonny.svelte";
 
-  let address = {
-    label: "대한민국",
-    children: [
-      { label: "경기도", children: [{ label: "수원" }, { label: "성남" }] },
-      { label: "강원도", children: [{ label: "속초" }, { label: "강릉" }] },
-    ],
-  };
+  let components = [
+    { name: "Jinny", comp: Jinny },
+    { name: "Wonny", comp: Wonny },
+  ];
+  let index = 1;
+  let selected = components[0].comp;
 </script>
 
-<Address {address} />
+{#each components as { name, comp }, i (name)}
+  <label>
+    <input type="radio" value={comp} bind:group={selected} on:change={() => (index = i + 1)} />
+    {name}
+  </label>
+{/each}
+
+<svelte:component this={selected} {index} />
