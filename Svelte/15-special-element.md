@@ -260,3 +260,75 @@ bind:online bind:scrollX bind:scrollY />
 ```
 
 ![](../img/220820-5.gif)
+
+### head, body
+
+스벨트에서 제공하는 head, body에 대해서도 알아본다
+
+`App.svelte`
+
+```html
+<script>
+  import Jenny from "./Jenny.svelte";
+  let toggle = false;
+</script>
+
+<button on:click={() => (toggle = !toggle)}>Toggle!</button>
+
+{#if toggle}
+  <Jenny />
+{/if}
+```
+
+`Jenny.svelte`
+
+```html
+<h1>Jenny!</h1>
+```
+
+toggle 값에 따라 Jenny 컴포넌트를 렌더링하는 간단한 동적 컴포넌트 렌더링 코드가 있다.
+위 Jenny 컴포넌트에서 head, body 내에 들어갈 요소를 직접 추가해줄 수 있는데 아래 예시를 보자.
+
+`Jenny.svelte`
+
+```html
+<svelte:head>
+  <link rel="stylesheet" href="./main.css" />
+</svelte:head>
+
+<h1>Jenny!</h1>
+```
+
+위 코드처럼 `svelte:head` 스벨트 컴포넌트 내에 head, body에 소스를 직접 넣어줄 수 있다.
+
+단, 위처럼 `main.css` 경로를 작성 후 저장하면 실제 `main.css`를 빌드한 파일이 /public 경로에 존재하지 않으므로, `index.html`와 같은 경로 선상에 `main.css`를 추가해준 뒤 새로고침하면 해당 코드가 적절히 실행되는 것을 확인할 수 있다.
+
+`./public/main.css`
+
+```css
+body {
+  background: royalblue;
+}
+```
+
+![실제 컴포넌트가 렌더링되면 main.css가 import 된다.](../img/220821-1.gif)
+
+위처럼 특정한 컴포넌트에서 head의 요소를 추가 및 삭제하는 용도로 사용할 수 있겠다.
+`svelte.body`도 비슷하게 사용할 수 있다.
+
+`Jenny.svelte`
+
+```html
+<!-- document.head -->
+<svelte:head>
+  <link rel="stylesheet" href="./main.css" />
+</svelte:head>
+
+<!-- document.body -->
+<svelte:body on:mousemove={(e) => console.log(e.clientX, e.clientY)} />
+<h1>Jenny!</h1>
+```
+
+위처럼 작성 후 Jenny 컴포넌트가 렌더링되도록 toggle 값을 변경해주면 마우스 커서의 움직임에 따른 값들을 콘솔에서 확인할 수 있다.
+
+![](../img/220821-2.gif)
