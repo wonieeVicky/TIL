@@ -1,11 +1,11 @@
-﻿<script context="module">
-  export let count = 0;
-</script>
-
+﻿<!-- <svelte:options immutable /> -->
 <script>
-  export let fruit;
+  import { afterUpdate } from "svelte";
+  export let name;
+  // 기존 fruit === 새로운 fruit
+
+  let updateCount = 0;
+  afterUpdate(() => (updateCount += 1));
 </script>
 
-<div on:click={() => (count += 1)}>
-  {fruit}
-</div>
+<div>{name}({updateCount})</div>
