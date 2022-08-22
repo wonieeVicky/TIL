@@ -332,3 +332,120 @@ body {
 위처럼 작성 후 Jenny 컴포넌트가 렌더링되도록 toggle 값을 변경해주면 마우스 커서의 움직임에 따른 값들을 콘솔에서 확인할 수 있다.
 
 ![](../img/220821-2.gif)
+
+### options - 불변성 선언(immutable)
+
+이번 시간에는 svelte.options의 Immutable 속성에 대해 알아보자.
+
+`App.svelte`
+
+```html
+<script>
+  import Fruit from "./Fruit.svelte";
+
+  let fruits = [
+    { id: 1, name: "Apple" },
+    { id: 2, name: "Banana" },
+    { id: 3, name: "Cherry" },
+    { id: 4, name: "Mango" },
+    { id: 5, name: "Orange" },
+  ];
+</script>
+
+<button
+  on:click={() => {
+    fruits[0] = { id: 1, name: "Apple" }; // 같은 데이터지만 객체 데이터는 가변성 데이터이므로 할당되는 메모리 위치는 달라진다.
+    fruits = fruits;
+  }}
+>
+	Update!
+</button>
+
+{#each fruits as fruit (fruit.id)}
+  <Fruit {fruit} />
+{/each}
+```
+
+`Fruit.svelte`
+
+```html
+<script>
+  export let fruit;
+</script>
+
+<div>{fruit.name}</div>
+```
+
+위와 같은 데이터가 있다. 버튼을 클릭 했을 때 fruits의 첫번째 값이 바뀌는 코드이다. 바뀌는 값은 기존의 데이터와 동일하지만 객체 데이터는 가변성 데이터(객체, 배열, 함수 등)이므로 할당되는 메모리 위치는 바뀌며 이는 값 업데이트로 이어진다.
+
+해당 값이 변경되었을 때, 전체 모든 데이터가 갱신되는 것인지, 해당 값만 갱신되는 것인지, 아니면 같은 값인 경우 갱신이 되지 않는 것인지 아래와 같이 확인할 수 있음
+
+`Fruit.svelte`
+
+```html
+<script>
+  import { afterUpdate } from "svelte";
+  export let fruit;
+
+  let updateCount = 0;
+  afterUpdate(() => (updateCount += 1));
+</script>
+
+<div>{fruit.name}({updateCount})</div>
+```
+
+위처럼 갱신 데이터를 afterUpdate 메서드를 통해 체크해보면 아래와 같이 노출된다.
+
+![](../img/220822-1.gif)
+
+모든 fruit 데이터가 전체 다 갱신되는 것이다. 이는 props에 전달되는 데이터가 가변성 객체이므로 발생하는 현상이다. 가변 데이터로 전제되는 것이다. 어떤 컴포넌트에 props로 가변성 데이터를 넘겨줄 경우 항상 새로운 데이터가 갱신된다고 여겨지므로 이때 가변성 데이터가 아니라고 명시할 수 있는 svelte:options 메서드를 활용할 수 있다.
+
+`Fruit.svelte`
+
+```html
+<svelte:options immutable />
+
+<script>
+  import { afterUpdate } from "svelte";
+  export let fruit;
+  // 기존 fruit === 새로운 fruit
+
+  let updateCount = 0;
+  afterUpdate(() => (updateCount += 1));
+</script>
+
+<div>{fruit.name}({updateCount})</div>
+```
+
+위처럼 fruit 데이터가 같은 데이터일 경우 갱신처리를 하지 않도록 immutable 옵션을 활성화 시켜주면 실제 변경되는 Apple 데이터만 갱신 count가 증가한다.
+
+![](../img/220822-2.gif)
+
+이렇게 각 child 컴포넌트에서 불변객체 처리를 해주는 것 외에도 반복문 자체에 구조 분해를 사용해서 아래와 같이 처리할 수도 있다.
+
+`App.svelte`
+
+```html
+<script>
+  import Fruit from "./Fruit.svelte";
+
+  let fruits = [
+    { id: 1, name: "Apple" },
+    { id: 2, name: "Banana" },
+    { id: 3, name: "Cherry" },
+    { id: 4, name: "Mango" },
+    { id: 5, name: "Orange" },
+  ];
+</script>
+
+<!-- code... -->
+{#each fruits as { id, name } (id)}
+<Fruit {name} />
+{/each}
+```
+
+위처럼 id, name 속성을 구조 분해해서 사용하면 두 속성 모두 불변성의 문자 데이터만 전달되므로 Fruit 컴포넌트의 Props로 불변성 데이터만 취급하도록 만들 수 있다.
+
+![](../img/220822-3.gif)
+
+위처럼 처리될 경우 첫 번째 데이터인 Apple도 count 변경이 되지 않는데, 해당 데이터도 기존 name 값과 변경되는 name 값이 같다고 여기기 때문이다.
