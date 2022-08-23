@@ -449,3 +449,80 @@ body {
 ![](../img/220822-3.gif)
 
 위처럼 처리될 경우 첫 번째 데이터인 Apple도 count 변경이 되지 않는데, 해당 데이터도 기존 name 값과 변경되는 name 값이 같다고 여기기 때문이다.
+
+### options - 접근 허용(accessors)
+
+이번에는 svelte의 accessors 라는 속성에 대해 살펴본다. 아래 예시를 보자
+
+`App.svelte`
+
+```html
+<script>
+  import Joy from "./Joy.svelte";
+
+  let joy;
+  function handler() {
+    console.log(joy);
+    console.log(joy.name); // undefined
+    console.log(joy.getAge()); // App.svelte:8 Uncaught TypeError: joy.getAge is not a function
+  }
+</script>
+
+<button on:click="{handler}">Toggle!</button>
+<Joy bind:this="{joy}" />
+```
+
+`Joy.svelte`
+
+```html
+<script>
+  let age = 33;
+  let name = "Joy";
+  function getAge() {
+    console.log(age); // Joy {$$: {…}, $capture_state: ƒ, $inject_state: ƒ}
+  }
+</script>
+
+<h1 on:click="{getAge}">{name}!</h1>
+```
+
+위 `Toggle` 버튼을 클릭하면 `Joy` 컴포넌트의 `this`로 대입해 준 `joy` 변수를 콘솔창에서 확인할 수 있다. Joy 컴포넌트는 이름을 노출시키며, h1 태그를 클릭하면 등록된 age 정보를 콘솔창에서 확인할 수 있는 로직이다.
+
+this를 joy변수로 연결한 상태에서 위 handler에 joy.name, joy.getAge() 함수를 찾는다면 값은 나올까? 나오지않음. 즉 joy 변수에 해당 컴포넌트 데이터에 접근할 수 없다는 것을 의미함. 하지만 접근할 수 있는 방법이 있다.
+
+svelte의 accessors 옵션을 추가하는 것이다.
+
+`Joy.svelte`
+
+```html
+<svelte:options accessors />
+
+<script>
+  let age = 33;
+  export let name = "Joy";
+  export function getAge() {
+    console.log(age);
+  }
+</script>
+```
+
+위처럼 Joy 컴포넌트에 accessors 옵션을 추가해주고, 내보낼 데이터를 export 처리를 해주면 된다.
+이후 App 컴포넌트를 콘솔창에 출력해보면 데이터가 정상적으로 노출된다!
+
+`App.svelte`
+
+```html
+<script>
+  import Joy from "./Joy.svelte";
+
+  let joy;
+
+  function handler() {
+    console.log(joy);
+    console.log(joy.name); // Joy
+    console.log(joy.getAge()); // 33
+  }
+</script>
+
+<!-- .. -->
+```
