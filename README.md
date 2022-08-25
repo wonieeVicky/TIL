@@ -137,21 +137,26 @@
 
 ## Svelte
 
-1. [intro](https://github.com/wonieeVicky/TIL/blob/main/Svelte/1-intro.md)
-2. [Basic](https://github.com/wonieeVicky/TIL/blob/main/Svelte/2-basic.md)
-3. [Lifecycle](https://github.com/wonieeVicky/TIL/blob/main/Svelte/3-lifecycle.md)
-4. [보간법](https://github.com/wonieeVicky/TIL/blob/main/Svelte/4-interpolation.md)
-5. [반응성](https://github.com/wonieeVicky/TIL/blob/main/Svelte/5-reactivity.md)
-6. [클래스와 스타일](https://github.com/wonieeVicky/TIL/blob/main/Svelte/6-class-and-style.md)
-7. [요소 바인딩](https://github.com/wonieeVicky/TIL/blob/main/Svelte/7-binding.md)
-8. [조건, 반복 그리고 키](https://github.com/wonieeVicky/TIL/blob/main/Svelte/8-condition-and-iteractions-and-keys.md)
-9. [비동기 처리](https://github.com/wonieeVicky/TIL/blob/main/Svelte/9-asynchronous-function.md)
-10. [사용자 입력 핸들링](https://github.com/wonieeVicky/TIL/blob/main/Svelte/10-user-input-handling.md)
-11. [컴포넌트](https://github.com/wonieeVicky/TIL/blob/main/Svelte/11-component.md)
-12. [슬롯](https://github.com/wonieeVicky/TIL/blob/main/Svelte/12-slot.md)
-13. [스토어](https://github.com/wonieeVicky/TIL/blob/main/Svelte/13-store.md)
-14. [액션](https://github.com/wonieeVicky/TIL/blob/main/Svelte/14-action.md)
-15. [특별한 요소](https://github.com/wonieeVicky/TIL/blob/main/Svelte/15-special-element.md)
+1. Svelte 개념 익히기
+
+   - [intro](https://github.com/wonieeVicky/TIL/blob/main/Svelte/1-intro.md)
+   - [Basic](https://github.com/wonieeVicky/TIL/blob/main/Svelte/2-basic.md)
+   - [Lifecycle](https://github.com/wonieeVicky/TIL/blob/main/Svelte/3-lifecycle.md)
+   - [보간법](https://github.com/wonieeVicky/TIL/blob/main/Svelte/4-interpolation.md)
+   - [반응성](https://github.com/wonieeVicky/TIL/blob/main/Svelte/5-reactivity.md)
+   - [클래스와 스타일](https://github.com/wonieeVicky/TIL/blob/main/Svelte/6-class-and-style.md)
+   - [요소 바인딩](https://github.com/wonieeVicky/TIL/blob/main/Svelte/7-binding.md)
+   - [조건, 반복 그리고 키](https://github.com/wonieeVicky/TIL/blob/main/Svelte/8-condition-and-iteractions-and-keys.md)
+   - [비동기 처리](https://github.com/wonieeVicky/TIL/blob/main/Svelte/9-asynchronous-function.md)
+   - [사용자 입력 핸들링](https://github.com/wonieeVicky/TIL/blob/main/Svelte/10-user-input-handling.md)
+   - [컴포넌트](https://github.com/wonieeVicky/TIL/blob/main/Svelte/11-component.md)
+   - [슬롯](https://github.com/wonieeVicky/TIL/blob/main/Svelte/12-slot.md)
+   - [스토어](https://github.com/wonieeVicky/TIL/blob/main/Svelte/13-store.md)
+   - [액션](https://github.com/wonieeVicky/TIL/blob/main/Svelte/14-action.md)
+   - [특별한 요소](https://github.com/wonieeVicky/TIL/blob/main/Svelte/15-special-element.md)
+
+2. Svelte Trello Clone App
+   - [intro](https://github.com/wonieeVicky/TIL/blob/main/Svelte/1-1-project-intro.md)
 
 ## **React**
 
