@@ -85,57 +85,56 @@ export default {
       }),
     }),
 
-    // replace ~ builtins 까지는 다음과 같은 순서대로 작성해야 정상적으로 동작함에 주의합니다!
+    // replace ~ builtins 까지는 아래와 같은 순서대로 작성해야 정상적으로 동작함(주의!)
     // 대부분의 플러그인은 Rollup 측에서 제공하는 것이 아니기 때문에,
-    // 플러그인의 동작 순서를 파악하는 것은 사용자(개발자)의 몫이라고 설명하고 있습니다.
+    // 플러그인의 동작 순서를 파악하는 것은 사용자(개발자)의 몫이라고 설명하고 있음
 
-    // Crypto-random-string에서 내부적으로 randomBytes가 사용됩니다.
+    // Crypto-random-string에서 내부적으로 randomBytes가 사용됨
     // Node Globals와 Builtins가 내부적으로 제공하지 않기 때문에,
-    // 다음과 같이 지정(대체)해야 정상적으로 동작합니다.
+    // 다음과 같이 지정(대체)해야 정상적으로 동작한다.
     // https://github.com/sindresorhus/crypto-random-string/blob/master/index.js
     replace({
       values: {
         "crypto.randomBytes": 'require("randombytes")',
       },
     }),
-    // NPM으로 설치하는 외부 모듈을 번들에 포함합니다.
+    // NPM으로 설치하는 외부 모듈을 번들에 포함한다.
     resolve({
-      // 브라우저 환경을 위한 번들로 포함하도록 지시합니다.
+      // 브라우저 환경을 위한 번들로 포함하도록 지시(최적화)
       browser: true,
-      // 중복 번들을 방지하기 위한 외부 모듈 이름을 지정합니다.
+      // 중복 번들을 방지하기 위한 외부 모듈 이름을 지정: 외부 모듈에 svelte를 쓸 경우 중복 번들되지 않도록 체크함
       dedupe: ["svelte"],
     }),
-    // 외부 모듈을 ES6 번들로 변환합니다.
+    // 외부 모듈을 ES6 번들로 변환: require('') 방식으로 호출하는 모듈을 번들링함
     commonjs(),
-    // 일부 Node 모듈이 필요로 하는 전역 API를 사용할 수 있습니다.
+    // 일부 Node 모듈이 필요로 하는 전역 API를 사용할 수 있음
     globals(),
-    // Node 내장 API를 사용할 수 있습니다.
+    // Node 내장 API를 사용할 수 있음
     builtins(),
 
-    // 경로 별칭을 지정합니다.
-    // 상대 경로에 대한 별칭이 없으면, 프로젝트를 리팩토링할 때 문제가 생길 확률이 매우 높아집니다.
+    // 경로 별칭 지정
+    // 상대 경로에 대한 별칭이 없으면, 프로젝트를 리팩토링할 때 문제가 생길 확률이 매우 높아진다.
     alias({
       entries: [{ find: "~", replacement: path.resolve(__dirname, "src/") }],
     }),
 
     // For Development mode!
-    // 개발 모드에서는 번들이 생성되면 `npm run start`를 호출합니다.
+    // 개발 모드에서는 번들이 생성되면 `npm run start`를 호출한다.
     !production && serve(),
-    // 개발 모드에서는 'public' 디렉토리에서 변경사항이 확인되면 브라우저를 새로고침합니다.
+    // 개발 모드에서는 'public' 디렉토리에서 변경사항이 확인되면 브라우저를 새로고침한다.
     !production && livereload("public"),
 
     // For Production mode!
-    // 제품 모드에서는 'console.log' 같은 Console 명령을 제거합니다.
+    // 제품 모드에서는 'console.log' 같은 Console 명령을 제거한다.
     production &&
       strip({
         include: "**/*.(svelte|js)",
       }),
-    // 제품 모드에서는 번들을 최소화(최적화)합니다.
+    // 제품 모드에서는 번들을 최소화(최적화, minify)
     production && terser(),
   ],
   watch: {
-    // 다시 빌드할 때, 터미널 화면을 초기화하지 않습니다.
-    // 기본값은 `true`입니다.
+    // 다시 빌드할 때, 터미널 화면을 초기화하지 않는다. 기본값은 `true`
     clearScreen: false,
   },
 };
