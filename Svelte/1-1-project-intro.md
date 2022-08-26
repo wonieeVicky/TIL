@@ -159,3 +159,97 @@ export default {
 
 위 설명을 차례대로 읽어보면서 각 역할들을 확인해보자.
 (resolve 의 dedupe 속성이 중복 번들을 제거하는 과정은 메모..!)
+
+### App, Header, ListContainer 컴포넌트 이해하기
+
+해당 앱의 핵심 컴포넌트에 대해서 이해하고 넘어간다.
+
+`App.svelte`
+
+```html
+<script>
+  import Header from "~/components/Header.svelte";
+  import ListContainer from "~/components/ListContainer.svelte";
+
+  Object.assign(document.body.style, {
+    backgroundColor: "darkgray",
+    backgroundImage: "url(/images/bg.jpg)",
+    backgroundSize: "cover",
+  });
+</script>
+
+<header />
+<ListContainer />
+```
+
+`alias` 별칭 `~`로 시작하는 `Header`, `ListContainer` 컴포넌트를 import하여 사용한다.
+`Object.assign`으로 `document.body`에 스타일을 부여한다. `backgroundImage`로 노출하는 `/images/bg.jpg`는 public 폴더에서 가져온다.
+
+`Header.svelte`
+
+```html
+<header>
+  <img src="/images/trello-logo.svg" alt="Trello" class="logo" />
+</header>
+
+<style lang="scss">
+  header {
+    height: 40px;
+    box-sizing: border-box;
+    background-color: rgba(black, 0.4);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    img.logo {
+      width: 80px;
+      opacity: 0.5;
+    }
+  }
+</style>
+```
+
+scss로 스타일을 추가하는데 중첩기능을 제공해주므로 작업 시 매우 효율적이다.
+
+`ListContainer.svelte`
+
+```html
+<script>
+  // ..
+</script>
+
+<div class="list-container">
+  <div bind:this="{listsEl}" class="lists">
+    {#each $lists as list (list.id)}
+    <List {list} {sortableLists} />
+    {/each}
+  </div>
+  <CreateList />
+</div>
+
+<style lang="scss">
+  .list-container {
+    width: 100vw;
+    // calc 함수는 표준 CSS API입니다.
+    // 40px은 Header 컴포넌트의 높잇값입니다.
+    height: calc(100vh - 40px);
+    padding: 30px;
+    box-sizing: border-box;
+    overflow-x: auto;
+    overflow-y: hidden;
+    // List를 수평 정렬시키기 위해서 사용합니다.
+    white-space: nowrap;
+    // inline-block의 띄어쓰기 공간을 초기화하기 위해 사용합니다.
+    font-size: 0;
+    .lists {
+      display: inline-block;
+      height: 100%;
+      // List를 수평 정렬시키기 위해서 사용합니다.
+      white-space: nowrap;
+      // inline-block의 띄어쓰기 공간을 초기화하기 위해 사용합니다.
+      font-size: 0;
+    }
+  }
+</style>
+```
+
+`ListContainer`는 수평으로 쌓여져있고, 이미 만들어진 `List`는 노출하고, 맨 우측에서 `CreateList` 컴포넌트를 배치한다.
