@@ -224,3 +224,122 @@ export default MainPage
 ```
 
 ![](../../img/220829-1.gif)
+
+### 이미지 사이즈 최적화
+
+앞서 스크롤에 따라 이미지가 나타나야 할 시점에 이미지를 로드하는 image lazy loading을 구현해보았다. 하지만, 이미지 크기 자체가 커서 스크롤 시 해당 리소스를 다운로드 받는 시간이 오래걸려 UX에 좋지 않아보인다. 이는 이미지 사이즈를 최적화하는 것으로 개선할 수 있다.
+
+이미지 사이즈 최적화는 이미지 크기를 줄이고 이미지 용량을 줄여 효율적인 리소스 로딩을 하는 것을 의미한다.
+현재 3946*3946 사이즈가 그대로 들어오고 있는데, 이를 300*300 사이즈로 줄이고 추가적인 이미지 압축을 통해 최대한 효율적인 리소스 다운로드를 구현할 수 있다.
+
+이미지 사이즈 최적화를 위해서는 이미지 포맷의 특징에 대해 알아야 한다.
+
+- PNG: 용량이 큼
+- JPG: PNG보다 용량이 작음. 화질이 떨어짐
+- WEBP: 구글에서 나온 차세대 이미지 포맷, JPG보다 더 좋은 이미지 포맷으로 소개됨
+
+위와 같은 특징에 따라 이번 프로젝트에는 이미지를 WEBP로 사용해보려고 한다. 이미지 컨버터는 [squoosh.app](http://squoosh.app) 를 사용하여 이미지 사이즈를 최적화한다.
+
+![](../../img/220829-1.png)
+
+위처럼 상세한 이미지 변화를 살핀 후 가장 적절한 포맷과 Quality로 이미지사이즈를 줄인 뒤 다운로드받는다.
+위와 같이 압축 후 이미지를 비교해보면 아래와 같이 큰 용량차이를 가지는 것을 확인할 수 있다.
+
+![](../../img/220829-2.png)
+
+위 이미지를 `.jpg` 파일 대신 적용하여 스크롤 이벤트에 적용해주면 이미지가 빠르게 호출되어 렌더링이 완료되는 것을 확인할 수 있다
+
+![](../../img/220829-2.gif)
+
+하지만 문제는 있다. .webp가 렌더링이 되지 않는 브라우저가 있는 것임.
+따라서 현재 브라우저가 webp 이미지를 지원하는지 파악한 후 지원되지 않을 경우 기존의 이미지를 렌더링하도록 구현할 수 있다. 이러한 체크는 picture 태그를 통해 빠르게 확인할 수 있다.
+
+```html
+<picture>
+  <source srcset="photo.avif" type="image/avif" />
+  <source srcset="photo.webp" type="image/webp" />
+  <img src="photo.jpg" alt="photo" />
+</picture>
+```
+
+위와 같이 source 속성에 각종 조건을 달면 그에 맞는 이미지가 렌더링되도록 설정할 수 있다. 확장자에 대한 분기는 type attribute를 이용해서 조건을 나눌 수 있다. image/avif → image/webp → image.jpg 로 처리할 수 있다.
+
+![](../../img/220829-3.png)
+
+최후의 경우에 사용할 jpg 이미지도 함께 압축한 뒤 위 picure 태그를 사용하여 조건부 렌더링을 구현해보자
+
+`./src/pages/MainPage.js`
+
+```jsx
+// ..
+function MainPage(props) {
+  // ...
+
+  return (
+    <div className="MainPage -mt-16">
+      <BannerVideo />
+      <div className="mx-auto">
+        <ThreeColumns
+          columns={[
+            <Card webp={main1_webp} image={main1}>
+              롱보드는 아주 재밌습니다.
+            </Card>,
+            <Card webp={main2_webp} image={main2}>
+              롱보드를 타면 아주 신납니다.
+            </Card>,
+            <Card webp={main3_webp} image={main3}>
+              롱보드는 굉장히 재밌습니다.
+            </Card>,
+          ]}
+        />
+        {/* ... */}
+      </div>
+    </div>
+  )
+}
+```
+
+위와 같이 Card 컴포넌트의 webp Props로 .webp 이미지 파일을 내려준 뒤 아래와 같이 수정한다.
+
+`./src/components/Card.js`
+
+```jsx
+function Card(props) {
+  const imgRef = useRef(null)
+
+  useEffect(() => {
+    const options = {}
+    const callback = (entries, observer) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          const target = entry.target
+          target.src = target.dataset.src
+
+          // srcset에 대한 조건 추가
+          const previousSibling = target.previousSibling
+          previousSibling.srcset = previousSibling.dataset.srcset
+
+          // 이미지를 로드한 후 unobserve 처리
+          observer.unobserve(target)
+        }
+      })
+    }
+    const observer = new IntersectionObserver(callback, options)
+    observer.observe(imgRef.current)
+  }, [])
+
+  return (
+    <div className="Card text-center">
+      <picture>
+        <source data-srcset={props.webp} type="image/webp" />
+        <img ref={imgRef} data-src={props.image} />
+      </picture>
+      {/* ... */}
+    </div>
+  )
+}
+```
+
+위와 같이 처리해주면 .webp 파일이 다운로드되고, 만약 .webp 파일이 지원되지 않는 브라우저에서는 정상적으로 .jpg 파일이 다운로드되는 것을 확인할 수 있다!
+
+![](../../img/220829-3.gif)
