@@ -65,16 +65,16 @@ serve, server는 서버 관련한 실행을 의미. build:style은 스타일을 
 
 ```jsx
 function createObserver() {
-  let observer;
+  let observer
 
   let options = {
     root: null,
-    rootMargin: "0px",
+    rootMargin: '0px',
     threshold: buildThresholdList(),
-  };
+  }
 
-  observer = new IntersectionObserver(handleIntersect, options);
-  observer.observe(boxElement); // boxElement에 관찰자를 적용시킨다.
+  observer = new IntersectionObserver(handleIntersect, options)
+  observer.observe(boxElement) // boxElement에 관찰자를 적용시킨다.
 }
 ```
 
@@ -83,10 +83,10 @@ function createObserver() {
 `./src/components/Card.js`
 
 ```jsx
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef } from 'react'
 
 function Card(props) {
-  const imgRef = useRef(null);
+  const imgRef = useRef(null)
 
   useEffect(() => {
     const callback = (entries, observer) => {
@@ -95,25 +95,25 @@ function Card(props) {
         // target element:
         // entry.isIntersecting - 화면 안에 요소가 들어와있는지 알려주는 요소
         if (entry.isIntersecting) {
-          console.log("is intersecting");
+          console.log('is intersecting')
         }
-      });
+      })
 
-      console.log("callback");
-    };
-    const options = {};
-    const observer = new IntersectionObserver(callback, options);
-    observer.observe(imgRef.current);
-  }, []);
+      console.log('callback')
+    }
+    const options = {}
+    const observer = new IntersectionObserver(callback, options)
+    observer.observe(imgRef.current)
+  }, [])
   return (
     <div className="Card text-center">
       <img ref={imgRef} src={props.image} />
       <div className="p-5 font-semibold text-gray-700 text-xl md:text-lg lg:text-xl keep-all">{props.children}</div>
     </div>
-  );
+  )
 }
 
-export default Card;
+export default Card
 ```
 
 위와 같이 이미지에 `useRef`로 참조를 걸고, `observer`를 적용해주면 아래와 같이 해당 이미지 엘리먼트가 `isIntersecting` 하는 시점에 `console.log` 코드가 실행되는 것을 확인할 수 있다.
@@ -128,28 +128,28 @@ export default Card;
 ```jsx
 //..
 function Card(props) {
-  const imgRef = useRef(null);
+  const imgRef = useRef(null)
 
   useEffect(() => {
     const callback = (entries, observer) => {
       entries.forEach((entry) => {
         if (entry.isIntersecting) {
-          console.log("is intersecting", entry.target.dataset.src);
+          console.log('is intersecting', entry.target.dataset.src)
           // data-set에 넣어둔 src를 실제 src에 주입 - 이미지 로드
-          entry.target.src = entry.target.dataset.src;
+          entry.target.src = entry.target.dataset.src
           // 이미지를 로드한 후 unobserve 처리
-          observer.unobserve(imgRef.current);
+          observer.unobserve(imgRef.current)
         }
-      });
-    };
+      })
+    }
     // ..
-  }, []);
+  }, [])
   return (
     <div className="Card text-center">
       <img ref={imgRef} data-src={props.image} />
       <div className="p-5 font-semibold text-gray-700 text-xl md:text-lg lg:text-xl keep-all">{props.children}</div>
     </div>
-  );
+  )
 }
 ```
 
@@ -157,4 +157,70 @@ function Card(props) {
 
 ![이미지 호출 시점에 맞춰 로드되는 것을 확인할 수 있음](../../img/220828-4.png)
 
-위처럼 메인 페이지의 모든 이미지에 대한 lazy loading을 실행해보고 비디오 파일 로드가 먼저 되도록 구현해보자!
+이 밖에 메인 페이지에 존재하는 모든 이미지에 대한 lazy loading을 아래와 같이 구현한다.
+
+`./src/pages/MainPage.js`
+
+```jsx
+//..
+function MainPage(props) {
+  const imgRef_first = useRef(null)
+  const imgRef_second = useRef(null)
+  const imgRef_third = useRef(null)
+
+  useEffect(() => {
+    const options = {}
+    const callback = (entries, observer) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          console.log('is intersecting', entry.target.dataset.src)
+          // data-set에 넣어둔 src를 실제 src에 주입 - 이미지 로드
+          entry.target.src = entry.target.dataset.src
+          // 이미지를 로드한 후 unobserve 처리
+          observer.unobserve(entry.target)
+        }
+      })
+    }
+    const observer = new IntersectionObserver(callback, options)
+    observer.observe(imgRef_first.current)
+    observer.observe(imgRef_second.current)
+    observer.observe(imgRef_third.current)
+  }, [])
+
+  return (
+    <div className="MainPage -mt-16">
+      <BannerVideo />
+      <div className="mx-auto">
+				{/* ... */}
+        <TwoColumns
+          bgColor={'#f4f4f4'}
+          columns={[
+            <img ref={imgRef_first} data-src={main_items} />,
+            // ..
+          ]}
+        />
+        <TwoColumns
+          bgColor={'#fafafa'}
+          columns={[
+            // ..
+            <img ref={imgRef_second} data-src={main_parts} />,
+          ]}
+          mobileReverse={true}
+        />
+        <TwoColumns
+          bgColor={'#f4f4f4'}
+          columns={[
+            <img ref={imgRef_third} data-src={main_styles} />,
+            // ..
+            />,
+          ]}
+        />
+      </div>
+    </div>
+  )
+}
+
+export default MainPage
+```
+
+![](../../img/220829-1.gif)
