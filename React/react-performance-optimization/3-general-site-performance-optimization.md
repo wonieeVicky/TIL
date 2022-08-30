@@ -343,3 +343,51 @@ function Card(props) {
 위와 같이 처리해주면 .webp 파일이 다운로드되고, 만약 .webp 파일이 지원되지 않는 브라우저에서는 정상적으로 .jpg 파일이 다운로드되는 것을 확인할 수 있다!
 
 ![](../../img/220829-3.gif)
+
+### 동영상 사이즈 최적화
+
+이번에는 동영상 최적화에 대해 구현해보자.
+사진 사이즈를 최적화한 것처럼 동영상 크기를 줄이는 방법이다.
+
+동영상을 압축하는 작업은 동영상의 화질을 저하시키므로, 메인 콘텐츠라면 고화질로 사용하고, 동영상이 메인 콘텐츠가 아닌 경우에만 최적화하는 것이 좋다. 해당 최적화 사이트는 [media.io](https://www.media.io/ko/video-compressor.html)에서 압축한다.
+
+위에서 이미지를 .webp파일로 저장했는데, 비디오는 .webm 파일로 저장하면 웹 브라우저에 최적화 된 동영상으로 만들 수 있다.
+
+![](../../img/220830-1.png)
+
+위처럼 수정하면 약 절반정도의 용량이 줄어든 것을 확인할 수 있다.
+
+![](../../img/220830-2.png)
+
+이를 `BannerVideo` 컴포넌트에 적용하면 되는데 .webm 파일 또한 미지원되는 브라우저가 있으므로 경우에 따라 .mp4파일을 재생하도록 설정해주어야 한다. 이는 `video` 태그를 사용하면 된다! (mp4도 동영상 압축 진행)
+
+`./src/components/BannerVideo.js`
+
+```jsx
+import React from 'react'
+import video_webm from '../assets/banner-video.webm'
+import video_mp4 from '../assets/banner-video.mp4'
+
+function BannerVideo() {
+  return (
+    <div className="BannerVideo w-full h-screen overflow-hidden relative bg-texture">
+      <div className="absolute h-screen w-full left-1/2">
+        <video
+          className="absolute translateX--1/2 h-screen max-w-none min-w-screen -z-1 bg-black min-w-full min-h-screen"
+          autoPlay
+          loop
+          muted
+        >
+          <source src={video_webm} type="video/webm" />
+          <source src={video_mp4} type="video/mp4" />
+        </video>
+      </div>
+      {/* ... */}
+    </div>
+  )
+}
+```
+
+위와 같이 처리하면 webm 유형이 지원되는 브라우저에서는 webm 파일이, 그렇지 않은 경우에는 mp4 파일이 실행된다. 만약 메인 콘텐츠 비디오에 렌더링을 해야할 경우 이미지 용량이 크다면 어떻게 하면 좋을까?
+
+파일을 여러개의 조각으로 나눠서 실행하는 방법이나 화질을 줄인 비디오 상단에 그라데이션이나 불투명도 스타일을 부여(filter: blur나 작은 dot를 균일한 간격으로 채우는 등의 ui 가림처리 등을 활용)해서 화질 저하에 대한 리스크를 줄여보면 좋다.
