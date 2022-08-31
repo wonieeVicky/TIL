@@ -391,3 +391,78 @@ function BannerVideo() {
 위와 같이 처리하면 webm 유형이 지원되는 브라우저에서는 webm 파일이, 그렇지 않은 경우에는 mp4 파일이 실행된다. 만약 메인 콘텐츠 비디오에 렌더링을 해야할 경우 이미지 용량이 크다면 어떻게 하면 좋을까?
 
 파일을 여러개의 조각으로 나눠서 실행하는 방법이나 화질을 줄인 비디오 상단에 그라데이션이나 불투명도 스타일을 부여(filter: blur나 작은 dot를 균일한 간격으로 채우는 등의 ui 가림처리 등을 활용)해서 화질 저하에 대한 리스크를 줄여보면 좋다.
+
+
+### 폰트 최적화1 - 폰트 적용 시점 컨트롤
+
+이번에는 웹폰트를 어떻게 최적화하여 쓸 수 있는지 알아보려고 한다.
+현재 메인페이지 상단에 존재하는 타이틀 영역에만 별도의 `BMYEONSUNG.30f546f7.ttf` 체가 다운받아지는 것을 확인할 수 있다. 해당 글씨체는 위 상단에서만 사용되는데, 무려 `750kb`를 차지하므로 이를 최적화할 필요가 있다.
+
+![](../../img/220831-1.gif)
+
+위 이미지를 보면 초기 로딩 시 폰트 파일을 가져오고 렌더링되는 과정이 그대로 노출되고 있는 것을 확인할 수 있다. 네트워크 환경에 따라 해당 현상이 더욱 불편하게 느껴질 수도 있다.
+
+웹 폰트는 렌더링 시 FOUT(Flash of Unstyled Text) 이슈와 FOIT(Flash of Invisible Text) 이슈가 있다. FOUT는 기본 폰트로 노출되다가 폰트 리소스가 다운로드될 경우 해당 폰트 스타일로 적용되는 현상을 의미하고, FOIT는 폰트가 모두 다운로드되기 전까지 노출되지 않다가 폰트 적용이 완료된 후에 텍스트가 반영되는 것을 의미한다. 위 gif 파일에서 확인할 수 있는 현상은 FOUT를 의미한다. 
+
+우리는 이러한 FOUT, FOIT 현상을 1. 폰트 적용 시점 컨트롤하고 2. 폰트 사이즈 줄이는 방법으로 개선해볼 수 있다. 먼저 폰트 적용 시점을 컨트롤 하는 방법에 대해 알아보자.
+
+이를 적용하기 위해서는 `font-display` 속성을 이용해서 구현할 수 있다.
+`font-display`는 auto(브라우저 기본 동작), block(FOIT, timeout = 3s), wap(FOUT), fallback(FOIT, timeout = 0.1s, 0.1초 이후 기본 폰트 적용, 3초 후에도 불러오지 못했을 시, 기본 폰트로 유지 이후 캐시), optional(FOIT, timeout = 0.1s, 이후 네트워크 상태에 따라 기본 폰트로 유지할지 웹폰트를 적용할지 결정, 이후 캐시)
+
+`./src/App.css`
+
+```css
+@font-face {
+  font-family: BMYEONSUNG;
+  src: url("./assets/fonts/BMYEONSUNG.ttf");
+  font-display: block;
+}
+```
+
+현재 홈페이지의 타이틀 영역은 매우 중요한 텍스트는 아니므로 우선 font-display를 block으로 처리한다. 그런 뒤 JavaScript로 폰트가 로드 시 부드럽게 화면에 렌더링될 수 있도록 스크립트를 추가해준다. 폰트가 다운로드 되었는지 파악할 수 있는 것은 패키지를 활용해서 구현할 수 있는데 fontfaceobserver라는 패키지를 설치해준다.
+
+```css
+> npm i fontfaceobserver
+```
+
+`./src/components/BannerVideo.js`
+
+```jsx
+import React, { useEffect, useState } from "react"
+import FontFaceObserver from "fontfaceobserver"
+// ..
+
+function BannerVideo() {
+  const [isFontLoaded, setIsFontLoaded] = useState(false)
+  const font = new FontFaceObserver("BMYEONSUNG")
+
+  useEffect(() => {
+    font.load().then(function () {
+      console.log("BMYEONSUNG has loaded")
+      setIsFontLoaded(true)
+    })
+  }, [font])
+
+  return (
+    <div className="BannerVideo w-full h-screen overflow-hidden relative bg-texture">
+      {/* ... */}
+      <div
+        className="w-full h-full flex justify-center items-center"
+        style={{ opacity: isFontLoaded ? 1 : 0, transition: "opacity 0.5s ease" }}
+      >
+        <div className="text-white text-center">
+          <div className="text-6xl leading-none font-semibold">KEEP</div>
+          <div className="text-6xl leading-none font-semibold">CALM</div>
+          <div className="text-3xl leading-loose">AND</div>
+          <div className="text-6xl leading-none font-semibold">RIDE</div>
+          <div className="text-5xl leading-tight font-semibold">LONGBOARD</div>
+        </div>
+      </div>
+    </div>
+  )
+}
+```
+
+위처럼 useEffect와 useState를 활용해서 font.load 시점을 체크한 뒤 상태 변경에 따라 글씨 영역에 자연스럽게 노출되도록 style 요소를 추가해주면 아래와 같이 자연스러운 폰트 렌더링 구현이 가능해진다.
+
+![](../../img/220831-2.gif)
