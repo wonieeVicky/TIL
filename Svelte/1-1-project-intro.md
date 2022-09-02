@@ -16,49 +16,49 @@ rollup.config.js는 우리가 원하는 번들러의 역할을 작성한 내용�
 
 ```jsx
 // built-in
-import path from "path";
+import path from "path"
 // @rollup: 비교적 최신에 만들어진 모듈임(@)
-import resolve from "@rollup/plugin-node-resolve";
-import commonjs from "@rollup/plugin-commonjs";
-import alias from "@rollup/plugin-alias";
-import strip from "@rollup/plugin-strip";
+import resolve from "@rollup/plugin-node-resolve"
+import commonjs from "@rollup/plugin-commonjs"
+import alias from "@rollup/plugin-alias"
+import strip from "@rollup/plugin-strip"
 // rollup: 비교적 구버전인 모듈
-import svelte from "rollup-plugin-svelte";
-import livereload from "rollup-plugin-livereload";
-import { terser } from "rollup-plugin-terser";
-import replace from "rollup-plugin-replace";
-import globals from "rollup-plugin-node-globals";
-import builtins from "rollup-plugin-node-builtins";
+import svelte from "rollup-plugin-svelte"
+import livereload from "rollup-plugin-livereload"
+import { terser } from "rollup-plugin-terser"
+import replace from "rollup-plugin-replace"
+import globals from "rollup-plugin-node-globals"
+import builtins from "rollup-plugin-node-builtins"
 // external
-import sveltePreprocess from "svelte-preprocess";
+import sveltePreprocess from "svelte-preprocess"
 
 // Rollup Watch 기능(-w)이 동작하는 경우만 '개발 모드'라고 판단
-const production = !process.env.ROLLUP_WATCH;
+const production = !process.env.ROLLUP_WATCH
 
 function serve() {
-  let server;
+  let server
 
   function toExit() {
     // 서버 있으면 바로 종료.
-    if (server) server.kill(0);
+    if (server) server.kill(0)
   }
 
   return {
     writeBundle() {
       // 서버가 있으면 실행하지 않음.
-      if (server) return;
+      if (server) return
 
       // 서버 생성.
       server = require("child_process").spawn("npm", ["run", "start", "--", "--dev"], {
         stdio: ["ignore", "inherit", "inherit"],
         shell: true,
-      });
+      })
 
       // 프로세스 종료 이벤트(SIGTERM, exit)에 서버 종료하도록 핸들링.
-      process.on("SIGTERM", toExit);
-      process.on("exit", toExit);
+      process.on("SIGTERM", toExit)
+      process.on("exit", toExit)
     },
-  };
+  }
 }
 
 // Rollup의 기본 옵션
@@ -82,7 +82,7 @@ export default {
       dev: !production,
       // Svelte 컴포넌트의 CSS를 별도 번들로 생성
       css: (css) => {
-        css.write("bundle.css");
+        css.write("bundle.css")
       },
       // 전처리 옵션을 지정합니다.
       preprocess: sveltePreprocess({
@@ -154,7 +154,7 @@ export default {
     // 다시 빌드할 때, 터미널 화면을 초기화하지 않는다. 기본값은 `true`
     clearScreen: false,
   },
-};
+}
 ```
 
 위 설명을 차례대로 읽어보면서 각 역할들을 확인해보자.
@@ -168,14 +168,14 @@ export default {
 
 ```html
 <script>
-  import Header from "~/components/Header.svelte";
-  import ListContainer from "~/components/ListContainer.svelte";
+  import Header from "~/components/Header.svelte"
+  import ListContainer from "~/components/ListContainer.svelte"
 
   Object.assign(document.body.style, {
     backgroundColor: "darkgray",
     backgroundImage: "url(/images/bg.jpg)",
     backgroundSize: "cover",
-  });
+  })
 </script>
 
 <header />
@@ -253,3 +253,75 @@ scss로 스타일을 추가하는데 중첩기능을 제공해주므로 작업 �
 ```
 
 `ListContainer`는 수평으로 쌓여져있고, 이미 만들어진 `List`는 노출하고, 맨 우측에서 `CreateList` 컴포넌트를 배치한다.
+
+### 프로젝트 설치 및 핵심 레이아웃의 이해
+
+프로젝트의 핵심 레이아웃을 이해하기 위해 기본 스벨트 템플릿 프로젝트를 만든다.
+
+```bash
+> npm degit sveltejs/template svelte-trello-app
+> cd svelte-trello-app/
+> npm i
+> npm run dev
+```
+
+위처럼 dev 환경의 svelte 프로젝트를 클론하여 구성한다. 가볍게 구조를 타이핑하기 위함
+
+`App.svelte`
+
+```html
+<div class="list-container">
+  <div class="lists">
+    <div class="list" />
+    <div class="list" />
+    <div class="list" />
+  </div>
+  <div class="create-list" />
+</div>
+
+<style>
+  :global(body) {
+    margin: 0;
+    padding: 0;
+  }
+  .list-container {
+    width: 100vw;
+    height: 100vh;
+    padding: 30px;
+    border: 8px solid red;
+    box-sizing: border-box;
+    overflow-x: auto;
+    overflow-y: hidden;
+    font-size: 0;
+    white-space: nowrap;
+  }
+  .list-container .lists {
+    display: inline-block;
+    height: 100%;
+    border: 10px solid blue;
+    box-sizing: border-box;
+    font-size: 0;
+    white-space: nowrap;
+  }
+  .list-container .lists .list {
+    display: inline-block;
+    width: 300px;
+    height: 100%;
+    border: 10px solid yellowgreen;
+    box-sizing: border-box;
+    font-size: 16px;
+  }
+  .list-container .create-list {
+    width: 300px;
+    height: 50px;
+    border: 10px solid yellowgreen;
+    box-sizing: border-box;
+    display: inline-block;
+    vertical-align: top;
+    font-size: 16px;
+  }
+</style>
+```
+
+위와 같이 처리하면 기본적인 trello 레이아웃이 생성된다.
+![](../img/220902-1.png)
