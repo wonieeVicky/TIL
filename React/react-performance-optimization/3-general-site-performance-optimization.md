@@ -69,7 +69,7 @@ function createObserver() {
 
   let options = {
     root: null,
-    rootMargin: '0px',
+    rootMargin: "0px",
     threshold: buildThresholdList(),
   }
 
@@ -83,7 +83,7 @@ function createObserver() {
 `./src/components/Card.js`
 
 ```jsx
-import React, { useEffect, useRef } from 'react'
+import React, { useEffect, useRef } from "react"
 
 function Card(props) {
   const imgRef = useRef(null)
@@ -95,11 +95,11 @@ function Card(props) {
         // target element:
         // entry.isIntersecting - 화면 안에 요소가 들어와있는지 알려주는 요소
         if (entry.isIntersecting) {
-          console.log('is intersecting')
+          console.log("is intersecting")
         }
       })
 
-      console.log('callback')
+      console.log("callback")
     }
     const options = {}
     const observer = new IntersectionObserver(callback, options)
@@ -134,7 +134,7 @@ function Card(props) {
     const callback = (entries, observer) => {
       entries.forEach((entry) => {
         if (entry.isIntersecting) {
-          console.log('is intersecting', entry.target.dataset.src)
+          console.log("is intersecting", entry.target.dataset.src)
           // data-set에 넣어둔 src를 실제 src에 주입 - 이미지 로드
           entry.target.src = entry.target.dataset.src
           // 이미지를 로드한 후 unobserve 처리
@@ -364,9 +364,9 @@ function Card(props) {
 `./src/components/BannerVideo.js`
 
 ```jsx
-import React from 'react'
-import video_webm from '../assets/banner-video.webm'
-import video_mp4 from '../assets/banner-video.mp4'
+import React from "react"
+import video_webm from "../assets/banner-video.webm"
+import video_mp4 from "../assets/banner-video.mp4"
 
 function BannerVideo() {
   return (
@@ -392,7 +392,6 @@ function BannerVideo() {
 
 파일을 여러개의 조각으로 나눠서 실행하는 방법이나 화질을 줄인 비디오 상단에 그라데이션이나 불투명도 스타일을 부여(filter: blur나 작은 dot를 균일한 간격으로 채우는 등의 ui 가림처리 등을 활용)해서 화질 저하에 대한 리스크를 줄여보면 좋다.
 
-
 ### 폰트 최적화1 - 폰트 적용 시점 컨트롤
 
 이번에는 웹폰트를 어떻게 최적화하여 쓸 수 있는지 알아보려고 한다.
@@ -402,7 +401,7 @@ function BannerVideo() {
 
 위 이미지를 보면 초기 로딩 시 폰트 파일을 가져오고 렌더링되는 과정이 그대로 노출되고 있는 것을 확인할 수 있다. 네트워크 환경에 따라 해당 현상이 더욱 불편하게 느껴질 수도 있다.
 
-웹 폰트는 렌더링 시 FOUT(Flash of Unstyled Text) 이슈와 FOIT(Flash of Invisible Text) 이슈가 있다. FOUT는 기본 폰트로 노출되다가 폰트 리소스가 다운로드될 경우 해당 폰트 스타일로 적용되는 현상을 의미하고, FOIT는 폰트가 모두 다운로드되기 전까지 노출되지 않다가 폰트 적용이 완료된 후에 텍스트가 반영되는 것을 의미한다. 위 gif 파일에서 확인할 수 있는 현상은 FOUT를 의미한다. 
+웹 폰트는 렌더링 시 FOUT(Flash of Unstyled Text) 이슈와 FOIT(Flash of Invisible Text) 이슈가 있다. FOUT는 기본 폰트로 노출되다가 폰트 리소스가 다운로드될 경우 해당 폰트 스타일로 적용되는 현상을 의미하고, FOIT는 폰트가 모두 다운로드되기 전까지 노출되지 않다가 폰트 적용이 완료된 후에 텍스트가 반영되는 것을 의미한다. 위 gif 파일에서 확인할 수 있는 현상은 FOUT를 의미한다.
 
 우리는 이러한 FOUT, FOIT 현상을 1. 폰트 적용 시점 컨트롤하고 2. 폰트 사이즈 줄이는 방법으로 개선해볼 수 있다. 먼저 폰트 적용 시점을 컨트롤 하는 방법에 대해 알아보자.
 
@@ -466,3 +465,86 @@ function BannerVideo() {
 위처럼 useEffect와 useState를 활용해서 font.load 시점을 체크한 뒤 상태 변경에 따라 글씨 영역에 자연스럽게 노출되도록 style 요소를 추가해주면 아래와 같이 자연스러운 폰트 렌더링 구현이 가능해진다.
 
 ![](../../img/220831-2.gif)
+
+### 폰트 최적화2 - subset, unicode-range, data-uri
+
+앞서 폰트 적용 시점에 대한 컨트롤을 조절해봤다면, 이번에는 폰트 사이즈를 줄이는 것을 해보려고 한다.
+폰트 사이즈를 줄이는 방법으로는 1. 웹폰트 포멧 사용 2. local 폰트 사용 3. subset 사용, 4. unicode range 적용, 5. data-uri로 변환하는 방법 등이 있다.
+
+폰트 사이즈를 줄이기 전에 우리가 주로 사용하는 폰트 포멧은 TTF/OTF, WOFF, WOFF2, EOT 등이 있다.
+
+![](../../img/220905-1.png)
+
+TTF/OTF는 압축이 되지 않은 폰트 파일이며, WOFF는 웹전용 폰트를 의미한다. WOFF는 압축된 상태이며, WOFF2는 더욱 효율이 증가한 웹폰트를 의미한다. 이외로 SVG 형식의 폰트도 있다.
+
+파일크기: EOT > TTF/OTF > WOFF > WOFF2 라고 볼 수 있음
+
+현재 우리 프로젝트에서는 BMYEONSUNG.ttf라는 1.9MB짜리 TTF/OTF 파일을 가지고 있는데, 이를 WOFF 파일 형식으로 변환해주는게 좋겠다. 변환은 transfonter.org에서 변환해보도록 한다.(편한거 사용)
+
+![](../../img/220905-2.png)
+
+위처럼 TTF파일을 WOFF, WOFF2 형식으로 변환하여 다운받을 수 있다.
+
+![](../../img/220905-3.png)
+
+위처럼 변환된 파일을 확인해보면 기존 1.9MB보다 훨씬 작은 파일로 압축되어진 것을 확인할 수 있다.
+해당 파일을 /src/assets/fons에 넣어두고 아래와 같이 넣어준다.
+
+`./src/App.css`
+
+```css
+/* 폰트 지원 브라우저에 따른 다양한 적용을 아래처럼 분류할 수 있다. */
+@font-face {
+  font-family: BMYEONSUNG;
+  src: url("./assets/fonts/BMYEONSUNG.woff2") format("woff2"), url("./assets/fonts/BMYEONSUNG.woff") format("woff"),
+    url("./assets/fonts/BMYEONSUNG.ttf") format("truetype");
+  font-display: block;
+}
+```
+
+![](../../img/220905-4.png)
+
+위와 같이 설정하면 woff2 파일이 크롬 브라우저에서 적절히 들어오는 것을 확인할 수 있다.
+이처럼 더 빠른 폰트 로딩을 구현할 수 있다.
+
+여기에서 추가로 이미 내 컴퓨터에 BMYEONSUNG를 가지고 있을 경우에는 컴퓨터의 폰트를 바로 가져와서 불러 쓸 수 있다. 아래와 같이 설정하면 됨
+
+```
+@font-face {
+  font-family: BMYEONSUNG;
+  src: local("BMYEONSUNG"), url("./assets/fonts/BMYEONSUNG.woff2") format("woff2"),
+    url("./assets/fonts/BMYEONSUNG.woff") format("woff"), url("./assets/fonts/BMYEONSUNG.ttf") format("truetype");
+  font-display: block;
+}
+```
+
+위처럼 처리하면 내가 폰트를 컴퓨터 자체에서 가지고 있을 경우 별도의 폰트 다운로드 없이 바로 렌더링이 되는 것을 확인할 수 있다. 폰트 깨짐 현상없이 매우 빠르게 로드할 수 있게된다! 위 방법이 위 1, 2번 폰트 사이즈 줄이기 방법에 해당된다.
+
+이외에도 3. subset 사용, 4. unicode range 적용 5. data-uri로 변환에 대한 방법을 알아본다.
+
+만약 폰트 사용 시 특정 글자의 폰트만 웹에서 사용한다면 subset을 사용하면 리소스 낭비를 줄일 수 있다.
+
+![](../../img/220905-5.png)
+
+실제 작업하고 있는 홈페이지의 메인 영문 영역만 글자를 쓰므로 크게 A, B, C, D, E, G, I, K, L, M, N, O, P, R 만 가지고 있음 된다. (한글 폰트, 숫자 폰트 등 모두 제외 가능)
+
+![](../../img/220905-6.png)
+
+이 또한 transfonter.org에서 위와 같이 변환해준다. 위처럼 변환된 파일을 다운받아 demo.html을 살펴보면 위 Characters에 넣어둔 글자만 연성체가 적용되고, 그 외의 폰트는 일반 폰트로 적용되어있는 것을 확인할 수 있다.
+
+![](../../img/220905-7.png)
+
+위와 같이 처리한 뒤 해당 파일을 assets 내부로 넣어준 다음 css에 아래와 같이 적용한다.
+
+```css
+@font-face {
+  font-family: BMYEONSUNG;
+  src: local("BMYEONSUNG"), url("./assets/fonts/subset-BMYEONSUNG.woff2") format("woff2"), url("./assets/fonts/subset-BMYEONSUNG.woff")
+      format("woff"), url("./assets/fonts/BMYEONSUNG.ttf") format("truetype");
+  font-display: block;
+}
+```
+
+![](../../img/220905-8.png)
+
+실제 적용된 폰트 파일이 8KB 밖에 되지 않는다..!
