@@ -7,8 +7,14 @@
   src: local("BMYEONSUNG"), url("./assets/fonts/subset-BMYEONSUNG.woff2") format("woff2"),
     url("./assets/fonts/subset-BMYEONSUNG.woff") format("woff"), url("./assets/fonts/BMYEONSUNG.ttf") format("truetype");
   font-display: block;
+  unicode-range: u+0041, u+0042, u+0043, u+0044, u+0045, u+0047, u+0049, u+004b, u+004c, u+004d, u+004e, u+004f, u+0050,
+    u+0052;
 }
 
 .BannerVideo {
+  font-family: "BMYEONSUNG", sans-serif;
+}
+
+.BannerImage {
   font-family: "BMYEONSUNG", sans-serif;
 }
