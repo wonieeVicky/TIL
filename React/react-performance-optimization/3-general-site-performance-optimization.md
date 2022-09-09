@@ -697,7 +697,7 @@ TTF/OTF는 압축이 되지 않은 폰트 파일이며, WOFF는 웹전용 폰트
 ![](../../img/220909-1.png)
 
 빌드 화면을 브라우저에서 오픈하면 폰트가 빠르게 적용되어 노출되는 것을 알 수 잇다.
-이 시점이 preload 인지를 확인하기 위해 Performance 탭으로 확인하면 다른 어떤 css, js 파일보다 먼저 폰트파일이 로드 된 것을 확인할 수 있다. 
+이 시점이 preload 인지를 확인하기 위해 Performance 탭으로 확인하면 다른 어떤 css, js 파일보다 먼저 폰트파일이 로드 된 것을 확인할 수 있다.
 원래 기본 css, js 이후에 다운받아져야 하는데, 개선된 점!
 
 그럼 이전에는 어땠는지 눈으로 확인해본다.
@@ -705,3 +705,63 @@ TTF/OTF는 압축이 되지 않은 폰트 파일이며, WOFF는 웹전용 폰트
 ![](../../img/220909-2.png)
 
 모든 파일이 다운로드 받아진 후 폰트 파일이 로드되고 있다.
+
+그럼 이 방식을 매번 build 파일에서 경로를 수정해줘야할까? 그건 아니다. 웹팩 설정을 수정해주면 됨
+먼저 관련 라이브러리르 추가로 설치해준다. (아래 과정에서 react-scripts 내부의 webpack 버전이 맞지 않아 다운로드 되지 않음. yarn으로 reInstall 하여 해결함)
+
+```bash
+> npm i react-app-rewired --save-dev
+> npm i preload-webpack-plugin --save-dev
+```
+
+`package.json`
+
+```json
+"scripts": {
+    "start": "npm run build:style && react-app-rewired start",
+    "build": "npm run build:style && react-app-rewired build",
+		//..
+}
+```
+
+위처럼 `package.json`에 적용되는 데이터를 `react-scripts`에서 `react-app-rewired`로 바꿔준 다음 실제 웹팩 설정을 수정하기 위해 루트 폴더에 `config-overrides.js` 파일을 추가해준다.
+
+`./config-overrides.js`
+
+```jsx
+const PreloadWebpackPlugin = require("preload-webpack-plugin")
+
+module.exports = function override(config, env) {
+  config.plugins.push(
+    new PreloadWebpackPlugin({
+      rel: "preload",
+      as: "font",
+      include: "allAssets",
+      fileWhitelist: [/(.woff2?)/i],
+    })
+  )
+  return config
+}
+```
+
+위와 같이 작성 후 build를 해주면 `build/index.html` 내에 `/static/media/`로 path가 잘 변형되어 들어가는 것을 확인할 수 있다.
+
+`./build/index.html`
+
+```jsx
+<!doctype html>
+<html lang="en">
+	<head>
+	  <!-- ... -->
+	  <link rel="preload" href="/static/media/BMYEONSUNG.b184ad44.woff2" as="font" type="font/woff2" crossorigin>
+	  <link rel="preload" href="/static/media/BMYEONSUNG.b184ad44.woff" as="font" type="font/woff2" crossorigin>
+	</head>
+</html>
+```
+
+위와 같이 처리하면 Performance 탭에서 확인할 수 있듯 woff2, woff에 대한 폰트가 모두 preload 되었다.
+
+![](../../img/220910-1.png)
+
+리소스 다운로드 시 두 가지 타입의 폰트가 다운로드 받아지는데, 이것은 바람직할까?
+떄에 따라 이는 낭비가 될 수 있으므로, 각자 프로젝트의 지원 환경에 맞게 적절히 필요한 파일만 미리 다운받도록 한다.
