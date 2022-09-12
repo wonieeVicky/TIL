@@ -765,3 +765,63 @@ module.exports = function override(config, env) {
 
 리소스 다운로드 시 두 가지 타입의 폰트가 다운로드 받아지는데, 이것은 바람직할까?
 떄에 따라 이는 낭비가 될 수 있으므로, 각자 프로젝트의 지원 환경에 맞게 적절히 필요한 파일만 미리 다운받도록 한다.
+
+### 캐시 최적화
+
+이번에는 LightHouse를 통해 캐시가 어떻게 쌓이고 있는지 분석해보고자 한다.
+
+![](../../img/220912-1.png)
+
+위 그림은 LightHouse로 분석한 Report 내용 중 일부인데, 위협요소에 Serve static assets with an efficient cahce policy라는 문구가 빨간색 텍스트로 노출되고 있다. 해당 문구는 효율적인 캐시정책이 적용되어있지 않다는 의미이다. 여기에서 static assets이란, 이미지나 동영상, js, css 파일 등이 속하며, 이러한 요소들이 캐시 정책을 제대로 적용하고 있지 않음을 의미한다. 
+
+![](../../img/220912-2.png)
+
+실제 main으로 동작하는 bundle.js의 경우 Request Headers 내용에 보면 Cache-control이 제대로 적용되어 있지 않은 상태라는 것을 알 수 있다. 그렇다면 캐시는 어떻게 설정할 수 있을까?
+
+먼저 캐시란 ‘데이터나 값을 미리 복사해 놓는 임시 장소나 그런 동작’을 의미한다.
+크롬 브라우저를 기준으로 웹 브라우저는 크게 1. 메모리 캐시, 2. 디스크 캐시로 캐싱을 한다. 메모리 캐시는 RAM 즉, 메모리에 데이터를 저장해두고 꺼내서 쓰는 방식이며, 디스크 캐시는 파일로 데이터를 저장하여 꺼내쓰는 방식이다. 이 두가지 방식은 사용자가 선택할 수 있는 옵션이 아니고 브라우저가 사용 빈도나 사용 사이드에 따라서 브라우저 자체의 알고리즘으로 처리된다.
+
+먼저 캐시를 적용하려면 브라우저가 특정 서버에 전달받는 리소스에 캐시를 적용해달라는 설정을 해야하는데 이때 `cache-control` 옵션을 사용한다. cache-control 에는 아래와 같은 옵션이 들어갈 수 있다.
+
+- no-cache: 캐시를 사용하기 전에 서버에 검사 후, 사용 결정
+- no-store: 캐시 사용 안 함
+- public: 모든 환경에서 캐시 사용 가능
+- private: 브라우저 환경에서만 캐시 사용, 외부 캐시 서버에서는 사용 불가
+- max-age: 캐시의 유효시간(60 → 60초, 600s → 10분)
+    - cache-control: max-age=60
+    - cache-control: private, max-age=600
+    - cache-control: no-cache (max-age=0과 같음)
+
+위 설정을 직접 프로젝트에 설정해보자. 이러한 설정은 서버상에서 설정해주는 것이니 참고하자.
+
+`./server/server.js`
+
+```jsx
+const header = {
+    setHeaders: (res, path) => {
+        res.setHeader('Cache-Control', 'private, no-cache, no-store, must-revalidate')
+        res.setHeader('Expires', '-1')
+        res.setHeader('Pragma', 'no-cache')
+    },
+}
+```
+
+![](../../img/220912-3.png)
+
+위와 같이 server.js 내 header 설정이 되어있으면 실제 브라우저의 Cache-control이 아래와 같이 잘 반영되어있는 것을 확인할 수 있다. 이를 아래와 같이 수정하면 웹 브라우저에서도 똑같이 반영된다.
+
+```jsx
+const header = {
+    setHeaders: (res, path) => {
+        res.setHeader("Cache-Control", "max-age=20")
+        res.setHeader('Expires', '-1')
+        res.setHeader('Pragma', 'no-cache')
+    },
+}
+```
+
+![](../../img/220912-4.png)
+
+위처럼 처리 후 20초가 지나면 캐싱 없이 새롭게 리소스를 다운받을까? 리소스가 수정이 되지않았으므로 저장한 캐시 데이터를 그대로 사용하게 되는데 그때 304 status로 노출되는 점도 함께 확인하자.
+
+![](../../img/220912-5.png)
