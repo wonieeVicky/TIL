@@ -772,7 +772,7 @@ module.exports = function override(config, env) {
 
 ![](../../img/220912-1.png)
 
-위 그림은 LightHouse로 분석한 Report 내용 중 일부인데, 위협요소에 Serve static assets with an efficient cahce policy라는 문구가 빨간색 텍스트로 노출되고 있다. 해당 문구는 효율적인 캐시정책이 적용되어있지 않다는 의미이다. 여기에서 static assets이란, 이미지나 동영상, js, css 파일 등이 속하며, 이러한 요소들이 캐시 정책을 제대로 적용하고 있지 않음을 의미한다. 
+위 그림은 LightHouse로 분석한 Report 내용 중 일부인데, 위협요소에 Serve static assets with an efficient cahce policy라는 문구가 빨간색 텍스트로 노출되고 있다. 해당 문구는 효율적인 캐시정책이 적용되어있지 않다는 의미이다. 여기에서 static assets이란, 이미지나 동영상, js, css 파일 등이 속하며, 이러한 요소들이 캐시 정책을 제대로 적용하고 있지 않음을 의미한다.
 
 ![](../../img/220912-2.png)
 
@@ -788,9 +788,9 @@ module.exports = function override(config, env) {
 - public: 모든 환경에서 캐시 사용 가능
 - private: 브라우저 환경에서만 캐시 사용, 외부 캐시 서버에서는 사용 불가
 - max-age: 캐시의 유효시간(60 → 60초, 600s → 10분)
-    - cache-control: max-age=60
-    - cache-control: private, max-age=600
-    - cache-control: no-cache (max-age=0과 같음)
+  - cache-control: max-age=60
+  - cache-control: private, max-age=600
+  - cache-control: no-cache (max-age=0과 같음)
 
 위 설정을 직접 프로젝트에 설정해보자. 이러한 설정은 서버상에서 설정해주는 것이니 참고하자.
 
@@ -798,11 +798,11 @@ module.exports = function override(config, env) {
 
 ```jsx
 const header = {
-    setHeaders: (res, path) => {
-        res.setHeader('Cache-Control', 'private, no-cache, no-store, must-revalidate')
-        res.setHeader('Expires', '-1')
-        res.setHeader('Pragma', 'no-cache')
-    },
+  setHeaders: (res, path) => {
+    res.setHeader("Cache-Control", "private, no-cache, no-store, must-revalidate")
+    res.setHeader("Expires", "-1")
+    res.setHeader("Pragma", "no-cache")
+  },
 }
 ```
 
@@ -812,11 +812,11 @@ const header = {
 
 ```jsx
 const header = {
-    setHeaders: (res, path) => {
-        res.setHeader("Cache-Control", "max-age=20")
-        res.setHeader('Expires', '-1')
-        res.setHeader('Pragma', 'no-cache')
-    },
+  setHeaders: (res, path) => {
+    res.setHeader("Cache-Control", "max-age=20")
+    res.setHeader("Expires", "-1")
+    res.setHeader("Pragma", "no-cache")
+  },
 }
 ```
 
@@ -825,3 +825,41 @@ const header = {
 위처럼 처리 후 20초가 지나면 캐싱 없이 새롭게 리소스를 다운받을까? 리소스가 수정이 되지않았으므로 저장한 캐시 데이터를 그대로 사용하게 되는데 그때 304 status로 노출되는 점도 함께 확인하자.
 
 ![](../../img/220912-5.png)
+
+그렇다면 브라우저는 어떻게 서버 데이터와 기존 캐싱 데이터가 다르다는 것을 알 수 있을까? 이는 ETag를 통해 알 수 있다.
+
+![](../../img/220913-1.png)
+
+ETag는 리소스에 대한 일종의 hash 값이라고 생각할 수 있다. 만약 Etag가 AAA 였다가 서버에 리소스를 요청하기 전에 해당 데이터는 Etag 값으로 변화를 탐지하고, Etag가 다른 값으로 바뀌었을 경우 새로운 리소스를 다운로드 하도록 처리할 수 있는 것이다.
+
+그런데, 위 setHeader 설정은 모든 리소스에 공통적으로 적용되도록 해놓은 옵션이다. 물론 Etag 때문에 캐시를 재로드 하는 과정은 줄어들지만 해시를 비교하는 로직은 계속 발생하므로 자원마다 다르게 적용되도록 구현해보는 것도 필요하다. (리소스가 잘 변경되지 않는 요소는 캐싱을 더 많이 처리할 수 있다)
+
+먼저 프로젝트에서 주로 사용하는 리소스의 구조는 HTML, JS, CSS, IMG 등이 있다.
+
+해당 파일에 변경사항이 발생하더라도 만약 캐싱이 1일 간 걸려있을 경우 해당 리소스를 새로 가져오지 않는다.
+때문에 1) HTML은 보통 `no-cache`로 캐싱을 처리한다. 2) JS, CSS의 경우도 항상 최신으로 유지되어야 하는데, 그럼 이 파일도 `no-cache`로 처리할까? 아니다! 보통 JS, CSS의 경우 새로 빌드 시 파일값 뒤에 새로운 해시값이 붙기 때문에 HTML 리소스가 최신으로 유지가 되는 한 항상 최신의 JS, CSS를 요청한다고 판단할 수 있는 것이다. 따라서 max-age=31536000(1년)등으로 설정하므로써 무한대에 가까운 캐싱을 설정해준다. 3) IMG의 경우에도 자주 변경될 경우 cache 기간을 짧게 하거나 혹은 긴 기간 캐싱 처리 후 hash를 적용하여 처리하는 것이 바람직하다. 즉 캐싱 적용은 아래와 같은 정책으로 운영하기로 한다.
+
+- HTML : no-cache
+- JS / CSS / IMG : public, max-age=31536000 + hash
+
+`./server/server.js`
+
+```jsx
+const header = {
+  setHeaders: (res, path) => {
+    if (path.endsWith(".html")) {
+      res.setHeader("Cache-Control", "no-cache")
+    } else if (path.endsWith(".js") || path.endsWith(".css") || path.endsWith(".webp")) {
+      res.setHeader("Cache-Control", "public, max-age=31536000")
+    } else {
+      res.setHeader("Cache-Control", "no-store")
+    }
+  },
+}
+```
+
+위와 같이 설정하면 파일별로 들어오는 Header 설정이 잘 변경되어 있는 것을 확인할 수 있다.
+
+![html은 no-cache로 설정](../../img/220913-2.png)
+![css, js, img 는 public, max-age=31536000로 설정](../../img/220913-3.png)
+![나머지는 no-store](../../img/220913-4.png)
