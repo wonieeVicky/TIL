@@ -935,3 +935,20 @@ module.exports = {
 ![](../../img/220914-4.png)
 
 1,781.4KB → 10KB로의 변화는 매우 큰 것이다. 위처럼 수정 후 다시 LightHouse를 돌려보면 기존의 CSS 이슈는 사라진 것을 확인할 수 있다. 👏
+
+### 요약정리
+
+이번 시간에는 아래의 것들을 최적화 해보았다.
+
+- 이미지 지연(lazy) 로딩
+  - IntersectionObserver 활용
+- 이미지 사이즈 최적화
+  - `.jpg`, `.webp` 활용, picture 태그로 브라우저에 따라 이미지 노출 포맷 분기처리
+- 동영상 최적화
+  - `.webm`, `.mp4` 로 동영상 압축
+- 폰트 최적화
+  - FOUT, FOIT의 차이, `font-display` 적용, `.woff`, `.woff2` 활용, `subset`, `data-uri` , `preload` 처리
+- 캐시 최적화
+  - server.js의 `Cache-control` 옵션 활용
+- 불필요한 CSS 제거
+  - Chrome Coverage 탭 활용(unused 코드 확인), PurgeCSS로 실사용 스타일 코드만 남김
