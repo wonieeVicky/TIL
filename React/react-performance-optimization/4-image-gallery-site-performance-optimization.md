@@ -104,3 +104,55 @@ const Image = styled.img`
 ![](../../img/220919-1.gif)
 
 레이아웃이 밀리지 않고 제자리에 데이터가 들어가는 것을 확인할 수 있다. 위처럼 하면 기존 Performance 탭에서 발생하던 Layout Shift 메시지도 발생하지 않는 것을 확인할 수 있다.
+
+### 이미지 지연(lazy) 로딩(react-lazyload)
+
+이번에는 이미지 지연 로딩에 대해 구현해본다. 이전 시간에도 이미지 지연로드를 구현해보았는데, 그때는 intersectionObserver를 활용해서 스크롤에 따른 이미지 로드가 처리되도록 작업했다.
+
+이번에는 비슷한 로직이지만 react-lazyload라는 라이브러리를 활용해서 구현해보도록 한다.
+
+```bash
+> npm i --save react-lazyload
+```
+
+`./src/components/PhotoItem.js`
+
+```jsx
+// ..
+import LazyLoad from "react-lazyload"
+
+export default PhotoItem({ photo: { urls, alt } }) {
+	// ..
+  return (
+    <ImageWrap>
+      <LazyLoad>
+        <Image src={urls.small + "&t=" + new Date().getTime()} alt={alt} onClick={openModal} />
+      </LazyLoad>
+    </ImageWrap>
+  )
+}
+```
+
+위처럼 react-lazyload의 LazyLoad를 이미지영역에 감싸주면 스크롤에 따라 이미지가 순차적으로 로드되는 것을 확인할 수 있다.
+
+![](../../img/220920-1.gif)
+
+스크롤 속도에 따라 fetch 되는 과정이 자주 보인다면 이미지 로드 시점을 조금 앞당기면 된다.
+
+```jsx
+// ..
+import LazyLoad from "react-lazyload"
+
+export default PhotoItem({ photo: { urls, alt } }) {
+	// ..
+  return (
+    <ImageWrap>
+      <LazyLoad offset={500}>
+        <Image src={urls.small + "&t=" + new Date().getTime()} alt={alt} onClick={openModal} />
+      </LazyLoad>
+    </ImageWrap>
+  )
+}
+```
+
+하위로 500px 에 대한 이미지를 사전에 로드해오는 설정임.
