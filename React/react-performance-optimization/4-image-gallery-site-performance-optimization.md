@@ -156,3 +156,171 @@ export default PhotoItem({ photo: { urls, alt } }) {
 ```
 
 하위로 500px 에 대한 이미지를 사전에 로드해오는 설정임.
+
+### useSelector 렌더링 이슈 개선
+
+이번 시간에는 `useSelector`가 렌더링에 미치는 영향에 대해 알아보고자 한다.
+기본적으로 React는 화면을 렌더링하는 라이프사이클이 있다. 이는 성능에 큰 영향을 미치는 요인이 된다.
+
+현재 사이트에 렌더링이 어떻게 동작하는지 확인하기 위해서는 개발자도구의 React Component 탭을 열어서 확인할 수 있다. Option에 `Highlight updates when components render.`를 활성화해주면 렌더링되는 레이아웃의 아웃라인이 highlight 처리되는 것을 확인할 수 있다.
+
+![](../../img/220921-1.gif)
+
+위 이미지가 렌더링되는 예시이다. 카테고리를 클릭했을 때 하단 갤러리 영역의 이미지가 바뀌므로 다시 렌더링되는 것은 이해할 수 있지만, 이미지 상세 모달을 클릭했을 때 뒷 배경인 갤러리 영역이 제렌더링 처리가 되고 있는 것은 문제가 있어보인다.
+
+이유는 redux에 이미지 데이터가 포함된 상태에서, 모달 상태 또한 redux의 값으로 변경되므로 상태가 변경되었다고 판단하여 함께 화면에 재렌더링 되는 것이다. 하지만 이는 문제가 있다. 모달의 상태를 갤러리 영역이 바라보지(구독하지) 않음에도 재렌더링이되기 때문.
+
+이를 이해하기 위해서는 `useSelector`의 동작원리를 알아야 한다.
+
+![](../../img/220921-1.png)
+
+redux store에서 새로운 데이터가 dispatch되면 새로운 redux store로 refresh 된다.
+
+![](../../img/220921-2.png)
+
+새로운 state와 기존의 state를 비교해서 값이 다르면 렌더링을 새로 하는데, state 내부의 값을 이루는 object의 값이 내부 정보는 같더라도 새로운 객체라고 판단하여 값이 다르다고 처리하는 것이다. (c 라는 값이 변경되어도 a, b에 대한 값도 변경되었다고 판단)
+
+그렇다면 useSelector 문제를 어떻게 해결할 수 있을까?
+
+1. Object를 새로 만들지 않도록 State 쪼개기
+
+   `./src/containers/ImageModalContainer.js`
+
+   ```jsx
+   // ..
+   function ImageModalContainer() {
+     /* const { modalVisible, bgColor, src, alt } = useSelector((state) => ({
+       modalVisible: state.imageModal.modalVisible,
+       bgColor: state.imageModal.bgColor,
+       src: state.imageModal.src,
+       alt: state.imageModal.alt,
+     })) */
+
+     /* object 내부로 넣지 않고, state를 따로 쪼갠다. */
+     const modalVisible = useSelector((state) => state.imageModal.modalVisible)
+     const bgColor = useSelector((state) => state.imageModal.bgColor)
+     const src = useSelector((state) => state.imageModal.src)
+     const alt = useSelector((state) => state.imageModal.alt)
+
+     console.log("ImageModalContainer was rendered")
+
+     return <ImageModal modalVisible={modalVisible} bgColor={bgColor} src={src} alt={alt} />
+   }
+
+   export default ImageModalContainer
+   ```
+
+   위처럼 하나의 object 내부에 데이터를 넣지 않고 state가 각자의 변수에 담기도록 처리하면 bgColor 하나만 바뀌어도 전체 데이터가 새로 렌더링되는 현상을 개선할 수 있다.
+
+   ![이미지 모달이 동작할 때만 콘솔 로그가 찍힌다.](../../img/220921-2.gif)
+
+2. 새로운 Equality Function 사용
+
+   이번에는 react-redux에서 제공하는 shallowEqual이라는 Euality Function을 활용하는 방법이다.
+
+   `./src/containers/ImageModalContainer.js`
+
+   ```jsx
+   // ..
+   import { useSelector, shallowEqual } from "react-redux"
+
+   function ImageModalContainer() {
+     /* 
+   	const { modalVisible, bgColor, src, alt } = useSelector((state) => ({
+       modalVisible: state.imageModal.modalVisible,
+       bgColor: state.imageModal.bgColor,
+       src: state.imageModal.src,
+       alt: state.imageModal.alt,
+     })) 
+   	*/
+     const { modalVisible, bgColor, src, alt } = useSelector(
+       (state) => ({
+         modalVisible: state.imageModal.modalVisible,
+         bgColor: state.imageModal.bgColor,
+         src: state.imageModal.src,
+         alt: state.imageModal.alt,
+       }),
+       shallowEqual // 각 데이터가 달라졌는지 하나하나 확인해주는 equality Func
+     )
+
+     console.log("ImageModalContainer was rendered")
+
+     return <ImageModal modalVisible={modalVisible} bgColor={bgColor} src={src} alt={alt} />
+   }
+   ```
+
+   위처럼 반영하면 `shallowEqual`이라는 함수가 각 modalVisible, bgColor, src, alt 데이터가 달라졌는지 하나씩 확인하여 변경 시에만 렌더링을 발생시키도록 처리해줄 수 있다.
+
+위와 같은 방법으로 Header와 PhotoListContainer 컴포넌트도 수정을 해준다.
+
+`./src/components/Header.js`
+
+```jsx
+//..
+function Header() {
+  const dispatch = useDispatch()
+  const category = useSelector((state) => state.category.category)
+
+  return ( ... )
+}
+
+export default Header
+```
+
+`./src/components/PhotoListContainer.js`
+
+```jsx
+// ..
+
+function PhotoListContainer() {
+  // ..
+  const { photos, loading } = useSelector(
+    (state) => ({
+      photos:
+        state.category.category === "all"
+          ? state.photos.data
+          : state.photos.data.filter((photo) => photo.category === state.category.category),
+      loading: state.photos.loading,
+    }),
+    shallowEqual
+  )
+  // ..
+}
+```
+
+위처럼 처리하면 기본적인 컴포넌트 리렌더링을 개선할 수 있다. 하지만 이미지 모달을 띄웠을 때 확인해보면, PhotoListContainer 컴포넌트가 리렌더링되는 것을 확인할 수 있다.
+
+![](../../img/220921-3.gif)
+
+shallowEqual을 넣었는데도 재렌더링되는 이유는 무엇일까?
+이유는 `useSelector` 내부의 `filter` 함수 때문이다. `useSelector` 내부에서 데이터 변경 처리를 하므로 같은 값이더라도 변경된 데이터로 인식하는 것이다.
+
+따라서 `filter`함수가 useSelector 외부에서 처리되도록 개선해준다.
+
+`./src/containers/PhotoListContainer.js`
+
+```jsx
+//..
+
+function PhotoListContainer() {
+  // //
+  const { category, allPhotos, loading } = useSelector(
+    (state) => ({
+      category: state.category.category,
+      allPhotos: state.photos.data,
+      loading: state.photos.loading,
+    }),
+    shallowEqual
+  )
+
+  const photos = category === "all" ? allPhotos : allPhotos.filter((photo) => photo.category === category)
+
+  // ..
+}
+```
+
+위처럼 filter가 외부에서 처리되도록 개선해준 뒤 화면을 확인해보면 아래와 같다.
+
+![](../../img/220921-4.gif)
+
+모달 클릭 시 `PhotoListContainer was rendered`가 콘솔 로그로 찍히지 않는 것을 확인할 수 있다.
