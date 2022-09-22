@@ -324,3 +324,81 @@ function PhotoListContainer() {
 ![](../../img/220921-4.gif)
 
 모달 클릭 시 `PhotoListContainer was rendered`가 콘솔 로그로 찍히지 않는 것을 확인할 수 있다.
+
+### Redux Reselect를 통한 렌더링 최적화
+
+이번에는 Redux Reselect를 통해 렌더링을 최적화해본다. 이전 시간에 `PhotoListContainer` 컴포넌트에서 불필요한 상태 변화를 방지하기 위해 photos 필터를 `useSelector` 외부에서 처리하도록 개선해주었다.
+
+이를 통해 렌더링을 최적화했다고 볼 수 있지만, 문제가 아예 없는 것이다.
+먼저 category 데이터는 실제 컴포넌트에서 사용되지 않는 데이터라는 것이다. (filter를 위해 도출)
+
+또한, PhotoListContainer에 다른 구조가 추가되는 경우 컴포넌트가 재 실행될 때마다 photos라는 데이터가 매번 새롭게 계산되어야 하므로 이는 좋지않다. (매번 Photos에 들어가는 500개의 이미지를 filter 해야 함)
+
+이 때, 사용할 수 있는 것이 `reselect` 라이브러리이다. redux와 함께 사용하는 이 라이브러리는 useSelect 내부에서 filter 등의 기능이 매번 다른 객체로 인지하지 않게끔 해준다!
+
+```bash
+> npm i --save reselect
+```
+
+위 reselect를 아래와 같이 적용해준다.
+
+`./src/components/PhotoListContainer.js`
+
+```jsx
+// ..
+import { createSelector } from "reselect"
+
+function PhotoListContainer() {
+  // ..
+
+  const selectFilteredPhotos = createSelector(
+    [(state) => state.photos.data, (state) => state.category.category],
+    (photos, category) => (category === "all" ? photos : photos.filter((photo) => photo.category === category))
+  )
+
+  const photos = useSelector(selectFilteredPhotos)
+  const loading = useSelector((state) => state.photos.loading)
+
+  console.log("PhotoListContainer rendered")
+
+  // ..
+}
+```
+
+위처럼 처리하면 이전 시간에 별도로 photos 계산을 하여 노출한 것처럼 불필요한 렌더링을 방지하게 해준다!
+
+그렇다면 reselect는 어떻게 useSelector 내부에서 동작해도 상태변화를 일으키지 않는 것일까?
+정답은 바로 memoization 기법을 활용하기 때문이다. reselect는 memoization 기법을 활용해서 함수에 똑같은 인자가 들어오면 이를 매번 계산하지 않고 미리 캐시된 값으로 반환을 해준다.
+
+예를 들어 photos가 500개의 이미지라고 했을 때, API를 다시 fetching 하지 않는 이상 object reference가 같기 때문에 이러한 경우 새로 데이터를 가져오지 않고 기존에 캐싱해놓은 데이터를 리턴해주는 것이다.
+
+1. (ref, ‘all’) ⇒ [500images]; → `(ref, ‘all’)` 유형의 이미지 500개를 가져옴
+2. (ref, ‘all’) ⇒ [ caching images.. ]; : 인자가 `(ref, ‘all’)` 기존과 같으므로 캐싱된 500개 이미지 반환
+3. (ref, ‘food’) ⇒ [ new images ]; → `(ref, ‘food’)`는 새로운 인자이므로 새로 이미지 500개를 가져옴
+
+이는 아래와 같은 구조로 분리하여 많이 사용한다.
+
+`./src/redux/selector/selectFilteredPhotos.js` \*생성
+
+```jsx
+import { createSelector } from "reselect"
+
+export default createSelector([(state) => state.photos.data, (state) => state.category.category], (photos, category) =>
+  category === "all" ? photos : photos.filter((photo) => photo.category === category)
+)
+```
+
+`./src/components/PhotoListContainer.js`
+
+```jsx
+// ..
+import selectFilteredPhotos from "../redux/selector/selectFilteredPhotos"
+
+function PhotoListContainer() {
+  const photos = useSelector(selectFilteredPhotos)
+  // ..
+}
+```
+
+각 기능에 대한 memoization 함수를 별도로 분리하는 방법임 !
+memoization 기능은 신규 기술이 아니므로 요즘은 recoil 등에서 내부 기능으로도 제공하고 있다.
