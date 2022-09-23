@@ -14,8 +14,6 @@ function PhotoListContainer() {
   const photos = useSelector(selectFilteredPhotos)
   const loading = useSelector((state) => state.photos.loading)
 
-  console.log("PhotoListContainer rendered")
-
   if (loading === "error") {
     return <span>Error!</span>
   }
