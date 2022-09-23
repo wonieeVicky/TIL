@@ -402,3 +402,133 @@ function PhotoListContainer() {
 
 각 기능에 대한 memoization 함수를 별도로 분리하는 방법임 !
 memoization 기능은 신규 기술이 아니므로 요즘은 recoil 등에서 내부 기능으로도 제공하고 있다.
+
+### 병목 함수에 memoization 적용
+
+이번에는 직접 `memoization` 함수를 만들어보려고 한다. 
+`memoization`이란 어떤 input → output이 있다고 했을 때, 해당 input과, output을 기억해놓았다가 같은 input일 경우 같은 output을 반환해주도록 처리해주는 것이다. 
+
+위 memoization 함수를 현 서비스의 어디에 적용할 수 있을까? 이미지가 뜨는 부분을 memoization 처리할 수 있다. 처음 상세페이지에서 이미지를 다운로드 받는 속도는 어찌할 수 없다 치더라도, 이미지의 컬러를 도출하여 배경화면에 적용하는 과정은 계산이 많이 소요되므로 한번 계산된 뒤 같은 이미지를 모달로 띄울 때, 해당 이미지에 대한 배경색 값을 memoization하여 호출한다면 성능을 개선할 수 있을 것이다.
+
+먼저 현재 구조를 살펴보면, 배경화면 색을 가져오는 함수는 `ImageModal`에서 사용하고 있는 `getAverageColorOfImage`라는 함수이다. 
+
+`./src/components/ImageModal.js`
+
+```jsx
+// ..
+import { getAverageColorOfImage } from '../utils/getAverageColorOfImage';
+
+function ImageModal({ modalVisible, src, alt, bgColor }) {
+  const dispatch = useDispatch();
+  const onLoadImage = e => {
+    const averageColor = getAverageColorOfImage(e.target);
+    // ..
+  };
+
+  // ..
+}
+```
+
+`./src/utils/getAverageColorOfImage.js`
+
+```jsx
+export function getAverageColorOfImage(imgElement) {
+  const canvas = document.createElement('canvas');
+  const context = canvas.getContext && canvas.getContext('2d');
+  const averageColor = {
+    r: 0,
+    g: 0,
+    b: 0,
+  };
+
+  if (!context) {
+    return averageColor;
+  }
+
+  const width = (canvas.width =
+    imgElement.naturalWidth || imgElement.offsetWidth || imgElement.width);
+  const height = (canvas.height =
+    imgElement.naturalHeight || imgElement.offsetHeight || imgElement.height);
+
+  context.drawImage(imgElement, 0, 0);
+
+  const imageData = context.getImageData(0, 0, width, height).data;
+  const length = imageData.length;
+
+  for (let i = 0; i < length; i += 4) {
+    averageColor.r += imageData[i];
+    averageColor.g += imageData[i + 1];
+    averageColor.b += imageData[i + 2];
+  }
+
+  const count = length / 4;
+  averageColor.r = ~~(averageColor.r / count); // ~~ => convert to int
+  averageColor.g = ~~(averageColor.g / count);
+  averageColor.b = ~~(averageColor.b / count);
+
+  return averageColor;
+}
+```
+
+즉 위 getAverageColorOfImage 함수에 memoization을 적용하려는 것이다.
+
+`./src/utils/getAverageColorOfImage.js`
+
+```jsx
+const cache = {}
+
+export function getAverageColorOfImage(imgElement) {
+  if (cache.hasOwnProperty(imgElement.src)) {
+    console.log("Cache has the key")
+    return cache[imgElement.src] // cache된 값을 반환
+  }
+
+  console.log("Cache don't have the key")
+  //..
+
+  cache[imgElement.src] = averageColor // 저장
+  return averageColor
+}
+```
+
+위처럼 memoization 함수를 구현해보았다. 
+memoization 함수는 pure function이어야만 한다. (동일한 값을 반환하도록 하기 위해)
+또한 cache 객체에 imgElement만 넣게될 경우 모든 이미지를 같은 이미지 객체로 인식하게 되므로 각 이미지의 src를 cache 데이터로 넣어 중복되지 않도록 처리해줄 수 있다.
+
+실제 performance 탭에서도 초기에는 getLoadImage 함수가 계산되는데 약 4초 정도 소요되는 반면 이후 동작 시 훨씬 빠른 속도로 해당 함수가 동작하는 것을 로그로 확인할 수 있다.
+
+이러한 memoization 함수는 다양한 타입에 삽입될 수 있으므로 이를 factory pattern으로 memoization 함수로 변경해주는 유틸 함수로 만들어 적용하는 것이 바람직한다.
+
+`./src/utils/memoize.js`
+
+```jsx
+export default function memoize(fn) {
+  const cache = {}
+
+  return function (...args) {
+    if (args.length !== 1) {
+      return fn(...args)
+    }
+    if (cache.hasOwnProperty(args)) {
+      return cache[args]
+    }
+
+    const result = fn(...args)
+    cache[args] = result
+
+    return fn(...args)
+  }
+}
+```
+
+`./src/utils/getAverageColorOfImage.js`
+
+```jsx
+import memoize from "./memoize"
+
+export const getAverageColorOfImage = memoize(function (imgElement) {
+   // ..
+})
+```
+
+위처럼 적용해줄 수 있는 것이다. 단 memoization은 heavy한 함수에 캐싱을 도와 성능을 개선해주므로 1회성 데이터는 굳이 memoization 처리를 하는 것이 불필요하다. 따라서 적절하게 상황에 맞춰 해당 함수를 사용하는 것이 바람직하다.
