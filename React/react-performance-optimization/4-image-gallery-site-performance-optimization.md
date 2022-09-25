@@ -405,25 +405,25 @@ memoization 기능은 신규 기술이 아니므로 요즘은 recoil 등에서 �
 
 ### 병목 함수에 memoization 적용
 
-이번에는 직접 `memoization` 함수를 만들어보려고 한다. 
-`memoization`이란 어떤 input → output이 있다고 했을 때, 해당 input과, output을 기억해놓았다가 같은 input일 경우 같은 output을 반환해주도록 처리해주는 것이다. 
+이번에는 직접 `memoization` 함수를 만들어보려고 한다.
+`memoization`이란 어떤 input → output이 있다고 했을 때, 해당 input과, output을 기억해놓았다가 같은 input일 경우 같은 output을 반환해주도록 처리해주는 것이다.
 
 위 memoization 함수를 현 서비스의 어디에 적용할 수 있을까? 이미지가 뜨는 부분을 memoization 처리할 수 있다. 처음 상세페이지에서 이미지를 다운로드 받는 속도는 어찌할 수 없다 치더라도, 이미지의 컬러를 도출하여 배경화면에 적용하는 과정은 계산이 많이 소요되므로 한번 계산된 뒤 같은 이미지를 모달로 띄울 때, 해당 이미지에 대한 배경색 값을 memoization하여 호출한다면 성능을 개선할 수 있을 것이다.
 
-먼저 현재 구조를 살펴보면, 배경화면 색을 가져오는 함수는 `ImageModal`에서 사용하고 있는 `getAverageColorOfImage`라는 함수이다. 
+먼저 현재 구조를 살펴보면, 배경화면 색을 가져오는 함수는 `ImageModal`에서 사용하고 있는 `getAverageColorOfImage`라는 함수이다.
 
 `./src/components/ImageModal.js`
 
 ```jsx
 // ..
-import { getAverageColorOfImage } from '../utils/getAverageColorOfImage';
+import { getAverageColorOfImage } from "../utils/getAverageColorOfImage"
 
 function ImageModal({ modalVisible, src, alt, bgColor }) {
-  const dispatch = useDispatch();
-  const onLoadImage = e => {
-    const averageColor = getAverageColorOfImage(e.target);
+  const dispatch = useDispatch()
+  const onLoadImage = (e) => {
+    const averageColor = getAverageColorOfImage(e.target)
     // ..
-  };
+  }
 
   // ..
 }
@@ -433,40 +433,38 @@ function ImageModal({ modalVisible, src, alt, bgColor }) {
 
 ```jsx
 export function getAverageColorOfImage(imgElement) {
-  const canvas = document.createElement('canvas');
-  const context = canvas.getContext && canvas.getContext('2d');
+  const canvas = document.createElement("canvas")
+  const context = canvas.getContext && canvas.getContext("2d")
   const averageColor = {
     r: 0,
     g: 0,
     b: 0,
-  };
+  }
 
   if (!context) {
-    return averageColor;
+    return averageColor
   }
 
-  const width = (canvas.width =
-    imgElement.naturalWidth || imgElement.offsetWidth || imgElement.width);
-  const height = (canvas.height =
-    imgElement.naturalHeight || imgElement.offsetHeight || imgElement.height);
+  const width = (canvas.width = imgElement.naturalWidth || imgElement.offsetWidth || imgElement.width)
+  const height = (canvas.height = imgElement.naturalHeight || imgElement.offsetHeight || imgElement.height)
 
-  context.drawImage(imgElement, 0, 0);
+  context.drawImage(imgElement, 0, 0)
 
-  const imageData = context.getImageData(0, 0, width, height).data;
-  const length = imageData.length;
+  const imageData = context.getImageData(0, 0, width, height).data
+  const length = imageData.length
 
   for (let i = 0; i < length; i += 4) {
-    averageColor.r += imageData[i];
-    averageColor.g += imageData[i + 1];
-    averageColor.b += imageData[i + 2];
+    averageColor.r += imageData[i]
+    averageColor.g += imageData[i + 1]
+    averageColor.b += imageData[i + 2]
   }
 
-  const count = length / 4;
-  averageColor.r = ~~(averageColor.r / count); // ~~ => convert to int
-  averageColor.g = ~~(averageColor.g / count);
-  averageColor.b = ~~(averageColor.b / count);
+  const count = length / 4
+  averageColor.r = ~~(averageColor.r / count) // ~~ => convert to int
+  averageColor.g = ~~(averageColor.g / count)
+  averageColor.b = ~~(averageColor.b / count)
 
-  return averageColor;
+  return averageColor
 }
 ```
 
@@ -491,7 +489,7 @@ export function getAverageColorOfImage(imgElement) {
 }
 ```
 
-위처럼 memoization 함수를 구현해보았다. 
+위처럼 memoization 함수를 구현해보았다.
 memoization 함수는 pure function이어야만 한다. (동일한 값을 반환하도록 하기 위해)
 또한 cache 객체에 imgElement만 넣게될 경우 모든 이미지를 같은 이미지 객체로 인식하게 되므로 각 이미지의 src를 cache 데이터로 넣어 중복되지 않도록 처리해줄 수 있다.
 
@@ -527,8 +525,121 @@ export default function memoize(fn) {
 import memoize from "./memoize"
 
 export const getAverageColorOfImage = memoize(function (imgElement) {
-   // ..
+  // ..
 })
 ```
 
-위처럼 적용해줄 수 있는 것이다. 단 memoization은 heavy한 함수에 캐싱을 도와 성능을 개선해주므로 1회성 데이터는 굳이 memoization 처리를 하는 것이 불필요하다. 따라서 적절하게 상황에 맞춰 해당 함수를 사용하는 것이 바람직하다.
+위처럼 적용해줄 수 있다. 단 memoization은 heavy한 함수에 캐싱을 도와 성능을 개선해주므로 1회성 데이터는 memoization 처리를 하는 것이 불필요하므로, 상황에 맞춰 적절히 함수를 사용하는 것이 바람직함!
+
+### 병목 함수 로직 개선하기
+
+이번에는 병목을 일으키는 함수에 대해 로직 개선을 해보고자 한다.
+지난 시간의 getAverageColorOfImage 함수 내부 로직부터 개선해보고자 한다.
+우선 공통의 memoiza 함수 적용을 제외한 직접 캐시를 적용한 함수 형태로 돌려둔다.
+
+`./src/utils/getAverageColorOfImage.js`
+
+```jsx
+const cache = {}
+
+export function getAverageColorOfImage(imgElement) {
+  if (cache.hasOwnProperty(imgElement.src)) {
+    return cache[imgElement.src]
+  }
+
+  // ..
+
+  context.drawImage(imgElement, 0, 0) // 병목 발생: drawImage는 캔버스에 이미지를 그리는 과정
+  const imageData = context.getImageData(0, 0, width, height).data // 병목 발생
+  const length = imageData.length
+
+  // 병목 발생
+  for (let i = 0; i < length; i += 4) {
+    averageColor.r += imageData[i]
+    averageColor.g += imageData[i + 1]
+    averageColor.b += imageData[i + 2]
+  }
+
+  //..
+
+  cache[imgElement.src] = averageColor
+  return averageColor
+}
+```
+
+![](../../img/220925-1.png)
+
+실제 위 함수는 Performance 탭에서 확인했을 때 4초 정도의 실행 시간을 가져가므로 병목을 일으키는 함수라고 볼 수 있다. 또한 위 함수의 병목을 일으키는 3가지 위치를 어떻게 개선해볼 수 있을까?
+
+1. drawImage는 캔버스에 이미지를 그리는 과정
+   1. 그리고자 하는 캔버스의 크기가 클수록 옮겨지는 속도가 느리므로 이미지의 사이즈를 작게해서 그림
+
+      1. 아예 이미지를 작게 가져오거나 2) 이미지를 캔버스에 그릴 때, 이미지를 작게 그리거나
+
+이는 ImageModal 내의 이미지 src를 가져오는 대신, PhotoItem 즉, 리스트에 존재하는 small 사이즈 이미지의 src를 가져와 처리하는 방법으로 개선할 수 있다.
+
+`./src/components/PhotoItem.js`
+
+```jsx
+// ..
+
+function PhotoItem({ photo: { id, urls, alt } }) {
+  // ..
+
+  const openModal = () => {
+    dispatch(showModal({ src: urls.full, alt, id })) // id값 추가
+  }
+
+  return (
+    <ImageWrap>
+      <LazyLoad offset={500}>
+        {/* id 속성 추가 */}
+        <Image crossOrigin="*" id={id} src={urls.small + "&t=" + new Date().getTime()} alt={alt} onClick={openModal} />
+      </LazyLoad>
+    </ImageWrap>
+  )
+}
+```
+
+`./src/containers/ImageModalContainer.js`
+
+```jsx
+// ..
+
+function ImageModalContainer() {
+  // id 값 추가 호출
+  const { modalVisible, bgColor, src, alt, id } = useSelector(
+    (state) => ({
+      // ..
+      id: state.imageModal.id,
+    }),
+    shallowEqual
+  )
+  {
+    /* id 속성 추가 */
+  }
+  return <ImageModal modalVisible={modalVisible} bgColor={bgColor} src={src} alt={alt} id={id} />
+}
+```
+
+`./src/components/ImageModal.js`
+
+```jsx
+//..
+function ImageModal({ modalVisible, src, alt, bgColor, id }) {
+  // ..
+  const onLoadImage = (e) => {
+    // e.target 대신 small.image id 반영
+    const averageColor = getAverageColorOfImage(document.querySelector(`#${id}`))
+    dispatch(setBgColor(averageColor))
+  }
+
+  return (
+    <Modal modalVisible={modalVisible} closeModal={closeModal} bgColor={bgColor}>
+      <ImageWrap>
+        <FullImage crossOrigin="*" src={src} alt={alt} onLoad={onLoadImage} />
+      </ImageWrap>
+    </Modal>
+  )
+}
+```
