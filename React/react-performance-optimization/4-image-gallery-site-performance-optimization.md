@@ -572,6 +572,7 @@ export function getAverageColorOfImage(imgElement) {
 실제 위 함수는 Performance 탭에서 확인했을 때 4초 정도의 실행 시간을 가져가므로 병목을 일으키는 함수라고 볼 수 있다. 또한 위 함수의 병목을 일으키는 3가지 위치를 어떻게 개선해볼 수 있을까?
 
 1. drawImage는 캔버스에 이미지를 그리는 과정
+
    1. 그리고자 하는 캔버스의 크기가 클수록 옮겨지는 속도가 느리므로 이미지의 사이즈를 작게해서 그림
 
       1. 아예 이미지를 작게 가져오거나 2) 이미지를 캔버스에 그릴 때, 이미지를 작게 그리거나
@@ -643,3 +644,95 @@ function ImageModal({ modalVisible, src, alt, bgColor, id }) {
   )
 }
 ```
+
+그런데 여기 문제가 있다. 만약 리스트의 이미지 중 아래 이미지의 배경색을 추출했다고 하자.
+
+![](../../img/220926-1.png)
+
+이 이미지를 모달로 띄우면 원본 사진은 아래와 같다.
+
+![](../../img/220926-2.png)
+
+이미지의 중간 영역만 잘라져서 리스트에 반영된 상태로 배경색이 추출되었다고 할 수 있다.
+함수 성능을 개선하면서 바라보는 이미지를 리스트 이미지로 변경했는데, 만약 이미지의 가운데와 위, 아래 영역이 색깔 대조가 많은 이미지라면? 그리고 이미지 전체의 평균 색상을 도출하는 것이 더 중요하다면 어떻게 해야할까?
+
+이때는 이미지 전체를 작은 사이즈의 캔버스에 이미지를 그리고 해당 이미지에 대한 대표 색상을 도출할 수 있다.
+
+`./src/components/ImageModal.js`
+
+```jsx
+// ..
+import { getAverageColorOfImage } from "../utils/getAverageColorOfImage"
+
+function ImageModal({ modalVisible, src, alt, bgColor, id }) {
+  const onLoadImage = (e) => {
+    const averageColor = getAverageColorOfImage(e.target) // roll-back
+    dispatch(setBgColor(averageColor))
+  }
+
+  // ..
+}
+```
+
+`./src/utils/getAverageColorOfImage.js`
+
+```jsx
+const cache = {}
+
+export function getAverageColorOfImage(imgElement) {
+  //..
+
+  const width = imgElement.naturalWidth || imgElement.offsetWidth || imgElement.width
+  const height = imgElement.naturalHeight || imgElement.offsetHeight || imgElement.height
+
+  canvas.width = width / 2
+  canvas.height = height / 2
+
+  // drawImage(image: CanvasImageSource, dx: number, dy: number, dw: number, dh: number): void;
+  context.drawImage(imgElement, 0, 0, canvas.width, canvas.height)
+
+  // ..
+}
+```
+
+위처럼 `drayImage` 시 width와, height 값을 인자로 설정하고, 기본 canvas 크기를 절반으로 줄여서 성능을 최적화할 수 있다.
+
+두번째로 반복문을 개선할 수 있다.
+
+`./src/utils/getAverageColorOfImage.js`
+
+```jsx
+const cache = {}
+
+export function getAverageColorOfImage(imgElement) {
+  //..
+
+  for (let i = 0; i < length; i += 40) {
+    // 빼경색 추출 픽셀 단위를 4에서 40으로 변경
+    averageColor.r += imageData[i]
+    averageColor.g += imageData[i + 1]
+    averageColor.b += imageData[i + 2]
+  }
+
+  const count = length / 40
+  // ..
+}
+```
+
+이외로 Modal 내 색 변경 애니메이션에 transition 효과를 추가하여 UX를 보강한다.
+
+`./src/components/Modal.js`
+
+```jsx
+//..
+
+const ModalWrap = styled.div`
+  // ..
+  transition: background-color 1s;
+`
+
+export default Modal
+```
+
+위처럼하면 원본 사진을 기준으로 성능을 최적화하도록 할 수 있다.
+다만 무조건 줄이는 것은 좋지 않다. 오히려 줄이는 과정에서 병목이 발생할 수 있으므로 적절한 시점을 찾아 함수 동작을 조절하도록 한다.
