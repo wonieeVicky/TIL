@@ -8,7 +8,7 @@ import { getAverageColorOfImage } from "../utils/getAverageColorOfImage"
 function ImageModal({ modalVisible, src, alt, bgColor, id }) {
   const dispatch = useDispatch()
   const onLoadImage = (e) => {
-    const averageColor = getAverageColorOfImage(document.querySelector(`#${id}`))
+    const averageColor = getAverageColorOfImage(e.target)
     dispatch(setBgColor(averageColor))
   }
 
