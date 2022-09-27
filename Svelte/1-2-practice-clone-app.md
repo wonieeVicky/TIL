@@ -81,3 +81,79 @@ d
 ```
 
 위처럼 하면 불필요한 여백이 아래와 같이 사라지는 것을 확인할 수 있으며 페이지 전역에 Roboto 폰트가 적용된 것을 확인할 수 있다.
+
+### SCSS(svelte-preprecess, node-sass)
+
+Header 태그에서 작성한 스타일 코드를 scss를 통해 개선해보고자 한다.
+
+```bash
+> npm i -D svelte-preprocess node-sass
+```
+
+`./rollup.config.js`
+
+```jsx
+import sveltePreprocess from "svelte-preprocess"
+
+// ..
+export default {
+  input: "src/main.js",
+  output: {
+    sourcemap: true,
+    format: "iife",
+    name: "app",
+    file: "public/build/bundle.js",
+  },
+  plugins: [
+    svelte({
+      preprocess: sveltePreprocess(), // preprocess 옵션 추가
+      dev: !production,
+    }),
+		// ..
+  ],
+	// ..
+}
+```
+
+위와 같이 설정 후 Header.svelte를 scss 포맷으로 수정해준다.
+
+`./src/components/Header.svelte`
+
+```html
+<header>
+  <img src="/images/trello-logo.svg" alt="Trello" class="logo" />
+</header>
+
+<style lang="scss">
+  header {
+    height: 40px;
+    box-sizing: border-box;
+    background-color: rgba(0, 0, 0, 0.4);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    img.logo {
+      width: 80px;
+      height: auto;
+      opacity: 0.5;
+    }
+  }
+</style>
+```
+
+위와 같이 설정 후 개발서버를 다시 띄워주면 스타일이 정상적으로 적용되어 있는 것을 확인할 수 있다.
+
+![](../img/220927-1.png)
+
+그런데 Header 파일 내 scss 로 속성으로 설정한 부분에서 아래와 같이 에러가 발생한다. 
+
+![](../img/220927-2.png)
+
+이는 바로 ****Svelte for VS Code 익스텐션이 node 위치를 찾지못해 발생한 오류로 이를 개선하기 위해서 해당 익스텐션 설정 내 `Language-server: Runtime` 위치에 node 경로를 입력해준다.**
+
+node 위치는 아래 명령어로 확인할 수 있다.
+
+```bash
+svelte-trello-app % which node
+/usr/local/bin/node
+```
