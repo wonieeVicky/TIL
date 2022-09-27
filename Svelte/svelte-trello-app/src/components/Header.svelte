@@ -2,7 +2,7 @@
   <img src="/images/trello-logo.svg" alt="Trello" class="logo" />
 </header>
 
-<style>
+<style lang="scss">
   header {
     height: 40px;
     box-sizing: border-box;
@@ -10,10 +10,10 @@
     display: flex;
     justify-content: center;
     align-items: center;
-  }
-  header img.logo {
-    width: 80px;
-    height: auto;
-    opacity: 0.5;
+    img.logo {
+      width: 80px;
+      height: auto;
+      opacity: 0.5;
+    }
   }
 </style>
