@@ -7,6 +7,10 @@
     "dev": "rollup -c -w",
     "start": "sirv public --no-clear"
   },
+  "browserslist": [
+    "> 1%",
+    "last 2 versions"
+  ],
   "devDependencies": {
     "@rollup/plugin-commonjs": "^15.1.0",
     "@rollup/plugin-node-resolve": "^9.0.0",
