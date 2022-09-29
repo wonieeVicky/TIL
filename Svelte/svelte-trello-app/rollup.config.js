@@ -1,10 +1,12 @@
 import svelte from "rollup-plugin-svelte"
 import commonjs from "@rollup/plugin-commonjs"
+import alias from "@rollup/plugin-alias"
 import resolve from "@rollup/plugin-node-resolve"
 import livereload from "rollup-plugin-livereload"
 import { terser } from "rollup-plugin-terser"
 import sveltePreprocess from "svelte-preprocess"
 import css from "rollup-plugin-css-only"
+import path from "path"
 
 const production = !process.env.ROLLUP_WATCH
 
@@ -63,6 +65,7 @@ export default {
       dedupe: ["svelte"],
     }),
     commonjs(),
+    alias({ entries: [{ find: "~", replacement: path.resolve(__dirname, "src/") }] }),
 
     // In dev mode, call `npm run start` once
     // the bundle has been generated
