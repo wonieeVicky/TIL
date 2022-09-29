@@ -249,3 +249,71 @@ export default {
 위 함수는 scss에서 제공하는 기능이므로, 간단하게 해당 컬러를 넣어 적용할 수 있어 매우 간편하다!
 
 ![실제 번들링된 css에는 자동으로 rgb 컬러로 들어가 있음](../img/220928-1.png)
+
+### 경로 별칭(@rollup/plugin-alias)
+
+이제 App 컴포넌트에 배경화면을 추가해본다.
+우리는 기본적인 방법으로 아래와 같이 배경화면을 추가해줄 수 있다.
+
+`./src/App.svelte`
+
+```html
+<script>
+  import Header from "./components/Header.svelte"
+
+  document.body.style.backgroundImage = "url(/images/bg.jpg)"
+  document.body.style.backgroundSize = "cover"
+</script>
+```
+
+그런데 위와 같은 적용 코드가 더 많아진다면, 지저분하고, 가독성이 떨어지게 될 것이다.
+따라서 위 코드는 아래와 같이 `Object.assign` 메서드를 사용해 깔끔하게 작성해줄 수 있다.
+
+`./src/App.svelte`
+
+```html
+<script>
+  import Header from "./components/Header.svelte"
+
+  Object.assign(document.body.style, {
+    backgroundColor: "darkgray",
+    backgroundImage: "url(/images/bg.jpg",
+    backgroundSize: "cover",
+  })
+</script>
+```
+
+이 외로도 import를 해오는 컴포넌트의 경로가 상대 경로로 작성되어 있는데, 파일 구조가 복잡해질수록 경로 별칭을 사용하는 것이 좋다. `@rollup/plugin-alias`를 먼저 설치한 뒤 rollup config에 설정을 추가해준다.
+
+```bash
+> npm i -D @rollup/plugin-alias
+```
+
+`./rollup.config.js`
+
+```jsx
+import path from "path"
+import alias from "@rollup/plugin-alias"
+//..
+
+export default {
+  // ..
+  plugins: [
+    // ..
+    commonjs(),
+    alias({ entries: [{ find: "~", replacement: path.resolve(__dirname, "src/") }] }),
+    // ..
+  ],
+  // ..
+}
+```
+
+위처럼 alias 설정을 추가한 뒤 Header 컴포넌트의 경로를 아래와 같이 수정해준다.
+
+`./src/App.svelte`
+
+```html
+<script>
+  import Header from "~/components/Header.svelte"
+</script>
+```
