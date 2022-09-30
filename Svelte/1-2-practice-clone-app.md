@@ -317,3 +317,97 @@ export default {
   import Header from "~/components/Header.svelte"
 </script>
 ```
+
+### ListContainer, List, CreateList 컴포넌트 작성
+
+이제 Header를 제외한 나머지 부분인 ListContainer 컴포넌트를 작업해본다.
+
+`./src/components/ListContainer.svelte`
+
+```html
+<script>
+  import List from "~/components/List.svelte"
+  import CreateList from "~/components/CreateList.svelte"
+</script>
+
+<div class="list-container">
+  <div class="lists">
+    <List />
+    <List />
+  </div>
+  <CreateList />
+</div>
+
+<style lang="scss">
+  .list-container {
+    width: 100vw;
+    height: calc(100vh - 40px);
+    border: 10px solid red;
+    padding: 30px;
+    box-sizing: border-box;
+    overflow-x: auto;
+    overflow-y: hidden;
+    white-space: nowrap;
+    font-size: 0;
+    .lists {
+      display: inline-block;
+      height: 100%;
+      border: 10px solid blue;
+      box-sizing: border-box;
+      white-space: nowrap;
+      font-size: 0;
+    }
+  }
+</style>
+```
+
+`./src/components/List.svelte`
+
+```html
+<div class="list" />
+
+<style lang="scss">
+  .list {
+    display: inline-block;
+    font-size: 16px;
+    white-space: normal;
+    width: 290px;
+    height: 100%;
+    border: 10px solid yellowgreen;
+    box-sizing: border-box;
+    margin: 0 4px;
+  }
+</style>
+```
+
+`./src/components/CreateList.svelte`
+
+```html
+<div class="create-list">+ Add another list</div>
+
+<style lang="scss">
+  .create-list {
+    font-size: 16px;
+    white-space: normal;
+    width: 290px;
+    display: inline-block;
+    padding: 10px 8px;
+    vertical-align: top;
+    background: rgba(#ebecf0, 0.6);
+    border-radius: 4px;
+    margin: 0 4px;
+    line-height: 20px;
+    cursor: pointer;
+    transition: 0.2s;
+    &:hover {
+      background: #ebecf0;
+    }
+  }
+</style>
+```
+
+![](../img/220930-1.png)
+
+위처럼 작업하면 아래와 같은 기본 레이아웃이 생성된다.
+
+해당 레이아웃을 만들 때 기본적으로 flex를 이용해서 많이 만들어왔는데, 여기에서는 inline-block 과 white-space, vertical-align 속성 등으로 해당 레이아웃을 구현함. 구 스타일 API로만 구성하는 레이아웃이므로 오히려 호환성 면에서 낫다는 생각도 든다. 참조할 것
