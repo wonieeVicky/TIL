@@ -411,3 +411,40 @@ export default {
 위처럼 작업하면 아래와 같은 기본 레이아웃이 생성된다.
 
 해당 레이아웃을 만들 때 기본적으로 flex를 이용해서 많이 만들어왔는데, 여기에서는 inline-block 과 white-space, vertical-align 속성 등으로 해당 레이아웃을 구현함. 구 스타일 API로만 구성하는 레이아웃이므로 오히려 호환성 면에서 낫다는 생각도 든다. 참조할 것
+
+### Lists 커스텀 스토어와 Storage API
+
+이제 createList 컴포넌트를 통해 실제 리스트를 생성할 수 있도록 만들어준다.
+이를 위해 store를 도입해준다. 정보 저장은 로컬 스토리지에 저장해준다.
+
+로컬스토리지는 최대 10MB까지 저장할 수 있으며 HTML5 권장은 5MB이다.
+Key-Value 형태의 문자로 저장하기 때문에 충분한 용량이라고 볼 수 있다. 로컬 스토리지는 창을 닫아도 저장된 데이터가 해당 도메인에서 계속 유지되므로 한 번 저장된 데이터가 유실되지 않고 계속 남게 된다.
+
+`./src/store/list.js`
+
+```jsx
+import { writable } from "svelte/store"
+
+const repoLists = JSON.parse(window.localStorage.getItem("lists")) || []
+
+const _lists = writable(repoLists) // 외부에서 사용하지 않고 내부에서만 사용하는 정보
+_lists.subscribe(($lists) => window.localStorage.setItem("lists", JSON.stringify($lists)))
+
+export const lists = {
+  subscribe: _lists.subscribe, // 실행시키지 않고 참조관계로 연결
+  add(payload) {
+    // custom event
+    const { title } = payload
+    _lists.update(($lists) => {
+      $lists.push({
+        id: "", // crypto-random-string을 통한 고유 문자열 생성
+        title,
+        cards: [],
+      })
+      return $lists
+    })
+  },
+}
+```
+
+위처럼 스토어 내부에 존재하는 writable 함수는 `_`기호를 사용해 `_lists` 변수로 저장하고, 이를 외부에서 사용하는 lists 함수와 참조 관계로 연결하여 구현해주면 스토리지를 활용한 간단한 subscribe, add 스토어 함수가 만들어진다.
