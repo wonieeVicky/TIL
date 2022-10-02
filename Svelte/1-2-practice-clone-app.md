@@ -448,3 +448,130 @@ export const lists = {
 ```
 
 위처럼 스토어 내부에 존재하는 writable 함수는 `_`기호를 사용해 `_lists` 변수로 저장하고, 이를 외부에서 사용하는 lists 함수와 참조 관계로 연결하여 구현해주면 스토리지를 활용한 간단한 subscribe, add 스토어 함수가 만들어진다.
+
+### 랜덤 고유 문자열 생성(crypto-random-string)과 Rollup 구성
+
+이제 list 스토어의 add 함수에 들어갈 랜덤 id 값을 `crypto-random-string`을 이용해 넣어보고자 한다. 간단한 패키지로 uuid가 있으나 rollup 설정을 하는 과정을 배워보고자 위 모듈을 선택했다.
+
+```bash
+> npm i -D crypto-random-string@3.2
+```
+
+설치한 모듈을 list 스토어에 반영해보자.
+
+`./src/store/list.js`
+
+```jsx
+import { writable } from "svelte/store"
+import cryptoRandomString from "crypto-random-string"
+
+const generateId = () => cryptoRandomString({ length: 10 })
+
+// ..
+export const lists = {
+  subscribe: _lists.subscribe,
+  add(payload) {
+    const { title } = payload
+    _lists.update(($lists) => {
+      $lists.push({
+        id: generateId(),
+        title,
+        cards: [],
+      })
+      return $lists
+    })
+  },
+}
+```
+
+`./src/components/CreateList.svelte`
+
+```html
+<script>
+  import { lists } from "~/store/list"
+  lists.add({
+    title: "vicky",
+  })
+</script>
+
+<div class="create-list">+ Add another list</div>
+```
+
+위와 같이 추가 후 lists.add를 실행시켜주면 에러가 발생하는데 에러메시지는 아래와 같다.
+
+```
+Uncaught TypeError: crypto__default.default.randomBytes is not a function
+```
+
+rollup 번들러를 사용하면 위와 같은 에러 메시지를 자주 만나게 되는데, rollup 번들러는 기본적으로 아주 가볍게 설계되어 있기 때문이다. 다르게 얘기하자면 날 것에 가까운 상태인데, node.js의 전역 API나 내장 API가 번들이 가능한 형태로 준비되어 있지 않기 때문에 위와 같이 node.js 구동에 필요한 메서드들이 추가되었을 때 에러메시지가 발생한다.
+
+따라서 필요에 따라 살을 붙여나가야한다. crypto 모듈 또한 별도의 번들 설정을 해주어야 사용할 수 있다.
+Node의 내장 API 사용을 위해서는 아래의 것들을 설치해주면 된다.
+
+- rollup-plugin-node-builtins : Node 내장 API를 사용할 수 있음
+- rollup-plugin-node-globals : 일부 Node 모듈이 필요로 하는 전역 API를 사용할 수 있다.
+- rollup-plugin-replace : 번들 파일의 문자를 대체한다. 문제가 발생하는 코드를 다른 코드로 대체 실행하기 위해 사용한다. ‘기능’을 대체하는 것이 아닌 ‘코드’를 대체함. 예를 들어 ‘없는 내부 모듈’을 사용하는 코드를 찾아 ‘있는 외부 모듈’을 사용할 수 있는 코드로 바꿔준다.
+
+`rollup-plugin-node-builtins`와 `rollup-plugin-node-globals` 모듈을 하나로 줄여 `globals/builtins`라고 부른다고 했을 때, `globals/builtins` 는 NodeJS에서 공식적으로 지원하는 모듈이 아니기 때문에, NodeJS가 최신 버전으로 업데이트 될 때마다 `globals/builtins`에 기능을 따로 개발해서 넣어줘야 한다. 이 부분 에서 시간, 기술 등의 여러가지 이유로 `globals/builtins`가 모든 NodeJS 기능을 제공하지 못하는 문제가 발생하는데, 이 때 `rollup-plugin-replace` 같은 추가 모듈을 통해 프로젝트에 `globals/builtins` 가 지원하지 못하는 기능을 따로 제공해줘야 한다. 이 중 대표적인 것이 `crypto-random-string` 모듈 내부의 `crypto.randomBytes` 메소드이다.
+
+먼저 `globals/builtins`를 설치해준다.
+
+```json
+"rollup-plugin-node-builtins": "^2.1.2",
+"rollup-plugin-node-globals": "^1.4.0",
+"rollup-plugin-replace": "^2.2.0",
+```
+
+```bash
+> npm i
+```
+
+devDependencies 에 위 3가지 모듈을 추가 후 패키지 설치를 진행해준다.
+
+`./rollup.config.js`
+
+```jsx
+// ..
+import globals from "rollup-plugin-node-globals"
+import builtins from "rollup-plugin-node-builtins"
+import replace from "rollup-plugin-replace"
+
+// ..
+export default {
+  // ..
+  plugins: [
+    // ..
+
+    replace({
+      values: {
+        "crypto.randomBytes": 'require("randombytes")',
+      },
+    }),
+
+    resolve({
+      browser: true,
+      dedupe: ["svelte"],
+    }),
+    commonjs(),
+
+    globals(),
+    builtins(),
+
+    // ..
+  ],
+}
+```
+
+위와 같이 설정 후 다시 개발서버를 실행시켜보면 기존에 발생하던 에러가 더이상 나오지 않는 것을 확인할 수 있다. 또한 add 함수가 실행되어 실제 로컬 스토리지에 데이터가 정상적으로 추가된 것을 확인할 수 있다.
+
+![](../img/221002-1.png)
+
+테스트 lists를 모두 삭제 한 뒤 CreateList에 테스트용으로 넣어 둔 add 함수를 제거 후 페이지를 새로 고침하면 초기 lists 데이터가 존재하지 않으므로 `store/list.js` 에서 만든 repoLists의 기본값이 빈 배열이 들어가 있는 것을 확인할 수 있다.
+
+`./store/list.js`
+
+```jsx
+const repoLists = JSON.parse(window.localStorage.getItem("lists")) || []
+```
+
+![](../img/221002-2.png)
