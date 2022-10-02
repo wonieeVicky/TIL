@@ -1,4 +1,7 @@
 ﻿import { writable } from "svelte/store"
+import cryptoRandomString from "crypto-random-string"
+
+const generateId = () => cryptoRandomString({ length: 10 })
 
 const repoLists = JSON.parse(window.localStorage.getItem("lists")) || []
 
@@ -11,7 +14,7 @@ export const lists = {
     const { title } = payload
     _lists.update(($lists) => {
       $lists.push({
-        id: "",
+        id: generateId(),
         title,
         cards: [],
       })
