@@ -575,3 +575,83 @@ const repoLists = JSON.parse(window.localStorage.getItem("lists")) || []
 ```
 
 ![](../img/221002-2.png)
+
+### List 생성을 위한 수정 모드(Edit mode)
+
+이번는 구현한 store를 이용해 추가된 list 내용을 추가해주도록 만들어본다.
+
+`./src/components/CreateList.svelte`
+
+```html
+<script>
+  import { tick } from "svelte"
+  import { lists } from "~/store/list"
+  let isEditMode = false
+  let title = ""
+  let textareaEl
+
+  function addList() {
+    // 값 존재 시 동작
+    if (title.trim()) {
+      lists.add({
+        title,
+      })
+    }
+    offEditMode()
+  }
+
+  async function onEditMode() {
+    isEditMode = true
+    await tick() // 데이터 갱신을 기다려준다.
+    textareaEl && textareaEl.focus()
+  }
+
+  function offEditMode() {
+    isEditMode = false
+    title = ""
+  }
+</script>
+
+<div class="create-list">
+  {#if isEditMode}
+  <div class="edit-mode">
+    <textarea bind:value={title} bind:this={textareaEl} placeholder="Enter a title for this list..." on:keydown={(e) =>
+    { e.key === "Enter" && addList() e.key === "Escape" && offEditMode() e.key === "Esc" && offEditMode() // IE, edge
+    지원 코드 }} />
+    <div class="actions">
+      <div class="btn" on:click="{addList}">Add List</div>
+      <div class="btn" on:click="{offEditMode}">Cancel</div>
+    </div>
+  </div>
+  {:else}
+  <div class="add-another-list" on:click="{onEditMode}">+ Add another list</div>
+  {/if}
+</div>
+```
+
+위와 같이 editMode 변수에 따라 적절한 컴포넌트가 들어가도록 해준 뒤 각 버튼의 성격에 맞게 addList, onEditMode, offEditMode 함수들을 구현해주었다.
+
+또한 ListContainer에 테스트를 위해 넣어두었던 렌더링 영역도 아래와 같이 수정해준다.
+
+`./src/components/ListContainer.svelte`
+
+```html
+<script>
+  import { lists } from "~/store/list"
+  import List from "~/components/List.svelte"
+  import CreateList from "~/components/CreateList.svelte"
+</script>
+
+<div class="list-container">
+  <div class="lists">
+    {#each $lists as list (list.id)}
+    <List />
+    {/each}
+  </div>
+  <CreateList />
+</div>
+```
+
+lists의 subscribe 메서드를 통해 가져온 lists 데이터를 each 문으로 반복시켜 List 컨테이너를 맞물려주면 원하는 데이터가 정상적으로 노출되는 것을 확인할 수 있다!
+
+![](../img/221003-1.gif)
