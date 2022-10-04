@@ -655,3 +655,130 @@ const repoLists = JSON.parse(window.localStorage.getItem("lists")) || []
 lists의 subscribe 메서드를 통해 가져온 lists 데이터를 each 문으로 반복시켜 List 컨테이너를 맞물려주면 원하는 데이터가 정상적으로 노출되는 것을 확인할 수 있다!
 
 ![](../img/221003-1.gif)
+
+### 전역 스타일(main.scss) 생성 및 구성
+
+editMode 상태에 대한 스타일을 추가해본다.
+
+`./src/scss/main.scss`
+
+```scss
+.actions {
+  display: flex;
+  padding-bottom: 10px;
+  .btn {
+    margin-right: 4px;
+  }
+}
+.btn {
+  // SCSS에서 반복적으로 사용되는 값을 다룰 때는,
+  // 변수로 만들어서 사용하면 편리함
+  $btn-color--default: #e2e6ea;
+  $btn-color--success: #61bd4f;
+  $btn-color--danger: #eb5a46;
+  $text-color--default: #212529;
+  $text-color--colorful: #fff;
+
+  display: inline-block;
+  padding: 6px 12px;
+  background-color: $btn-color--default;
+  color: $text-color--default;
+  border-radius: 4px;
+  line-height: 20px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 400;
+  &:hover {
+    // SCSS에서 제공하는 darken 함수는,
+    // 인수로 Color, Amount를 순서대로 작성해,
+    // (10%) 더 어두운 색을 만들 수 있다.
+    background-color: darken($btn-color--default, 10%);
+  }
+  &.success {
+    background-color: $btn-color--success;
+    color: $text-color--colorful;
+    &:hover {
+      background-color: darken($btn-color--success, 10%);
+    }
+  }
+  &.danger {
+    background-color: $btn-color--danger;
+    color: $text-color--colorful;
+    &:hover {
+      background-color: darken($btn-color--danger, 10%);
+    }
+    // 모든 위험한(danger) 버튼의 글자 뒤에는 !(느낌표)를 붙인다.
+    &::after {
+      content: "!";
+    }
+  }
+  &.small {
+    font-size: 12px;
+    padding: 0 6px;
+  }
+}
+.edit-mode {
+  textarea {
+    resize: none;
+    outline: none;
+    border: none;
+    background: #fff;
+    margin-bottom: 8px;
+    padding: 6px 8px;
+    border-radius: 4px;
+    box-shadow: 0 1px 0 rgba(9, 30, 66, 0.25);
+    line-height: 20px;
+    width: 100%;
+    height: 66px;
+    box-sizing: border-box;
+    display: block;
+  }
+}
+```
+
+위처럼 scss를 사용하면 변수를 사용하는 것이 가능하고, scss에서 제공하는 API 들을 사용해 스타일을 더욱 손쉽게 구현할 수 있다. 위 스타일은 어디에서나 사용할 수 있는 범용 스타일이므로 아래와 같이 적용해줄 수 있다.
+
+`./src/components/CreateList.svelte`
+
+```html
+<style lang="scss">
+  @import "../scss/main.scss";
+  /* ... */
+</style>
+```
+
+위와 같이 import 해주면 각 페이지에서 처리될 scss 파일을 넣어줄 수 있다.
+하지만 서비스의 규모가 커진다고 했을 때 위 방법은 매우 귀찮은 방법이 될 수 있으므로 아래와 같이 적용해줄 수 있다.
+
+`./rollup.config.js`
+
+```jsx
+export default {
+  // ...
+  plugins: [
+    svelte({
+      preprocess: sveltePreprocess({
+        scss: {
+          // prepend로 main.scss를 앞에 붙여준다.
+          // 동작하는 svelte 파일에 lang="scss"일 때만 동작함
+          prependData: '@import "./src/scss/main.scss";',
+        },
+        postcss: {
+          plugins: [require("autoprefixer")()],
+        },
+      }),
+    }),
+    // ..
+  ],
+  watch: {
+    clearScreen: false,
+  },
+}
+```
+
+위와 같이 sveltePreprocess 메서드에 scss.prependData 옵션을 추가해주면 된다.
+단, 동작하는 svelte 파일에 style 태그의 lang 옵션이 scss일 때만 해당 옵션이 적용된다는 것을 잊지말자!
+
+dev 화면을 새로고침하면 스타일이 잘 적용된 것을 확인할 수 있다 🙂
+
+![](../img/221004-1.png)
