@@ -45,6 +45,9 @@ export default {
   plugins: [
     svelte({
       preprocess: sveltePreprocess({
+        scss: {
+          prependData: '@import "./src/scss/main.scss";', // prepend로 데이터를 앞에 붙여준다.
+        },
         postcss: {
           plugins: [require("autoprefixer")()],
         },
