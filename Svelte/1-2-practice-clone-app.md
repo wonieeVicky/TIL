@@ -782,3 +782,83 @@ export default {
 dev 화면을 새로고침하면 스타일이 잘 적용된 것을 확인할 수 있다 🙂
 
 ![](../img/221004-1.png)
+
+### **자동으로 수정 모드 종료(autoFocusout.js, Actions)**
+
+이번에는 자동으로 수정모드를 종료하는 기능을 구현해본다. 자동으로 종료한다는 것은 CreateList 컴포넌트 외부 영역을 클릭하면 해당 수정모드가 false로 바뀌면서 입력창이 닫히도록 구현하는 것을 의미함
+
+위 기능은 CreateList에서 뿐만 아니라 ListContainer 영역에서도 수정할 때 컴포넌트 외부를 클릭하면 해당 컴포넌트의 입력모드가 종료되고 기본 레이아웃으로 돌아가게된다. 따라서 이러한 기능은 여러 컴포넌트에서 범용적으로 사용될 기능이므로 최대한 유틸성 함수로 만들어보면 좋겠다.
+
+svelte.action을 통해서 해당 기능을 만들 수 있다.
+
+`./src/actions/autoFocus.js`
+
+```jsx
+export function autoFocusout(el, focusoutListener) {
+  // setTimeout을 0으로 설정하면 화면이 그려진 후 실행됨.
+  // call stack에 해당 이벤트가 쌓여있다가 기본 로직(Task)이 실행된 후 동작
+  setTimeout(() => {
+    // el의 clickEvent가 window까지 전파되지 않도록 처리
+    el.addEventListener("click", focusinListener)
+    // close edit-mode
+    window.addEventListener("click", focusoutListener)
+  })
+}
+```
+
+위와 같이 설정 후 해당 동작을 `CreateList`에 적용해본다.
+
+`*.*/src/components/CreateList.svelte`
+
+```html
+<script>
+  import { autoFocusout } from "~/actions/autoFocusout"
+  // ..
+</script>
+
+<div class="create-list">
+  {#if isEditMode}
+  <!-- use 메서드에 autoFocusout 유틸함수를 연결, 두 번째 인자로 offEditMode 함수를 연결 -->
+  <div use:autoFocusout="{offEditMode}" class="edit-mode">
+    <!-- codes.. -->
+  </div>
+  {:else}
+  <div class="add-another-list" on:click="{onEditMode}">+ Add another list</div>
+  {/if}
+</div>
+```
+
+위와 같이 처리하면 CreateList 외부에서 클릭 이벤트가 발생했을 때 해당 입력이 종료된다.
+특히 autoFocusout 이벤트에 setTimeout을 적용해줬는데, 별도의 시간 설정없이 setTimeout에 콜백함수를 감싸주면 해당 콜백함수가 call stack에 담겼다가 기본 로직(task)가 종료된 후 실행되도록 처리할 수 있다. 🥸
+
+그런데, 수정모드 종료 후 다시 재진입하려고 했을 때 해당 클릭이벤트가 실행되지 않는다.
+그 이유는 `.edit-mode`에 적용된 클릭이벤트가 중복되면서 실행되지 않는 것이다. 따라서 `removeEventListener`로 기존 클릭 이벤트를 제거해준 뒤 다시 이벤트가 추가되도록 해주도록 개선해준다.
+
+`./src/actions/autoFocusout.js`
+
+```jsx
+export function autoFocusout(el, focusoutListener) {
+  const focusinListener = (event) => {
+    event.stopPropagation()
+  }
+  // setTimeout을 0으로 설정하면 화면이 그려진 후 실행됨(call stack) - 기본 로직(Task)이 실행된 후 동작함
+  setTimeout(() => {
+    // el의 clickEvent가 window까지 전파되지 않도록 처리
+    el.addEventListener("click", focusinListener)
+    // close edit-mode
+    window.addEventListener("click", focusoutListener)
+  })
+
+  return {
+    // el 요소가 파괴되면 destroy 실행
+    destroy() {
+      el.removeEventListener("click", focusinListener)
+      window.removeEventListener("click", focusoutListener)
+    },
+  }
+}
+```
+
+위처럼 return.destroy 함수에 removeEventListener 함수로 연결해주면 이벤트 중복처리를 방지할 수 있으며, 아래아 같이 기능이 정상적으로 동작한다.
+
+![](../img/221005-1.gif)
