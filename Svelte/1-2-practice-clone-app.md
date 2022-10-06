@@ -862,3 +862,82 @@ export function autoFocusout(el, focusoutListener) {
 위처럼 return.destroy 함수에 removeEventListener 함수로 연결해주면 이벤트 중복처리를 방지할 수 있으며, 아래아 같이 기능이 정상적으로 동작한다.
 
 ![](../img/221005-1.gif)
+
+### List 컴포넌트 레이아웃의 이해
+
+이번에는 List 컴포넌트 레이아웃을 분석하고 만들어본다.
+
+`./src/components/List.svelte`
+
+```html
+<div class="list">
+  <div class="list__inner">
+    <div class="list__heading" />
+    <div class="list__cards">
+      <div class="card" />
+      <div class="card" />
+    </div>
+    <div class="create-card" />
+  </div>
+</div>
+```
+
+List는 위와 같은 구조를 지닌다. 먼저 타이틀 영역을 뿌려줄 heading 영역과, 할일 목록을 노출할 cards 영역, 그리고 새로운 할 일 생성을 위해 create-card 영역도 필요하다.
+
+그런데 위 클래스명들에 모두 **언더바를 사용한 것을 볼 수 있다. 이는 CSS BEM 방식이라고 하는데, 이는 크게 2가지 즉, 상태와 부분으로 구분된다. 하이픈(-)은 ‘상태’를 나타내며(E.g. `.car—-run`, `.car—-stop`) 언더바(\_*)*는 ‘부분’을 나타낸다. (E.g. `.car**door`, `.car\_\_wheel`)
+
+즉 위에서 \_\_로 처리한 heading과 inner, cards는 list의 부분을 의미하므로 해당 BEM을 따른 것이라고 할 수 있다. 이러한 CSS 규칙은 암묵적인 룰이므로 필요에 맞게 적절히 활용하면 된다.
+
+그럼 위 엘리먼트 구조에 간단한 골격을 스타일로 추가해본다.
+
+`./src/components/List.svelte`
+
+```scss
+body {
+  height: 100vh;
+  padding: 0;
+  padding: 30px;
+  box-sizing: border-box;
+}
+.list {
+  display: inline-block;
+  font-size: 16px;
+  white-space: normal;
+  width: 290px;
+  height: 100%;
+  border: 10px solid yellowgreen;
+  box-sizing: border-box;
+  margin: 0 4px;
+  & * {
+    box-sizing: border-box;
+  }
+}
+.list__inner {
+  border: 10px solid blue;
+  display: flex;
+  flex-direction: column;
+  max-height: 100%;
+}
+.list__heading {
+  border: 10px solid green;
+}
+.list__cards {
+  border: 10px solid orange;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+.list__cards .card {
+  height: 150px;
+  border: 10px solid;
+}
+.create-card {
+  border: 10px solid red;
+}
+```
+
+위와 같이 처리해주면 아래와 같은 레이아웃을 그려낼 수 있다.
+`display:flex;`일 때 하위 div가 width 값을 아무리 크게 가져도 전체 100% 크기를 넘지 않는다는 점 참고하자
+
+![](../img/221006-1.png)
+
+이제 골격은 완성되었으니 내부 구조를 만들어본다.
