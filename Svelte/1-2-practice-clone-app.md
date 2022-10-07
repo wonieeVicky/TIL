@@ -941,3 +941,100 @@ body {
 ![](../img/221006-1.png)
 
 이제 골격은 완성되었으니 내부 구조를 만들어본다.
+
+### List 컴포넌트 작성
+
+먼저 List 컴포넌트에 데이터를 넣기 위해 ListContainer 내부에 있는 List 컴포넌트 반복문에 데이터 연결을 해준다.
+
+`./src/components/ListContainer.svelte`
+
+```html
+<div class="list-container">
+  <div class="lists">
+    {#each $lists as list (list.id)}
+    <!-- list 데이터 연결 -->
+    <List {list} />
+    {/each}
+  </div>
+  <CreateList />
+</div>
+```
+
+그 다음 주입한 list 데이터를 바탕으로 List 컨데이터를 아래와 같이 작성해준다.
+
+`./src/components/List.svelte`
+
+```html
+<script>
+  import CreateCard from "~/components/CreateCard.svelte"
+  import ListTitle from "~/components/ListTitle.svelte"
+  import Card from "~/components/Card.svelte"
+
+  export let list
+</script>
+
+<div class="list">
+  <div class="list__inner">
+    <div class="list__heading">
+      <ListTitle />
+      <p>{list.cards.length} cards</p>
+    </div>
+    <div class="list__cards">
+      {#each list.cards as card (card.id)}
+      <Card />
+      {/each}
+    </div>
+    <CreateCard />
+  </div>
+</div>
+
+<style lang="scss">
+  body {
+    height: 100vh;
+    padding: 0;
+    padding: 30px;
+    box-sizing: border-box;
+  }
+  .list {
+    display: inline-block;
+    font-size: 16px;
+    white-space: normal;
+    width: 290px;
+    height: 100%;
+    box-sizing: border-box;
+    margin: 0 4px;
+    & * {
+      box-sizing: border-box;
+    }
+
+    & .list__inner {
+      display: flex;
+      flex-direction: column;
+      max-height: 100%;
+      padding: 10px 8px;
+      background: #ebecf0;
+      border-radius: 4px;
+      & .list__heading {
+        margin-bottom: 10px p {
+          color: #5e6c84;
+          padding: 0 8px;
+        }
+      }
+      & .list__cards {
+        overflow-y: auto;
+        overflow-x: hidden;
+        margin-bottom: 10px;
+        .card {
+          height: 150px;
+        }
+      }
+    }
+  }
+</style>
+```
+
+CreateCard, ListTitle, Card 컴포넌트는 파일만 생성하여 적용하고 List 영역의 기본 디자인을 추가해준다.
+
+![](../img/221007-1.png)
+
+위와 같이 카드 섹션 스타일이 정상적으로 쌓이는 것을 확인할 수 있다.
