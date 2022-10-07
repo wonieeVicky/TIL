@@ -7,7 +7,7 @@
 <div class="list-container">
   <div class="lists">
     {#each $lists as list (list.id)}
-      <List />
+      <List {list} />
     {/each}
   </div>
   <CreateList />
