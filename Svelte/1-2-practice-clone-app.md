@@ -1038,3 +1038,148 @@ CreateCard, ListTitle, Card 컴포넌트는 파일만 생성하여 적용하고 
 ![](../img/221007-1.png)
 
 위와 같이 카드 섹션 스타일이 정상적으로 쌓이는 것을 확인할 수 있다.
+
+### ListTitle 컴포넌트 작성
+
+이번에는 List 컴포넌트 안에 들어갈 ListTitle 컴포넌트를 만들어본다.
+먼저 List 컴포넌트에서 가지고 있는 list 정보를 ListTitle 컴포넌트에 상속하여 데이터가 뿌려질 수 있도록 해준다.
+
+`./src/components/List.svelte`
+
+```html
+<!-- codes... -->
+<div class="list">
+  <div class="list__inner">
+    <div class="list__heading">
+      <!-- list props로 전달 -->
+      <ListTitle {list} />
+    </div>
+    <!-- codes... -->
+  </div>
+</div>
+```
+
+`./src/components/ListTitle.svelte`
+
+```html
+<script>
+  import { lists } from "~/store/list"
+
+  export let list
+  let isEditMode = false
+  let title = list.title
+  let textareaEl
+
+  function saveTitle() {}
+  function removeList() {}
+  function onEditMode() {}
+  function offEditMode() {}
+</script>
+
+{#if isEditMode}
+<div class="edit-mode">
+  <textarea bind:value={title} bind:this={textareaEl} placeholder="Enter a title for this list.." on:keydown={(e) => {
+  e.key === "Enter" && saveTitle() e.key === "Escape" && offEditMode() e.key === "Esc" && offEditMode() }} />
+  <div class="actions">
+    <div class="btn success" on:click="{saveTitle}">Save</div>
+    <div class="btn" on:click="{offEditMode}">Cancel</div>
+    <div class="btn danger" on:click="{removeList}">Delete List</div>
+  </div>
+</div>
+{:else}
+<h2 class="title">
+  {list.title}
+  <div class="btn small edit-btn-for-list" on:click="{onEditMode}">Edit</div>
+</h2>
+{/if}
+
+<!-- (참고) 해당 컴포넌트에 입력할 스타일이 없더라도
+  기존 rollup.config에 설정한 globla 스타일을 적용하고 싶다면
+  lang 속성이 'scss'로 설정된 빈 스타일 태그를 넣어줘야 반영된다. -->
+<style lang="scss">
+  h2.title {
+    font-weight: 700;
+    padding: 4px 8px;
+    cursor: pointer;
+    position: relative;
+    .edit-btn-for-list {
+      position: absolute;
+      top: 0;
+      right: 0;
+      display: none;
+    }
+  }
+  :global(.list__inner:hover .edit-btn-for-list) {
+    display: block !important;
+  }
+</style>
+```
+
+상세한 액션을 구현하기 전에 기본 이벤트 함수만 생성 후 html 구조에 적용하고 스타일을 맞춰 넣어주었다.
+
+위 코드에서 주의깊게 봐야할 점은 `<style lang="scss">` 부분인데, 만약 ListTitle 컴포넌트 하위에 스타일이 추가될 요소가 없다면 style 태그를 사용한 스타일 코드를 추가하지 않을텐데 이것이 문제가 된다.
+
+어떤 문제? rollup.config에서 설정한 main.scss가 해당 컴포넌트에 적용되지 않음! 따라서 추가할 스타일 코드가 없더라도 `<style lang="scss"></style>`을 넣어줘야 전역 스타일이 해당 컴포넌트에 적용된다는 것을 참고하자.
+
+`./src/components/ListTitle.svelte`
+
+```html
+<script>
+  import { tick } from "svelte"
+  import { autoFocusout } from "~/actions/autoFocusout"
+  import { lists } from "~/store/list"
+
+  export let list
+  let isEditMode = false
+  let title = list.title
+  let textareaEl
+
+  function saveTitle() {
+    if (title.trim()) {
+      lists.edit({
+        listId: list.id,
+        title,
+      })
+    }
+    offEditMode()
+  }
+
+  function removeList() {
+    lists.remove({
+      listId: list.id,
+    })
+  }
+
+  async function onEditMode() {
+    isEditMode = true
+    title = list.title
+    await tick()
+    textareaEl && textareaEl.focus()
+  }
+
+  function offEditMode() {
+    isEditMode = false
+  }
+</script>
+
+{#if isEditMode}
+<div use:autoFocusout="{offEditMode}" class="edit-mode">
+  <textarea bind:value={title} bind:this={textareaEl} placeholder="Enter a title for this list.." on:keydown={(e) => {
+  e.key === "Enter" && saveTitle() e.key === "Escape" && offEditMode() e.key === "Esc" && offEditMode() }} />
+  <div class="actions">
+    <div class="btn success" on:click="{saveTitle}">Save</div>
+    <div class="btn" on:click="{offEditMode}">Cancel</div>
+    <div class="btn danger" on:click="{removeList}">Delete List</div>
+  </div>
+</div>
+{:else}
+<h2 class="title">
+  {list.title}
+  <div class="btn small edit-btn-for-list" on:click="{onEditMode}">Edit</div>
+</h2>
+{/if}
+```
+
+나머지 이벤트 함수를 모두 구현한 뒤, 유틸 함수로 만들어두었던 `autoFocusout` 함수도 `isEditMode`의 최상위 div에 적용해두었다. 특히 `onEditMode`를 클릭했을 때 textareaEl에 focus를 시켜주기 위해 tick 함수로 엘리먼트의 변경사항을 체크하는 로직을 추가해준 부분도 유의하여 보면 좋겠다.
+
+![](../img/221008-1.gif)
