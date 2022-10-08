@@ -9,7 +9,7 @@
 <div class="list">
   <div class="list__inner">
     <div class="list__heading">
-      <ListTitle />
+      <ListTitle {list} />
       <p>{list.cards.length} cards</p>
     </div>
     <div class="list__cards">
