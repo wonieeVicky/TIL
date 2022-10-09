@@ -1183,3 +1183,65 @@ CreateCard, ListTitle, Card 컴포넌트는 파일만 생성하여 적용하고 
 나머지 이벤트 함수를 모두 구현한 뒤, 유틸 함수로 만들어두었던 `autoFocusout` 함수도 `isEditMode`의 최상위 div에 적용해두었다. 특히 `onEditMode`를 클릭했을 때 textareaEl에 focus를 시켜주기 위해 tick 함수로 엘리먼트의 변경사항을 체크하는 로직을 추가해준 부분도 유의하여 보면 좋겠다.
 
 ![](../img/221008-1.gif)
+
+### List 데이터의 수정(edit)과 삭제(remove)
+
+이번에는 데이터의 수정과 삭제를 구현해본다.
+먼저 수정을 구현해보는데, 이는 지난번 만들었던 list.js의 커스텀 스토어 이벤트를 추가해주는 방법으로 구현한다.
+
+`./src/store/list.js`
+
+```jsx
+export const lists = {
+  // ..
+  edit(payload) {
+    const { listId, title } = payload
+    _lists.update(($lists) => {
+      const foundList = $lists.find((l) => l.id === listId)
+      foundList.title = title
+      return $lists
+    })
+  },
+}
+```
+
+위처럼 작성하면 payload 인자로 넘어오는 데이터에 있는 listId와 title로 \_lists의 데이터를 변경하도록 해줄 수 있다.
+그런데, 위 foundList를 가져오는 로직을 lodash를 사용하면 좀 더 쉽게 구현할 수 있음. 우선 설치한다.
+
+```bash
+> npm i -D lodash
+```
+
+위와 같이 설치 후 list.js에서 사용하기 위해서 아래와 같이 import를 해준 뒤 edit과 remove 이벤트를 구현해준다.
+
+`./src/store/list.js`
+
+```jsx
+// import _ from "lodash" - lodash는 다양한 기능을 가지고 있음. tree shaking해서 불필요한 코드를 줄이자
+import _find from "lodash/find" // lodash.find만 가져옴
+import _remove from "lodash/remove" // lodash.remove만 가져옴
+
+export const lists = {
+  // ..
+  edit(payload) {
+    const { listId, title } = payload
+    _lists.update(($lists) => {
+      // const foundList = $lists.find((l) => l.id === listId)
+      const foundList = _find($lists, { id: listId })
+      foundList.title = title
+      return $lists
+    })
+  },
+  remove(payload) {
+    const { listId } = payload
+    _lists.update(($lists) => {
+      _remove($lists, { id: listId })
+      return $lists
+    })
+  },
+}
+```
+
+lodash 전체 가져오지 않고 쓸 것만(find, remove) tree shaking하여 가져온다는 점 참고하자!
+
+![](../img/221009-1.gif)
