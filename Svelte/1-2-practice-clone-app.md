@@ -1245,3 +1245,62 @@ export const lists = {
 lodash 전체 가져오지 않고 쓸 것만(find, remove) tree shaking하여 가져온다는 점 참고하자!
 
 ![](../img/221009-1.gif)
+
+### List 정렬을 위한 모듈(sortablejs)
+
+이번에는 List 정렬을 위한 모듈을 추가해보려고 한다. 여기서 말하는 정렬 모듈은 드래그앤드롭으로 영역을 옮기는 것을 의미하고, 이러한 액션을 바탕으로 실제 데이터도 순서가 변경되는 것을 의미한다. 이러한 마우스 이벤트를 지원해주는 모듈이 있는데 이것이 바로 `sortablejs` 라는 모듈이다. 
+
+```bash
+> npm i -D sortablejs
+```
+
+위 모듈을 적용할 곳은 ListContainer와 내부 Card 영역이다.
+해당 영역의 마우스 움직임에 따라 별도로 처리되므로 Sortable 옵션의 group을 통해 동작 영역을 분리해서 처리해줘야함. 
+우선, ListContainer에 적용시켜준다.
+
+`./src/components/ListContainer.svelte`
+
+```html
+<script>
+  import Sortable from "sortablejs"
+  import { onMount } from "svelte"
+  import { lists } from "~/store/list"
+  import List from "~/components/List.svelte"
+  import CreateList from "~/components/CreateList.svelte"
+
+  let listsEl
+
+  onMount(() => {
+    // For Lists
+    sortableLists = new Sortable(listsEl, {
+      group: "My Lists", // 한 목록에서 다른 목록으로 요소를 끌어오려면(DnD) 두 목록의 그룹 값이 같아야 함
+      handle: ".list", // 드래그 핸들이 될 요소의 선택자를 입력
+      delay: 50, // 클릭이 밀리는 것을 방지하기 위해 약간의 지연 시간 추가
+      animation: 0, // 정렬할 때 애니메이션 속도(ms) 지정
+      forceFallback: true, // 다양한 환경의 일관된 Drag&Drop(DnD)을 위해 HTML5 기본 DnD 동작을 무시하고 내장 기능 사용함
+      // 요소의 DnD가 종료되면 실행할 핸들러(함수) 지정
+      onEnd(event) {
+        console.log(event) // event 객체의 정렬에 대한 다양한 정보가 들어있다.
+      },
+    })
+  })
+</script>
+
+<div class="list-container">
+  <div bind:this={listsEl} class="lists">
+    {#each $lists as list (list.id)}
+      <List {list} />
+    {/each}
+  </div>
+  <CreateList />
+</div>
+```
+
+`.lists` 영역에 listEl 변수를 `this`로 바인딩 시켜준 뒤 `onMount` 이벤트로 Sortable 기능을 적용해주었다. 
+Sortable 기능에 들어가는 다양한 옵션에 대한 주석 설명을 잘 확인해보자. 
+
+위 상태로 개발환경을 실행시켜보면, 아직 ghost영역에 대한 스타일 지정은 되어잇지 않지만, 순서 변경이 잘되며 onEnd 이벤트에 넣어둔 console.log에 event 객체에 대한 정보가 나타나는 것을 확인 할 수 있다. 
+
+![](../img/221010-1.gif)
+
+이제 이를 바탕으로 실제 스토어 데이터를 변경해주는 reorder 이벤트를 구현해본다.
