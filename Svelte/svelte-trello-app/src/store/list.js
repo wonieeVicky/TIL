@@ -2,6 +2,7 @@
 import cryptoRandomString from "crypto-random-string"
 import _find from "lodash/find"
 import _remove from "lodash/remove"
+import _cloneDeep from "lodash/cloneDeep"
 
 const generateId = () => cryptoRandomString({ length: 10 })
 
@@ -12,6 +13,15 @@ _lists.subscribe(($lists) => window.localStorage.setItem("lists", JSON.stringify
 
 export const lists = {
   subscribe: _lists.subscribe, // 실행시키지 않고 참조관계로 연결
+  reorder(payload) {
+    const { oldIndex, newIndex } = payload
+    _lists.update(($lists) => {
+      const clone = _cloneDeep($lists[oldIndex]) // 원래 데이터를 복사
+      $lists.splice(oldIndex, 1) // 원래 데이터를 제거
+      $lists.splice(newIndex, 0, clone) // 새로운 위치에 데이터 저장
+      return $lists
+    })
+  },
   add(payload) {
     const { title } = payload
     _lists.update(($lists) => {
