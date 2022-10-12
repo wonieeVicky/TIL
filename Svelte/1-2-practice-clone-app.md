@@ -1362,3 +1362,43 @@ export const lists = {
 그 이후 ListContainer에서 onEnd 이벤트로 reorder 데이터를 구현해주면 실제 html 뿐만 아니라 데이터의 이동도 함꼐 이루어지는 것을 확인할 수 있다.
 
 ![](../img/221011-1.gif)
+
+### 정렬 상태 클래스 - ghost, chosen, drag, fallback
+
+이번에는 sortablejs로 정렬 동작 시 상태에 따른 스타일을 추가하기 위해 정렬 상태 클래스에 대해서 알아본다.
+리스트들을 이동시키기 위해 완성된 내용을 잠시 살펴보면, 해당 List를 누르는 순간, `.sortable-chosen`이라는 클래스가 추가된다. 또, 이 상태에서 마우스를 손을 떼지 않은 상태로 해당 List 컴포넌트를 마우스로 끌어당기는 순간 `.sortable-ghost`라는 클래스가 추가된다. 뿐만 아니라 움직이는 순간 선택한 List 컴포넌트의 복사본이 해당 위치에 추가되는데, 이때 추가되는 복사본에는 `.sortable-fallback.sortable-drag`이라는 클래스가 붙어있다는 것도 확인할 수 있다. 아마 `.sortable-ghost` 클래스가 붙은 컴포넌트는 그림자의 역할을 하고, 실제 끌어당길 때 옮겨지는 UI가 `.sortable-drag` 역할을 하는 거라고 볼 수 있다.
+
+이러한 내용은 sortablejs의 [options docs](https://github.com/SortableJS/Sortable#options)에 있는 내용들이며, Options의 ghostClass, chosenClass, fallbackClass, dragClass를 별도의 클래스명으로 커스텀할 수도 있다.
+
+이제 스타일을 추가해보자. 해당 클래스들이 실제로 붙는 건 Sortable 객체 생성 시 `handle: ".list"`로 설정해주었기 때문에 .list에 해당 객체가 붙는다. 따라서 List 컴포넌트에 스타일을 추가해야 함
+
+`./src/components/List.svelte`
+
+```scss
+/* ... */
+/* sortable-ghost 그림자 스타일 추가 */
+:global(.list.sortable-ghost) {
+  position: relative;
+  opacity: 0.2;
+  &::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: #000;
+    border-radius: 4px;
+  }
+}
+/* sortable-chosen 시 이동되는 엘리먼트에 mouse-move 효과 추가 */
+:global(.list.sortable-chosen) {
+  cursor: move;
+}
+```
+
+위와 같이 추가해주었다. 스타일 앞에 `:global` 수식을 붙인 이유는 해당 클래스가 실제 돔에 생성되어 있지 않고 동적으로 추가되므로 scss 빌드 시 생략되지 않도록 추가해준 것임. 
+
+![](../img/221012-1.gif)
+
+위처럼 추가 후 기존 스타일을 잡기 위해 넣어두었던 border를 지워주면 위와 같이 드래그앤드롭에 대한 애니메이션이 깔끔하게 구현된 것을 확인할 수 있다.
