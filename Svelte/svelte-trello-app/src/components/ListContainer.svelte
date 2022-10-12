@@ -21,7 +21,7 @@
         console.log(event) // event 객체의 정렬에 대한 다양한 정보가 들어있어요.
         lists.reorder({
           oldIndex: event.oldIndex,
-          newIndex: event.newIndex
+          newIndex: event.newIndex,
         })
       },
     })
@@ -41,7 +41,6 @@
   .list-container {
     width: 100vw;
     height: calc(100vh - 40px);
-    border: 10px solid red;
     padding: 30px;
     box-sizing: border-box;
     overflow-x: auto;
@@ -51,8 +50,6 @@
     .lists {
       display: inline-block;
       height: 100%;
-      border: 10px solid blue;
-      box-sizing: border-box;
       white-space: nowrap;
       font-size: 0;
     }
