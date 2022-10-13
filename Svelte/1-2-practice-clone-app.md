@@ -1401,4 +1401,72 @@ export const lists = {
 
 ![](../img/221012-1.gif)
 
-위처럼 추가 후 기존 스타일을 잡기 위해 넣어두었던 border를 지워주면 위와 같이 드래그앤드롭에 대한 애니메이션이 깔끔하게 구현된 것을 확인할 수 있다.
+위처럼 추가 후 기존 스타일을 잡기 위해 넣어두었던 border를 지워주면 위와 같이 드래그앤드롭에 대한 애니메이션이 깔끔하게 
+구현된 것을 확인할 수 있다.
+
+### CreateCard 컴포넌트 작성
+
+이번에는 상세 할 일을 추가하는 CreateCard 컴포넌트를 완성해본다. 
+대부분 구현했던 내용을 확장시키는 개념이므로 어렵지 않게 구현할 수 있다.
+
+`./src/components/CreateCard.svelte`
+
+```html
+<script>
+  import { tick } from "svelte"
+  import { autoFocusout } from "~/actions/autoFocusout"
+  let isEditMode = false
+  let title = ""
+  let textareaEl
+
+  function addCard() {}
+
+  async function onEditMode() {
+    isEditMode = true
+    title = ""
+    await tick()
+    textareaEl && textareaEl.focus()
+  }
+
+  function offEditMode() {
+    isEditMode = false
+  }
+</script>
+
+{#if isEditMode}
+  <div use:autoFocusout={offEditMode} class="edit-mode">
+    <textarea
+      bind:value={title}
+      bind:this={textareaEl}
+      placeholder="Enter a title for this card..."
+      on:keydown={(event) => {
+        event.key === "Enter" && addCard()
+        event.key === "Escape" && offEditMode()
+        event.key === "Esc" && offEditMode()
+      }}
+    />
+    <div class="actions">
+      <div class="btn success" on:click={addCard}>Add card</div>
+      <div class="btn" on:click={offEditMode}>Cancel</div>
+    </div>
+  </div>
+{:else}
+  <div class="add-another-card" on:click={onEditMode}>+Add another card</div>
+{/if}
+
+<style lang="scss">
+  .add-another-card {
+    padding: 4px 8px;
+    font-size: 14px;
+    color: #5e6c84;
+    cursor: pointer;
+    border-radius: 4px;
+    &:hover {
+      background: rgba(9, 30, 66, 0.08);
+      color: #172b4d;
+    }
+  }
+</style>
+```
+
+위와 같이 addCard 이벤트를 제외한 기본 html 구조 및 이벤트를 구현했다. autoFocusout 등의 이벤트도 잘 처리되는 것을 확인할 수 있다. 나머지 addCard는 lists 커스텀 스토어에서 기능을 추가해줘야한다.
