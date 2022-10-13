@@ -36,6 +36,7 @@
     height: 100%;
     box-sizing: border-box;
     margin: 0 4px;
+    line-height: 20px;
     & * {
       box-sizing: border-box;
     }
