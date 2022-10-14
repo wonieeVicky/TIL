@@ -50,3 +50,18 @@ export const lists = {
     })
   },
 }
+
+export const cards = {
+  // subscribe 메서드가 없으므로 cards는 그냥 객체일 뿐이다.
+  add(payload) {
+    const { listId, title } = payload
+    _lists.update(($lists) => {
+      const foundList = _find($lists, { id: listId })
+      foundList.cards.push({
+        id: generateId(),
+        title,
+      })
+      return $lists
+    })
+  },
+}
