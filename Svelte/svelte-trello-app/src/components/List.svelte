@@ -17,7 +17,7 @@
         <Card />
       {/each}
     </div>
-    <CreateCard />
+    <CreateCard listId={list.id} />
   </div>
 </div>
 

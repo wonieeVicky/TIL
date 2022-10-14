@@ -1,11 +1,21 @@
 ﻿<script>
   import { tick } from "svelte"
+  import { cards } from "~/store/list"
   import { autoFocusout } from "~/actions/autoFocusout"
+  export let listId
   let isEditMode = false
   let title = ""
   let textareaEl
 
-  function addCard() {}
+  function addCard() {
+    if (title.trim()) {
+      cards.add({
+        listId,
+        title: "",
+      })
+    }
+    offEditMode()
+  }
 
   async function onEditMode() {
     isEditMode = true
