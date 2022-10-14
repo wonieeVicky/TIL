@@ -1397,16 +1397,16 @@ export const lists = {
 }
 ```
 
-위와 같이 추가해주었다. 스타일 앞에 `:global` 수식을 붙인 이유는 해당 클래스가 실제 돔에 생성되어 있지 않고 동적으로 추가되므로 scss 빌드 시 생략되지 않도록 추가해준 것임. 
+위와 같이 추가해주었다. 스타일 앞에 `:global` 수식을 붙인 이유는 해당 클래스가 실제 돔에 생성되어 있지 않고 동적으로 추가되므로 scss 빌드 시 생략되지 않도록 추가해준 것임.
 
 ![](../img/221012-1.gif)
 
-위처럼 추가 후 기존 스타일을 잡기 위해 넣어두었던 border를 지워주면 위와 같이 드래그앤드롭에 대한 애니메이션이 깔끔하게 
+위처럼 추가 후 기존 스타일을 잡기 위해 넣어두었던 border를 지워주면 위와 같이 드래그앤드롭에 대한 애니메이션이 깔끔하게
 구현된 것을 확인할 수 있다.
 
 ### CreateCard 컴포넌트 작성
 
-이번에는 상세 할 일을 추가하는 CreateCard 컴포넌트를 완성해본다. 
+이번에는 상세 할 일을 추가하는 CreateCard 컴포넌트를 완성해본다.
 대부분 구현했던 내용을 확장시키는 개념이므로 어렵지 않게 구현할 수 있다.
 
 `./src/components/CreateCard.svelte`
@@ -1434,24 +1434,17 @@ export const lists = {
 </script>
 
 {#if isEditMode}
-  <div use:autoFocusout={offEditMode} class="edit-mode">
-    <textarea
-      bind:value={title}
-      bind:this={textareaEl}
-      placeholder="Enter a title for this card..."
-      on:keydown={(event) => {
-        event.key === "Enter" && addCard()
-        event.key === "Escape" && offEditMode()
-        event.key === "Esc" && offEditMode()
-      }}
-    />
-    <div class="actions">
-      <div class="btn success" on:click={addCard}>Add card</div>
-      <div class="btn" on:click={offEditMode}>Cancel</div>
-    </div>
+<div use:autoFocusout="{offEditMode}" class="edit-mode">
+  <textarea bind:value={title} bind:this={textareaEl} placeholder="Enter a title for this card..." on:keydown={(event)
+  => { event.key === "Enter" && addCard() event.key === "Escape" && offEditMode() event.key === "Esc" && offEditMode()
+  }} />
+  <div class="actions">
+    <div class="btn success" on:click="{addCard}">Add card</div>
+    <div class="btn" on:click="{offEditMode}">Cancel</div>
   </div>
+</div>
 {:else}
-  <div class="add-another-card" on:click={onEditMode}>+Add another card</div>
+<div class="add-another-card" on:click="{onEditMode}">+Add another card</div>
 {/if}
 
 <style lang="scss">
@@ -1469,4 +1462,71 @@ export const lists = {
 </style>
 ```
 
-위와 같이 addCard 이벤트를 제외한 기본 html 구조 및 이벤트를 구현했다. autoFocusout 등의 이벤트도 잘 처리되는 것을 확인할 수 있다. 나머지 addCard는 lists 커스텀 스토어에서 기능을 추가해줘야한다.
+위와 같이 addCard 이벤트를 제외한 기본 html 구조 및 이벤트를 구현했다.
+autoFocusout 등의 이벤트도 잘 처리되는 것을 확인할 수 있다. 나머지 addCard는 lists 커스텀 스토어에서 기능을 추가해줘야한다.
+
+### Card 생성(add)
+
+`./src/components/List.svelte`
+
+```html
+<div class="list">
+  <div class="list__inner">
+    <!-- ... -->
+    <!-- CreateCard에 listId 정보 상속 -->
+    <CreateCard listId="{list.id}" />
+  </div>
+</div>
+```
+
+`./src/components/CreateCard.svelte`
+
+```html
+<script>
+  // ..
+  import { cards } from "~/store/list"
+  export let listId
+
+  function addCard() {
+    if (title.trim()) {
+      cards.add({
+        listId,
+        title: "",
+      })
+    }
+    offEditMode()
+  }
+
+  // ..
+</script>
+
+<!-- ... -->
+```
+
+위와 같이 CreateCard 컴포넌트에 addCard 이벤트를 완성해준다. 값을 넣어준 뒤 완료되면 editMode를 off로 전환해주는 로직이다. 아직 cards라는 스토어 객체가 존재하지 않으므로 위와 같이 작성 후 스토어 객체를 추가해준다,
+
+`./src/store/list.js`
+
+```jsx
+export const cards = {
+  // subscribe 메서드가 없으므로 cards는 그냥 객체일 뿐이다.
+  add(payload) {
+    const { listId, title } = payload
+    _lists.update(($lists) => {
+      const foundList = _find($lists, { id: listId })
+      foundList.cards.push({
+        id: generateId(),
+        title,
+      })
+      return $lists
+    })
+  },
+}
+```
+
+해당 cards는 별도로 다른 컴포넌트에서 구독을 하고 있을 이유가 없다. 그저 list 내부에 존재하는 종속 데이터이므로 이를 커스텀 스토어 객체로 구현하지 않고, 단순 객체로 구현해준다. (즉, subscribe 메서드가 추가되지 않는다.)
+lodash의 \_find 메서드로 간단히 적절한 id 값을 찾아 내용을 추가해주는 메서드를 구현하였다.
+
+위와 같이 저장 후 코드를 실행해보면 카드리스트 컴포넌트가 완성되지 않아 하단에 카드가 생성되지는 않으나 해당 list에 존재하는 cards 갯수를 아래와 같이 확인할 수 있다.
+
+![](../img/221014-1.png)
