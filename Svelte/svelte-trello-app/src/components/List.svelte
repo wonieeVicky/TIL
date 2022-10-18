@@ -48,7 +48,8 @@
       background: #ebecf0;
       border-radius: 4px;
       & .list__heading {
-        margin-bottom: 10px p {
+        margin-bottom: 10px;
+        p {
           color: #5e6c84;
           padding: 0 8px;
         }

@@ -11,7 +11,7 @@
     if (title.trim()) {
       cards.add({
         listId,
-        title: "",
+        title,
       })
     }
     offEditMode()
