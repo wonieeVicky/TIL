@@ -1530,3 +1530,102 @@ lodash의 \_find 메서드로 간단히 적절한 id 값을 찾아 내용을 추
 위와 같이 저장 후 코드를 실행해보면 카드리스트 컴포넌트가 완성되지 않아 하단에 카드가 생성되지는 않으나 해당 list에 존재하는 cards 갯수를 아래와 같이 확인할 수 있다.
 
 ![](../img/221014-1.png)
+
+### Card 컴포넌트 작성
+
+이번에는 addCard 이벤트로 생성한 카드 내용을 노출할 Card 컴포넌트를 생성해본다.
+먼저 Card 컴포넌트를 작성할 때 필요한 Card 데이터를 List 컴포넌트에서 상속 받아와야 한다.
+
+`./src/components/List.svelte`
+
+```html
+<div class="list">
+  <div class="list__inner">
+    <!-- ... -->
+    <div class="list__cards">
+      <!-- Card 컴포넌트에 card 속성 내려준다. -->
+      {#each list.cards as card (card.id)}
+      <Card {card} />
+      {/each}
+    </div>
+  </div>
+</div>
+```
+
+`./src/components/Card.svelte`
+
+```html
+<script>
+  import { tick } from "svelte"
+  import { autoFocusout } from "~/actions/autoFocusout"
+
+  export let card
+  let isEditMode = false
+  let title
+  let textareaEl
+
+  function saveCard() {}
+  function removeCard() {}
+  async function onEditMode() {
+    isEditMode = true
+    title = card.title
+    await tick()
+    textareaEl && textareaEl.focus()
+  }
+  function offEditMode() {
+    isEditMode = false
+  }
+</script>
+
+<div class="card">
+  {#if isEditMode}
+  <div use:autoFocusout="{offEditMode}" class="edit-mode">
+    <textarea bind:value={title} bind:this={textareaEl} placeholder="Enter a title for this card..." on:keydown={(event)
+    => { event.key === "Enter" && saveCard() event.key === "Escape" && offEditMode() event.key === "Esc" &&
+    offEditMode() }} />
+    <div class="actions">
+      <div class="btn success" on:click="{saveCard}">Save</div>
+      <div class="btn" on:click="{offEditMode}">Cancel</div>
+      <div class="btn success" on:click="{removeCard}">Delete Card</div>
+    </div>
+  </div>
+  {:else}
+  <div class="title">
+    {card.title}
+    <div class="btn small" on:click="{onEditMode}">Edit</div>
+  </div>
+  {/if}
+</div>
+
+<style lang="scss">
+  .card {
+    margin-bottom: 8px;
+    &:last-child {
+      margin-bottom: 1px;
+    }
+    .title {
+      background: #fff;
+      padding: 6px 8px;
+      border-radius: 4px;
+      box-shadow: 0 1px 0 rgba(9, 30, 66, 0.25);
+      line-height: 20px;
+      position: relative;
+      &:hover {
+        background-color: #f5f5f5;
+      }
+      .btn {
+        position: absolute;
+        top: 6px;
+        right: 8px;
+        display: none;
+      }
+      &:hover .btn {
+        display: block;
+      }
+    }
+  }
+</style>
+```
+
+위와 같이 기본적인 saveCard, removeCard, offEditMode, onEditMode 이벤트와 autoFocusout 기능을 적용한 기본 Card 컴포넌트를 완성했다. 
+나머지 editCard, removeCard 이벤트를 완성해보자
