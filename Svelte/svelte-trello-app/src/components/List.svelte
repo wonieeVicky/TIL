@@ -14,7 +14,7 @@
     </div>
     <div class="list__cards">
       {#each list.cards as card (card.id)}
-        <Card {card} />
+        <Card listId={list.id} {card} />
       {/each}
     </div>
     <CreateCard listId={list.id} />
