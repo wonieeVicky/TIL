@@ -1,14 +1,30 @@
 ﻿<script>
   import { tick } from "svelte"
   import { autoFocusout } from "~/actions/autoFocusout"
+  import { cards } from "~/store/list"
 
+  export let listId
   export let card
   let isEditMode = false
   let title
   let textareaEl
 
-  function saveCard() {}
-  function removeCard() {}
+  function saveCard() {
+    if (title.trim()) {
+      cards.edit({
+        listId,
+        cardId: card.id,
+        title,
+      })
+    }
+    offEditMode()
+  }
+  function removeCard() {
+    cards.remove({
+      listId,
+      cardId: card.id,
+    })
+  }
   async function onEditMode() {
     isEditMode = true
     title = card.title
@@ -36,7 +52,7 @@
       <div class="actions">
         <div class="btn success" on:click={saveCard}>Save</div>
         <div class="btn" on:click={offEditMode}>Cancel</div>
-        <div class="btn success" on:click={removeCard}>Delete Card</div>
+        <div class="btn danger" on:click={removeCard}>Delete Card</div>
       </div>
     </div>
   {:else}
