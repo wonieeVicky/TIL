@@ -1627,5 +1627,93 @@ lodash의 \_find 메서드로 간단히 적절한 id 값을 찾아 내용을 추
 </style>
 ```
 
-위와 같이 기본적인 saveCard, removeCard, offEditMode, onEditMode 이벤트와 autoFocusout 기능을 적용한 기본 Card 컴포넌트를 완성했다. 
+위와 같이 기본적인 saveCard, removeCard, offEditMode, onEditMode 이벤트와 autoFocusout 기능을 적용한 기본 Card 컴포넌트를 완성했다.
 나머지 editCard, removeCard 이벤트를 완성해보자
+
+### Card 데이터의 수정(edit)과 삭제(remove)
+
+Card 데이터의 수정과 삭제를 아래와 같이 구현한다
+
+`./src/components/List.svelte`
+
+```html
+<div class="list">
+  <div class="list__inner">
+    <!-- ... -->
+    <div class="list__cards">
+      <!-- Card 컴포넌트에 listId 추가로 상속 -->
+      {#each list.cards as card (card.id)}
+      <Card listId="{list.id}" {card} />
+      {/each}
+    </div>
+  </div>
+</div>
+```
+
+`./src/components/Card.svelte`
+
+```html
+<script>
+  // ..
+  import { cards } from "~/store/list"
+
+  export let listId // List.svelte에서 상속받은 listId 선언
+  export let card
+  let isEditMode = false
+  let title
+  let textareaEl
+
+  function saveCard() {
+    if (title.trim()) {
+      cards.edit({
+        listId,
+        cardId: card.id,
+        title,
+      })
+    }
+    offEditMode()
+  }
+
+  function removeCard() {
+    cards.remove({
+      listId,
+      cardId: card.id,
+    })
+  }
+</script>
+```
+
+위 이벤트는 list.js에서 작업한 커스텀 이벤트 객체에 추가해주면 된다.
+
+`./src/store/list.js`
+
+```jsx
+// ..
+export const cards = {
+  // subscribe 메서드가 없으므로 cards는 그냥 객체일 뿐이다.
+  add(payload) {
+    // ..
+  },
+  edit(payload) {
+    const { listId, cardId, title } = payload
+    _lists.update(($lists) => {
+      const foundList = _find($lists, { id: listId })
+      const foundCard = _find(foundList.cards, { id: cardId })
+      foundCard.title = title
+      return $lists
+    })
+  },
+  remove(payload) {
+    const { listId, cardId } = payload
+    _lists.update(($lists) => {
+      const foundList = _find($lists, { id: listId })
+      _remove(foundList.cards, { id: cardId })
+      return $lists
+    })
+  },
+}
+```
+
+cards 이벤트 객체도 lodash의 \_find, \_remove 메서드를 사용해 간단하게 구현한다.
+
+![](../img/221020-1.gif)
