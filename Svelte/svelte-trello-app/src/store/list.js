@@ -53,6 +53,17 @@ export const lists = {
 
 export const cards = {
   // subscribe 메서드가 없으므로 cards는 그냥 객체일 뿐이다.
+  reorder(payload) {
+    const { oldIndex, newIndex, fromListId, toListId } = payload
+    _lists.update(($lists) => {
+      const fromList = _find($lists, { id: fromListId })
+      const toList = fromListId === toListId ? fromList : _find($lists, { id: toListId }) // 같은 List 내 이동 시를 고려함
+      const clone = _cloneDeep(fromList.cards[oldIndex]) // cards는 객체 데이터이므로 데이터 삭제 시 함께 사라질 수 있어 cloneDeep으로 깊은 복사
+      fromList.cards.splice(oldIndex, 1) // 데이터 삭제
+      toList.cards.splice(newIndex, 0, clone) // 데이터 추가
+      return $lists
+    })
+  },
   add(payload) {
     const { listId, title } = payload
     _lists.update(($lists) => {
