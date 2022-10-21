@@ -1717,6 +1717,7 @@ export const cards = {
 cards 이벤트 객체도 lodash의 \_find, \_remove 메서드를 사용해 간단하게 구현한다.
 
 ![](../img/221020-1.gif)
+
 ### Card 정렬(sortablejs)과 dataset
 
 이번에는 카드 컴포넌트 순서를 정렬하는 기능을 구현해본다. 이번 카트 정렬에서 유념해야할 내용은 카드의 이동은 해당하는 cardList에서만 되는 것이 아닌 옆 cardList에도 옮길 수 있도로 구현해야한다는 점이다.
@@ -1772,8 +1773,34 @@ cards 이벤트 객체도 lodash의 \_find, \_remove 메서드를 사용해 간�
 </div>
 ```
 
-아직 구현하지 않았지만 cards 커스텀 함수에 reorder 이벤트를 구현하여 이동시킬 예정이다. 
+아직 구현하지 않았지만 cards 커스텀 함수에 reorder 이벤트를 구현하여 이동시킬 예정이다.
 해당 이벤트는 ListContainer 간 카드 이동도 가능해야 하므로 전달 payload에 listId가 포함되어 있어야 한다.
 
 따라서 전달인자는 fromListId, toListId, oldIndex, newIndex로 처리됨.
 이제 실제 cards.reorder 이벤트를 구현해본다
+
+### Card 데이터 재정렬(reorder)
+
+`./src/store/list.js`
+
+```jsx
+export const cards = {
+  reorder(payload) {
+    const { oldIndex, newIndex, fromListId, toListId } = payload
+    _lists.update(($lists) => {
+      const fromList = _find($lists, { id: fromListId })
+      const toList = fromListId === toListId ? fromList : _find($lists, { id: toListId }) // 같은 List 내 이동 시를 고려함
+      const clone = _cloneDeep(fromList.cards[oldIndex]) // cards는 객체 데이터이므로 데이터 삭제 시 함께 사라질 수 있어 cloneDeep으로 깊은 복사
+      fromList.cards.splice(oldIndex, 1) // 데이터 삭제
+      toList.cards.splice(newIndex, 0, clone) // 데이터 추가
+      return $lists
+    })
+  },
+  // ..
+}
+```
+
+위와 같이 cards.reorder 이벤트를 구현한다.
+이동할 List를 fromList와 toList 변수에 담는데, 혹 같은 List 내부에서 카드만 순서 이동이 일어날 경우를 대비해 toList 변수에 삼항 연산자로 불필요한 연산이 발생하지 않도록 처리해주었다!
+
+이후, 카드 삭제 시 clone 변수에 담아둔 이동 데이터가 사라질 위험이 있으므로 cloneDeep 메서드로 깊은 복사하여 보관하고, 해당 데이터를 삭제 후 toList 컴포넌트에 추가하는 로직을 넣어 이벤트를 구현했다
