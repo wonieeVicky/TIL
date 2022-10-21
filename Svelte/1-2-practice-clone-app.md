@@ -1717,3 +1717,63 @@ export const cards = {
 cards 이벤트 객체도 lodash의 \_find, \_remove 메서드를 사용해 간단하게 구현한다.
 
 ![](../img/221020-1.gif)
+### Card 정렬(sortablejs)과 dataset
+
+이번에는 카드 컴포넌트 순서를 정렬하는 기능을 구현해본다. 이번 카트 정렬에서 유념해야할 내용은 카드의 이동은 해당하는 cardList에서만 되는 것이 아닌 옆 cardList에도 옮길 수 있도로 구현해야한다는 점이다.
+
+기존 ListContainer에 구현해두었던 Sortable 이벤트를 List 컴포넌트에 그대로 가져와 최적화해보자
+
+`./src/components/List.svelte`
+
+```jsx
+<script>
+  import Sortable from "sortablejs"
+  import { onMount } from "svelte"
+  import { cards } from "~/store/list"
+	// ..
+
+  export let list
+  let cardsEl
+  let sortableCards
+
+  onMount(() => {
+    // For Cards
+    sortableCards = new Sortable(cardsEl, {
+      group: "My Cards", // 한 목록에서 다른 목록으로 요소를 끌어오려면(DnD) 두 목록의 그룹 값이 같아야 한다.
+      handle: ".card", // 드래그 핸들이 될 요소의 선택자를 입력
+      delay: 50, // 클릭이 밀리는 것을 방지하기 위해 약간의 지연 시간을 추가
+      animation: 0, // 정렬할 때 애니메이션 속도(ms)를 지정
+      forceFallback: true, // 다양한 환경의 일관된 Drag&Drop(DnD)을 위해 HTML5 기본 DnD 동작을 무시하고 내장 기능을 사용
+      // 요소의 DnD가 종료되면 실행할 핸들러(함수)를 지정
+      onEnd(event) {
+        console.log(event) // event 객체의 정렬에 대한 다양한 정보가 포함되어 있음
+        cards.reorder({
+          fromListId: event.from.dataset.listId, // 출발 list__cards.id
+          toListId: event.to.dataset.listId, // 도착 list__cards.id
+          oldIndex: event.oldIndex,
+          newIndex: event.newIndex,
+        })
+      },
+    })
+  })
+</script>
+
+<div class="list">
+  <div class="list__inner">
+		<!-- ... -->
+		<!-- ListContainer 간 이동을 위해 dataset으로 id 값 저장 -->
+    <div class="list__cards" bind:this={cardsEl} data-list-id={list.id}>
+      {#each list.cards as card (card.id)}
+        <Card listId={list.id} {card} />
+      {/each}
+    </div>
+    <CreateCard listId={list.id} />
+  </div>
+</div>
+```
+
+아직 구현하지 않았지만 cards 커스텀 함수에 reorder 이벤트를 구현하여 이동시킬 예정이다. 
+해당 이벤트는 ListContainer 간 카드 이동도 가능해야 하므로 전달 payload에 listId가 포함되어 있어야 한다.
+
+따라서 전달인자는 fromListId, toListId, oldIndex, newIndex로 처리됨.
+이제 실제 cards.reorder 이벤트를 구현해본다
