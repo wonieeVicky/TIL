@@ -1804,3 +1804,36 @@ export const cards = {
 이동할 List를 fromList와 toList 변수에 담는데, 혹 같은 List 내부에서 카드만 순서 이동이 일어날 경우를 대비해 toList 변수에 삼항 연산자로 불필요한 연산이 발생하지 않도록 처리해주었다!
 
 이후, 카드 삭제 시 clone 변수에 담아둔 이동 데이터가 사라질 위험이 있으므로 cloneDeep 메서드로 깊은 복사하여 보관하고, 해당 데이터를 삭제 후 toList 컴포넌트에 추가하는 로직을 넣어 이벤트를 구현했다
+
+### Card 정렬 상태(ghost, chosen)에 대한 스타일 추가
+
+`./src/components/Card.svelte`
+
+```scss
+:global(.card.sortable-ghost) {
+  opacity: 0.1;
+  position: relative;
+  &::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: #000;
+    border-radius: 4px;
+  }
+}
+:global(.card.sortable-chosen) {
+  cursor: move;
+}
+```
+
+![](../img/221022-1.gif)
+
+위와 같이 스타일을 추가해주면 Card 간 이동 시에도 그림자 효과가 잘 나타난다.
+하지만 완벽히 끝난 것은 아니다. 바로 editMode에서 마우스로 이동 시 해당 UI 상태로 이동이 가능한 상황이기 때문이다!
+
+![](../img/221022-2.gif)
+
+따라서 editMode에서는 카드 간 이동이 불가능하도록 개선해야한다.
