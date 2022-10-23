@@ -7,8 +7,14 @@
   import Card from "~/components/Card.svelte"
 
   export let list
+  export let sortableLists
   let cardsEl
   let sortableCards
+
+  function disableSortable(e) {
+    sortableCards.option("disabled", e.detail)
+    sortableLists.option("disabled", e.detail)
+  }
 
   onMount(() => {
     // For Cards
@@ -35,15 +41,15 @@
 <div class="list">
   <div class="list__inner">
     <div class="list__heading">
-      <ListTitle {list} />
+      <ListTitle {list} on:editMode={disableSortable} />
       <p>{list.cards.length} cards</p>
     </div>
     <div class="list__cards" bind:this={cardsEl} data-list-id={list.id}>
       {#each list.cards as card (card.id)}
-        <Card listId={list.id} {card} />
+        <Card listId={list.id} {card} on:editMode={disableSortable} />
       {/each}
     </div>
-    <CreateCard listId={list.id} />
+    <CreateCard listId={list.id} on:editMode={disableSortable} />
   </div>
 </div>
 
