@@ -1837,3 +1837,133 @@ export const cards = {
 ![](../img/221022-2.gif)
 
 따라서 editMode에서는 카드 간 이동이 불가능하도록 개선해야한다.
+
+### 수정 모드일 때 정렬 기능 끄기
+
+그렇다면 editMode 일 때 정렬 기능을 어떻게 끌 수 있을까?
+SortableJS에서 제공되는 Methods를 살펴보고 적절한 기능을 가져와서 구현해보면 좋겠다.
+
+SortableJs에는 `option` 메소드를 지원하는데, 이에 적용할 수 있는 첫 번째 `name` 인수는 `new Sortable(el, opts)`의 `opts` 부분에 적용할 수 있는 옵션을 의미한다. 이를 이용해서 기능을 구현해볼 수 있을 것 같다.
+
+또한, 수정모드는 CardList를 옮길 때에도 동일하게 동작하면 안되므로, CardList와 Card 이동을 모두 아우르는 기능을 구현해야 한다. 그러려면 edit 버튼을 클릭하여 editMode에 진입했을 때 sortableCards, sortableLists 객체 이벤트를 잠시 꺼두었다가 editMode가 종료되면 다시 실행하도록 구현해준다.
+
+우선 해당 이벤트를 모두 아우를 수 있도록 하기 위해서는 List 컴포넌트에서 작업하는 것이 적절하므로 List 컴포넌트에서 sortableLists 객체를 핸들링할 수 있도록 ListContainer에서 List 컴포넌트로 내려주는 상속인자에 sortableLists 정보를 추가해준다.
+
+`./src/components/ListContainer.svelte`
+
+```html
+<div class="list-container">
+  <div bind:this="{listsEl}" class="lists">
+    {#each $lists as list (list.id)}
+    <!-- 전달인자 sortableLists 추가 -->
+    <List {list} {sortableLists} />
+    {/each}
+  </div>
+</div>
+```
+
+그리고 받아온 sortableLists를 List 컴포넌트에서 불러와준 뒤 기본적인 disableSortable 이벤트를 아래와 같이 구현해준다.
+
+`./src/components/List.svelte`
+
+```html
+<script>
+  export let sortableLists
+
+  function disableSortable(e) {
+    sortableCards.option("disabled", e.detail)
+    sortableLists.option("disabled", e.detail)
+  }
+</script>
+
+<div class="list">
+  <div class="list__inner">
+    <div class="list__heading">
+      <ListTitle {list} on:editMode="{disableSortable}" />
+      <p>{list.cards.length} cards</p>
+    </div>
+    <!-- ... -->
+  </div>
+</div>
+```
+
+이를 먼저 ListTitle 영역에 적용해본다. `on:editMode`라는 커스텀 이벤트를 연결해주었다.
+
+`./src/components/ListTitle.svelte`
+
+```
+import { tick, createEventDispatcher } from "svelte"
+// ..
+const dispatch = createEventDispatcher()
+
+async function onEditMode() {
+  isEditMode = true
+  title = list.title
+  dispatch("editMode", true) // dispatch event 추가
+  await tick()
+  textareaEl && textareaEl.focus()
+}
+
+function offEditMode() {
+  isEditMode = false
+  dispatch("editMode", false) // dispatch event 추가
+}
+
+// dispatch event 방어로직 추가
+onDestroy(() => {
+  offEditMode()
+})
+```
+
+그리고 svelte의 `createEventDispatcher`를 이용해 editMode가 변경될 때마다 `dispatch` 이벤트로 변화를 감지할 수 있도록 연결해주었다. 위처럼 처리 후 새로고침하여 확인해보면 title 영역에 수정중일 때에는 sortableJs가 동작하지 않게 된다.
+
+뿐만 아니라, ListTitle 컴포넌트에서 onDestroy 이벤트에 offEditMode를 실행하여 editMode 이벤트의 상태를 false로 전환하는 방어 코드를 추가해서 넣어둔 것을 확인할 수 있는데, 현재 editMode가 동작하지 않도록 처리하는 메서드가 true/false에 의해 설정되므로 혹시 모를 상황(editMode를 수정하지 않고 다른 액션이 발생하여, sortableJS가 동작해야 하는 시점에도 여전히 false인 상태로 존재하는 상황)에 대비하기 위한 방어코드이다.
+
+위 동작을 나머지 Card, CreateCard에도 동일하게 적용해준다.
+
+`./src/components/List.svelte`
+
+```html
+<div class="list">
+  <div class="list__inner">
+    <div class="list__heading">
+      <ListTitle {list} on:editMode="{disableSortable}" />
+      <p>{list.cards.length} cards</p>
+    </div>
+    <div class="list__cards" bind:this="{cardsEl}" data-list-id="{list.id}">
+      {#each list.cards as card (card.id)}
+      <Card listId="{list.id}" {card} on:editMode="{disableSortable}" />
+      {/each}
+    </div>
+    <CreateCard listId="{list.id}" on:editMode="{disableSortable}" />
+  </div>
+</div>
+```
+
+먼저 List 컴포넌트에서 Card, CreateCard 컴포넌트에 on:editMode로 이벤트를 연결해준다.
+
+`./src/components/Card.svelte`, `./src/components/CreateCard.svelte`
+
+```jsx
+import { tick, createEventDispatcher, onDestroy } from "svelte"
+// ..
+const dispatch = createEventDispatcher()
+
+async function onEditMode() {
+  // ..
+  dispatch("editMode", true) // dispatch event 추가
+  // ..
+}
+
+function offEditMode() {
+  isEditMode = false
+  dispatch("editMode", false) // dispatch event 추가
+}
+
+// dispatch event 방어로직 추가
+onDestroy(() => {
+  offEditMode()
+})
+```
+
+![](../img/221023-1.gif)
