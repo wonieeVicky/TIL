@@ -1967,3 +1967,114 @@ onDestroy(() => {
 ```
 
 ![](../img/221023-1.gif)
+
+### Github 저장소 생성, 프로젝트 push
+
+페이지 배포를 위한 git 저장소 생성 및 프로젝트 push를 해본다.
+먼저 프로젝트 배포의 기준이 되는 레포지토리를 하나 생성해준다.
+
+![](../img/221024-1.png)
+
+그리고 터미널로 가서 git push 전 설정이 잘되어있는지 부터 확인한다.
+
+```bash
+> git config --global --list
+
+user.name=최혜원Vicky
+user.email=fongfing@uneedcomms.com
+core.excludesfile=/Users/uneedcomms/.gitignore_global
+difftool.sourcetree.cmd=opendiff "$LOCAL" "$REMOTE"
+difftool.sourcetree.path=
+mergetool.sourcetree.cmd=/Applications/Sourcetree.app/Contents/Resources/opendiff-w.sh "$LOCAL" "$REMOTE" -ancestor "$BASE" -merge "$MERGED"
+mergetool.sourcetree.trustexitcode=true
+commit.template=/Users/uneedcomms/.stCommitMsg
+```
+
+회사 정보로 저장되어 있으니 이것부터 바꿔줘야함
+
+```bash
+> git config --global user.name "wonieeVicky"
+> git config --global user.email "hwfongfing@gmail.com"
+> git config --global --list
+
+user.name=wonieeVicky
+user.email=hwfongfing@gmail.com
+core.excludesfile=/Users/uneedcomms/.gitignore_global
+```
+
+위처럼 바꿔준 뒤 다음 과정을 진행하자
+
+```bash
+> git init
+
+Reinitialized existing Git repository in /Users/uneedcomms/study/svelte-trello-app/.git/
+
+> git status
+
+On branch master
+
+No commits yet
+
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
+        .gitignore
+        README.md
+        package-lock.json
+        package.json
+        public/
+        rollup.config.js
+        scripts/
+        src/
+
+nothing added to commit but untracked files present (use "git add" to track)
+```
+
+git status로 push 되지 않은 데이터들이 존재하는 것을 확인 후 이를 git 프로젝트에 push 해준당
+
+```bash
+> git add .
+> git commit -m 'Create Project'
+
+[master (root-commit) 029b91a] Create project
+ 23 files changed, 9776 insertions(+)
+ create mode 100644 .gitignore
+ create mode 100644 README.md
+ create mode 100644 package-lock.json
+ create mode 100644 package.json
+ create mode 100644 public/favicon.png
+ create mode 100644 public/global.css
+ create mode 100644 public/images/bg.jpg
+ create mode 100644 public/images/trello-logo.svg
+ create mode 100644 public/index.html
+ create mode 100644 rollup.config.js
+ create mode 100644 scripts/setupTypeScript.js
+ create mode 100644 src/App.svelte
+ create mode 100644 src/actions/autoFocusout.js
+ create mode 100644 src/components/Card.svelte
+ create mode 100644 src/components/CreateCard.svelte
+ create mode 100644 src/components/CreateList.svelte
+ create mode 100644 src/components/Header.svelte
+ create mode 100644 src/components/List.svelte
+ create mode 100644 src/components/ListContainer.svelte
+ create mode 100644 src/components/ListTitle.svelte
+ create mode 100644 src/main.js
+ create mode 100644 src/scss/main.scss
+ create mode 100644 src/store/list.js
+
+> git remote add origin https://github.com/wonieeVicky/svelte-trello-clone-app.git
+> git push -u origin master
+
+Enumerating objects: 33, done.
+Counting objects: 100% (33/33), done.
+Delta compression using up to 8 threads
+Compressing objects: 100% (28/28), done.
+Writing objects: 100% (33/33), 350.80 KiB | 19.49 MiB/s, done.
+Total 33 (delta 2), reused 0 (delta 0), pack-reused 0
+remote: Resolving deltas: 100% (2/2), done.
+To https://github.com/wonieeVicky/svelte-trello-clone-app.git
+ * [new branch]      master -> master
+Branch 'master' set up to track remote branch 'master' from 'origin'.
+```
+
+위처럼 처리하면 생성한 레퍼지토리에 작업물이 잘 반영된 것을 확인할 수 있다!
+이제 프로젝트를 netlify를 사용해 간단히 배포해본다.
