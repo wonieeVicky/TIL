@@ -2078,3 +2078,51 @@ Branch 'master' set up to track remote branch 'master' from 'origin'.
 
 위처럼 처리하면 생성한 레퍼지토리에 작업물이 잘 반영된 것을 확인할 수 있다!
 이제 프로젝트를 netlify를 사용해 간단히 배포해본다.
+
+### Netlify를 통한 지속적인 배포(Continuous Deployment, CD)
+
+netlify를 통한 cd를 구축해보고자 한다. netlify는 정적 사이트를 간단하게 배포할 수 있게 해준다.
+가입 후 로그인 - SItes - Import from Git 클릭 - Github 선택 - [svelte-trello-clone-app] 레퍼지토리 선택 - 나머지 deploy 세팅은 아래 이미지 참조 
+
+![](../img/221025-1.png)
+
+설정이 완료되었으면 [Deploy site] 버튼 클릭한다.
+배포가 시작되고 Deploys 탭에서 배포 상태를 바로 확인할 수 있다.
+
+![](../img/221025-2.png)
+
+배포가 완료되면 [https://delightful-bublanina-465d42.netlify.app/](https://delightful-bublanina-465d42.netlify.app/) 로 배포가 잘 된 것을 확인할 수 있다.
+그럼 이제 실제 master 브랜치에 git push로 수정이 발생할 경우 새롭게 자동으로 빌드가 되는지 확인해보자
+
+`./src/components/Header.svelte`
+
+```html
+<header>
+  <img src="/images/trello-logo.svg" alt="Trello" class="logo" />
+</header>
+
+<style lang="scss">
+  header {
+    /* ... */
+    img.logo {
+      width: 80px;
+      height: auto;
+      opacity: 0; /* 수정 */
+    }
+  }
+</style>
+```
+
+위처럼 로고의 투명도를 0으로 설정한 뒤 git push 해본다.
+
+```bash
+> git add .
+> git status
+> git commit -m "..."
+> git push -u origin master
+```
+
+![](../img/221025-3.png)
+
+새롭게 배포가 시작되고 변경사항이 잘 반영된 것을 확인할 수 있다.
+정적인 사이트 배포는 netlify 잘 사용해봐야겠음
