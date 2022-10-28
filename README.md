@@ -158,6 +158,7 @@
 2. Svelte Trello Clone App
    - [intro](https://github.com/wonieeVicky/TIL/blob/main/Svelte/1-1-project-intro.md)
    - [clone App 만들기(실습)](https://github.com/wonieeVicky/TIL/blob/main/Svelte/1-2-practice-clone-app.md)
+   - [clone App을 Snowpack 프로젝트로 이관하기](https://github.com/wonieeVicky/TIL/blob/main/Svelte/1-3-transfer-trello-app-to-the-snowpack-project.md)
 
 ## **React**
 
