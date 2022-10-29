@@ -171,4 +171,59 @@ $ tree .
 ```
 
 위처럼 dist 폴더에 작업물 파일이 정상적으로 빌드되어 들어가는 것을 확인할 수 있다!
-기본적인 snowpack 사용법에 대해 익혀봤다
+기본적인 snowpack 사용법에 대해 익혀봤다.
+
+### 주요 디렉터리 복사 및 HMR 적용
+
+이제 기존에 작업한 Trello 클론 앱을 snowpack으로 옮겨본다.
+우선 기존 소스를 옮길 디렉터리부터 생성해준다.
+
+```bash
+% mkdir svelte-trello-app-snowpack
+% cd svelte-trello-app-snowpack
+$ code .
+```
+
+위 디렉터리로 vscode를 열어준 뒤 기존 trello-app의 public, src 경로의 파일을 복사해준다.
+다음으로 public/build에는 rollup이 만든 빌드 파일이 들어있으므로 하위 경로 및 파일을 모두 삭제해준다.
+
+그리고 난 뒤 기존 build 경로로 연결되어 있던 main.js 코드의 경로를 수정해준다.
+
+`./public/index.html`
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <!-- ... -->
+    <!-- <script type="module" src="/dist/main.js"></script> -->
+    <script type="module" src="/dist/main.js"></script>
+  </head>
+</html>
+```
+
+이제 HMR를 적용해본다. 자세한 내용은 문서참조
+
+`./src/main.js`
+
+```jsx
+import App from "./App.svelte"
+
+const app = new App({
+  target: document.body,
+  props: {
+    name: "world",
+  },
+})
+
+export default app
+
+// Hot Module Replacement (HMR) - Remove this snippet to remove HMR.
+// 화면에 변경되었을 때 자동적으로 감지하여 화면이 새로고침되도록 해줌
+if (import.meta.hot) {
+  import.meta.hot.accept()
+  import.meta.hot.dispose(() => {
+    app.$destroy()
+  })
+}
+```
