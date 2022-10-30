@@ -269,4 +269,103 @@ import { v4 as uuid } from "uuid"
 const generateId = () => uuid()
 ```
 
-위와 같이 처리하면 기본적인 핵심 모듈 설치와 구성을 완
+기본적인 핵심 모듈 설치와 구성이 완료되었다!
+
+### SCSS 및 Svelte Preprocess 구성
+
+이번에는 svelte의 전처리 옵션을 이관해보고자 한다.
+기존에 svelte 프로젝트에서는 sveltePreprocess로 전처리 옵션을 구성해보았는데, 이를 snowpack.config.js에 새롭게 설정할 필요가 있다.
+
+`rollup.config.js(기존 프로젝트)`
+
+```jsx
+import sveltePreprocess from "svelte-preprocess"
+
+// ..
+plugins: [
+  svelte({
+    preprocess: sveltePreprocess({
+      scss: {
+        prependData: '@import "./src/scss/main.scss";', // prepend로 데이터를 앞에 붙여준다.
+      },
+      postcss: {
+        plugins: [require("autoprefixer")()],
+      },
+    }),
+    // ..
+  }),
+  // ..
+]
+```
+
+`snowpack.config.js`
+
+```jsx
+module.exports = {
+  mount: {
+    public: "/",
+    src: "/_dist_",
+  },
+  plugins: [
+    [
+      "@snowpack/plugin-svelte",
+      {
+        preprocess: require("svelte-preprocess")({
+          scss: {
+            prependData: '@import "./src/scss/main.scss";',
+          },
+          postcss: {
+            plugins: [require("autoprefixer")()],
+          },
+        }),
+      },
+    ],
+    "@snowpack/plugin-dotenv",
+  ],
+}
+```
+
+`@snowpack/plugin-svelte` 패키지를 설치하면 `svelte-preprocess` 모듈이 함께 설치되므로, 별도의 설치과정없이 바로 svelte-preprocess를 위처럼 적용해준다. 위와 같은 설치 방법은 [공식 문서](https://www.npmjs.com/package/@snowpack/plugin-svelte)를 보고 참조하여 작업할 수 있다.
+
+이제 node-sass도 설치해줘본다. 아래의 관련 패키지를 설치해줘야 한다.
+
+```bash
+% npm i -D @snowpack/plugin-sass
+```
+
+이후 snowpack.config.js의 plugins에 추가해준다.
+
+`snowpack.config.js`
+
+```jsx
+module.exports = {
+  mount: {
+    // ..
+  },
+  plugins: [
+    [
+      "@snowpack/plugin-svelte",
+      {
+        // ..
+      },
+    ],
+    "@snowpack/plugin-dotenv",
+    "@snowpack/plugin-sass", // 여기에 추가
+  ],
+}
+```
+
+뿐만 아니라 autoPrefixer 기능을 사용하기 위해서는 기준 브라우저 버전을 package.json에서 맞춰주어야 한다.
+기존 프로젝트에서 설정해둔 browserlist 설정도 package.json에 추가해준다.
+
+`package.json`
+
+```json
+{
+  // ..
+  "browserslist": ["> 1%", "last 2 versions"],
+  "devDependencies": {}
+}
+```
+
+scss 및 전처리 관련 설정 끗
