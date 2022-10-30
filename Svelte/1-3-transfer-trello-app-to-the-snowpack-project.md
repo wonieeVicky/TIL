@@ -227,3 +227,46 @@ if (import.meta.hot) {
   })
 }
 ```
+
+### 핵심 모듈 설치 및 구성
+
+이제 기존 프로젝트에서 설치해야하는 핵심 모듈을 파악하고 실제로 설치해본다.
+
+`package.json`
+
+```bash
+% npm init -y
+% npm i -D snowpack svelte @snowpack/plugin-svel
+te @snowpack/plugin-dotenv autoprefixer postcss uuid lodash sortablejs
+```
+
+프로젝트에 필요한 패키지를 설치한 뒤 snowpack 구동에 필요한 옵션을 추가해보자
+
+`snowpack.config.js`
+
+```jsx
+module.exports = {
+  mount: {
+    public: "/",
+    src: "/_dist_",
+  },
+  plugins: ["@snowpack/plugin-svelte", "@snowpack/plugin-dotenv"],
+}
+```
+
+위와 같이 public, src 루트를 추가해주고, 사용할 plugins를 적절히 추가해준다.
+
+다음으로 기존에 crypto-random-string으로 구현했던 generateId 함수를 uuid를 통해 구현하도록 로직을 일부 수정해준다.
+
+`./src/store/list.js`
+
+```jsx
+// ..
+// import cryptoRandomString from "crypto-random-string"
+import { v4 as uuid } from "uuid"
+
+// const generateId = () => cryptoRandomString({ length: 10 })
+const generateId = () => uuid()
+```
+
+위와 같이 처리하면 기본적인 핵심 모듈 설치와 구성을 완
