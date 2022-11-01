@@ -369,3 +369,84 @@ module.exports = {
 ```
 
 scss 및 전처리 관련 설정 끗
+
+### 제품 모드의 로그 제거 구성
+
+이번에는 제품 모드일 때 drop_console 옵션도 옮겨본다.
+기존 rollup에서는 strip이라는 패키지로 구현헀는데, 이는 rollup 설정 시 사용되는 모듈이므로 snowpack에 적용할 수 있는 babel-plugin-transform-remove-console 라는 모듈이다.
+
+babel은 기본적으로 JS 하위 호환 최적화해주는 모듈임. snowpack [관련 설정 문서](https://www.snowpack.dev/guides/babel/#nav-primary)를 보고 설정해본다
+
+```bash
+% npm i --save-dev @snowpack/plugin-babel babel-plugin-transform-remove-console
+```
+
+`snowpack.config.js`
+
+```json
+const production = process.env.NODE_ENV === "production"
+
+module.exports = {
+  mount: {
+    public: "/",
+    src: "/_dist_",
+  },
+  plugins: [
+    // ..
+    [
+      "@snowpack/plugin-babel",
+      {
+        transformOptions: {
+          plugins: production ? ["transform-remove-console"] : [],
+        },
+      },
+    ],
+  ],
+}
+```
+
+위처럼 제품모드일 때만 transform-remove-console이 동작하도록 설정한다.
+이러면 끝. 이면 좋겠지만 아니다. 위 설정은 javascript, typescript에서만 자동 적용되고, 대부분의 코드가 있는 svelte 파일 내부의 콘솔은 위 설정으로 지워지지 않는다.
+
+이때 `snowpack.config.js` 내에 svelte-preprocess 옵션을 추가하여 처리할 수 있다.
+
+```json
+const production = process.env.NODE_ENV === "production"
+function babelOptions() {
+  return {
+    plugins: production ? ["transform-remove-console"] : [],
+  }
+}
+
+module.exports = {
+  mount: {
+    public: "/",
+    src: "/_dist_",
+  },
+  plugins: [
+    [
+      "@snowpack/plugin-svelte",
+      {
+        preprocess: require("svelte-preprocess")({
+          scss: {
+            prependData: '@import "./src/scss/main.scss";',
+          },
+          postcss: {
+            plugins: [require("autoprefixer")()],
+          },
+          babel: babelOptions(), // babel 설정을 svelte-preprocess 내부에 추가
+        }),
+      },
+    ],
+    [
+      "@snowpack/plugin-babel",
+      {
+        transformOptions: babelOptions(), // 기본 drop console 기능 추가
+      },
+    ],
+    // ..
+  ],
+}
+```
+
+위처럼 기본 js, ts 파일에 대한 drop console 기능과 svelte 파일 내에서의 drop console 기능을 유틸함수로 분리하여 구성할 수 있다. 실제 빌드해보면 정상적으로 파일이 수정된 것을 확인할 수 있다!
