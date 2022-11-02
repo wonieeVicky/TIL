@@ -492,3 +492,30 @@ module.exports = {
 ```
 
 문제없이 동작하는지 dev, build로 확인해본다. 기존 public 폴더에 빌드되던 것들이 이제 build 폴더로 변경됨
+
+### Github 저장소 생성 및 프로젝트 push
+
+이번에는 snowpack 프로젝트를 깃헙에 올려보자. .gitignore 부터 추가해준다.
+
+`.gitignore`
+
+```
+/node_modules/
+/build/
+
+.DS_Store
+```
+
+다음 git repo를 새로 create 만들어준 뒤 아래와 같이 진행한다.
+
+```bash
+% git init
+% git status
+% git add .
+% git status
+% git commit -m "Create project"
+% git remote add origin https://github.com/wonieeVicky/svelte-trello-app-snowpack.git
+% git push -u origin master
+```
+
+레퍼지토리 잘 올라감 :)
