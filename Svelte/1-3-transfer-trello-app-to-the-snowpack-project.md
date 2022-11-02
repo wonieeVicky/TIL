@@ -450,3 +450,45 @@ module.exports = {
 ```
 
 위처럼 기본 js, ts 파일에 대한 drop console 기능과 svelte 파일 내에서의 drop console 기능을 유틸함수로 분리하여 구성할 수 있다. 실제 빌드해보면 정상적으로 파일이 수정된 것을 확인할 수 있다!
+
+### 코드 최적화(최소화) 및 경로 별칭 구성
+
+이번에는 alias 및 minify 설정도 옮겨본다.
+우선 snowpack에 내장된 alias 설정 기능을 사용하면 되고 minify는 별도 플러그인은 따로 설치해준다.
+
+```bash
+% npm i -D @snowpack/plugin-optimize
+```
+
+`snowpack.config.js`
+
+```jsx
+// ..
+module.exports = {
+  mount: // ..
+  plugins: [
+    // ..
+    "@snowpack/plugin-optimize",
+  ],
+  alias: {
+    "~": "./src",
+  },
+}
+```
+
+위와 같이 설정하면 기본적인 빌드 설정이 완료된다.
+
+`package.json`
+
+```json
+{
+  // ..
+  "scripts": {
+    "dev": "snowpack dev",
+    "build": "snowpack build"
+  }
+  // ..
+}
+```
+
+문제없이 동작하는지 dev, build로 확인해본다. 기존 public 폴더에 빌드되던 것들이 이제 build 폴더로 변경됨
