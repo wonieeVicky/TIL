@@ -519,3 +519,9 @@ module.exports = {
 ```
 
 레퍼지토리 잘 올라감 :)
+
+### Netlify를 통한 CD 구현
+
+마지막으로 netlify를 통한 CD를 구현해본다.
+
+Netlify 접속 → Add new site → Github repository 선택 → 각 옵션 설정 후 deploy 시작
