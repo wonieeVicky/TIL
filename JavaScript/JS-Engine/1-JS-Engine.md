@@ -60,3 +60,70 @@ document.querySelector("#header").addEventListener("click", (e) => console.log("
 위처럼 함수의 선언과 호출, 그리고 고차함수에 대한 정확한 이해는 기본적이고 중요한 부분임
 
 ---
+
+### 호출 스택 분석
+
+`callstack.js`
+
+```jsx
+const x = "x";
+function c() {
+  const y = "y";
+  console.log("c");
+}
+
+function a() {
+  const x = "x";
+  console.log("a");
+  function b() {
+    const z = "z";
+    console.log("b");
+    c();
+  }
+  b();
+}
+
+a();
+c();
+
+// a
+// b
+// c
+// c
+```
+
+위 함수를 보고 코드를 실행해보기 전에 기본적으로 어떤 결과로 실행될지를 알아야 한다.
+함수에서 각 접근 가능한 변수들도 미리 알 수 있어야 한다.
+
+자바스크립트 코드는 기본적으로 왼쪽에서 오른쪽으로, 위에서부터 아래로 흐른다.
+또한 스택 구조로 코드 수행 순서가 담긴다는 것을 잊지말자. (위 구조가 스택 구조로 읽히는지 확인)
+
+```
+a > log(즉시 실행 후 삭제) > b > log(즉시 실행 후 삭제) > c > log
+```
+
+즉, c 함수 종료 후 b 함수 종료, 마지막으로 a 함수가 종료되는 스택 구조
+위 코드의 호출 순서를 코드 실행 시 확인 할 수 있다. `debugger` 라는 메서드를 실행시키면 됨.
+
+`callstack.js`
+
+```jsx
+const x = "x";
+function c() {
+  const y = "y";
+  console.log("c");
+  debugger; // 여기 추가
+}
+
+function a() {
+  // ..
+}
+
+a();
+c();
+```
+
+![개발자 도구에서 Call Stack을 확인할 수 있다.](../../img/221105-1.png)
+
+개발자 도구를 확인하면 콜스택 뿐만 아니라 Scope까지 모두 확인할 수 있다.
+anonymous는 뭘까? 헷갈린다면, 파일가 초기 실행되는 것을 anonymous라는 함수라고 생각하면 된다.
