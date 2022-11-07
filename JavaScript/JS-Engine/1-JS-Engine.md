@@ -127,3 +127,109 @@ c();
 
 개발자 도구를 확인하면 콜스택 뿐만 아니라 Scope까지 모두 확인할 수 있다.
 anonymous는 뭘까? 헷갈린다면, 파일가 초기 실행되는 것을 anonymous라는 함수라고 생각하면 된다.
+
+### 스코프 체인
+
+호출 스택은 흐름만 이해하면 그 순서가 머리에 자연스럽게 그려지게 될 것이다.
+이번에는 스코프 체인에 대해서도 알아보자. 스코프 체인은 함수가 어디까지 접근이 가능한지를 나타내는 단어이다.
+
+```jsx
+const x = "x";
+function c() {
+  const y = "y";
+  console.log("c");
+}
+
+function a() {
+  const x = "x";
+  console.log("a");
+  function b() {
+    const z = "z";
+    console.log("b");
+    c();
+  }
+  b(); // 1 - b 함수 실행
+}
+
+a();
+c();
+```
+
+1번 영역에서 b 함수가 실행되는 것은 스코프 체인에 의한 것이다. 같은 함수 a 내부에 b 함수 블럭의 본문이 존재하기 때문이다. 만약 위 코드가 아래와 같다면 어떨까?
+
+```jsx
+const x = "x";
+function c() {
+  const y = "y";
+  console.log("c");
+  function b() {
+    const z = "z";
+    console.log("b");
+    c();
+  }
+}
+
+function a() {
+  const x = "x";
+  console.log("a");
+  b(); // 1 - b is not defined
+}
+
+a();
+c();
+```
+
+a 함수에서 b함수가 실행되는데, 정상적으로 실행될까?
+같은 블럭에 존재하지 않으므로 b 함수가 정의되지 않았다는 에러가 발생한다.
+b 함수의 선언이 c 함수 내부에 있기 때문이다. 이것이 바로 lexical scope이며, 스코프 체인 이슈이다.
+anonymous 함수 내 c 함수 존재(내부에 b 함수 존재) 즉 b → c → anonymous의 구조라고 할 수 있다.
+
+스코프 체인이 중요한 이유는 무엇일까? 함수가 어디까지 접근 가능한지를 파악하기 위해서는 각 함수 간의 관계를 파악하는 것이 필수이기 때문이다.
+
+만약 b 함수 내부에서 a 함수를 실행시킨다면 정상적으로 동작할까?
+
+```jsx
+const x = "x";
+function c() {
+  const y = "y";
+  console.log("c");
+  function b() {
+    const z = "z";
+    console.log("b");
+    a(); // 1 - 정상 동작
+  }
+}
+
+function a() {
+  const x = "x";
+  console.log("a");
+}
+
+a();
+c();
+```
+
+정상적으로 동작한다. anonymous가 a 함수를 가지고 있기 때문이다.
+b함수는 anonymous가 아니라, c 함수 내부에 존재하므로 에러가 발생했음
+
+이렇게 선언 간의 지도가 머릿 속에 자연스럽게 그려지는지 확인해본다.
+
+```jsx
+const x = "x1";
+function c() {
+  // ..
+}
+
+function a() {
+  const x = "x2";
+  console.log("a");
+  console.log(x); // x2
+}
+
+a();
+```
+
+위와 같은 코드가 있을 때, x의 값이 x2로 담기는 것도 스코프 체인의 개념으로 볼 수 있다.
+a 함수 블럭 내에 x의 값이 선언되어 있기 때문임. 만약 a 함수 내부에 x 에 대한 선언이 없을 경우 x1이 로그에 찍힐 것이다.
+
+이는 스코프 체인이 아닌, 호이스팅에 의한 것이다.
