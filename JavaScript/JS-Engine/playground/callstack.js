@@ -2,18 +2,19 @@
 function c() {
   const y = "y";
   console.log("c");
-  debugger;
+  // debugger;
+  a();
 }
 
 function a() {
   const x = "x";
   console.log("a");
-  function b() {
-    const z = "z";
-    console.log("b");
-    c();
-  }
-  b();
+  // function b() {
+  //   const z = "z";
+  //   console.log("b");
+  //   c();
+  // }
+  // b();
 }
 
 a();
