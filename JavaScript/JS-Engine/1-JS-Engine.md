@@ -270,3 +270,140 @@ var h; // 호이스팅에 의해 h라는 변수가 코드 최상위로 끌어올
 h = "vicky";
 console.log(window.h); // vicky :: window 객체로 자동 적용되는 이슈도 있음
 ```
+
+### this
+
+브라우저 상에서 기본적으로 this는 window다. (node 환경에서는 global임)
+
+```jsx
+console.log(this); // window { ... } globalThis
+```
+
+브라우저, 노드 모두 globalThis로 통합하여 사용할 수 있다.
+strict 모드이면 this는 undefined이다. (ES2015 모듈에서는 strict 모드가 자동 적용됨)
+
+```jsx
+function a() {
+  "use strict";
+  console.log(this); // undefined
+}
+
+a();
+```
+
+this가 변경되는 가장 간략한 예시는 아래와 같다.
+
+```jsx
+const obj = {
+  name: "vicky",
+  sayName() {
+    console.log(this.name);
+  },
+};
+
+obj.sayName(); // vicky
+window.name; // 빈 값 반환
+```
+
+그런데 sayName 함수를 새로운 변수에 담아버리면 this는 유실된다.
+
+```jsx
+const sayN = obj.sayName;
+sayN(); // 빈 값 반환
+```
+
+또한, new 생성자 함수를 사용하여 this를 변경시킬 수 있다.
+
+```jsx
+function Human(name) {
+  this.name = name;
+}
+
+new Human("vicky"); // Human {name: 'vicky'} [[Prototype]]: Object ...
+```
+
+이 밖에 bind, call, apply 메서드를 사용해 this를 변경할 수도 있다.
+
+```jsx
+function sayName() {
+  console.log(this.name);
+}
+sayName(); // 빈 값 반환
+sayName.bind({ name: "vicky" })(); // vicky
+sayName.apply({ name: "vicky" }); // vicky
+sayName.call({ name: "vicky" }); // vicky
+```
+
+this는 함수가 호출되는 순간에 정해진다.
+
+위 코드에서 `obj.sayName()`의 경우 `sayName` 앞에 obj가 정확히 붙어있으므로 this는 obj 값들로 결정된다.
+하지만 `sayN`의 경우 `obj.sayName()`을 담은 새로운 함수가 실행되므로 obj가 담기지 않는다.
+
+이 밖에 this는 arrow function을 사용할 때에도 상속되지 않는다.
+
+```jsx
+const obj = {
+  name: "vicky",
+  sayName: () => console.log(this.name),
+};
+
+obj.sayName(); // 빈 값 반환
+```
+
+만약 아래의 경우에는 어떤 결과가 나올지 상상해보자
+
+```jsx
+const obj = {
+  name: "vicky",
+  sayName() {
+    console.log(this.name);
+    function inner() {
+      console.log(this);
+      console.log("inner:", this.name);
+    }
+    inner();
+    // 만약 this를 obj로 상속하고 싶다면 bind, call, apply 활용 가능
+    // inner.call(obj); // vicky
+  },
+};
+
+obj.sayName();
+// vicky
+// window { ... }
+// 빈 값 반환
+```
+
+왜 Inner 함수 내부의 this 값에 name이 상속되지 않았는가? this는 함수 호출 시 정해지며 obj.sayName은 호출 시 obj가 기준이 되므로 this가 적용되고, 상대적으로 inner는 함수 호출 시 this를 바꿔주는 영역이 없으므로 window 객체가 된다.
+
+만약 arrow function이면 결과는 어떻게 될까?
+
+```jsx
+const obj = {
+  name: "vicky",
+  sayName() {
+    console.log(this.name);
+    const inner = () => {
+      console.log(this);
+      console.log(this.name);
+    };
+    inner();
+  },
+};
+
+obj.sayName();
+// vicky
+// { name: 'vicky', sayName: f }
+// vicky
+```
+
+이렇게 되면 inner 함수에 `obj.name` 값이 상속된다! 왜 때문인지 잘 파악해야 한다.
+화살표 함수는 부모 함수의 this를 그대로 가져오므로 위 코드의 inner의 this도 obj 데이터를 상속받게 된다.
+
+this는 함수가 호출될 때 함수 호출하는 방법에 따라 결정된다는 것을 기억하자.
+머릿 속에 콜 스택이 그려지고 각 상황에서 this가 어떻게 적용되어 있는지도 파악할 수 있어야 한다.
+
+위의 경우 `anonymous`(this = window) → `obj.sayName`(this = obj) → `log`(this.name 즉, obj.name인 vicky 반환) → `inner`(this = obj) → `log`(this.name 즉, obj.name인 vicky 반환)
+
+만약 화살표 함수가 아닐 경우에는 아래와 같이 된다.
+
+위의 경우 `anonymous`(this = window) → `obj.sayName`(this = obj) → `log`(this.name 즉, obj.name인 vicky 반환) → `inner`(this = window) → `log`(window.name 즉, 값이 없으므로 빈 값 반환)
