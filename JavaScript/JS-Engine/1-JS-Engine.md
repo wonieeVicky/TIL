@@ -413,9 +413,9 @@ this는 함수가 호출될 때 함수 호출하는 방법에 따라 결정된�
 this를 분석할 수 없는 경우도 있다.
 
 ```jsx
-const header = document.querySelector('...');
-header.addEventListener('click', function(){
-	console.log(this); // <h3 class="mainPage"> ... </h3>
+const header = document.querySelector("...");
+header.addEventListener("click", function () {
+  console.log(this); // <h3 class="mainPage"> ... </h3>
 });
 ```
 
@@ -428,30 +428,72 @@ this는 함수가 호출될 때 결정되는데, `function(){ console.log(this) 
 
 ```jsx
 const header = {
-	addEventListener: function(eventName, callback){
-		// callback(); // this = window이므로 아닐 것 같음
+  addEventListener: function (eventName, callback) {
+    // callback(); // this = window이므로 아닐 것 같음
 
-		callback.call(this); // this = header로 바인딩
-	}
-}
+    callback.call(this); // this = header로 바인딩
+  },
+};
 ```
 
-위 this 변경 로직을 이해해두면, 향후 라이브러리를 개발하거나 데이터 핸들링을 위한 커스텀 함수를 만들 때 적절히 활용해볼 수 있을 것 같음.. 
+위 this 변경 로직을 이해해두면, 향후 라이브러리를 개발하거나 데이터 핸들링을 위한 커스텀 함수를 만들 때 적절히 활용해볼 수 있을 것 같음..
 
 만약 위와 같이 엘리먼트가 반환되지 않도록 하려면 화살표 함수로 구현하면 된다.
 
 ```jsx
-const header = document.querySelector('...');
-header.addEventListener('click', () => {
-	console.log(this); // window
+const header = document.querySelector("...");
+header.addEventListener("click", () => {
+  console.log(this); // window
 });
 ```
 
 번외. apply와 call 함수의 차이점
 
 ```jsx
-function add(a, b) { return a + b }
+function add(a, b) {
+  return a + b;
+}
 
 add.apply(null, [3, 5]); // 8, 뒤 인자가 배열로 들어감
 add.call(null, 3, 5); // 8, 뒤 인자가 순서대로 들어감
 ```
+
+### 블록 스코프와 매개변수
+
+아래와 같은 코드가 있다고 하자. 콜스택과 선언맵을 그릴 수 있어야 한다.
+
+```jsx
+const x = true;
+const y = false;
+
+function a() {
+  let a = 4;
+  if (x) {
+    let a = 3;
+    for (let i = 0; i < a; i++) {
+      console.log(i);
+    }
+    if (y) {
+      kkk();
+    }
+  }
+  z(); // z is not defined
+}
+
+a();
+const z = () => {};
+// function z() {} // 만약 function 문으로 z가 작성되었을 경우 호이스팅 되므로 에러발생 x
+```
+
+콜스택
+
+- anonymous → a(this=window) →
+
+선언맵
+
+- anonymous → a(f), x(true), y(false) → y(true)
+- a → a(4)
+- a(if)(x) → a(3)
+- a(if)(for) → i(0)
+- a(if)(for) → i(1)
+- a(if)(for) → i(2)

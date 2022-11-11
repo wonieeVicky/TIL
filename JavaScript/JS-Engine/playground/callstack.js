@@ -1,21 +1,23 @@
-﻿const x = "x";
-function c() {
-  const y = "y";
-  console.log("c");
-  // debugger;
-  a();
-}
+﻿const x = true;
+const y = false;
 
 function a() {
-  const x = "x";
-  console.log("a");
-  // function b() {
-  //   const z = "z";
-  //   console.log("b");
-  //   c();
-  // }
-  // b();
+  let a = 4;
+  if (x) {
+    let a = 3;
+    for (let i = 0; i < a; i++) {
+      console.log(i);
+    }
+    if (y) {
+      kkk();
+    }
+  }
+  z();
 }
 
 a();
-c();
+const z = (a, b) => {
+  return a + b;
+};
+
+z(1, 2);
