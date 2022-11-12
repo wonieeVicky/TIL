@@ -100,6 +100,7 @@
 
 - JS Engine 구현
   1. [JS Engine - 콜스택과 선언맵](https://github.com/wonieeVicky/TIL/blob/main/JavaScript/JS-Engine/1-JS-Engine.md)
+  2. [JS Engine - 비동기](https://github.com/wonieeVicky/TIL/blob/main/JavaScript/JS-Engine/2-JS-Engine-asynchronous.md)
 
 ## TDD
 
