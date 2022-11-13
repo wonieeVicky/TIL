@@ -146,3 +146,48 @@ T-fn(0) → T-fn(1000) → T-fn(2000) (T는 setTimeout의 줄임말)
 위 이벤트 큐 영역이 실행되기 위해서는 콜 스택으로 옮겨져야 하며 해당 코드가 실행되도록 옮겨지기 위해서는 테스크 큐(매크로/마이크로 큐)에서 담겨 이벤트 루프에 의해 콜 스택으로 옮겨진다. (콜 스택이 비어져있을 때 하나씩 올려줌)
 
 비동기는 순서의 문제이므로 위 과정을 하나씩 대입해 그릴 수 있다면 비동기 함수 또한, 동기 함수처럼 파악할 수 있게 된다.
+
+### 한 번 비동기는 영원한 비동기 코드
+
+이벤트 큐 영역에 들어가게 된 비동기 코드들이 Task Queue 즉, macro / micro 큐에 담겨 이벤트 루프에 의해 실행된다. 그렇다면 macro, micro 큐에는 어떤 코드들이 각각 담기게 될까?
+
+micro Queue에는 promise, process.nextTick가 담기고, 나머지는 macro Queue에 속하게 된다.
+
+이 둘이 나뉘는 이유는 코드가 거의 동시에 (완전 동시는 있을 수 없지만 아주 근소한 차이의 동시) 큐에 속하게 될 경우를 대비한 것으로 macro, micro Queue에 동시의 코드들이 담겨있을 경우 무조건 micro Queue가 먼저 실행된다.
+
+즉, micro task queue가 꽉 차있는 상태라면 영원히 macro task queue는 실행되지 않는다.
+코드로 간단히 이 예시를 확인할 수 있음
+
+```
+// 즉시 실행을 의미하는 setImmediate 함수 - macro queue에 담긴다.
+setImmediate(() => {
+  console.log("a");
+});
+
+// 바로 실행되는 promise 함수 - micro queue에 담긴다.
+Promise.resolve().then(() => {
+  console.log("p");
+});
+
+// p
+// a
+```
+
+위 코드는 p, a로 반환됨. 즉, 거의 동시에 실행되는 함수에 있어서 micro queue → macro queue 가 우선되어 실행된다.
+
+```jsx
+let a = 2;
+
+setTimeout(() => {
+  a = 5;
+  console.log("b");
+}, 0);
+
+console.log(a); // 2
+setTimeout(() => {
+  console.log(a); // 5
+}, 0);
+```
+
+한번 동기는 영원한 비동기이기 때문에 바로 a값을 디버그 콘솔에 찍어보면 2가 담긴다.
+단, 비동기 함수에 감싸 다시 a값을 확인해보면 5로 변경된 것을 확인할 수 있다.

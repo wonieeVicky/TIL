@@ -1,9 +1,15 @@
-﻿setTimeout(() => {
+﻿/* setImmediate(() => {
   console.log("a");
+}); */
+let a = 2;
+setTimeout(() => {
+  a = 5;
+  // console.log("b");
 }, 0);
+console.log(a);
 setTimeout(() => {
-  console.log("b");
-}, 1000);
-setTimeout(() => {
-  console.log("c");
-}, 2000);
+  console.log(a);
+}, 0);
+/* Promise.resolve().then(() => {
+  console.log("p");
+}); */
