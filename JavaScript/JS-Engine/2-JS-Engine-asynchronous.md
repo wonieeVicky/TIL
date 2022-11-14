@@ -191,3 +191,39 @@ setTimeout(() => {
 
 한번 동기는 영원한 비동기이기 때문에 바로 a값을 디버그 콘솔에 찍어보면 2가 담긴다.
 단, 비동기 함수에 감싸 다시 a값을 확인해보면 5로 변경된 것을 확인할 수 있다.
+
+### Promise에도 동기 부분이 있다.
+
+이제, promise란 실행은 바로 하되, 결괏값을 나중에 원할 때 쓸 수 있는 것으로 이해하자
+
+```jsx
+let a = 2;
+const p = new Promise((resolve, reject) => {
+  console.log("제일 먼저");
+  setTimeout(() => {
+    a = 5;
+    console.log(a);
+    resolve(a);
+  }, 0);
+});
+
+// 딴짓딴짓
+console.log("딴짓");
+// 딴짓딴짓
+p.then((result) => {
+  console.log("result:", result);
+});
+
+// 제일 먼저
+// 딴짓
+// 5
+// result: 5
+```
+
+위와 같은 비동기 코드가 있다고 했을 대, 가장 먼저 `console.log`를 통해 값이 찍히는 부분은 바로 `제일 먼저`이다. 왜냐면 promise 내부의 콜백함수 영역은 동기 함수이기 때문이다. `(resolve, reject) => {…}`
+
+비동기 코드는 코드의 흐름에 위치하지 않을 때만 비동기 함수로 파악하면 된다.
+위 코드에서 이벤트 큐에는 setTimeout 함수 + p.then 함수가 들어가게 된다.
+모든 동기 코드가 실행이 종료되면 macro queue에 존재하는 setTmeout 함수가 실행되고, 콜스택이 모두 비워지면 micro queue에 존재하는 p.then을 콜스택으로 가져와 실행시킨다.
+
+이렇게 함수를 순서에 맞게 큐에 넣고, 이를 실행시키는 과정을 추상화해봄으로써 더욱 js 엔진과 친숙해질 수 있게 된다.
