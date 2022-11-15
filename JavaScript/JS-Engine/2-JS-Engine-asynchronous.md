@@ -227,3 +227,166 @@ p.then((result) => {
 모든 동기 코드가 실행이 종료되면 macro queue에 존재하는 setTmeout 함수가 실행되고, 콜스택이 모두 비워지면 micro queue에 존재하는 p.then을 콜스택으로 가져와 실행시킨다.
 
 이렇게 함수를 순서에 맞게 큐에 넣고, 이를 실행시키는 과정을 추상화해봄으로써 더욱 js 엔진과 친숙해질 수 있게 된다.
+
+### async/await, Promise로 바꾸기
+
+Promise.then., Promise.catch는 보통 아래와 같이 쓴다.
+
+```jsx
+p.then(() => {})
+  .then(() => {})
+  .then(() => {})
+  .then(() => {})
+  .catch(() => {})
+  .finally(() => {});
+```
+
+아래와 같이 쓸 수 있음
+
+```jsx
+p.then(() => {})
+  .then(() => {})
+  .catch(() => {
+    // 에러로 이동
+  })
+  .then(() => {})
+  .catch(() => {
+    // 에러로 이동
+  })
+  .then(() => {})
+  .catch(() => {
+    // 에러로 이동
+  })
+  .finally(() => {});
+```
+
+각 처리 코드에 따라 catch를 각각 붙혀서 에러에 따른 처리를 구체화할 수도 있다. (몰랐음..)
+이 밖에도 async, await 함수도 그렇다.
+
+```jsx
+function delayp(ms) {
+  return new Promise((resolve, reject) => {
+    setTimeout(resolve, ms);
+  });
+}
+
+async function a() {
+  try {
+    await delayp(1000); // 특수 비동기 함수에 대한 반환 처리 로직을 별도로 최적화
+  } catch (err) {
+    console.error(err);
+  }
+
+  try {
+    await delayp(1000);
+    await delayp(1000);
+    await delayp(1000);
+  } catch (err) {
+    console.error(err);
+  }
+}
+```
+
+또한, then 안에서 리턴되는 문자는 다음 then의 result 값으로 담긴다.
+
+```jsx
+p.then((result) => {
+  console.log("result:", result);
+  return 1;
+})
+  .then((result) => {
+    console.log(result); // 1이 반환
+  })
+  .then((result) => {
+    console.log(result); // 별도 return이 없으면 undefined이 담긴다.
+    return Promise.resolve(1);
+  })
+  .then((result) => {
+    console.log(result); // 1이 반환
+  })
+  .then(() => {})
+  .finally(() => {});
+```
+
+위와 같이 반환되는 구조 제대로 이해하고 있는지 확인
+async ~ await 함수도 아래와 같은 trick을 이해하고 있는지 확인하자
+
+```jsx
+async function aa() {
+  const a = await 1; // a = 1
+  const b = await Promise.resolve(1); // b = 1
+}
+
+aa();
+```
+
+뿐만 아니라 async ~ await 함수를 promise로 바꿀 수도 잇어야 한다
+
+```
+async function aa() {
+  const a = await 1; // a = 1
+  console.log("a:", a); // 비동기 코드
+  console.log("---"); // 비동기 코드
+  await null;
+  const b = await Promise.resolve(1); // b = 1
+  console.log("b:", b);
+  return b;
+}
+
+// 위 aa 함수를 promise 함수로 바꿔보자
+Promise.resolve(1)
+  .then((a) => {
+    console.log("a:", a);
+    console.log("---");
+    return null;
+  })
+  .then(() => {
+    return Promise.resolve(1);
+  })
+  .then((b) => {
+    console.log("b:", b);
+    return b;
+  });
+```
+
+위 aa 함수는 아래 Promise 함수로 구현할 수 있게된다.
+위와 같이 바꿀 수 있어야 비동기 async- await 코드에 대한 콜스택, 메시지 큐 등을 직접 머릿 속에 추상화하여 읽어내려갈 수 있게 된다.
+
+또한 실제 aa 함수는 언제 종료될까?
+`return b;`영역? 노노 바로 비동기 코드가 실행되는 `const a = await 1;`에서 종료된다.
+
+```jsx
+async function a() {
+  console.log("2"); // 동기코드
+  const a = await 1; // await then, 여기서부터 모두 비동기 코드(한번 비동기는 영원한 비동기)
+  console.log("4");
+  console.log("a", a);
+  console.log("----");
+  await null;
+  const b = await Promise.resolve(1);
+  console.log("b", b);
+}
+
+console.log("1");
+a()
+  .then((result) => {
+    console.log("result:", result);
+  })
+  .then((result2) => {
+    console.log("result2:", result2);
+  });
+
+console.log("3");
+
+// 1
+// 2
+// 3
+// 4
+// a 1
+// ----
+// b 1
+// result: undefined
+// result2: undefined
+```
+
+위 비동기 함수에도 동기 로직이 섞여있다. 따라서 함수 실행 순서에 따라 콘솔로그가 어떻게 반환되어 오는지 잘 확인해보자
