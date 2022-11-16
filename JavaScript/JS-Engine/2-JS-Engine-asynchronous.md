@@ -390,3 +390,79 @@ console.log("3");
 ```
 
 위 비동기 함수에도 동기 로직이 섞여있다. 따라서 함수 실행 순서에 따라 콘솔로그가 어떻게 반환되어 오는지 잘 확인해보자
+
+### 무지성 await 연달아 쓰지 말자
+
+async 함수 사용 시 무지성으로 await을 많이 쓰게 되는데 그러지 않는 것이 좋다.
+
+```jsx
+function delayP(ms) {
+  return new Promise((resolve, reject) => {
+    setTimeout(resolve, ms);
+  });
+}
+
+async function a() {
+  await delayP(3000); // 3초
+  console.log("1");
+  await delayP(6000); // 6초
+  console.log("2");
+  await delayP(9000); // 9초
+  console.log("3");
+} // total 18s
+```
+
+위와 같은 `delayP` 비동기 함수가 있을 때, await을 무조건 앞에 붙이면 a 함수가 모두 실행되는데 총 18초가 걸리게 된다. 만약 첫번째와, 두번째가 동시에 실행될 수 있는 것이라면 위와 같이 처리하는 것이 비효율적일 것이다. 따라서 아래와 같이 처리할 수 있다.
+
+```jsx
+async function b() {
+  const p1 = delayP(3000); // 3초
+  const p2 = delayP(6000); // 6초
+  await Promise.allSettled([p1, p2]); // 6ch
+  await delayP(9000); // 9초
+} // total 15s
+
+// 결괏값을 가지고 바로 다음 로직을 실행하는 아래 구조만 활용하지 말고 위 구조도 익혀두자
+axios
+  .get()
+  .then(() => {})
+  .catch(() => {});
+```
+
+이러면 18초에서 15초로 함수 동작 시간을 줄일 수 있게된다. 즉 프로미스는 무조건 await을 붙이지말고 동시에 실행되도 되는 것은 우선 실행시켜 결괏값을 가진 상태로 유지하다가 필요한 상황에 다음 동작을 구현하는 것이 바람직하다.
+
+만약 아래와 같이 게시글을 작성하는 함수가 있다고 하자
+
+```jsx
+async function createPost() {
+  const post = await db.getPost(); // 게시물 조회
+  if (post) {
+    res.status(403).send("이미 게시글이 존재합니다.");
+  } else {
+    await db.createPost(); // 게시글 작성
+    await db.userIncrementPostCount(); // 1. 사용자에 작성글 카운트 1 증가
+    await db.createNoti(); // 2. 게시글 작성 완료 알림
+  }
+}
+```
+
+사실 게시글 작성 여부에 따라 1, 2는 각각 실행되어도 무방한 로직이다.
+따라서 이를 await으로 굳이 단계를 나눌 필요가 없다. 이는 아래와 같이 처리할 수 있다.
+
+```jsx
+async function createPost() {
+  const post = await db.getPost(); // 게시물 조회
+  if (post) {
+    res.status(403).send("이미 게시글이 존재합니다.");
+  } else {
+    await db.createPost(); // 게시글 작성
+
+    // 아래처럼 개선
+    const p1 = db.userIncrementPostCount();
+    const p2 = db.createNoti();
+    await Promise.allSettled([p1.p2]);
+  }
+}
+```
+
+이렇게 만들면 불필요한 단계 대기를 줄일 수 있게 된다.
