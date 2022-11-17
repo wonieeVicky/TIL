@@ -466,3 +466,43 @@ async function createPost() {
 ```
 
 이렇게 만들면 불필요한 단계 대기를 줄일 수 있게 된다.
+
+### 프로미스의 다양한 활용
+
+위에서 작업했던 b 함수를 프로미스를 활용해서 구현해보면 아래와 같다.
+
+```jsx
+async function b() {
+  const p1 = delayP(3000); // 3초
+  const p2 = delayP(6000); // 6초
+  await Promise.allSettled([p1, p2]); // 6ch
+  await delayP(9000); // 9초
+} // total 15s
+
+new Promise((resolve, reject) => {
+  const p1 = delayP(3000); // 3초
+  const p2 = delayP(6000); // 6초
+	return Promise.all([p1, p2]); // 6초
+}).then(() => {
+  await delayP(9000); // 9초
+});
+```
+
+위와 같이 구조를 잘 변경할 수 있도록 습득하자
+
+```jsx
+const results = await Promise.all([p1, p2, p3]);
+results.map(async () => {
+  // p1, p2, p3가 순차적으로 실행되지 않는다. 동시에 조작
+  await result조작();
+}, []);
+```
+
+위와 같이 p1, p2, p3가 실행되는 프로미스가 있다고 했을 때, map 안에 async로 돌리면 순차적으로 실행되지 않는다.
+만약 순차적 실행이 중요하다면 아래와 같이 for문으로 해결할 수 있다.
+
+```jsx
+for (let result of results) {
+  await result조작(); // p1 끝나고 p2 끝나고 p3, 순서대로 조작
+}
+```
