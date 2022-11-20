@@ -552,6 +552,10 @@
     - [람다 배포하기](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/16-4-deploy-lambda.md)
     - [람다 설정하기](https://github.com/wonieeVicky/TIL/blob/main/NodeJS/16-5-set-lambda.md)
 
+## Python
+
+1. [Basic Python](Python/1-basic.md)
+
 ## Graphic & Layout
 
 1. SVG
