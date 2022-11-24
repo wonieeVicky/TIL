@@ -554,7 +554,8 @@
 
 ## Python
 
-1. [Basic Python](Python/1-basic.md)
+1. [Python 개발 환경 세팅](Python/1-env-setting.md)
+2. [Python 자료형](Python/2-basic.md)
 
 ## Graphic & Layout
 
