@@ -101,3 +101,62 @@ power = 2 ** 10 # 1024
 # percent
 remainder = 15 % 4 # 3
 ```
+
+### 리스트(list)
+
+- list가 필요한 이유: 동일한 속성의 데이터를 하나로 묶어 관리하기 위함
+  아래와 같이 할당한다.
+  ```python # a = 90 # b = 30 # c = 60
+  class_score = [90, 30, 60] # 혹은
+  class_score = list([90, 30, 60])
+
+      print(class_score) # [90, 30, 60]
+      type(class_score) # list
+
+      class_score = [1, 2, [1, 2]]
+      ```
+
+- indexing
+
+  - 0부터 시작하는 이유? 변수가 가리키는 list의 첫번째 값을 의미하므로
+    - class_score[1]은 변수가 가리키는 list(90이 첫번째 값)에서 1단계 다음에 존재하므로 30
+    ```python
+    class_score = [90, 30, 60]
+    class_score[2] # 60
+    class_score[1] # 30
+    ```
+  - -1 indexing
+    ```python
+    class_score = [1, 2, 3, 4, 5];
+    print(class_score[-1]) # 5
+    print(class_score[-1]) # 4
+    ```
+  - ‘범위’ 인덱싱: 값을 여러 개 가져오고 싶을 때
+
+    ```python
+    class_score = [1, 2, 3, 4, 5];
+    class_score[0:1] # [1] - 첫 번째 인수는 포함, 두 번째 인수는 미포함
+    class_score[0:2] # [1, 2]
+    class_score[:1] # [1]
+    class_score[1:] # [2, 3, 4, 5]
+    class_score[:] # [1, 2, 3, 4, 5]
+    class_score[-2:] # [4, 5]
+
+    type(class_score[1]) # int
+    type(class_score[0:2]) # list
+    ```
+
+- 다차원 리스트
+
+  ```python
+  # 2차원 리스트
+  중고차 = ["K5", "white", [5000, 6000]]
+  print(중고차[2][1]) # 6000
+
+  # 3차원 리스트 - 행렬
+  [
+  	[1, 2, 4],
+  	[1, 2, 3],
+  	[1, 3, 2]
+  ]
+  ```
