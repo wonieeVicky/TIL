@@ -1,6 +1,6 @@
 import React from "react";
-import ReactDOM from "react-dom";
+import { createRoot } from "react-dom/client";
 
 import Games from "./Games";
 
-ReactDOM.render(<Games />, document.querySelector("#root"));
+createRoot(document.querySelector("#root")).render(<Games />);
