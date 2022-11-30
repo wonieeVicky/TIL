@@ -12,6 +12,8 @@ const Games = () => {
         &nbsp;
         <Link to="/game/lotto-generator">로또생성기</Link>
         &nbsp;
+        <Link to="/game/new-hooks">새로운 hooks</Link>
+        &nbsp;
         <Link to="/game/index">게임 매쳐</Link>
       </div>
       <div>
