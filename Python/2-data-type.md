@@ -106,7 +106,8 @@ remainder = 15 % 4 # 3
 
 - list가 필요한 이유: 동일한 속성의 데이터를 하나로 묶어 관리하기 위함
   아래와 같이 할당한다.
-  ```python # a = 90 # b = 30 # c = 60
+
+  ````python # a = 90 # b = 30 # c = 60
   class_score = [90, 30, 60] # 혹은
   class_score = list([90, 30, 60])
 
@@ -115,6 +116,8 @@ remainder = 15 % 4 # 3
 
       class_score = [1, 2, [1, 2]]
       ```
+
+  ````
 
 - indexing
 
@@ -160,3 +163,29 @@ remainder = 15 % 4 # 3
   	[1, 3, 2]
   ]
   ```
+
+### 튜플(tuple)
+
+튜플은 리스트와 동일한데 다른 점이 있다. 먼저 사용법은 아래와 같다.
+
+```python
+a = (1, 2)
+type(a) # tuple
+
+a[1] # 2
+```
+
+위 방법은 리스트와 동일함. 다른 점은 내용이 immutable하게 관리된다는 의미이다.
+
+```python
+a = [1, 2]
+a[0] = 3
+a # [3, 2]
+
+b = (1, 2)
+b[0] = 3 # TypeError 'tuple' object does not support item assignment
+```
+
+위처럼 튜플 변수는 값을 수정할 수 없다. list는 mutable 자료형, tuple은 immutable 자료형임
+
+튜플 자료형 변수에 대해 추가, 삭제, 변경 등의 operation이 일어날 때에는 기존의 값을 모두 버리고 새로운 값으로 대체되는 특징을 가진다(immutable이라 기존에 만들어진 값에는 수정이 불가능하므로 새로운 값을 생성) 이러한 특징을 이해하는데에는 포인터의 개념을 알면 도움이 되며, python mutable, immutable로 검색해서 더 공부해본다.
