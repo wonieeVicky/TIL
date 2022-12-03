@@ -189,3 +189,65 @@ b[0] = 3 # TypeError 'tuple' object does not support item assignment
 위처럼 튜플 변수는 값을 수정할 수 없다. list는 mutable 자료형, tuple은 immutable 자료형임
 
 튜플 자료형 변수에 대해 추가, 삭제, 변경 등의 operation이 일어날 때에는 기존의 값을 모두 버리고 새로운 값으로 대체되는 특징을 가진다(immutable이라 기존에 만들어진 값에는 수정이 불가능하므로 새로운 값을 생성) 이러한 특징을 이해하는데에는 포인터의 개념을 알면 도움이 되며, python mutable, immutable로 검색해서 더 공부해본다.
+
+### 문자열(string)
+
+문자열 = 스트링(string) = 문자열 스트링(string) 자료형
+문자열 변수는 문자 그 자체를 나타나기 위해 사용된다.
+
+```python
+a = 안녕하세요 # NameError : name '안녕하세요' is not defined
+a = '안녕하세요'
+a # 안녕하세요
+```
+
+- indexing: 문자열은 한글자씩 인덱싱도 가능하다.
+
+```python
+a = '안녕하세요'
+a[0] # 안
+a[-1] # 요
+a[:-2] # 안녕하
+```
+
+### 딕셔너리(dictionary) 자료형
+
+리스트 자료형과 다르게 이름을 붙여 저장한다.
+
+```python
+중고차2 = {"brand": "BMW", "model": "k5"}
+중고차2["brand"] = "Hyundai"
+
+print(중고차2["brand"]); # Hyundai
+
+my_dict = {'car': 'k5', 'bmw': 'x5', 'tico': 'tico'}
+# 혹은
+my_dict2 = dict(car = 1000, name = 'vicky') # 이 방식으로 선언 시 key는 반드시 문자열이어야 함
+```
+
+굳이 딕셔너리 자료형을 써야하는 이유는 무엇일까? 아래와 같이 써도 구현 가능한데..?
+
+```python
+my_list = [[ 123, 456 ], [ 'my_key', 1000 ]]
+```
+
+⇒ 딕셔너리 자료형의 원래 이름은 Hashtable 이라고 불림. 데이터를 저장 시 hash 값을 번호로 하는 방에 데이터를 저장함. unique 특성을 유지하는 것임. 결국 딕셔너리의 모든 key, value 쌍에 대해 하나씩 일일히 비교하면서 찾는 것이 아닌 hash 값을 이용해 딱 한번 check만 하면 되는 장점이 있음
+
+```python
+my_list = [[ 123, 456 ], [ 'my_key', 1000 ], ...]
+```
+
+만약 위 리스트 데이터에서 인덱스 하나당 조회가 1초가 걸린다고 했을 때, 데이터가 100개고 맨 마지막 데이터를 찾는다면 첫 번째 값부터 조회할 시 100초가 걸리게 된다. 즉 n개의 데이터가 있을 때 조회 시 최악의 경우 n초가 걸리게 되는 것임. 반면에 hashtable의 경우 변수값이 저장된 방 key를 가지고 직접 저장된 데이터를 찾아오기 때문에 find operation 속도가 현저히 차이날 수 있음. 적재적소에 적절한 데이터형을 사용하는 것은 매우 중요하다.
+
+```python
+company_list = ["삼성전자", "현대차"]
+price_list = [10, 90]
+
+company_price_list = [["삼성전자", 10], ["현대차", 90]]
+stock_dict = { "삼성전자": 10, "현대차": 90 }
+stock_dict["삼성전자"] # 10
+stock_dict["현대차"] # 90
+
+stock_dict["하이닉스"] = 100
+stock_dict # { "삼성전자": 10, "현대차": 90, "하이닉스": 100 }
+```
