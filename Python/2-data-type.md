@@ -266,3 +266,21 @@ stock_dict["현대차"] # 90
 stock_dict["하이닉스"] = 100
 stock_dict # { "삼성전자": 10, "현대차": 90, "하이닉스": 100 }
 ```
+
+### 집합(set)
+
+집합 자료형도 hash 알고리즘을 사용한다. 내부적으로 hash를 사용
+(hash는 uniqueness가 보장되므로 이와 같은 특징을 갖는다)
+
+```python
+my_set = {1, 2, 3, 1}
+my_set # {1, 2, 3}
+```
+
+중복된 데이터를 저장하지 않을 때 사용한다. 이 외에도 데이터셋 간의 비교(교집합, 합집합, 차집합 등)과 빠른 find operation을 활용할 때 사용된다.
+
+```python
+my_list = [1, 2, 3, 4, 4]
+my_new_set = set(my_list) # set 자료형으로 변경
+my_new_set # {1, 2, 3, 4}
+```
