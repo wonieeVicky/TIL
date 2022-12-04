@@ -86,3 +86,43 @@ jupyter extenstion을 설치해본다. [jupyterlab-toc](https://github.com/jupyt
 설치 후 jupyter-lab을 실행시키면 아래와 같이 마크다운으로 코드를 문서화할 수 있는 목록 기능이 추가된다.
 
 ![](../img/221127-1.png)
+
+### PERL
+
+- Python에는 코드를 실행하는 다른 방법인 Perl이 있다.
+  - 터미널에서 `python3` 를 치고 그 안에서 한 줄 단위의 간단한 연산을 구현할 수 있다.
+  - Like Chrome console 창과 비슷한 역할을 한다.
+  - 종료하려면 `exit()`를 입력하면 된다.
+- Read - Eval - Print Loop
+  Read : (코드를) 읽어서
+  Eval : (읽은 코드를) 평가(실행)하고
+  Print : (실행한 결과를) 출력하는
+  Loop : 루프(반복)
+
+### Command Shell(Terminal) 사용법
+
+- Shell이란 운영체제와 사용자가 소통하는 방법이다.
+- Python 을 쓸 때에는 Graphic Shell보다는 Command Shell이 편하므로 Command Shell을 쓴다.
+- 간단한 명령어
+  - `pwd` : 현재 폴더 경로 출력
+  - `ls` : 현재 폴더 내용물 출력
+  - `cd <폴더명>`: 다른 폴더로 이동
+    - `cd..` : 상위 폴더로 이동
+  - `cp` : 파일을 다른 이름으로 복사
+    - `cp test.py test2.py`
+  - `rm` : 파일을 삭제
+
+### print() 함수
+
+- 괄호 안에 있는 내용을 화면에 출력하는 명령
+
+```python
+# test.py
+print('Hello World')
+
+# run code at Mac OS
+python test.py // Hello World
+
+# python만 칠경우 터미널에서 파이썬이 실행된다. 나오려면..
+exit()
+```
