@@ -284,3 +284,44 @@ my_list = [1, 2, 3, 4, 4]
 my_new_set = set(my_list) # set 자료형으로 변경
 my_new_set # {1, 2, 3, 4}
 ```
+
+### 불(bool, boolean)
+
+이 자료형은 개념이 쉬우나 활용하는 측면에서 조금 어렵게 느껴질 수 있다.
+
+```python
+a = 1 # 숫자
+a = "abc" # 문자
+
+a = True # 불
+type(a) # bool
+a = False
+a # False
+```
+
+- with `and`, `or` : and, or 연산자를 사용할 수 있다.
+  ```python
+  # and && - 두 값 모두 참이어야 참
+  True and True # True
+  True and False # False
+  False and False # False
+
+  # or || - 둘 중 한 값이 참이면 참
+  True or False # True
+  False or False # False
+
+  # 이런 것도 가능하다.
+  True and True or False # = ((True and True) or False) = True
+  ```
+- bool로 받아들여야 하는 낯선 구문들: 부등호로 불 값을 변수에 저장할 수 있다.
+  ```python
+  a = -1
+  c = a < 1
+  c # True
+
+  a <= 1 # True
+  a == 3 # False
+  a != 3 # True
+
+  a > 1 or a < 0 # = False or True = True
+  ```
