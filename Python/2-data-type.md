@@ -193,7 +193,7 @@ b[0] = 3 # TypeError 'tuple' object does not support item assignment
 ### 문자열(string)
 
 문자열 = 스트링(string) = 문자열 스트링(string) 자료형
-문자열 변수는 문자 그 자체를 나타나기 위해 사용된다.
+문자열 변수는 따옴표로 감싸진 글로 문자 그 자체를 나타나기 위해 사용된다.
 
 ```python
 a = 안녕하세요 # NameError : name '안녕하세요' is not defined
@@ -208,6 +208,21 @@ a = '안녕하세요'
 a[0] # 안
 a[-1] # 요
 a[:-2] # 안녕하
+```
+
+- 텍스트 두 개를 더하면 문자열이 이어붙으며, 텍스트는 더하기만 가능하고 빼기 등의 다른 계산은 불가능하다.
+
+```python
+my_name = 'Vicky'
+text = '1990'+'0326'
+
+print(my_name, text) #Vicky 19900326
+
+birth_year='1990'
+birth_date='0326'
+year_and_date = birth_year + birth_date
+
+print("year_and_date : {}".format(year_and_date)) # year_and_date : 19900326
 ```
 
 ### 딕셔너리(dictionary) 자료형
