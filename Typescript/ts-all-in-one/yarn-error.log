@@ -1,0 +1,36 @@
+Arguments: 
+  /usr/local/bin/node /Users/uneedcomms/.npm-global/bin/yarn init
+
+PATH: 
+  /Users/uneedcomms/opt/anaconda3/bin:/Users/uneedcomms/opt/anaconda3/condabin:/Users/uneedcomms/Library/Python/3.8/bin:/opt/homebrew/opt/curl/bin:/opt/homebrew/bin:/Users/uneedcomms/.npm-global/bin:/usr/local/bin:/System/Cryptexes/App/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/share/dotnet:~/.dotnet/tools:/Library/Frameworks/Mono.framework/Versions/Current/Commands
+
+Yarn version: 
+  1.22.19
+
+Node version: 
+  14.17.3
+
+Platform: 
+  darwin x64
+
+Trace: 
+  Error: canceled
+      at Interface.<anonymous> (/Users/uneedcomms/.npm-global/lib/node_modules/yarn/lib/cli.js:137150:13)
+      at Interface.emit (events.js:375:28)
+      at Interface._ttyWrite (readline.js:910:16)
+      at ReadStream.onkeypress (readline.js:235:10)
+      at ReadStream.emit (events.js:375:28)
+      at emitKeys (internal/readline/utils.js:358:14)
+      at emitKeys.next (<anonymous>)
+      at ReadStream.onData (readline.js:1179:36)
+      at ReadStream.emit (events.js:375:28)
+      at addChunk (internal/streams/readable.js:290:12)
+
+npm manifest: 
+  No manifest
+
+yarn manifest: 
+  No manifest
+
+Lockfile: 
+  No lockfile

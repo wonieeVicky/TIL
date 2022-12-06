@@ -1,0 +1,12 @@
+{
+  "name": "ts-all-in-one",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "devDependencies": {
+    "typescript": "^4.9.3"
+  }
+}
