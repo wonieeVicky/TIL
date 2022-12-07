@@ -23,6 +23,7 @@
     - [module](https://github.com/wonieeVicky/TIL/blob/main/Typescript/1-12-module.md)
     - [utlity type](https://github.com/wonieeVicky/TIL/blob/main/Typescript/1-13-utility-type.md)
 
+
 2.  TypeScript 개념 정리 + 실적 적용
 
     - [타입스크립트의 필요성, JS에서 타입 체크하기](https://github.com/wonieeVicky/TIL/blob/main/Typescript/2-1-need-to-ts-and-chec-type-in-js.md)
@@ -40,6 +41,7 @@
     - [타입 호환](https://github.com/wonieeVicky/TIL/blob/main/Typescript/2-13-type-compatibility.md)
     - [타입 모듈화](https://github.com/wonieeVicky/TIL/blob/main/Typescript/2-14-type-module.md)
 
+
 3.  실전 프로젝트로 배우는 타입스크립트
 
     - [유틸리티 타입(Partial, Pick, Omit)](https://github.com/wonieeVicky/TIL/blob/main/Typescript/3-1-utility-type-partial-pick-omit.md)
@@ -56,6 +58,10 @@
     - [차트 관련 타입 오류 해결 및 tree-shaking을 위한 enum 타입 개선](https://github.com/wonieeVicky/TIL/blob/main/Typescript/3-12-error-fix-for-chartjs.md)
     - [엄격한 타입 적용](https://github.com/wonieeVicky/TIL/blob/main/Typescript/3-13-apply-tight-type.md)
 
+
+4. 타입스크립트 올인원 - 기본 문법편
+
+    - [타입스크립트를 배워야 하는 이유](Typescript/4-1-ts-all-in-one-intro.md)
 ## JavaScript
 
 - EcmaScript6
