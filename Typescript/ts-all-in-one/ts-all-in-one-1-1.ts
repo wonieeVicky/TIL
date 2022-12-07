@@ -1,4 +1,4 @@
-﻿const a: string = "5";
+﻿const a = 5;
 const b: number = 5;
 const c: boolean = true;
 const d: undefined = undefined;
@@ -18,7 +18,10 @@ interface Add {
 }
 const add: Add = (a, b) => a + b;
 
-const obj: { x: number; y: number } = { x: 1, y: 2 };
+const obj: {
+  x: number;
+  y: number;
+} = { x: 1, y: 2 };
 
 const arr: string[] = ["a", "b", "c"];
 const arr2: Array<number> = [123, 456, 789];
