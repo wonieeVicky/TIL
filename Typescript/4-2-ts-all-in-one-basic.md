@@ -101,13 +101,14 @@ typscript 코드는 Javascript 변환 시 모두 사라진다. 따라서 타이�
 ```tsx
 function add4(x: number, y: number): number; // type 정의
 
-function add4(x: any, y: any) {
+function add4(x, y) {
   // 실제 코드 작성
   return x + y;
 }
 ```
 
 위와 같이 할 경우 타입 정의를 한 type 정의 영역이 1번 라인은 js 변환 시 사라진다.
+(단 tsconfig.json 설정이 !noImplicitAny && strictNullChecks여야 정상 동작함!!)
 뿐만 아니라 `as` 키워드도 사라진다.
 
 ```tsx
@@ -122,4 +123,5 @@ let test = 123;
 test = "hello";
 ```
 
-위와 같은 제한은 JavaScript의 자유도를 매우 제한시키지만, 타입을 명확히 함으로써 예상하지 못한 버그를 초기에 잡을 수 있고, 예측 가능한 코딩을 할 수 있게되므로 실보다 득이 많다.
+위와 같은 제한은 JavaScript의 자유도를 매우 제한시키지만,
+타입을 명확히 함으로써 예상하지 못한 버그를 초기에 잡을 수 있고, 예측 가능한 코딩을 할 수 있게되므로 실보다 득이 많다.
