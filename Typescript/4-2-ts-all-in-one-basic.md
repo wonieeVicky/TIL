@@ -90,3 +90,36 @@ const a = 5;
 ![](../img/221208-1.png)
 
 즉 위와 같은 타입 추론 방법이 number로 선언한 것보다 오히려 더 정확한 타입 선언이므로 때로는 타입 선언이 불필요할 수도 있다. 타입 추론에 맡겨도 되는 부분은 맡겨버리자
+
+### js 변환 시 사라지는 부분을 파악할 것
+
+typscript 코드는 Javascript 변환 시 모두 사라진다. 따라서 타이핑 영역을 정확히 파악해야한다.
+먼저 기본적으로 `type`, `interface`, `generic`은 변환 시 모두 사라지는 코드이다.
+
+또한 `body 없는 function 구조`의 함수 타입 정의도 사라진다. 아래 예시를 보자
+
+```tsx
+function add4(x: number, y: number): number; // type 정의
+
+function add4(x: any, y: any) {
+  // 실제 코드 작성
+  return x + y;
+}
+```
+
+위와 같이 할 경우 타입 정의를 한 type 정의 영역이 1번 라인은 js 변환 시 사라진다.
+뿐만 아니라 `as` 키워드도 사라진다.
+
+```tsx
+let test = 123;
+test = "hello" as unknown as number; // as는 타입을 강제로 변환
+```
+
+위 코드는 아래와 같이 변환됨
+
+```jsx
+let test = 123;
+test = "hello";
+```
+
+위와 같은 제한은 JavaScript의 자유도를 매우 제한시키지만, 타입을 명확히 함으로써 예상하지 못한 버그를 초기에 잡을 수 있고, 예측 가능한 코딩을 할 수 있게되므로 실보다 득이 많다.

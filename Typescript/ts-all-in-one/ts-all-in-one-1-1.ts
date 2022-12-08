@@ -28,3 +28,8 @@ const arr2: Array<number> = [123, 456, 789];
 
 // 길이가 고정되었을 때 튜플로 정의
 const arr3: [number, number, string] = [1, 2, "3"];
+
+function add4(x: number, y: number): number;
+function add4(x: any, y: any) {
+  return x + y;
+}
