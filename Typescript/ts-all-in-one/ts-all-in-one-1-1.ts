@@ -30,6 +30,27 @@ const arr2: Array<number> = [123, 456, 789];
 const arr3: [number, number, string] = [1, 2, "3"];
 
 function add4(x: number, y: number): number;
-function add4(x: any, y: any) {
+function add4(x, y) {
   return x + y;
+}
+
+let test = 123;
+test = "hello" as unknown as number;
+
+try {
+  const array: string[] = [];
+  array.push("hello");
+} catch (error) {
+  error;
+}
+
+// const head = document.querySelector("#head")!
+
+// console.log(head);
+// head.innerHTML = "hello";
+
+const head = document.querySelector("#head");
+if (head) {
+  head.innerHTML = "hello";
+  console.log(head);
 }
