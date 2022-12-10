@@ -54,3 +54,23 @@ if (head) {
   head.innerHTML = "hello";
   console.log(head);
 }
+
+const aa: string = "hello";
+const bb: String = "hell";
+
+function cc(a1: string, b1: string) {}
+cc(aa, bb);
+
+type World = "world" | "hell";
+type Greeting = `hello ${World}`;
+const GreetingResult: Greeting = "";
+
+function rest(a, ...args: string[]) {
+  console.log(a, args); // [1,2,3]
+}
+
+rest(1, "2", "3");
+
+const tuple: [string, number] = ["1", 1];
+tuple[2] = "hello"; // Error
+tuple.push("hello");

@@ -167,3 +167,75 @@ if (head) {
 
 위와 같이 head 엘리먼트가 존재하면 코드가 진행되도록 조건을 명확히 만들어주면 에러가 발생하지 않는다.
 코드를 읽는 입장에서도 문제가 없으며 이후 예상하지 못했던 경우에 대해서도 모두 방어가 가능하므로 훨씬 바람직한 방법임
+
+### 원시 래퍼 타입, 템플릿 리터럴 타입, rest, 튜플
+
+string과 String 은 서로 다른 타입이다. String은 래퍼 개체. 아래 예시를 보자
+
+```tsx
+const aa: string = "hello";
+const bb: String = "hell";
+
+function cc(a1: string, b1: string) {}
+cc(aa, bb); // bb에 Error 발생
+```
+
+위와 같이 bb 변수에 String 래퍼 타입을 넣을 경우 아래와 같은 에러 메시지가 반환된다.
+
+![](../img/221211-1.png)
+
+위에서 사용한 래퍼개체 String은 `new String()` 메서드 사용할 때 쓰는 String 타입이다.
+거의 사용하지 않으므로 안쓴다고 생각하자.
+
+또 타입 정의를 아래와 같이할 수도 있다.
+
+```tsx
+type World = "world";
+const txt: World = "world";
+```
+
+![](../img/221211-2.png)
+
+위 사용은 템플릿 리터럴 타입에서도 동일하게 적용할 수 있다.
+
+```tsx
+const txtB = `hello ${txt}`;
+type Greeting = `hello ${World}`;
+```
+
+![](../img/221211-3.png)
+
+위 예시는 실제 아래와 같은 방법으로 활용된다.
+
+```tsx
+type World = "world" | "hell";
+type Greeting = `hello ${World}`;
+
+const GreetingResult: Greeting = "";
+```
+
+![](../img/221211-4.png)
+
+위와 같이 `GreetingResult` 변수에 `Greeting` 타입을 대입하면 타이핑에 의해 `hello hell` 과 `hello world`라는 값 두가지가 자동완성으로 제공된다.
+
+위 Greeting 타입이 World type이 아닌 일반 string 이었다면 해당 자동완성은 제공되지 않았을 것임
+더욱 명확한 타입을 제시할 수 있으므로 위와 같은 방법으로 템플릿 리터럴이 활용된다.
+
+이 밖에 rest 문법은 아래와 같이 타이핑 할 수 있다.
+
+```tsx
+function rest(a, ...args: string[]) {
+  console.log(a, args); // a = 1,  args = ["2", "3"]
+}
+
+rest(1, "2", "3");
+```
+
+또한 튜플 타이핑에 대해 알아보자
+
+```tsx
+const tuple: [string, number] = ["1", 1];
+
+tuple[2] = "hello"; // Error
+tuple.push("hello"); // Ok, 세번째 요소를 추가하므로 에러가 나야하지만 발생하지 않음
+```
