@@ -59,11 +59,11 @@ const aa: string = "hello";
 const bb: String = "hell";
 
 function cc(a1: string, b1: string) {}
-cc(aa, bb);
+// cc(aa, bb);
 
 type World = "world" | "hell";
 type Greeting = `hello ${World}`;
-const GreetingResult: Greeting = "";
+// const GreetingResult: Greeting = "";
 
 function rest(a, ...args: string[]) {
   console.log(a, args); // [1,2,3]
@@ -72,5 +72,42 @@ function rest(a, ...args: string[]) {
 rest(1, "2", "3");
 
 const tuple: [string, number] = ["1", 1];
-tuple[2] = "hello"; // Error
+// tuple[2] = "hello"; // Error
 tuple.push("hello");
+
+// enum은 JavaScript 변환 시 사라진다.
+const enum EDirection {
+  Up = 3,
+  Down,
+  Left = "hello",
+  Right = "vicky",
+}
+
+// object는 JavaScript 변환 시 유지된다.
+const ODirection = {
+  Up: 3,
+  Down: 1,
+  Left: "hello",
+  Right: "vicky",
+} as const;
+
+const e_up = EDirection.Up; // 3
+const e_down = EDirection.Down; // 4
+const e_left = EDirection.Left; // hello
+const e_right = EDirection.Right; // vicky
+
+const o_up = ODirection.Up; // 3
+const o_down = ODirection.Down; // 4
+const o_left = ODirection.Left; // hello
+const o_right = ODirection.Right; // vicky
+
+function walk(dir: EDirection) {}
+// It requires an extra line to pull out the keys
+type Direction = typeof ODirection[keyof typeof ODirection];
+function run(dir: Direction) {}
+
+walk(EDirection.Up);
+run(ODirection.Up);
+
+const testObj = { a: "123", b: 123, c: true } as const;
+type Key = typeof testObj[keyof typeof testObj];

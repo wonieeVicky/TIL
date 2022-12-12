@@ -239,3 +239,82 @@ const tuple: [string, number] = ["1", 1];
 tuple[2] = "hello"; // Error
 tuple.push("hello"); // Ok, 세번째 요소를 추가하므로 에러가 나야하지만 발생하지 않음
 ```
+
+### enum, keyof, typeof
+
+`enum` 타입에 대해 알아보자.
+
+```tsx
+// enum은 JavaScript 변환 시 사라진다.
+const enum EDirection {
+  Up = 3,
+  Down,
+  Left = "hello",
+  Right = "vicky",
+}
+
+const e_up = EDirection.Up; // 3
+const e_down = EDirection.Down; // 4
+const e_left = EDirection.Left; // hello
+const e_right = EDirection.Right; // vicky
+```
+
+위와 같이 데이터를 정의해서 쓸 수 있다. `enum`은 `javaScript` 변환 시 사라진다는 특징이 있다.
+이를 보통 객체로 구현할 수 있는데, 아래와 같다.
+
+```tsx
+// object는 JavaScript 변환 시 유지된다.
+const ODirection = {
+  Up: 3,
+  Down: 1,
+  Left: "hello",
+  Right: "vicky",
+} as const;
+
+const o_up = ODirection.Up; // 3
+const o_down = ODirection.Down; // 4
+const o_left = ODirection.Left; // hello
+const o_right = ODirection.Right; // vicky
+```
+
+위 `enum`과 동일한 기능을 하지만 `object`로 정의한 변수 객체 값은 사라지지않고 보관된다는 특징이 있음
+따라서 필요에 따라 남겨야할 경우와 값이 없어도 될 경우를 잘 나누어 사용하면 되겠다.
+
+![](../img/221211-5.png)
+
+이 밖에도 `enum`은 타입으로 사용할 수도 있다.
+
+```tsx
+function walk(dir: EDirection) {}
+//  dir = 1 | 3 | "hello" | "vicky"
+
+walk(EDirection.Up); // walk(3)
+```
+
+만약 `enum` 타입 사용이 어렵게 느껴진다면 객체 `ODirection` 으로도 타이핑을 할 수 있다.
+
+```tsx
+// It requires an extra line to pull out the keys
+type Direction = typeof ODirection[keyof typeof ODirection];
+
+// type Direction = 1 | 3 | "hello" | "vicky"
+function run(dir: Direction) {}
+
+run(ODirection.Up);
+```
+
+위 방법이 복잡하니 그냥 enum을 쓰게 된다 😄 이 참에 `keyof`에 대해 알아보자.
+
+```tsx
+const testObj = { a: "123", b: 123, c: true };
+type Key = keyof typeof testObj; // type Key = "a" | "b" | "c"
+```
+
+만약 값을 type으로 모으고 싶다면 아래와 같이 한다.
+
+```tsx
+const testObj = { a: "123", b: 123, c: true } as const;
+type Key = typeof testObj[keyof typeof testObj]; // type Key = true | 123 | "123"
+```
+
+`keyof typeof Object`는 key만 모아올 수 있고 `typeof Object[keyof typeof Object]`로 하면 value만 모을 수 있다.
