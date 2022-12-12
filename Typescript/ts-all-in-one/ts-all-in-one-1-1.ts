@@ -111,3 +111,23 @@ run(ODirection.Up);
 
 const testObj = { a: "123", b: 123, c: true } as const;
 type Key = typeof testObj[keyof typeof testObj];
+
+type A = { a: string };
+const aaa: A = { a: "123" };
+
+interface B {
+  a: string;
+}
+const bbb: B = { a: "123" };
+
+type TypeUnion = string | number;
+const txtUnion: TypeUnion = 123;
+
+type TypeUnionObj = { hello: "world" } | { vicky: "choi" };
+const unionObj1: TypeUnionObj = { hello: "world" };
+const unionObj2: TypeUnionObj = { vicky: "choi" };
+const unionObj3: TypeUnionObj = { hello: "world", vicky: "choi" };
+
+type TypeIntersectionObj = { hello: "world" } & { vicky: "choi" };
+const intersectionObj1: TypeIntersectionObj = { hello: "world", vicky: "choi" };
+const intersectionObj2: TypeIntersectionObj = { hello: "world" }; // Error

@@ -318,3 +318,44 @@ type Key = typeof testObj[keyof typeof testObj]; // type Key = true | 123 | "123
 ```
 
 `keyof typeof Object`는 key만 모아올 수 있고 `typeof Object[keyof typeof Object]`로 하면 value만 모을 수 있다.
+
+### union(|)과 intersection(&)
+
+type과 interface 모두 타입정의를 할 때 쓰인다.
+
+```tsx
+// type 정의
+type A = { a: string };
+
+// interface 정의
+interface B {
+  a: string;
+}
+
+const aaa: A = { a: "123" };
+const bbb: B = { a: "123" };
+```
+
+interface는 객체지향 프로그래밍 즉, 복잡한 타이핑이 지원되어야할 때 사용한다. type은 간단한 타이핑 시 사용
+
+이번에는 `union`을 알아본다. ‘또는’을 의미함
+
+```tsx
+type TypeUnion = string | number;
+const txtUnion: TypeUnion = 123;
+
+type TypeUnionObj = { hello: "world" } | { vicky: "choi" };
+const unionObj1: TypeUnionObj = { hello: "world" };
+const unionObj2: TypeUnionObj = { vicky: "choi" };
+const unionObj3: TypeUnionObj = { hello: "world", vicky: "choi" };
+```
+
+string, number 중 하나의 타입으로 지정하거나 객체 값도 `TypeUnionObj` 처럼 설정할 수 있다. 여러 개 중 하나만 만족
+
+```tsx
+type TypeIntersectionObj = { hello: "world" } & { vicky: "choi" };
+const intersectionObj1: TypeIntersectionObj = { hello: "world", vicky: "choi" };
+const intersectionObj2: TypeIntersectionObj = { hello: "world" }; // Error
+```
+
+`Intersection(&)`은 ‘그리고’를 의미하므로 모든 속성이 모두 만족되어야 한다. 위 예시 참고하자
