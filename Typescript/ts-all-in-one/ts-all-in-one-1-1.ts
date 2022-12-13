@@ -131,3 +131,44 @@ const unionObj3: TypeUnionObj = { hello: "world", vicky: "choi" };
 type TypeIntersectionObj = { hello: "world" } & { vicky: "choi" };
 const intersectionObj1: TypeIntersectionObj = { hello: "world", vicky: "choi" };
 const intersectionObj2: TypeIntersectionObj = { hello: "world" }; // Error
+
+type Animal = { breath: true };
+type Mamal = Animal & { breed: true };
+type Human = Mamal & { think: true };
+
+const vicky: Human = { breath: true, breed: true, think: true };
+
+interface AnimalInterface {
+  breath: true;
+}
+
+interface MamalInterface extends Mamal {
+  breed: true;
+}
+
+const baduc: MamalInterface = { breath: true, breed: true };
+
+interface SameInterface {
+  talk: () => void;
+}
+interface SameInterface {
+  eat: () => void;
+}
+interface SameInterface {
+  shit: () => void;
+}
+
+const same: SameInterface = {
+  talk: () => {},
+  eat: () => {},
+  shit: () => {},
+};
+
+interface Props {}
+type Type = string | number;
+enum Hello {
+  Left,
+  Right,
+}
+
+const a: Props = {};

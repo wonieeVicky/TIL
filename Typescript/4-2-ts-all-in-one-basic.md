@@ -359,3 +359,90 @@ const intersectionObj2: TypeIntersectionObj = { hello: "world" }; // Error
 ```
 
 `Intersection(&)`은 ‘그리고’를 의미하므로 모든 속성이 모두 만족되어야 한다. 위 예시 참고하자
+
+### type alias와 interface extends
+
+타입은 아래와 같은 방법으로 상속된다.
+
+```tsx
+type Animal = { breath: true };
+type Mamal = Animal & { breed: true };
+type Human = Mamal & { think: true };
+
+const vicky: Human = { breath: true, breed: true, think: true };
+```
+
+& 으로 상속을 구현함. interface 도 extends로 상속 구현이 가능하다.
+
+```tsx
+interface AnimalInterface {
+  breath: true;
+}
+
+interface MamalInterface extends AnimalInterface {
+  breed: true;
+}
+
+const baduc: MamalInterface = { breath: true, breed: true };
+```
+
+보통 타입은 간단한 타이핑 시 사용하고, interface는 좀 더 넓은 확장면에 있어서 유리하므로 필요에 따라 나눠 사용한다.
+이 밖에도 interface의 extends 객체로 타입으로 선언한 코드를 넣을 수도 있다. 또한 type에 interface를 조합할 수 있다.
+
+```tsx
+interface MamalInterface extends Mamal {
+  breed: true;
+}
+
+const baduc: MamalInterface = { breath: true, breed: true };
+```
+
+interface는 아래와 같은 오버라이딩 특징을 가진다.
+
+```tsx
+interface SameInterface {
+  talk: () => void;
+}
+interface SameInterface {
+  eat: () => void;
+}
+interface SameInterface {
+  shit: () => void;
+}
+
+const same: SameInterface = {
+  talk: () => {},
+  eat: () => {},
+  shit: () => {},
+};
+```
+
+위 처럼 같은 명의 interface는 종국에는 하나의 SameInterface라는 타입으로 합쳐진다.
+이러한 장점이 있어서 라이브러리를 사용할 때 Interface로 타입을 추가 확장하여 사용할 수 있다.
+
+타입스크립트의 네이밍 룰에 대해 잠깐 알아본다.
+
+```tsx
+// 예전에는 I, T, E 등 대문자를 앞으로 붙였음
+interface Iinterface {}
+type Type = string | number;
+enum EHello {
+  Left,
+  Right,
+}
+
+// 요즘은 no
+interface Props {}
+type Type = string | number;
+enum Hello {
+  Left,
+  Right,
+}
+
+const a: Props = {};
+```
+
+기존에는 타입 정의를 할 때 interface, type, enum을 구분하기 위해 앞에 I, T, E 등의 키워드를 붙였다.
+하지만 요즘은 잘 안씀. IDE 툴이 알아서 타입을 알려주므로 굳이 표시할 이유가 없음
+
+![](../img/221213-1.png)
