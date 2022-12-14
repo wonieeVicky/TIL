@@ -446,3 +446,77 @@ const a: Props = {};
 하지만 요즘은 잘 안씀. IDE 툴이 알아서 타입을 알려주므로 굳이 표시할 이유가 없음
 
 ![](../img/221213-1.png)
+
+### 타입을 집합으로 생각하자(좁은 타입과 넓은 타입)
+
+```
+type A = string | number; // 넓은 타입
+type B = string; // 좁은 타입
+```
+
+타입은 좁은 타입과 넓은 타입으로 나눌 수 있다. 좁은 타입은 넓은 타입에 적용이 가능하지만, 넓은 타입이 좁은 타입으로 할당하는 것은 불가능함. 비슷한 원리로 any는 전체집합, never는 공집합으로 볼 수 있다.
+
+```tsx
+type A = string | number; // 상대적으로 넓은 타입
+type B = string; // 상대적으로 좁은 타입
+type AB = A | B; // A와 B를 '또는' 으로 연결하므로 넓은 타입
+
+type objA = { name: string }; // 속성이 좁을수록 넓은 타입
+type objB = { age: number }; // 속성이 좁을수록 넓은 타입
+
+type objC = { name: string; age: number }; // 속성이 구체적일수록 좁은 타입
+```
+
+위와 같은 타입의 성질을 활용하면 아래의 타이핑이 구현할 수 있다.
+
+```tsx
+type objA = { name: string };
+type objB = { age: number };
+
+type objAB = objA | objB;
+type objC = objA & objB;
+
+const ab: objAB = { name: "vicky" };
+const c: objC = { name: "vicky", age: 33 };
+```
+
+`또는`과 `그리고` 로 만들어진 타입을 적용한 것이다. 위 타입은 아래와 같이 대입할 수 있다.
+
+```tsx
+const c: objC = { name: "vicky", age: 33 };
+const ab: objAB = { name: "vicky" };
+
+const ab: objAB = c;
+```
+
+`objC` 타입 (좁은 타입) → `objAB`(넓은 타입)이므로 타입 적용이 가능함
+하지만 아래의 경우에는 문제가 있다.
+
+```tsx
+const ab: objAB = { name: "vicky" };
+const c: objC = { name: "vicky", age: 33 };
+
+const c: objC = ab;
+```
+
+![](../img/221214-1.png)
+
+objC타입이 좁은 타입이므로 여기에 넓은 타입을 적용할 수 없다.
+그렇다면 아래와 같이 좁은 타입 속성을 할당한 c에 `married`라는 데이터를 추가한다고 해보자
+
+```tsx
+const c: objC = { name: "vicky", age: 33, married: false }; // 잉여 속성 검사에 따라 Error
+```
+
+위 코드는 잉여 속성 검사에 따라 Type Error가 발생한다.
+
+![](../img/221214-2.png)
+
+실제 대입한 값이 { name: "vicky", age: 33, married: false } 로 objC가 더 넓은 타입에 속하기 때문에 문제가 없어야 하지만 추가적인 속성 검사에 따른 에러가 발생하는 것임. 이는 아래와 같이 값을 따로 빼주면 에러가 발생하지 않는다.
+
+```tsx
+const obj = { name: "vicky", age: 33, married: false };
+const c: objC = obj; // Ok
+```
+
+위와 같이 객체 리터럴에 바로 값을 대입하는 것은 에러를 발생시킬 수 있다는 점 알아두자.
