@@ -173,16 +173,55 @@
 
 // const a: Props = {};
 
-type A = string | number; // 넓은 타입
-type B = string; // 좁은 타입
-type AB = A | B;
+// type A = string | number; // 넓은 타입
+// type B = string; // 좁은 타입
+// type AB = A | B;
 
-type objA = { name: string }; // 속성이 좁을수록 넓은 타입
-type objB = { age: number }; // 속성이 좁을수록 넓은 타입
+// type objA = { name: string }; // 속성이 좁을수록 넓은 타입
+// type objB = { age: number }; // 속성이 좁을수록 넓은 타입
 
-type objAB = objA | objB;
-type objC = objA & objB; // name, age 속성을 가짐
+// type objAB = objA | objB;
+// type objC = objA & objB; // name, age 속성을 가짐
 
-const ab: objAB = { name: "vicky" };
-const obj = { name: "vicky", age: 33, married: false };
-const c: objC = obj;
+// const ab: objAB = { name: "vicky" };
+// const obj = { name: "vicky", age: 33, married: false };
+// const c: objC = obj;
+
+// void 두 가지 사용법
+function a(): void {
+  return;
+  return undefined;
+  // return null
+  // return 3;
+}
+
+const b = a();
+
+interface Human {
+  talk: () => void;
+}
+
+const human: Human = {
+  talk() {
+    return "vicky";
+  },
+};
+
+const human2 = human.talk() as unknown as number;
+const human3 = <number>(<unknown>human.talk());
+console.log(`${human3}`);
+
+function test(callback: () => void): void {}
+test(() => {
+  return "3";
+});
+
+declare function forEach(arr: number[], callback: (el: number) => void): void;
+let target: number[] = [];
+
+forEach([1, 2, 3], (el) => {
+  target.push(el);
+});
+forEach([1, 2, 3], (el) => {
+  return target.push(el);
+});
