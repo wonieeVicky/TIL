@@ -188,14 +188,43 @@
 // const c: objC = obj;
 
 // void 두 가지 사용법
-function a(): void {
-  return;
-  return undefined;
-  // return null
-  // return 3;
-}
+// function a(): void {
+//   return;
+//   return undefined;
+//   // return null
+//   // return 3;
+// }
 
-const b = a();
+// const b = a();
+
+// interface Human {
+//   talk: () => void;
+// }
+
+// const human: Human = {
+//   talk() {
+//     return "vicky";
+//   },
+// };
+
+// const human2 = human.talk() as unknown as number;
+// const human3 = <number>(<unknown>human.talk());
+// console.log(`${human3}`);
+
+// function test(callback: () => void): void {}
+// test(() => {
+//   return "3";
+// });
+
+// declare function forEach(arr: number[], callback: (el: number) => void): void;
+// let target: number[] = [];
+
+// forEach([1, 2, 3], (el) => {
+//   target.push(el);
+// });
+// forEach([1, 2, 3], (el) => {
+//   return target.push(el);
+// });
 
 interface Human {
   talk: () => void;
@@ -203,25 +232,14 @@ interface Human {
 
 const human: Human = {
   talk() {
-    return "vicky";
+    return 123;
   },
 };
+const b = human.talk() as unknown as number;
+b.toString();
 
-const human2 = human.talk() as unknown as number;
-const human3 = <number>(<unknown>human.talk());
-console.log(`${human3}`);
-
-function test(callback: () => void): void {}
-test(() => {
-  return "3";
-});
-
-declare function forEach(arr: number[], callback: (el: number) => void): void;
-let target: number[] = [];
-
-forEach([1, 2, 3], (el) => {
-  target.push(el);
-});
-forEach([1, 2, 3], (el) => {
-  return target.push(el);
-});
+try {
+  // something that might throw an error
+} catch (Error) {
+  (Error as Error).message;
+}

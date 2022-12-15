@@ -592,3 +592,67 @@ declare function forEach(arr: number[], callback: (el: number) => void): void; /
 ```
 
 이를 number를 반환하도록 처리하여 타입 에러를 개선할 수 있지만, void를 적용하여 `반환값을 신경쓰지 않겠다`고 정의할 수 있겠다.
+
+### unknown과 any(그리고 타입 대입 가능표)
+
+`unknown`과 `any`의 다른 점은 무엇인가? 먼저 any를 대입하면 이후 타입검사를 하지 않겠다는 의미이다.
+따라서 any를 쓸 바에는 unknown을 쓴다.
+
+```tsx
+interface Human {
+  talk: () => void;
+}
+
+const human: Human = {
+  talk() {
+    return "vicky";
+  },
+};
+
+const b: any = human.talk();
+
+b.method(); // Ok
+b.아무거나(); // Ok
+```
+
+만들어지지 않은 메서드도 문제없이 실행되는 것을 확인할 수 있음. 이에 반해 `unknown`은 타입을 직접 정의해줘야 한다.
+
+```tsx
+const b: unknown = human;
+(b as Human).talk();
+```
+
+`any`는 타입 정의를 포기할 때 쓰고, `unknown`은 현재 타입을 정확하게 알기 어려울 때 나중에 타입 정의를 해서 사용하기 위해 사용함
+
+```tsx
+try {
+  // something that might throw an error
+} catch (Error) {
+  (Error as Error).message;
+}
+```
+
+아래의 코드를 보면 매개변수로 전달받는 Error는 unknown 타입이다. 이를 직접 사용하기 위해서는 Error에 대한 타입을 정의해줘야한다.
+
+![](../img/221215-1.png)
+
+```tsx
+interface Human {
+  talk: () => void;
+}
+
+const human: Human = {
+  talk() {
+    return 123;
+  },
+};
+
+const b = human.talk() as unknown as number;
+b.toString();
+```
+
+위 코드에서도 talk를 void로 선언 후 number를 반환하였을 때. b에 toString 메서드를 넣기 위해서는 `as unknown as number` 라는 타이핑을 별도로 지정해줘야한다. void로 넘어오기 때문임. 만약 저 타이핑 코드를 넣지 않으면 `'void' 형식에 'toString' 속성이 없습니다.` 라는 에러가 발생하게 됨
+
+이 밖의 타입간 대입 가능표는 아래 내용을 참고자하자. 위 이미지는 참고만 할 것. 어차피 타입 코드 에러 시 ts checker가 알려준다.
+
+![초록색 화살표도 strict: true일 경우 타입 에러 발생함. 안된다고 생각하자](../img/221215-2.png)
