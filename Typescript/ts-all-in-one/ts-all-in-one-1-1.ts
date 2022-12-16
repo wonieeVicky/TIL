@@ -226,20 +226,83 @@
 //   return target.push(el);
 // });
 
-interface Human {
-  talk: () => void;
+// interface Human {
+//   talk: () => void;
+// }
+
+// const human: Human = {
+//   talk() {
+//     return 123;
+//   },
+// };
+// const b = human.talk() as unknown as number;
+// b.toString();
+
+// try {
+//   // something that might throw an error
+// } catch (Error) {
+//   (Error as Error).message;
+// }
+
+function numOrStr(a: number | string) {
+  if (typeof a === "string") {
+    return a.charAt(3);
+  }
+  if (typeof a === "number") {
+    a.toFixed(1);
+  }
 }
 
-const human: Human = {
-  talk() {
-    return 123;
-  },
-};
-const b = human.talk() as unknown as number;
-b.toString();
+function numOrNumArray(a: number | number[]) {
+  // number[]
+  if (Array.isArray(a)) {
+    return a.push(3);
+  }
+  // number
+  return a.toFixed(1);
+}
+numOrNumArray([1, 2]);
+numOrNumArray(123);
 
-try {
-  // something that might throw an error
-} catch (Error) {
-  (Error as Error).message;
+// class A {
+//   aaa() {}
+// }
+// class B {
+//   bbb() {}
+// }
+
+// function aOrb(params: A | B) {
+//   if (params instanceof A) {
+//     params.aaa();
+//   }
+//   if (params instanceof B) {
+//     params.bbb();
+//   }
+// }
+
+// aOrb(A());
+// aOrb(new A());
+
+type A = { type: "a"; aaa: string };
+type B = { type: "c"; bbb: string };
+type C = { type: "c"; ccc: string };
+
+function typeCheck(a: A | B | C) {
+  // a 객체 안에 bbb 속성이 있을 경우
+  // if ("bbb" in a) {
+  //   return a.bbb;
+  // }
+  // if ("ccc" in a) {
+  //   return a.ccc;
+  // }
+}
+
+type Human = { type: "human"; talk: () => {} };
+type Dog = { type: "dog"; bow: () => {} };
+type Cat = { type: "cat"; meow: () => {} };
+
+function reply(a: Human | Dog | Cat) {
+  if ("talk" in a) {
+    a.talk();
+  }
 }

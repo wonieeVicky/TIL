@@ -656,3 +656,146 @@ b.toString();
 이 밖의 타입간 대입 가능표는 아래 내용을 참고자하자. 위 이미지는 참고만 할 것. 어차피 타입 코드 에러 시 ts checker가 알려준다.
 
 ![초록색 화살표도 strict: true일 경우 타입 에러 발생함. 안된다고 생각하자](../img/221215-2.png)
+
+### 타입 좁히기(타입 가드)
+
+아래와 같은 함수가 있다고 하자
+
+```tsx
+function numOrStr(a: number | string) {
+  if (typeof a === "string") {
+    return a.split(",");
+  }
+  return a.toFixed(1);
+}
+
+numOrStr("123");
+numOrStr(123);
+```
+
+위 함수는 타입에 따라 올바르게 처리되는 문제 없는 함수이다. 만약 위 코드가 아래처럼 되어있다고 한다면 어떨까
+
+```tsx
+function numOrStr(a: number | string) {
+  return a.toFixed(1); // Error
+}
+```
+
+매개변수로 들어오는 인자값들이 number 혹은 string 이기 때문에 위 함수는 에러가 난다. toFixed는 number 타입에만 지원되는 메서드이기 때문이다. 타입 에러를 아래와 같이 해결할 수도 있을 것이다.
+
+```tsx
+function numOrStr(a: number | string) {
+  return (a as number).toFixed(1); // Ok
+}
+```
+
+`as`는 강제로 타입을 변환해주므로 타입 에러가 발생하는 것은 없앨 수 있으나 실제 string 타입이 들어왔을 때 위 함수는 에러를 발생시킨다. 따라서 `unknown`이거나 미리 만들어진 타입이 잘못되었을 때만 `as`를 쓰는 것이 좋다. 
+
+이때 타입 가드(`typeof`)를 이용해서 타입을 좁힐 수 있다.
+
+```tsx
+function numOrStr(a: number | string) {
+  if (typeof a === "string") {
+    return a.charAt(3);
+  }
+  if (typeof a === "number") {
+    a.toFixed(1);
+  }
+  if(typeof a ==='boolean'){
+    a.toString(); // Error! boolean은 number | string에 포함되지 않는다. never 타입
+  }
+}
+```
+
+위처럼 매개변수에 들어오는 인자값을 `typeof`로 정해서 처리해주면 타입에러를 발생하지 않는다.
+
+```tsx
+function numOrNumArray(a: number | number[]) {
+  // number[]
+  if (Array.isArray(a)) {
+    return a.push(3);
+  }
+  // number
+  return a.toFixed(1);
+}
+numOrNumArray([1, 2]);
+numOrNumArray(123);
+```
+
+원시값은 `typeof`를 쓰고 배열일 경우 `Array.isArray` 메서드 사용. class 함수의 경우에는 아래와 같이 쓴다.
+
+```tsx
+class A { aaa() {} }
+class B { bbb() {} }
+
+function aOrb(params: A | B) {
+  if (params instanceof A) {
+    params.aaa();
+  }
+  if (params instanceof B) {
+    params.bbb();
+  }
+}
+
+aOrb(A()); // Error
+aOrb(new A()); // Ok
+```
+
+클래스 간 확인은 `instanceof`로 구별한다.
+
+```tsx
+type A = { type: "a"; aaa: string };
+type B = { type: "b"; bbb: string };
+type C = { type: "c"; ccc: string };
+
+function typeCheck(a: A | B | C) {
+  if (a.type === "a") {
+    return a.aaa;
+  }
+  if (a.type === "b") {
+    return a.bbb || a.ccc;
+  }
+  return a.ccc;
+}
+```
+
+위처럼 타입 체크는 내부 속성만으로도 타입 체크가 가능하다. 만약 B, C의 타입이 같은 문자라면 어떻게 될까?
+
+![](../img/221216-1.png)
+
+당연히 에러가 발생한다. `a.bbb`도 가능하지만 `a.ccc`도 가능하므로..
+`typeof` 방식 말고 `in` 메서드를 사용해도 가능하다.
+
+```tsx
+type A = { type: "a"; aaa: string };
+type B = { type: "c"; bbb: string };
+type C = { type: "c"; ccc: string };
+
+function typeCheck(a: A | B | C) {
+  // a 객체 안에 bbb 속성이 있을 경우
+  if ("bbb" in a) {
+    return a.bbb;
+  }
+  if ("ccc" in a) {
+    return a.ccc;
+  }
+}
+```
+
+따라서 객체를 생성할 때에는 타이핑을 위해 type이라는 속성을 추가해놓으면 작업할 때 수월한 면이 있다.
+
+```tsx
+type Human = { type: "human"; talk: () => {} };
+type Dog = { type: "dog"; bow: () => {} };
+type Cat = { type: "cat"; meow: () => {} };
+
+function reply(a: Human | Dog | Cat) {
+  if ("talk" in a) {
+    a.talk();
+  }
+	// or
+	if(a.type === "human"){
+		a.talk();
+	}
+}
+```
