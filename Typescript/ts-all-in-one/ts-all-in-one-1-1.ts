@@ -307,40 +307,55 @@ numOrNumArray(123);
 //   }
 // }
 
-interface Cat {
-  meow: number;
+// interface Cat {
+//   meow: number;
+// }
+// interface Dog {
+//   bow: number;
+// }
+
+// // is: 타입을 구분해주는 커스텀 함수를 직접 만든다.
+// function catOrDog(a: Cat | Dog): a is Dog {
+//   // 타입 판별을 직접한다.
+//   if ((a as Cat).meow) {
+//     return false;
+//   }
+//   return true;
+// }
+// const cat: Cat | Dog = { meow: 3 };
+
+// function pet(a: Cat | Dog) {
+//   if (catOrDog(a)) {
+//     console.log(a.bow); // Ok
+//     console.log(a.meow); // Error
+//   }
+// }
+
+// pet(cat);
+
+// const isRejected = (input: PromiseSettledResult<unknown>): input is PromiseRejectedResult =>
+//   input.status === "rejected";
+// const isFullfilled = <T>(input: PromiseSettledResult<T>): input is PromiseFulfilledResult<T> =>
+//   input.status === "fulfilled";
+
+// // PromiseSettledResult - PromiseRejectedResult or PromiseFulfilledResult
+
+// const promises = await Promise.allSettled([Promise.resolve("a"), Promise.resolve("b")]);
+// const errors = promises.filter(isRejected);
+
+// export {};
+
+// {}, Object는 모든 타입을 의미한다고 외우자(null과 undefined는 제외) - unknown과 비슷
+// 실제 객체 타이핑은 object를 써야 한다.
+// 하지만 객체 타이핑 시 object는 최대한 지양, interface, type, class를 사용한다.
+
+const x: {} = "hello"; // Ok
+const y: Object = "hi"; // Ok
+const xx: object = "hii"; // Error
+const yyy: object = { hello: "world" }; // Ok
+const z: unknown = "hi"; // unknown = {} | null | undeinfed 를 의미함
+
+if (z) {
+  // null, undefined는 if문에서 걸러짐
+  z;
 }
-interface Dog {
-  bow: number;
-}
-
-// is: 타입을 구분해주는 커스텀 함수를 직접 만든다.
-function catOrDog(a: Cat | Dog): a is Dog {
-  // 타입 판별을 직접한다.
-  if ((a as Cat).meow) {
-    return false;
-  }
-  return true;
-}
-const cat: Cat | Dog = { meow: 3 };
-
-function pet(a: Cat | Dog) {
-  if (catOrDog(a)) {
-    console.log(a.bow); // Ok
-    console.log(a.meow); // Error
-  }
-}
-
-pet(cat);
-
-const isRejected = (input: PromiseSettledResult<unknown>): input is PromiseRejectedResult =>
-  input.status === "rejected";
-const isFullfilled = <T>(input: PromiseSettledResult<T>): input is PromiseFulfilledResult<T> =>
-  input.status === "fulfilled";
-
-// PromiseSettledResult - PromiseRejectedResult or PromiseFulfilledResult
-
-const promises = await Promise.allSettled([Promise.resolve("a"), Promise.resolve("b")]);
-const errors = promises.filter(isRejected);
-
-export {};
