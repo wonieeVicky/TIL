@@ -283,26 +283,64 @@ numOrNumArray(123);
 // aOrb(A());
 // aOrb(new A());
 
-type A = { type: "a"; aaa: string };
-type B = { type: "c"; bbb: string };
-type C = { type: "c"; ccc: string };
+// type A = { type: "a"; aaa: string };
+// type B = { type: "c"; bbb: string };
+// type C = { type: "c"; ccc: string };
 
-function typeCheck(a: A | B | C) {
-  // a 객체 안에 bbb 속성이 있을 경우
-  // if ("bbb" in a) {
-  //   return a.bbb;
-  // }
-  // if ("ccc" in a) {
-  //   return a.ccc;
-  // }
+// function typeCheck(a: A | B | C) {
+//   // a 객체 안에 bbb 속성이 있을 경우
+//   if ("bbb" in a) {
+//     return a.bbb;
+//   }
+//   if ("ccc" in a) {
+//     return a.ccc;
+//   }
+// }
+
+// type Human = { type: "human"; talk: () => {} };
+// type Dog = { type: "dog"; bow: () => {} };
+// type Cat = { type: "cat"; meow: () => {} };
+
+// function reply(a: Human | Dog | Cat) {
+//   if ("talk" in a) {
+//     a.talk();
+//   }
+// }
+
+interface Cat {
+  meow: number;
+}
+interface Dog {
+  bow: number;
 }
 
-type Human = { type: "human"; talk: () => {} };
-type Dog = { type: "dog"; bow: () => {} };
-type Cat = { type: "cat"; meow: () => {} };
+// is: 타입을 구분해주는 커스텀 함수를 직접 만든다.
+function catOrDog(a: Cat | Dog): a is Dog {
+  // 타입 판별을 직접한다.
+  if ((a as Cat).meow) {
+    return false;
+  }
+  return true;
+}
+const cat: Cat | Dog = { meow: 3 };
 
-function reply(a: Human | Dog | Cat) {
-  if ("talk" in a) {
-    a.talk();
+function pet(a: Cat | Dog) {
+  if (catOrDog(a)) {
+    console.log(a.bow); // Ok
+    console.log(a.meow); // Error
   }
 }
+
+pet(cat);
+
+const isRejected = (input: PromiseSettledResult<unknown>): input is PromiseRejectedResult =>
+  input.status === "rejected";
+const isFullfilled = <T>(input: PromiseSettledResult<T>): input is PromiseFulfilledResult<T> =>
+  input.status === "fulfilled";
+
+// PromiseSettledResult - PromiseRejectedResult or PromiseFulfilledResult
+
+const promises = await Promise.allSettled([Promise.resolve("a"), Promise.resolve("b")]);
+const errors = promises.filter(isRejected);
+
+export {};
