@@ -799,3 +799,70 @@ function reply(a: Human | Dog | Cat) {
 	}
 }
 ```
+
+### 커스텀 타입가드 (is, 형식 조건자)
+
+위와 같은 이미 존재하는 방법으로 타이핑을 하는 방법도 있고, `is` 메서드를 사용해서 커스텀 타입가드를 만들어줄 수도 있다
+`is`는 return 값에 타입을 정의할 수 있다.
+
+```tsx
+// is: 타입을 구분해주는 커스텀 함수를 직접 만든다.
+function catOrDog(a: Cat | Dog): a is Dog {
+  // 타입 판별을 직접 한다.
+  if ((a as Cat).meow) {
+    return false;
+  }
+  return true;
+}
+```
+
+위와 같이 is를 사용한 커스텀 타입 가드를 사용했을 경우에는 아래와 같이 if문에서 타입스크립트로 정확한 타입을 알려주도록 할 수 있다.
+
+```tsx
+const cat: Cat | Dog = { meow: 3 };
+
+function pet(a: Cat | Dog) {
+	// a의 값이 Dog라는 것을 정확히 검증
+  if (catOrDog(a)) {
+    console.log(a.bow); // Ok
+    console.log(a.meow); // Error
+  }
+}
+
+pet(cat);
+```
+
+간단한 경우 `typeof`, `instanceof`, `in`, `Array.isArray` 등의 메서드를 쓰면 되지만 복잡도가 높아졌을 때 활용해볼 수 있다. `is`가 안되면 타입추론이 안되는 경우가 발생할 수도 있음
+
+위 메서드를 실무에 적용한다면 `promise` 함수에서 써볼 수 있다. 확인해보자
+
+```tsx
+const isRejected = (input: PromiseSettledResult<unknown>): input is PromiseRejectedResult =>
+  input.status === "rejected";
+const isFullfilled = <T>(input: PromiseSettledResult<T>): input is PromiseFulfilledResult<T> =>
+  input.status === "fulfilled";
+
+// PromiseSettledResult - PromiseRejectedResult or PromiseFulfilledResult
+
+const promises = await Promise.allSettled([Promise.resolve("a"), Promise.resolve("b")]);
+const errors = promises.filter(isRejected);
+```
+
+만약 위와 같은 `isRejected`, `isFullfilled`라는 타입에 대해 만들어져있지 않다면 어떨까?
+errors가 별도의 타이핑이 되지 않고 실패한 경우만 골라내도록 만들어졌다면 코드는 아래와 같을 것이다.
+
+```tsx
+const errors = promises.filter((promise) => promise.status === "rejected");
+```
+
+위 코드도 문제는 없음. 하지만 errors의 타입 추론이 Rejected를 타나내지 못한다.
+
+![](../img/221218-1.png)
+
+errors를 `PromiseSettledResult<string>[]`으로  추론하고 있음. 이를 위 isRejected라는 타입핑된 코드로 넣은 `const errors = promises.filter(isRejected);`로 처리한다면 결과는 다음과 같다.
+
+![](../img/221218-2.png)
+
+명확하게 `PromiseRejectedResult[]`로 반환함. 사실 위 errors의 경우와 아래 errors 함수에 들어간 isRejected 타이핑 코드는 동일한 코드이다. 다른게 있다면 `is` 메서드를 사용해 반환값을 원하는 바로 커스텀했다는 것이다.
+
+타입스크립트가 타입추론을 잘못할 때 정확한 타입을 쳐다보도록 커스텀해줄 수 있다.
