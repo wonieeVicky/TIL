@@ -908,3 +908,40 @@ if (z) { // null, undefined는 if문에서 걸러지므로 이렇게 코드 작�
   z;
 }
 ```
+
+### readonly, indexed Signiture, Mapped Types
+
+자주 쓰이는 3가지 타입스크립트 사용법에 대해 알아본다.
+먼저, readonly 속성은 한번 설정해놓으면 값을 수정하지 못하게 하므로 유용하다.
+
+```tsx
+interface A {
+  readonly a: string;
+  b: string;
+}
+
+const aaa: A = { a: "hello", b: "world" };
+aaa.a = 123; // Error
+```
+
+두번째로 인덱스 시그니처에 대해 알아본다. (`[props: string]` 형태로 쓴다. )
+많은 속성들을 한번에 처리할 때 유용함(이미 많이 쓰고 있음)
+
+```tsx
+type IndexedType = { [props: string]: string };
+const aaa: IndexedType = { a: "hello", b: "world" };
+```
+
+아래와 같이 mapped Type으로도 쓸 수도 있다.
+
+```tsx
+type B = "Human" | "Mammal" | "Animal"; // interface에는 또는(|), 그리고(&) 메서드를 사용하지 못함
+type IndexedType = { [key in B]: number };
+const aaa: IndexedType = { Human: 123, Mammal: 456, Animal: 789 };
+
+// 값에도 지정 가능함
+type IndexedType = { [key in B]: B };
+const aaa: IndexedType = { Human: "Human", Mammal: "Mammal", Animal: "Animal" };
+```
+
+위와 같이 in 키워드로 타이핑을 하면 실제 타입을 더욱 명확하게 좁힐 수 있으므로 좋다.

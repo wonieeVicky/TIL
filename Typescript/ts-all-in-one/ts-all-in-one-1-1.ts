@@ -349,13 +349,23 @@ numOrNumArray(123);
 // 실제 객체 타이핑은 object를 써야 한다.
 // 하지만 객체 타이핑 시 object는 최대한 지양, interface, type, class를 사용한다.
 
-const x: {} = "hello"; // Ok
-const y: Object = "hi"; // Ok
-const xx: object = "hii"; // Error
-const yyy: object = { hello: "world" }; // Ok
-const z: unknown = "hi"; // unknown = {} | null | undeinfed 를 의미함
+// const x: {} = "hello"; // Ok
+// const y: Object = "hi"; // Ok
+// const xx: object = "hii"; // Error
+// const yyy: object = { hello: "world" }; // Ok
+// const z: unknown = "hi"; // unknown = {} | null | undeinfed 를 의미함
 
-if (z) {
-  // null, undefined는 if문에서 걸러짐
-  z;
+// if (z) {
+//   // null, undefined는 if문에서 걸러짐
+//   z;
+// }
+
+interface A {
+  readonly a: string;
+  b: string;
 }
+
+// aaa.a = 123;
+type B = "Human" | "Mammal" | "Animal";
+type IndexedType = { [key in B]: B };
+const aaa: IndexedType = { Human: "Human", Mammal: "Mammal", Animal: "Animal" };
