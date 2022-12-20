@@ -1131,3 +1131,86 @@ class C extends B {
   }
 }
 ```
+
+### Optional, Generic 기본
+
+타입스크립트 기본적인 기능 중에 optional을 짚고간다. 물음표(?)를 붙이면 필수값이 아니라는 의미임
+interface, type 모두 사용 가능함
+
+```tsx
+function abc(a: number, b?: number, c?: number) {}
+// or
+function abc(..args: number[]) {} // 인자 갯수가 정해져있지 않은 경우 이렇게 쓸 수도 있음
+
+abc(1); // Ok
+abc(1, 2); // Ok
+abc(1, 2, 3); // Ok
+
+let obj: { a: string; b?: string } = { a: "hello", b: "world" };
+obj = { a: "vicky" }; // Ok
+```
+
+두번째는 제네릭에 대해 알아본다. 이를 이해하기 위해 일단 제네릭은 왜 필요할까?
+
+```tsx
+function add(x: string | number, y: string | number): string | number {
+  // ..
+}
+add(1, 2); // 3
+add("1", "2"); // '12'
+```
+
+숫자 타입에는 숫자 덧셈, 문자 타입에는 join 역할을 해주는 add 함수를 만들고 싶다고 할 때, 위처럼 생각할 수 있다.
+하지만 위 함수는 에러가 발생한다. `add(1, ‘2’)`이나 `add(’1’, 2)`의 경우 타입이 달라 예상치 못한 에러가 발생하기 때문
+
+즉, 위와 같은 경우가 발생하지 않게 하려면 함수를 아예 다르게 하거나 제네릭을 사용하는 방법을 쓸 수 있다.
+
+```tsx
+function add<T>(x: T, y: T): T {
+  // ..
+}
+```
+
+`<T>`로 하나의 타입을 표현하는 것이다. 만약 string 타입이 들어간다면 모두 string, number 타입이 들어간다면 모두 number로 인식한다. 즉, 실제 사용할 때 타입이 정해지도록 처리하는 것이다.
+
+위 제네릭에 제한을 둘 수도 있다. 만약 boolean 값이 add 함수에 적용되지 않도록 설정하고 싶다면 아래와 같이 한다.
+
+```tsx
+function add<T extends number | string>(x: T, y: T): T {
+  return x + y; // Error는 계속 발생. T가 어떤 타입인지 ts는 아직 모름
+}
+```
+
+제네릭은 여러 개 만들어 넣을 수도 있음
+
+```tsx
+function add<T extends number, K extends string>(x: T, y: K): T {}
+
+add(1, 2); // Error
+add("1", "2"); // Error
+add(1, "2"); // Ok
+```
+
+다양한 포맷으로 만들 수 있음
+
+```tsx
+// <T extends {...}>
+function add<T extends { a: string }>(x: T): T {  }
+add({ a: 'vicky' }); // Ok
+
+// <T extends any[]>
+function add<T extends string[]>(x: T): T {  }
+add(["1", "2", "3"]); // Ok
+
+// <T extends (...args: any) => any>
+function add<T extends (a: string) => number>(x: T): T { return x; }
+function add<T extends (...args: any) => any>(x: T): T { } // 제한을 모두 풀고 싶을 때는 요렇게 쓸 수도 있지
+add((data) => +data); // Ok
+
+// 클래스 생성자 자체를 인자로 넣고 싶을 때 아래 방식 참고 - 인스턴스 x
+// <T extends abstract new (...args: any) => any>
+function add<T extends abstract new (...args: any) => any>(x: T): T { return x; }
+class A { ... }
+
+add(A); // Ok
+```

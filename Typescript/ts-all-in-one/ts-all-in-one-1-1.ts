@@ -382,29 +382,70 @@
 // const b: A = new A();
 // const c: typeof A = A;
 
-interface A {
-  readonly a: string;
-  b: string;
+// interface A {
+//   readonly a: string;
+//   b: string;
+// }
+
+// abstract class B {
+//   private readonly a: string = "123";
+//   b: string = "vicky";
+//   c: string = "wow";
+
+//   abstract method(): void;
+//   method2() {
+//     return "3";
+//   }
+// }
+
+// class C extends B {
+//   method() {
+//     // console.log(this.a); // Error
+//     console.log(this.b); // Ok
+//     console.log(this.c); // Ok
+//   }
+// }
+// // new C().a; // Error
+// new C().b; // Error
+// new C().c;
+
+// function abc(a: number, b?: number, c?: number) {}
+// // function abc(..args: number[]) {} // 인자 갯수가 정해져있지 않은 경우 이렇게 쓸 수도 있음
+
+// abc(1); // Ok
+// abc(1, 2); // Ok
+// abc(1, 2, 3); // Ok
+
+// let obj: { a: string; b?: string } = { a: "hello", b: "world" };
+// obj = { a: "vicky" }; // Ok
+
+// function add<T extends number, K extends string>(x: T, y: K): T {
+//   return x + y;
+// }
+
+// // function add(x: string | number, y: string | number): string | number {
+// //   return x + y;
+// // }
+// // add(1, 2); // 3
+// add("1", "2"); // '12'
+// add(1, "2"); // '12'
+
+function genericTest<T extends string | number>(x: T): T {
+  return x;
 }
 
-abstract class B {
-  private readonly a: string = "123";
-  b: string = "vicky";
-  c: string = "wow";
+// <T extends {...}>
+// <T extends any[]>
+// <T extends (...args: any) => any>
+// <T extends abstract new (...args: any) => any>
 
-  abstract method(): void;
-  method2() {
-    return "3";
-  }
+function add<T extends new (...args: any) => any>(x: T): T {
+  return x;
 }
 
-class C extends B {
-  method() {
-    // console.log(this.a); // Error
-    console.log(this.b); // Ok
-    console.log(this.c); // Ok
-  }
+class A {
+  constructor() {}
 }
-// new C().a; // Error
-new C().b; // Error
-new C().c;
+
+add(A); // Ok
+//
