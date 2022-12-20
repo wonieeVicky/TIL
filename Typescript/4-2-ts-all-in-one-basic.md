@@ -689,7 +689,7 @@ function numOrStr(a: number | string) {
 }
 ```
 
-`as`는 강제로 타입을 변환해주므로 타입 에러가 발생하는 것은 없앨 수 있으나 실제 string 타입이 들어왔을 때 위 함수는 에러를 발생시킨다. 따라서 `unknown`이거나 미리 만들어진 타입이 잘못되었을 때만 `as`를 쓰는 것이 좋다. 
+`as`는 강제로 타입을 변환해주므로 타입 에러가 발생하는 것은 없앨 수 있으나 실제 string 타입이 들어왔을 때 위 함수는 에러를 발생시킨다. 따라서 `unknown`이거나 미리 만들어진 타입이 잘못되었을 때만 `as`를 쓰는 것이 좋다.
 
 이때 타입 가드(`typeof`)를 이용해서 타입을 좁힐 수 있다.
 
@@ -701,7 +701,7 @@ function numOrStr(a: number | string) {
   if (typeof a === "number") {
     a.toFixed(1);
   }
-  if(typeof a ==='boolean'){
+  if (typeof a === "boolean") {
     a.toString(); // Error! boolean은 number | string에 포함되지 않는다. never 타입
   }
 }
@@ -725,8 +725,12 @@ numOrNumArray(123);
 원시값은 `typeof`를 쓰고 배열일 경우 `Array.isArray` 메서드 사용. class 함수의 경우에는 아래와 같이 쓴다.
 
 ```tsx
-class A { aaa() {} }
-class B { bbb() {} }
+class A {
+  aaa() {}
+}
+class B {
+  bbb() {}
+}
 
 function aOrb(params: A | B) {
   if (params instanceof A) {
@@ -793,10 +797,10 @@ function reply(a: Human | Dog | Cat) {
   if ("talk" in a) {
     a.talk();
   }
-	// or
-	if(a.type === "human"){
-		a.talk();
-	}
+  // or
+  if (a.type === "human") {
+    a.talk();
+  }
 }
 ```
 
@@ -822,7 +826,7 @@ function catOrDog(a: Cat | Dog): a is Dog {
 const cat: Cat | Dog = { meow: 3 };
 
 function pet(a: Cat | Dog) {
-	// a의 값이 Dog라는 것을 정확히 검증
+  // a의 값이 Dog라는 것을 정확히 검증
   if (catOrDog(a)) {
     console.log(a.bow); // Ok
     console.log(a.meow); // Error
@@ -839,7 +843,7 @@ pet(cat);
 ```tsx
 const isRejected = (input: PromiseSettledResult<unknown>): input is PromiseRejectedResult =>
   input.status === "rejected";
-const isFullfilled = <T>(input: PromiseSettledResult<T>): input is PromiseFulfilledResult<T> =>
+const isFullfilled = <T,>(input: PromiseSettledResult<T>): input is PromiseFulfilledResult<T> =>
   input.status === "fulfilled";
 
 // PromiseSettledResult - PromiseRejectedResult or PromiseFulfilledResult
@@ -859,7 +863,7 @@ const errors = promises.filter((promise) => promise.status === "rejected");
 
 ![](../img/221218-1.png)
 
-errors를 `PromiseSettledResult<string>[]`으로  추론하고 있음. 이를 위 isRejected라는 타입핑된 코드로 넣은 `const errors = promises.filter(isRejected);`로 처리한다면 결과는 다음과 같다.
+errors를 `PromiseSettledResult<string>[]`으로 추론하고 있음. 이를 위 isRejected라는 타입핑된 코드로 넣은 `const errors = promises.filter(isRejected);`로 처리한다면 결과는 다음과 같다.
 
 ![](../img/221218-2.png)
 
@@ -883,11 +887,11 @@ const xx: object = "hii"; // Error
 const yyy: object = { hello: "world" }; // Ok
 ```
 
-`{}`, `Object` 타입 모두 문자열 타입을 넣어도 에러가 나지 않는다. 
+`{}`, `Object` 타입 모두 문자열 타입을 넣어도 에러가 나지 않는다.
 
 `object` 타입만 문자열 대입 시 에러를 반환함
 
-즉 실제 객체 타이핑을 할 경우 `object` 타입만 써야한다는 것을 알 수 있다. 
+즉 실제 객체 타이핑을 할 경우 `object` 타입만 써야한다는 것을 알 수 있다.
 
 하지만 객체 타이핑 시 `object`는 최대한 지양하고 `interface`, `type`, `class`를 활용해서 구현하는 것이 바람직하다.
 
@@ -895,16 +899,17 @@ const yyy: object = { hello: "world" }; // Ok
 
 지난 시간 `unknown`을 지금 당장 타입을 정할 수 없어서 모든 타입을 열어놓은 경우라고 했는데, 같은 것을 의미할까?
 
-정답은 “일부”만 맞음. `unknown` 타입은 원시자료형을 포함해 객체, 배열, undefined, null을 모두 포함. 
+정답은 “일부”만 맞음. `unknown` 타입은 원시자료형을 포함해 객체, 배열, undefined, null을 모두 포함.
 
-하지만 `{}`, `Object`는 undefined, null을 제외한 원시자료형 전부를 의미한다. 
+하지만 `{}`, `Object`는 undefined, null을 제외한 원시자료형 전부를 의미한다.
 
 즉 `unknown =  {} | null | undefined` 라고 할 수 있당
 
 ```tsx
 const z: unknown = "hi"; // unknown = {} | null | undeinfed 를 의미함
 
-if (z) { // null, undefined는 if문에서 걸러지므로 이렇게 코드 작성 가능
+if (z) {
+  // null, undefined는 if문에서 걸러지므로 이렇게 코드 작성 가능
   z;
 }
 ```
@@ -945,3 +950,184 @@ const aaa: IndexedType = { Human: "Human", Mammal: "Mammal", Animal: "Animal" };
 ```
 
 위와 같이 in 키워드로 타이핑을 하면 실제 타입을 더욱 명확하게 좁힐 수 있으므로 좋다.
+
+### 클래스의 새로운 기능들
+
+클래스 타이핑에 대한 새로운 기능들을 알아보자
+
+```tsx
+class A {
+  a: string;
+  b: number;
+
+  constructor() {
+    this.a = "123";
+    this.b = 123;
+  }
+
+  method() {}
+}
+```
+
+클래스의 contructor에서 사용되는 변수들은 위와 같은 구조로 타이핑된다.
+위 코드는 아래와 같이 빠르게 줄여서 사용할 수 있음. 하지만 위 구조에 대해 기본적으로 이해하고 있어야 함
+
+```tsx
+class A {
+  a: string = "123";
+  b: number = 123;
+
+  method() {}
+}
+```
+
+constructor 내부 매개변수로 전달되는 인자에 초기 값을 넣어줄 수도 있다.
+
+```tsx
+class A {
+  a: string;
+  b: number;
+
+  // 기본값이 정해져 있을 경우 ? 를 굳이 사용하지 말자
+  constructor(a: string, b: number = 123) {
+    this.a = a;
+    this.b = b;
+  }
+
+  method() {}
+}
+
+const a = new A("123"); // b 값을 따로 입력하지 않아도 에러 발생하지 않음
+```
+
+또한 클래스 내부에 private 변수 지정을 `#`이라는 별칭을 붙여 표현할 수 있게 되었다.
+
+```tsx
+class A {
+  private a: string = "123";
+  #b: number = 123; // #를 붙이면 private - javascript update
+
+  method() {
+    console.log(this.a, this.#b);
+  }
+}
+```
+
+하지만 protected를 표현할 수 있는 별칭은 존재하지 않으므로 별로 유용하지 않은 듯?
+쓴다면 기존 방법(타입스크립트 protected, private)을 그대로 사용하는 것을 추천한다고 함 (하지만 타입스크립트 메서드이므로 JS 변환 시 public으로 바뀐다는 문제가 있으니 참고, 실제 개발 단계에서 해당 클래스의 외부에서 내부 변수 접근 시 타입 에러가 발생할 것이므로 큰 문제는 없어보인다.)
+
+```tsx
+class A {
+  a: string;
+  b: number;
+
+  constructor(a: string, b: number = 123) {
+    this.a = a;
+    this.b = b;
+  }
+
+  method() {}
+}
+
+const b: A = new A("123"); // instance A
+const c: typeof A = A; // class A
+```
+
+또한, 클래스 자체가 하나의 타입이 될 수 있음
+이때 타이핑은 `typeof A` 로 사용하며, `A`를 그대로 타입으로 적용할 경우 이는 인스턴스를 가리킨다.
+
+또 다른 업데이트로 타입스크립트에 implements, private, protected가 지원된다는 점이다.
+
+```tsx
+interface A {
+  readonly a: string;
+  b: string;
+}
+
+class B implements A {
+  a: string = "123";
+  b: string = "vicky";
+}
+```
+
+위 방법으로 클래스는 interface를 구현(implements) 할 수 있다.
+위 타입스크립트 코드는 아래와 같이 변환된다.
+
+```jsx
+"use strict";
+class B {
+  constructor() {
+    this.a = "123";
+    this.b = "vicky";
+  }
+}
+
+/* 개인 컴으로 했을 때는 IIFE 함수로 변환.. */
+var B = /** @class */ (function () {
+  function B() {
+    this.a = "123";
+    this.b = "vicky";
+  }
+  return B;
+})();
+```
+
+implements 등의 메서드는 사라지고, 알아서 contructor를 붙여준다.
+만일 위 코드에서 지정한 타입이 아닌 잘못된 타입을 넣었을 때 ts 자체에서 에러를 내므로, 클래스 모양을 implements interface로 통제할 수 있다는 점이 핵심
+
+pravate, protected 예시도 보자
+
+```jsx
+interface A {
+  readonly a: string;
+  b: string;
+}
+
+class B implements A {
+  private a: string = "123";
+  protected b: string = "vicky";
+  c: string = "wow";
+
+  method() {
+    console.log(this.a, this.b, this.c); // Ok
+  }
+}
+
+class C extends B {
+  method() {
+    console.log(this.a); // Error
+    console.log(this.b); // Ok
+    console.log(this.c); // Ok
+  }
+}
+new C().a; // Error
+new C().b; // Error
+new C().c;
+```
+
+private 변수 `a`의 경우 실제 구현체인 Class B 내부에서만 사용 가능. protecte 변수 `b`는 상속 클래스인 Class C 내부에서까지만 사용 가능. public 변수 `c`만 인스턴스로 사용 가능하다.
+
+그런데 사실 상 클래스 구현체 내부에서 `readonly`, `private`, `protected` 등의 메서드가 모두 사용 가능하므로 굳이 interface를 implements해서 타이핑을 할 경우가 많진 않을 것 같음 (객체 지향 원칙 중에 추상에 의존하고, 구현에 의존하지 말 것이라는 원칙 때문에, 추상은 interface로 분리, 구현체는 class로 나눠 놓는 규칙을 그대로 따르는 경우가 많음)
+
+덧, 클래스도 추상(abstract) 클래스도 구현 가능함
+
+```tsx
+abstract class B {
+  private readonly a: string = "123";
+  b: string = "vicky";
+  c: string = "wow";
+
+  abstract method(): void;
+  method2() {
+    return "3";
+  }
+}
+
+class C extends B {
+  method() {
+    // abstract 함수인 method는 반드시 구현해줘야 한다.
+    console.log(this.b); // Ok
+    console.log(this.c); // Ok
+  }
+}
+```
