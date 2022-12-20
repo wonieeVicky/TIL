@@ -1179,6 +1179,10 @@ function add<T>(x: T, y: T): T {
 function add<T extends number | string>(x: T, y: T): T {
   return x + y; // Error는 계속 발생. T가 어떤 타입인지 ts는 아직 모름
 }
+
+// 혹은 별도의 타입 지정 없이 함수 호출 시 아래의 방법으로 쓸 수 있음
+add<number>(1, 2);
+add<string>("1", "2");
 ```
 
 제네릭은 여러 개 만들어 넣을 수도 있음
@@ -1214,6 +1218,7 @@ class A { ... }
 
 add(A); // Ok
 ```
+
 클래스, 타입에도 제네릭을 간단히 넣을 수 있음
 
 ```tsx
