@@ -430,22 +430,24 @@
 // add("1", "2"); // '12'
 // add(1, "2"); // '12'
 
-function genericTest<T extends string | number>(x: T): T {
-  return x;
-}
-
 // <T extends {...}>
 // <T extends any[]>
 // <T extends (...args: any) => any>
 // <T extends abstract new (...args: any) => any>
 
-function add<T extends new (...args: any) => any>(x: T): T {
-  return x;
-}
+// function add<T extends new (...args: any) => any>(x: T): T {
+//   return x;
+// }
 
-class A {
-  constructor() {}
-}
+// class A {
+//   constructor() {}
+// }
 
-add(A); // Ok
-//
+// add(A); // Ok
+
+const a = (b: number = 3, c: number = 263) => {
+  return b + c;
+};
+
+const test = (b: { children: string } = { children: "vicky" }) => b.children;
+const add = <T>(x: T, y: T) => ({ x, y }); // JSX가 React이면 에러 발생. 이때 JSX 를 none으로 바꾼다

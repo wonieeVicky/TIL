@@ -1214,3 +1214,18 @@ class A { ... }
 
 add(A); // Ok
 ```
+
+### 기본값 타이핑
+
+기본 값도 타이핑이 필요하다. 객체 인자에 대한 예시 꼭 살펴보자. (_~~맨날 실수하는 부분~~_)
+
+```tsx
+const a = (b: number = 3, c: number = 263) => b + c;
+const test = (b: { children: string } = { children: "vicky" }) => b.children;
+
+// JSX: React인 경우 아래 함수의 경우 에러가 발생
+const add = <T,>(x: T, y: T) => ({ x, y }); // 이때 JSX 를 none으로 바꿔서 해결
+const add = <T = unknown,>(x: T, y: T) => ({ x, y }); // 혹은 unknown 기본값을 넣어서 해결
+const add = <T extends unknown>(x: T, y: T) => ({ x, y }); // 혹은 unknown 기본값을 넣어서 해결
+const add = <T,>(x: T, y: T) => ({ x, y }); // T 옆에 콤마만 붙여줘도 해결할 수 있다고 함(?)
+```
