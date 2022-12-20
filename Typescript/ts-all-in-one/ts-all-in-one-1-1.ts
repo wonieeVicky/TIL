@@ -244,25 +244,25 @@
 //   (Error as Error).message;
 // }
 
-function numOrStr(a: number | string) {
-  if (typeof a === "string") {
-    return a.charAt(3);
-  }
-  if (typeof a === "number") {
-    a.toFixed(1);
-  }
-}
+// function numOrStr(a: number | string) {
+//   if (typeof a === "string") {
+//     return a.charAt(3);
+//   }
+//   if (typeof a === "number") {
+//     a.toFixed(1);
+//   }
+// }
 
-function numOrNumArray(a: number | number[]) {
-  // number[]
-  if (Array.isArray(a)) {
-    return a.push(3);
-  }
-  // number
-  return a.toFixed(1);
-}
-numOrNumArray([1, 2]);
-numOrNumArray(123);
+// function numOrNumArray(a: number | number[]) {
+//   // number[]
+//   if (Array.isArray(a)) {
+//     return a.push(3);
+//   }
+//   // number
+//   return a.toFixed(1);
+// }
+// numOrNumArray([1, 2]);
+// numOrNumArray(123);
 
 // class A {
 //   aaa() {}
@@ -360,12 +360,51 @@ numOrNumArray(123);
 //   z;
 // }
 
+// interface A {
+//   readonly a: string;
+//   b: string;
+// }
+
+// // aaa.a = 123;
+// type B = "Human" | "Mammal" | "Animal";
+// type IndexedType = { [key in B]: B };
+// const aaa: IndexedType = { Human: "Human", Mammal: "Mammal", Animal: "Animal" };
+
+// class A {
+//   private a: string = "123";
+//   #b: number = 123; // #를 붙이면 private - javascript 업데이트
+
+//   method() {
+//     console.log(this.a, this.#b);
+//   }
+// }
+
+// const b: A = new A();
+// const c: typeof A = A;
+
 interface A {
   readonly a: string;
   b: string;
 }
 
-// aaa.a = 123;
-type B = "Human" | "Mammal" | "Animal";
-type IndexedType = { [key in B]: B };
-const aaa: IndexedType = { Human: "Human", Mammal: "Mammal", Animal: "Animal" };
+abstract class B {
+  private readonly a: string = "123";
+  b: string = "vicky";
+  c: string = "wow";
+
+  abstract method(): void;
+  method2() {
+    return "3";
+  }
+}
+
+class C extends B {
+  method() {
+    // console.log(this.a); // Error
+    console.log(this.b); // Ok
+    console.log(this.c); // Ok
+  }
+}
+// new C().a; // Error
+new C().b; // Error
+new C().c;
