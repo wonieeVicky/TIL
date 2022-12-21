@@ -445,9 +445,10 @@
 
 // add(A); // Ok
 
-const a = (b: number = 3, c: number = 263) => {
-  return b + c;
-};
+// const a = (b: number = 3, c: number = 263) => {
+//   return b + c;
+// };
 
-const test = (b: { children: string } = { children: "vicky" }) => b.children;
+// const test = (b: { children: string } = { children: "vicky" }) => b.children;
 const add = <T>(x: T, y: T) => ({ x, y }); // JSX가 React이면 에러 발생. 이때 JSX 를 none으로 바꾼다
+const aa = <{ x: number; y: number }>add(1, 2);
