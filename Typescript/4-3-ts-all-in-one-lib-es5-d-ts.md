@@ -101,3 +101,47 @@ predicate: (value: T, index: number, array: T[]) => value is S
 위 predicate 함수 구조와 맞도록 최대한 구현해주어야 바람직한 결과를 반환받을 수 있음.
 
 lib.es5.d.ts를 분석하는 것이 큰 도움이 된다. 타인이 만든 타입에 대해 볼 수 있고, 자바스크립트 사전을 보는 것 같은 느낌이 든다.
+
+### forEach 타입 직접 만들기
+
+이제 반대로 타입을 직접 만들어본다.
+
+```tsx
+const a: Arr = [1, 2, 3];
+
+a.forEach((item) => {
+  console.log(item);
+});
+
+const b: Arr = ["1", "2", "3"];
+
+b.forEach((item) => {
+  console.log(item);
+});
+```
+
+간단한 여러 타입의 배열을 forEach 함수로 실행시킬 때 Arr 에 대한 타이핑을 한다면 어떻게 할 수 있을까?
+
+```tsx
+interface Arr<T> {
+  forEach(callback: (item: T, index: number) => void): void;
+  // forEach(callbackfn: (value: T, index: number, array: T[]) => void, thisArg?: any): void;
+}
+
+const a: Arr<number> = [1, 2, 3];
+
+a.forEach((item) => {
+  console.log(item);
+  item.toFixed(1);
+});
+
+const b: Arr<string> = ["1", "2", "3"];
+
+b.forEach((item) => {
+  console.log(item);
+  item.charAt(3);
+});
+```
+
+위처럼 제네릭 T를 통해 설정한 타입이 데이터에 들어오는 것을 명시해주면 에러가 발생하지 않는다.
+아래 주석이 실제 forEach 함수에 대한 타이핑 코드임. forEach 사용 시 index나 추가적인 thisArg 등을 사용하게 될 경우 타입을 추가해서 확장해주면 된다.
