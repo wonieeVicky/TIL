@@ -16,26 +16,14 @@
 
 // type Arr = Array<number>;
 interface Arr<T> {
-  forEach(callback: (item: T, index: number) => void): void;
+  map<S>(callback: (item: T, index: number) => S): S[];
+  map<U>(callbackfn: (value: T, index: number, array: T[]) => U, thisArg?: any): U[];
 }
 
 const a: Arr<number> = [1, 2, 3];
 
-a.forEach((item) => {
-  console.log(item);
-  item.toFixed(1);
-});
-
-const b: Arr<string> = ["1", "2", "3"];
-
-b.forEach((item) => {
-  console.log(item);
-  item.charAt(3);
-});
-
-const c: Arr<string | number> = [1, "2", "3"];
-
-b.forEach((item) => {
-  console.log(item);
-  item.charAt(3);
-});
+const b = a.map((item) => item + 1); // number[]
+const c = a.map((item) => item.toString()); // string[]
+const d = a.map((item) => !(item % 2)); // boolean[]
+const e: Arr<string> = ["1", "2", "3"];
+const f = e.map((item) => +item); // number[]

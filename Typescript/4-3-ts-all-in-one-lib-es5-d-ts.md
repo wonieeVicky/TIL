@@ -145,3 +145,45 @@ b.forEach((item) => {
 
 위처럼 제네릭 T를 통해 설정한 타입이 데이터에 들어오는 것을 명시해주면 에러가 발생하지 않는다.
 아래 주석이 실제 forEach 함수에 대한 타이핑 코드임. forEach 사용 시 index나 추가적인 thisArg 등을 사용하게 될 경우 타입을 추가해서 확장해주면 된다.
+
+### map 타입 직접 만들기
+
+map도 만들어본다. 가장 기본적인 내용으로만 구현해보면 아래와 같다
+
+```tsx
+interface Arr<T> {
+  map(callback: (item: T, index: number) => T): T[];
+}
+
+const a: Arr<number> = [1, 2, 3];
+
+a.map((item) => item + 1); // Ok
+a.map((item) => item.toString()); // Error
+```
+
+위 숫자 리턴의 map 함수에서는 정상적으로 동작하지만, 두 번째 문자열을 반환하는 map 함수는 당연히 에러를 뱉는다.
+즉, 반환값의 T가 잘못되었다는 의미임. 따라서 이를 아래와 같이 쓸 수 있다.
+
+```tsx
+interface Arr<T> {
+  map<S>(callback: (item: T, index: number) => S): S[];
+}
+const a: Arr<number> = [1, 2, 3];
+
+// or
+interface Arr<T, S> {
+  map(callback: (item: T) => S): S[];
+}
+
+const a: Arr<number, number> = [1, 2, 3];
+
+// 어느 방법으로든 아래의 모든 경우를 수렴한다.
+const b = a.map((item) => item + 1); // number[]
+const c = a.map((item) => item.toString()); // string[]
+const d = a.map((item) => !(item % 2)); // boolean[]
+
+const e: Arr<string> = ["1", "2", "3"];
+const f = e.map((item) => +item); // number[]
+```
+
+`map<U>(callbackfn: (value: T, index: number, array: T[]) => U, thisArg?: any): U[];` 실제 map 타이핑 코드와 비교해보면 거의 비슷하다!
