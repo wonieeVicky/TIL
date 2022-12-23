@@ -213,6 +213,7 @@ const e = c.filter(predicate); // [1, 3, 5]
 다른 함수들도 이런 식으로 타입을 직접 만들어주는 연습을 하다보면 자연스럽게 실력을 쌓을 수 있다.
 
 - some 타이핑 혼자 해 봄
+
   ```tsx
   interface Arr<T> {
     // 정답은 요거임
@@ -229,4 +230,62 @@ const e = c.filter(predicate); // [1, 3, 5]
   const predicate = (v: string | number) => typeof v === "boolean";
   const e = c.some(predicate); // false
   ```
+
   함수 리턴에 어떤 값이 들어갈지 몰라서 void가 아닌 unknown으로 썻는데, 적절했던 것 같음
+
+### 공변성과 반공변성
+
+공변성과 반공변성에 대해 알아보자. 조금 어려운 개념임
+
+```tsx
+function a(x: string): number {
+  return +x;
+}
+a("1"); // 1
+
+type B = (x: string) => number | string;
+const b: B = a; // Ok, why...??????????
+```
+
+위와 같이 문자열을 넣어 숫자로 반환하는 함수가 있다고 했을 때
+type B는 동일한 `string` 타입의 매개변수를 받아 `number` 또는 `string` 타입을 반환한다. `number` 타입만 반환하는 a가 왜 대입이 가능할까?
+
+정답은 `리턴 값은 더 넓은 값은 대입이 가능하다.` 이다. 즉 `number ⊂ number | string` 이지만, `number | string ⊄ number`이다.
+
+```tsx
+function a(x: string): number | string {
+  return +x;
+}
+
+type B = (x: string) => number; // (x: string) => number (ok), (x: string) => string (x)
+const b: B = a; // Error!
+```
+
+풀어서 이해하면 쉽게 수용 가능함. 반면에 매개변수는 좀 다르다.
+
+```tsx
+function a(x: string): number {
+  return +x;
+}
+
+type B = (x: string | number) => number;
+const b: B = a; // Error
+// '(x: string) => number' 형식은 'B' 형식에 할당할 수 없습니다.
+// 'x' 및 'x' 매개 변수의 형식이 호환되지 않습니다.
+// 'string | number' 형식은 'string' 형식에 할당할 수 없습니다.
+
+function a(x: string | number): number {
+  return +x;
+}
+
+type B = (x: string) => number;
+const b: B = a; // Ok, why.......??????????????????
+```
+
+`매개변수는 좁은 타입으로만 대입이 가능하다.`
+
+즉, 즉 `number | string ⊂ number` 이지만, `number ⊄ string | number`이다.
+
+이해하기 어려우니 리턴 값은 넓은 타입으로 확장하여 대입이 가능하고, 매개변수는 좁은 타입으로만 대입이 가능하다. 라고 납득, 수용한다.
+
+공변성, 반공변성에 대해서 이해하기가 매우 복잡하므로 법칙처럼 이해하는 것이 좋겠다.

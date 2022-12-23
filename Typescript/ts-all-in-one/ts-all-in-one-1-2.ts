@@ -15,17 +15,29 @@
 // const filtered = ["1", 2, "3", 4, 5].filter(predicate); // ["1", "3"] string[]
 
 // type Arr = Array<number>;
-interface Arr<T> {
-  // filter<S extends T>(callback: (v: T) => v is S): S[]; // S는 T의 부분집합임을 제네릭으로 표현
-  // some(predicate: (value: T, index: number, array: T[]) => unknown, thisArg?: any): boolean;
-  some(callback: (value: T, index: number) => boolean): boolean;
+// interface Arr<T> {
+//   // filter<S extends T>(callback: (v: T) => v is S): S[]; // S는 T의 부분집합임을 제네릭으로 표현
+//   // some(predicate: (value: T, index: number, array: T[]) => unknown, thisArg?: any): boolean;
+//   some(callback: (value: T, index: number) => boolean): boolean;
+// }
+
+// const a: Arr<number> = [1, 2, 3];
+// const b = a.some((v) => !(v % 2));
+
+// const c: Arr<number | string> = [1, "2", 3, "4", 5];
+// const d = c.some((v) => typeof v === "string"); // ["2", "4"]
+
+// const predicate = (v: string | number) => typeof v === "number";
+// const e = c.some(predicate); // [1, 3, 5]
+
+// 공변성, 반공변성.. 함수 간에 서로 대입
+
+function a(x: string | number): number {
+  return +x;
 }
 
-const a: Arr<number> = [1, 2, 3];
-const b = a.some((v) => !(v % 2));
+type B = (x: string) => number;
+const b: B = a;
 
-const c: Arr<number | string> = [1, "2", 3, "4", 5];
-const d = c.some((v) => typeof v === "string"); // ["2", "4"]
-
-const predicate = (v: string | number) => typeof v === "number";
-const e = c.some(predicate); // [1, 3, 5]
+let d: 5 = 5;
+let e = 5;
