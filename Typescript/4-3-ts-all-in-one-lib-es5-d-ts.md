@@ -211,3 +211,22 @@ const e = c.filter(predicate); // [1, 3, 5]
 `is`는 반환값에 대한 타입을 지정해주는 메서드이므로 `T`의 부분집합인 `S`가 반환값의 타입이라고 지정해줄 수 있음
 
 다른 함수들도 이런 식으로 타입을 직접 만들어주는 연습을 하다보면 자연스럽게 실력을 쌓을 수 있다.
+
+- some 타이핑 혼자 해 봄
+  ```tsx
+  interface Arr<T> {
+    // 정답은 요거임
+    // some(predicate: (value: T, index: number, array: T[]) => unknown, thisArg?: any): boolean;
+    some(callback: (value: T, index: number) => unknown): boolean;
+  }
+
+  const a: Arr<number> = [1, 2, 3];
+  const b = a.some((v) => !(v % 2)); // true
+
+  const c: Arr<number | string> = [1, "2", 3, "4", 5];
+  const d = c.some((v) => typeof v === "string"); // true
+
+  const predicate = (v: string | number) => typeof v === "boolean";
+  const e = c.some(predicate); // false
+  ```
+  함수 리턴에 어떤 값이 들어갈지 몰라서 void가 아닌 unknown으로 썻는데, 적절했던 것 같음

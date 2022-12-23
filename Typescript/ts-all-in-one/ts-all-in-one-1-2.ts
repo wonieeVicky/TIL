@@ -16,14 +16,16 @@
 
 // type Arr = Array<number>;
 interface Arr<T> {
-  filter<S extends T>(callback: (v: T) => v is S): S[]; // S는 T의 부분집합임을 제네릭으로 표현
+  // filter<S extends T>(callback: (v: T) => v is S): S[]; // S는 T의 부분집합임을 제네릭으로 표현
+  // some(predicate: (value: T, index: number, array: T[]) => unknown, thisArg?: any): boolean;
+  some(callback: (value: T, index: number) => boolean): boolean;
 }
 
 const a: Arr<number> = [1, 2, 3];
-const b = a.filter((v): v is number => !(v % 2));
+const b = a.some((v) => !(v % 2));
 
 const c: Arr<number | string> = [1, "2", 3, "4", 5];
-const d = c.filter((v): v is string => typeof v === "string"); // ["2", "4"]
+const d = c.some((v) => typeof v === "string"); // ["2", "4"]
 
-const predicate = (v: string | number): v is number => typeof v === "number";
-const e = c.filter(predicate); // [1, 3, 5]
+const predicate = (v: string | number) => typeof v === "number";
+const e = c.some(predicate); // [1, 3, 5]
