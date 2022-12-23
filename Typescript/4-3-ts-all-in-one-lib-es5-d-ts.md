@@ -187,3 +187,27 @@ const f = e.map((item) => +item); // number[]
 ```
 
 `map<U>(callbackfn: (value: T, index: number, array: T[]) => U, thisArg?: any): U[];` 실제 map 타이핑 코드와 비교해보면 거의 비슷하다!
+
+### filter 타입 직접 만들기
+
+마지막으로 filter도 만들어본다. filter는 조금 어렵당
+
+```tsx
+interface Arr<T> {
+  filter<S extends T>(callback: (v: T) => v is S): S[];
+}
+
+const a: Arr<number> = [1, 2, 3];
+const b = a.filter((v): v is number => !(v % 2));
+
+const c: Arr<number | string> = [1, "2", 3, "4", 5];
+const d = c.filter((v): v is string => typeof v === "string"); // ["2", "4"]
+
+const predicate = (v: string | number): v is number => typeof v === "number";
+const e = c.filter(predicate); // [1, 3, 5]
+```
+
+`S`는 `T`의 부분 집합임을 제네릭으로 표현해서 완성했다.
+`is`는 반환값에 대한 타입을 지정해주는 메서드이므로 `T`의 부분집합인 `S`가 반환값의 타입이라고 지정해줄 수 있음
+
+다른 함수들도 이런 식으로 타입을 직접 만들어주는 연습을 하다보면 자연스럽게 실력을 쌓을 수 있다.

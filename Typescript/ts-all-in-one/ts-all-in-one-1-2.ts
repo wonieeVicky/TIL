@@ -16,14 +16,14 @@
 
 // type Arr = Array<number>;
 interface Arr<T> {
-  map<S>(callback: (item: T, index: number) => S): S[];
-  map<U>(callbackfn: (value: T, index: number, array: T[]) => U, thisArg?: any): U[];
+  filter<S extends T>(callback: (v: T) => v is S): S[]; // S는 T의 부분집합임을 제네릭으로 표현
 }
 
 const a: Arr<number> = [1, 2, 3];
+const b = a.filter((v): v is number => !(v % 2));
 
-const b = a.map((item) => item + 1); // number[]
-const c = a.map((item) => item.toString()); // string[]
-const d = a.map((item) => !(item % 2)); // boolean[]
-const e: Arr<string> = ["1", "2", "3"];
-const f = e.map((item) => +item); // number[]
+const c: Arr<number | string> = [1, "2", 3, "4", 5];
+const d = c.filter((v): v is string => typeof v === "string"); // ["2", "4"]
+
+const predicate = (v: string | number): v is number => typeof v === "number";
+const e = c.filter(predicate); // [1, 3, 5]
