@@ -289,3 +289,39 @@ const b: B = a; // Ok, why.......??????????????????
 이해하기 어려우니 리턴 값은 넓은 타입으로 확장하여 대입이 가능하고, 매개변수는 좁은 타입으로만 대입이 가능하다. 라고 납득, 수용한다.
 
 공변성, 반공변성에 대해서 이해하기가 매우 복잡하므로 법칙처럼 이해하는 것이 좋겠다.
+
+### 다양한 경우의 수가 있을 때, 하나에는 걸리겠지(overloading)
+
+같은 타입을 여러번 선언하는 것을 오버로딩이라고 한다.
+자바스크립트는 함수를 여러번 선언할 수 있기 때문에 이러한 개념이 생겼다.
+
+```tsx
+// declare function overAdd(x: number, y: number, z?: number): number;
+declare function overAdd(x: number, y: number): number;
+declare function overAdd(x: string, y: string): string;
+declare function overAdd(x: number, y: number, z: number): number;
+
+overAdd(1, 2); // Ok
+overAdd(2, 3, 4); // Ok
+overAdd("1", "2"); // Ok
+```
+
+optional type method인 `?`를 모르는 상태에서 위와 같이 overAdd 함수를 두 번 선언할 수 있으며, 위 선언으로 인해 하위 함수는 모두 tsc 를 통과하게 된다.
+
+즉, 다양한 경우의 수에 대한 타이핑이 어려울 경우, 급한대로 위와 같이 오버로딩 처리할 수 있다.
+
+위 오버로딩 방법은 클래스에서도 동일하게 구현 가능함
+
+```tsx
+class A {
+  add(x: number, y: number): number;
+  add(x: string, y: string): string;
+  // 오버로딩을 해놨을 경우 실제 구현부에서는 any로 처리해도 알아서 number, string으로 처리한다.
+  add(x: any, y: any) {
+    return x + y;
+  }
+}
+
+const c = new A().add(1, 2); // number, Ok
+const d = new A().add("가", "나"); // string, Ok
+```

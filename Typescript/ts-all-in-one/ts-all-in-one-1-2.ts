@@ -32,12 +32,33 @@
 
 // 공변성, 반공변성.. 함수 간에 서로 대입
 
-function a(x: string | number): number {
-  return +x;
+// function a(x: string | number): number {
+//   return +x;
+// }
+
+// type B = (x: string) => number;
+// const b: B = a;
+
+// let d: 5 = 5;
+// let e = 5;
+
+// overloading
+// declare function overAdd(x: number, y: number, z?: number): number;
+declare function overAdd(x: number, y: number): number;
+declare function overAdd(x: string, y: string): string;
+declare function overAdd(x: number, y: number, z: number): number;
+
+overAdd(1, 2);
+overAdd(2, 3, 4);
+overAdd("1", "2");
+
+class A {
+  add(x: number, y: number): number;
+  add(x: string, y: string): string;
+  add(x: any, y: any) {
+    return x + y;
+  }
 }
 
-type B = (x: string) => number;
-const b: B = a;
-
-let d: 5 = 5;
-let e = 5;
+const c = new A().add(1, 2); // number
+const d = new A().add("가", "나"); // string
