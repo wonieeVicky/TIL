@@ -325,3 +325,86 @@ class A {
 const c = new A().add(1, 2); // number, Ok
 const d = new A().add("가", "나"); // string, Ok
 ```
+
+### 타입스크립트는 건망증이 심하다 ( + 에러 처리법)
+
+타입스크립트는 건망증이 심하다. 일회성 타이핑 느낌. 아래 예시를 보자
+
+```tsx
+interface Axios {
+  get: () => void;
+}
+
+// axios 라이브러리를 쓰면 기본 Error 타입에 response 객체가 추가되므로
+// 아래와 같이 interface를 확장해서 커스텀한 뒤 사용한다.
+interface CustomError extends Error {
+  response?: {
+    data: any;
+  };
+}
+
+declare const axios: Axios;
+
+(async () => {
+  try {
+    await axios.get();
+  } catch (err: unknown) {
+    console.error((err as CustomError).response?.data); // Ok
+    err.response?.data; // Error
+  }
+})();
+```
+
+위와 같이 간단히 Axios 라이브러리에 대한 타이핑을 구현했다고 생각해보자.
+
+기본적으로 TypeScript 에서 제공되는 Error 타입은 name, message, stack? 속성이다.
+하지만 axios 라이브러리는 response라는 객체를 추가 반환하므로 CustomError라는 interface 타입을 확장하여 적용해준 부분이 포인트.
+`err as CustomError` 로 타입 지정
+
+그럼 윗 부분 console.error에서는 큰 문제없이 타입이 잘 추론되어서 넘어가지만 바로 하단에 `err.response?.data;` 는 에러 발생한다.
+위에서 지정해줬으니 하위부터는 자동 적용되지 않을까? 생각하겠지만 타입스크립트는 일회성이므로 건망증이 심하다. 매번 써줘야함
+
+하지만, 이것이 귀찮기 때문에 보통 변수에 담아서 쓴다.
+
+```tsx
+// ..
+
+(async () => {
+  try {
+    await axios.get();
+  } catch (err: unknown) {
+    const customError = err as CustomError; // 변수에 담았음
+    console.error(customError.response?.data); // Ok
+    customError.response?.data; // Ok
+  }
+})();
+```
+
+as는 웬만하면 안쓰는 것이 좋다. as는 타입이 unknown일 때 사용하기 때문에, unknown으로 지정된 객체에 타입을 확장하는 경우에만 사용하고 최대한 지양하는 것이 좋다.
+as 키워드가 좋지 않은 이유는 사람이 만드는 일이기 때문이다. 사람은 늘 실수를 만듦. (그때는 맞고 지금은 틀리다. 의 경우가 다량 발생)
+
+또한, 사실 위 코드는 바로 에러를 발생시킨다. Error가 CustomError가 아닐 경우에 대한 방어코드가 없기 때문
+따라서 최대한 as 사용을 지우고, 클래스 타이핑으로 변환하여 아래와 같이 해결하는 것이 바람직하다.
+
+```tsx
+// 자바스크립트에서도 유지되는 클래스 타이핑으로 변환
+class CustomError extends Error {
+  response?: {
+    data: any;
+  };
+}
+declare const axios: Axios;
+
+(async () => {
+  try {
+    await axios.get();
+  } catch (err: unknown) {
+    // instanceof 라는 메서드를 쓰기 위해 class 타입으로 바꿔줌
+    if (err instanceof CustomError) {
+      // 이미 err as CustomError 이므로 err 그냥 쓸 수 있다.
+      console.error(err.response?.data);
+      err.response?.data;
+    }
+  }
+})();
+```

@@ -44,21 +44,49 @@
 
 // overloading
 // declare function overAdd(x: number, y: number, z?: number): number;
-declare function overAdd(x: number, y: number): number;
-declare function overAdd(x: string, y: string): string;
-declare function overAdd(x: number, y: number, z: number): number;
+// declare function overAdd(x: number, y: number): number;
+// declare function overAdd(x: string, y: string): string;
+// declare function overAdd(x: number, y: number, z: number): number;
 
-overAdd(1, 2);
-overAdd(2, 3, 4);
-overAdd("1", "2");
+// overAdd(1, 2);
+// overAdd(2, 3, 4);
+// overAdd("1", "2");
 
-class A {
-  add(x: number, y: number): number;
-  add(x: string, y: string): string;
-  add(x: any, y: any) {
-    return x + y;
-  }
+// class A {
+//   add(x: number, y: number): number;
+//   add(x: string, y: string): string;
+//   add(x: any, y: any) {
+//     return x + y;
+//   }
+// }
+
+// const c = new A().add(1, 2); // number
+// const d = new A().add("가", "나"); // string
+
+interface Axios {
+  get: () => void;
 }
 
-const c = new A().add(1, 2); // number
-const d = new A().add("가", "나"); // string
+// axios 라이브러리를 쓰면 기본 Error 타입에 response 객체가 추가되므로
+// 아래와 같이 interface를 확장해서 커스텀한 뒤 사용한다.
+class CustomError extends Error {
+  response?: {
+    data: any;
+  };
+}
+declare const axios: Axios;
+
+(async () => {
+  try {
+    await axios.get();
+  } catch (err: unknown) {
+    if (err instanceof CustomError) {
+      const customError = err as CustomError;
+      console.error(customError.response?.data);
+      customError.response?.data; // Error
+    }
+  }
+})();
+
+const a = <T = unknown>(v: T): T => v;
+const c = a(3);
