@@ -52,3 +52,57 @@ type Partial<T> = {
   [P in keyof T]?: T[P];
 };
 ```
+
+### Pick 타입 분석
+
+Partial은 모든 속성을 optional하게 해주기 때문에 딱히 좋은 기능이라고 할 수 없다.
+아무 것도 안넣어도 성립하는 마법.. 따라서 잘 사용하지 않고 Pick, Omit을 자주 활용하게 된다.
+
+Omit과 Pick의 예시를 한번 보자.
+
+```tsx
+interface Profile {
+  name: string;
+  age: number;
+  married: boolean;
+}
+
+const vicky: Pick<Profile, "name" | "age"> = {
+  name: "vicky",
+  age: 33,
+};
+
+const vicky: Omit<Profile, "married"> = {
+  name: "vicky",
+  age: 33,
+};
+```
+
+Pick은 정확히 사용할 타입만 명시하는 유틸리티이고, Omit은 특정 속성을 제외하고 나머지를 가져오는 타입이다. Omit의 경우 많은 속성 가운데 소수의 타입을 제외할 때 자주 사용한다.
+
+위 역할을 하는 Pick 타입을 직접 만들어보자..
+
+```tsx
+// custom Pick
+type P<T, S extends keyof T> = {
+  [P in S]: T[P];
+};
+
+const vicky: P<Profile, "name" | "age"> = {
+  name: "vicky",
+  age: 33,
+};
+```
+
+위와 같이 T의 key 중에 S가 속하게 되고, 이 키 값을 기준으로 기존 T에서 Key 값에 대한 type value를 가져오도록 구성하면 된다. 실제 문서와 거의 동일하다.
+
+```tsx
+/**
+ * From T, pick a set of properties whose keys are in the union K
+ */
+type Pick<T, K extends keyof T> = {
+  [P in K]: T[P];
+};
+```
+
+매우 흡사 :)

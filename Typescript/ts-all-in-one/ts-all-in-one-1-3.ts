@@ -4,9 +4,9 @@
   married: boolean;
 }
 
-// custom Partial
-type P<T> = {
-  [P in keyof T]?: T[P];
+// custom Pick
+type P<T, S extends keyof T> = {
+  [P in S]: T[P];
 };
 
 const vicky: Profile = {
@@ -15,7 +15,17 @@ const vicky: Profile = {
   married: false,
 };
 
-const filteredVicky: Partial<Profile> = {
+const PartialVicky: Partial<Profile> = {
+  name: "vicky",
+  age: 33,
+};
+
+const PickVicky: Pick<Profile, "name" | "age"> = {
+  name: "vicky",
+  age: 33,
+};
+
+const OmitVicky: Omit<Profile, "married"> = {
   name: "vicky",
   age: 33,
 };
