@@ -143,7 +143,7 @@ interface Profile {
   married: boolean;
 }
 
-type A = Exclude<keyof Profile, 'married'> // type A = "name" | "age"
+type A = Exclude<keyof Profile, "married">; // type A = "name" | "age"
 ```
 
 위와 같은 코드가 있다면 A 타입은 `name` 혹은 `age`를 나타낸다.
@@ -172,3 +172,129 @@ const OmitVicky: O<Profile, "married"> = {
 `S extends keyof any` 라는 의미는 S가 string | number | symbol 타입이라는 제약조건을 건 것이다.
 
 이 제약조건을 넣지 않으면 Profile 등의 interface obj를 넣을 수도 있게 된다.
+
+### Required, Record, NonNullable 타입 분석
+
+Required 타입은 optional 속성을 필수값으로 바꿔주는 타입이다.
+
+```tsx
+interface Profile {
+  name?: string;
+  age?: number;
+  married?: boolean;
+}
+
+const vicky: Required<Profile> = {
+  name: "vicky",
+  age: 33,
+  married: false,
+};
+```
+
+모든 속성을 필수값으로 바꿔주므로 하나의 속성이라도 제외되면 에러가 발생한다.
+위 Required 속성을 실제 구현하면 아래와 같다.
+
+```tsx
+type R<T> = {
+  [key in keyof T]-?: T[key];
+};
+
+const vicky: R<Profile> = {
+  name: "vicky",
+  age: 33,
+  married: false,
+};
+```
+
+`-?`는 modifier로 optional을 모두 제거하라는 의미를 가진다. (반대로 `+?`도 있으나 굳이 쓸 필요가 없다)
+
+위 vicky 객체에 name은 쉽게 수정할 수 있다. 하지만 수정하지 못하게 하려면? `Readonly`를 쓴다.
+
+```tsx
+const vicky: Readonly<Profile> = {
+  name: "vicky",
+  age: 33,
+  married: false,
+};
+
+// 혹은
+type R<T> = {
+  readonly [key in keyof T]-?: T[key];
+};
+
+const vicky: R<Profile> = {
+  name: "vicky",
+  age: 33,
+  married: false,
+};
+
+vicky.name = "woniee"; // Error!
+```
+
+아래와 같이 `-readonly`라고 쓰면 readonly 속성을 제외하라는 의미가 된다.
+
+```tsx
+interface Profile {
+  readonly name?: string;
+  readonly age?: number;
+  readonly married?: boolean;
+}
+
+type R<T> = {
+  -readonly [key in keyof T]-?: T[key];
+};
+
+const vicky: R<Profile> = {
+  name: "vicky",
+  age: 33,
+  married: false,
+};
+
+vicky.name = "vicky"; // Ok
+```
+
+Record 타입은 사용하고자 하는 타입을 간단히 적어놓은 것이다. (`IObj` 같은 느낌)
+
+```tsx
+interface Obj {
+  [key: string]: number;
+}
+
+// 아래 둘은 같은 타입을 가진다.
+const obj: Obj = { a: 3, b: 5, c: 7 };
+const recordObj: Record<string, number> = { a: 3, b: 5, c: 7 };
+```
+
+Record 타입을 직접 만들면 아래와 같다.
+
+```tsx
+type R<T extends keyof any, S> = {
+  [key in T]: S;
+};
+const recordObj: R<string, number> = { a: 3, b: 5, c: 7 };
+```
+
+NonNullable 타입은 키에 적용되는 타입이다. nullable 하지 않은 값만 가져온다.
+
+```tsx
+type A = string | null | undefined | boolean | number;
+type B = NonNullable<A>; // type B = string | number | boolean
+```
+
+NonNullable은 아래와 같이 삼항 연산자로 만들 수 있음
+
+```tsx
+type N<T> = T extends null | undefined ? never : T;
+type B = N<A>; // type B = string | number | boolean
+```
+
+실제는 아래와 같이 되어 있다.
+
+```tsx
+/**
+ * Exclude null and undefined from T
+ */
+type NonNullable<T> = T & {};
+```
+
+T가 `undefined`, `null`이면 `&`에서 아예 걸러지기 때문에 위와 같이 간단히 적을 수 있음
