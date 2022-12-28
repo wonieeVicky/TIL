@@ -105,4 +105,70 @@ type Pick<T, K extends keyof T> = {
 };
 ```
 
-매우 흡사 :)
+매우 흡사하다.
+
+### Omit, Exclude, Extract 타입 분석
+
+Omit을 알기 전에 Exclude를 알아야 한다.
+
+```tsx
+/**
+ * Exclude from T those types that are assignable to U
+ */
+type Exclude<T, U> = T extends U ? never : T;
+
+/**
+ * Extract from T those types that are assignable to U
+ */
+type Extract<T, U> = T extends U ? T : never;
+```
+
+Exclude는 위 정의와 같이 T 타입에서 U 타입을 뺀 것이다. Extract는 정반대다.
+즉 Exclude는 제외, Extract는 추출의 의미를 가진다.
+
+- Exclude는 T가 U의 부분집합이면 없애고, 아니면 남겨준다.
+- Extract는 T가 U의 부분집합이면 남기고, 아니면 없앤다.
+
+```tsx
+type Animal = "Cat" | "Dog" | "Human";
+
+type Mammal = Exclude<Animal, "Human">; // type Mammal = "Cat" | "Dog"
+type Human = Extract<Animal, "Human">; // type Human = "Human"
+```
+
+```tsx
+interface Profile {
+  name: string;
+  age: number;
+  married: boolean;
+}
+
+type A = Exclude<keyof Profile, 'married'> // type A = "name" | "age"
+```
+
+위와 같은 코드가 있다면 A 타입은 `name` 혹은 `age`를 나타낸다.
+(`keyof Profile = “name” | “age” | “married”`)
+
+즉 위 타입 A로 아래와 같은 Pick 타입 구현이 가능해진다.
+
+```tsx
+const testVicky: Pick<Profile, Exclude<keyof Profile, "married">> = {
+  name: "vicky",
+  age: 33,
+};
+```
+
+즉 위 코드는 O라는 커스텀 타이핑을 하여 Omit 역할을 하게 하면 아래와 같다.
+
+```tsx
+type O<T, S extends keyof any> = Pick<T, Exclude<keyof T, S>>;
+const OmitVicky: O<Profile, "married"> = {
+  name: "vicky",
+  age: 33,
+};
+```
+
+즉 Omit은 Pick과 Exclude를 활용하여 만들어내는 타입이다.
+`S extends keyof any` 라는 의미는 S가 string | number | symbol 타입이라는 제약조건을 건 것이다.
+
+이 제약조건을 넣지 않으면 Profile 등의 interface obj를 넣을 수도 있게 된다.
