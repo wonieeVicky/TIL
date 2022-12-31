@@ -298,3 +298,91 @@ type NonNullable<T> = T & {};
 ```
 
 T가 `undefined`, `null`이면 `&`에서 아예 걸러지기 때문에 위와 같이 간단히 적을 수 있음
+
+### infer 타입 분석
+
+먼저 Parameters, ReturnType 타입에 대해 알아보자.
+Parameters는 인자에 대한 타입을, ReturnType은 리턴 값에 대한 타입을 추론해서 가져올 수 있다.
+
+```tsx
+function zip(x: number, y: string, z: boolean): { x: number; y: string; z: boolean } {
+  return { x, y, z };
+}
+
+type Params = Parameters<typeof zip>; // type Params = [number, string, boolean]
+type Return = ReturnType<typeof zip>; // type Return = { x: number; y: string; z: boolean }
+type First = Params[0]; // number
+```
+
+Params, Return 타입 변수에 담기는 값은 튜플로 담기므로 배열의 index로 해당 타입에 접근할 수 있다.
+실제 예시를 만들어보자
+
+```tsx
+type P<T extends (...args: any) => any> = T extends (...args: infer P) => any ? P : never;
+type Params = P<typeof zip>; // type Params = [number, string, boolean]
+type First = Params[0]; // number
+```
+
+`<T extends (...args: any) => any>` 의 의미는 T는 무조건 함수여야 한다는 뜻임
+
+infer는 타입스크립트가 알아서 추론한다는 의미를 가진다.
+
+- `추론 조건 ? 추론 성공 시의 값 : 추론 실패 시의 값`
+- `T extends (...args: infer P) => any ? P : never;`
+  - 매개변수에 추론 값이 있으면 그걸 쓰고, 없으면 쓰지 않는다는 의미를 가진다.
+
+만약 리턴타입에 대한 값 추론을 하려면 어떻게 만들면 될까?
+
+```tsx
+type R<T extends (...args: any) => any> = T extends (...args: any) => infer P ? P : never;
+type Return = R<typeof zip>; // type Return = { x: number; y: string; z: boolean }
+```
+
+이번에는 instanceType과 ContructorParameters에 대해 알아본다.
+이는 생성자를 대상으로 사용하는 타입이다.
+
+```tsx
+/**
+ * Obtain the parameters of a constructor function type in a tuple
+ */
+type ConstructorParameters<T extends abstract new (...args: any) => any> = T extends abstract new (
+  ...args: infer P
+) => any
+  ? P
+  : never;
+
+/**
+ * Obtain the return type of a constructor function type
+ */
+type InstanceType<T extends abstract new (...args: any) => any> = T extends abstract new (...args: any) => infer R
+  ? R
+  : any;
+```
+
+위 타입은 아래와 같이 사용함
+
+```tsx
+class A {
+  a: string;
+  b: number;
+  c: boolean;
+
+  constructor(a: string, b: number, c: boolean) {
+    this.a = a;
+    this.b = b;
+    this.c = c;
+  }
+}
+
+const d = new A("vicky", 33, true);
+type D = ConstructorParameters<typeof A>; // type D = [a: string, b: number, c: boolean] - 생성자의  파라미터
+type I = InstanceType<typeof A>; // type I = Test
+
+const e: A = new A("woniee", 32, true); // 인스턴스(new)
+```
+
+위의 메서드를 앎으로서 더 다양한 타입 확장이 가능해진다.
+공부할 때는 구현이 어떤 원리로 되어있는지 집중하는 것이 좋다.
+
+이 외에도 `Uppercase`, `Lowercase`, `Capitalize`, `Upcapitalize`, `ThisType` 등이 있다.
+위 코드는 대거 intrinsic 타입 형태로 만들어져있다. (타입스크립트에서 별도의 커스텀 코드로 구현)
