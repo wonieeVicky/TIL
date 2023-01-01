@@ -386,3 +386,105 @@ const e: A = new A("woniee", 32, true); // 인스턴스(new)
 
 이 외에도 `Uppercase`, `Lowercase`, `Capitalize`, `Upcapitalize`, `ThisType` 등이 있다.
 위 코드는 대거 intrinsic 타입 형태로 만들어져있다. (타입스크립트에서 별도의 커스텀 코드로 구현)
+
+### 완전 복잡한 타입 분석하기(Promise와 Awaited 편)
+
+infer에 대해서 좀 더 공부해본다. 아래 예제를 보자
+
+```tsx
+// Promise는 Promise<결괏값> 타입으로 표현함
+const p1 = Promise.resolve(1)
+  .then((a) => a + 1)
+  .then((a) => a + 1)
+  .then((a) => a.toString());
+
+const p2 = Promise.resolve(2);
+const p3 = new Promise((res, _) => setTimeout(res, 1000));
+
+Promise.all([p1, p2, p3]).then((result) => console.log(result)); // ['3', 2, unknown]
+```
+
+위 코드는 프로미스 객체인 p1, p2, p3가 모두 실행된 뒤 그 값을 반환하는 코드이다.
+위 코드 실행 결과는 아마도 `['3', 2, unknown]`일 것이며 타입스크립트는 이를 똑똑하게 추론해낸다.
+
+![](../img/230101-1.png)
+
+어떻게 반환 값을 모두 다 추론해낼 수 있는 것일까? 특히 p1의 중첩 then문을 어떻게 예측 할 수 있었을까?
+우선 lib.es2015.promise.d.ts에 all 메서드에 대한 타입정의를 참고해보자
+
+```tsx
+/**
+ * Creates a Promise that is resolved with an array of results when all of the provided Promises
+ * resolve, or rejected when any Promise is rejected.
+ * @param values An array of Promises.
+ * @returns A new Promise.
+ */
+all<T extends readonly unknown[] | []>(values: T): Promise<{ -readonly [P in keyof T]: Awaited<T[P]> }>;
+```
+
+위 코드에서 T는 `[p1, p2, p3]`를 의미한다.
+이는 `{ ‘0’: p1, ‘1’: p2, ‘2’: p3, Length: 3 }`이라는 객체로 정의할 수도 있다.
+그렇다면 keyof T는 뭘까? `keyof T = '0' | '1' | '2' | 'Length'` 이다.
+
+```tsx
+const arr = [1, 2, 3];
+type Arr = keyof typeof arr; // type Arr = keyof number[]
+
+const arr = [1, 2, 3] as const;
+type Arr = keyof typeof arr; // type Arr = keyof readonly [1, 2, 3]
+const key1: Arr = "2"; // Ok
+const key2: Arr = "3"; // Error
+```
+
+즉 T[P]는 배열의 값들을 의미하고 이를 Awaited 타입이 해결해준다.
+
+```tsx
+/**
+ * Recursively unwraps the "awaited type" of a type. Non-promise "thenables" should resolve to `never`. This emulates the behavior of `await`.
+ */
+type Awaited<T> = T extends null | undefined
+  ? T // special case for `null | undefined` when not in `--strictNullChecks` mode
+  : T extends object & { then(onfulfilled: infer F, ...args: infer _): any } // `await` only unwraps object types with a callable `then`. Non-object types are not unwrapped
+  ? F extends (value: infer V, ...args: infer _) => any // if the argument to `then` is callable, extracts the first argument
+    ? Awaited<V> // recursively unwrap the value
+    : never // the argument to `then` was not callable
+  : T; // non-object or non-thenable
+```
+
+Awaited 타입은 위와 같음. 복잡해보이지만 이해하면 쉽다.
+
+- `T extends null | undefined ? T` 는 T 값이 null, undefined일 경우를 고려하므로 생략한다.
+- `T extends object & { then(onfulfilled: infer F, ...args: infer _): any }`
+  - 프로미스는 object이며 `T extends object` 이 성립
+  - `{ then(onfulfilled: infer F, ...args: infer _): any }`
+    - promise가 then 메서드를 가졌는지를 체크하므로 성립
+- `F extends ((value: infer V, ...args: infer _) => any)`
+  - F는 함수형태인지 확인하므로 성립 ⇒ `Awaited<V>`로 처리된다.
+
+반환형태가 `Awaited<number>`가 되므로 그 다음 메서드가 계속 number로 이어질 수 있게되는 것이다.
+
+```
+const p1 = Promise.resolve(1).then((a) => a + 1).then((a) => a + 1).then((a) => a.toString());
+// Promise<number> => Promise<number> => Promise<number> => Promise<string>
+const p2 = Promise.resolve(2); // Promise<number>
+const p3 = new Promise((res, _) => setTimeout(res, 1000)); // Promise<unknown>
+```
+
+위와 같이 처리되므로 [string, number, unknown] 이 추론되게 되는 것이다. (어렵지만 몇 번보면 쉬워질 듯)
+Awaited는 중첩된 Promise 타입 과정을 풀어서 최종 타입으로 추론해내는 타입이라고 볼 수 있다.
+
+```tsx
+type Result = Awaited<Promise<Promise<Promise<number>>>>; // type Result = number
+```
+
+즉, 재귀적으로 추론됨을 위 `Awaited` 타입을 보고 확인할 수 있음
+또한, `infer`를 사용해 새로운 타입을 만들어내고 추론할 수 있다. 왜 이미 존재하는 Promise 타입을 Awaited 타입 안에서 사용하지 않까? 그 이유는 Promise 객체 외에 별도로 만들어진 프로미스와 유사한 형태의 커스텀 타이핑도 포함할 수 있는 duck typing을 타입스크립트에서 채택하고 있기 때문이다.
+
+즉 아래와 같은 타이핑을 허용함을 의미한다.
+
+```tsx
+type Result = Awaited<{ then(onfulfilled: (v: number) => number): any }>; // thenable
+```
+
+위 Result 타입은 then을 사용할 수 있는 타입으로 허용되며, 타입 추론도 성공적으로 이루어짐.
+이를 `thenable`한 타입이라고 한다. (_~~어렵다~~_)
