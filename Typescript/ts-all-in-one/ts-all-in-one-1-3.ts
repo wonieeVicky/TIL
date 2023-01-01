@@ -81,23 +81,41 @@
 // type Return = ReturnType<typeof zip>; // type Return = { x: number; y: string; z: boolean }
 // type First = Params[0]; // number
 
-class A {
-  a: string;
-  b: number;
-  c: boolean;
+// class A {
+//   a: string;
+//   b: number;
+//   c: boolean;
 
-  constructor(a: string, b: number, c: boolean) {
-    this.a = a;
-    this.b = b;
-    this.c = c;
-  }
-}
+//   constructor(a: string, b: number, c: boolean) {
+//     this.a = a;
+//     this.b = b;
+//     this.c = c;
+//   }
+// }
 
-const d = new A("vicky", 33, true);
-type D = ConstructorParameters<typeof A>; // type D = [a: string, b: number, c: boolean] - 생성자의  파라미터
-type I = InstanceType<typeof A>; // type I = Test
+// const d = new A("vicky", 33, true);
+// type D = ConstructorParameters<typeof A>; // type D = [a: string, b: number, c: boolean] - 생성자의  파라미터
+// type I = InstanceType<typeof A>; // type I = Test
 
-const e: A = new A("woniee", 32, true); // 인스턴스(new)
+// const e: A = new A("woniee", 32, true); // 인스턴스(new)
 
-const F = "Hello world";
-const G: Lowercase<typeof F> = "hello world"; // type e = "hello world"
+// const F = "Hello world";
+// const G: Lowercase<typeof F> = "hello world"; // type e = "hello world"
+
+// Promise는 Promise<결괏값> 타입으로 표현함
+const p1 = Promise.resolve(1)
+  .then((a) => a + 1)
+  .then((a) => a + 1)
+  .then((a) => a.toString()); // Promise<number> => Promise<number> => Promise<number> => Promise<string>
+const p2 = Promise.resolve(2); // Promise<number>
+const p3 = new Promise((res, _) => setTimeout(res, 1000)); // Promise<unknown>
+
+Promise.all([p1, p2, p3]).then((result) => console.log(result)); // ['3', 2, unknown]
+
+const arr = [1, 2, 3] as const;
+type Arr = keyof typeof arr; // type Arr = keyof readonly [1, 2, 3]
+const key1: Arr = "2"; // Ok
+const key2: Arr = "3"; // Error
+
+// type Result = Awaited<Promise<Promise<Promise<number>>>>; // type Result = number
+type Result = Awaited<{ then(onfulfilled: (v: number) => number): any }>; // thenable
