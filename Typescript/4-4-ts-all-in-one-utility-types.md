@@ -488,3 +488,72 @@ type Result = Awaited<{ then(onfulfilled: (v: number) => number): any }>; // the
 
 위 Result 타입은 then을 사용할 수 있는 타입으로 허용되며, 타입 추론도 성공적으로 이루어짐.
 이를 `thenable`한 타입이라고 한다. (_~~어렵다~~_)
+
+### 완전 복잡한 타입 분석하기(bind 편)
+
+이번에는 bind 타입에 대해 알아본다. bind 타이핑은 아래와 같다.
+
+```tsx
+/**
+ * For a given function, creates a bound function that has the same body as the original function.
+ * The this object of the bound function is associated with the specified object, and has the specified initial parameters.
+ * @param thisArg The object to be used as the this object.
+ * @param args Arguments to bind to the parameters of the function.
+ */
+bind<T>(this: T, thisArg: ThisParameterType<T>): OmitThisParameter<T>;
+bind<T, A0, A extends any[], R>(this: (this: T, arg0: A0, ...args: A) => R, thisArg: T, arg0: A0): (...args: A) => R;
+bind<T, A0, A1, A extends any[], R>(this: (this: T, arg0: A0, arg1: A1, ...args: A) => R, thisArg: T, arg0: A0, arg1: A1): (...args: A) => R;
+bind<T, A0, A1, A2, A extends any[], R>(this: (this: T, arg0: A0, arg1: A1, arg2: A2, ...args: A) => R, thisArg: T, arg0: A0, arg1: A1, arg2: A2): (...args: A) => R;
+bind<T, A0, A1, A2, A3, A extends any[], R>(this: (this: T, arg0: A0, arg1: A1, arg2: A2, arg3: A3, ...args: A) => R, thisArg: T, arg0: A0, arg1: A1, arg2: A2, arg3: A3): (...args: A) => R;
+bind<T, AX, R>(this: (this: T, ...args: AX[]) => R, thisArg: T, ...args: AX[]): (...args: AX[]) => R;
+```
+
+bind 타입을 이해하기 위해서는 ThisParameterType, OmitParameterType을 알
+
+```tsx
+/**
+ * Extracts the type of the 'this' parameter of a function type, or 'unknown' if the function type has no 'this' parameter.
+ */
+type ThisParameterType<T> = T extends (this: infer U, ...args: never) => any ? U : unknown;
+```
+
+`ThisParameterType` 는 this를 추론해내는 파라미터이다. 
+즉 위 파라미터로 아래와 같은 타입 추론이 가능해진다.
+
+```tsx
+function bindTest(this: Window | typeof obj) {
+  console.log(this); // window
+}
+
+const obj = { name: "vicky" };
+const b = bindTest.bind(obj);
+b(); // vicky
+
+type T = ThisParameterType<typeof bindTest>; // type T = Window | { name: string; }
+```
+
+`T` 타입은 Window 혹은 { name: string } 값을 가진다. 만약 this가 any라면 `T` 타입은 any로 추론될 것이다.
+
+```tsx
+/**
+ * Removes the 'this' parameter from a function type.
+ */
+type OmitThisParameter<T> = unknown extends ThisParameterType<T> ? T : T extends (...args: infer A) => infer R ? (...args: A) => R : T;
+```
+
+`OmitThisParameter` 는 this 파라미터가 unknown일 때(this 추론이 안될 때) 타이핑을 의미한다.
+
+`unknown extends ThisParameterType<T>` 즉, 타입 추론이 실패했을 때 즉, this가 없을 경우에는 그 타입대로 그대로 가고, 타입 추론이 성공했을 때에는 this를 제외한 남은 매개변수와 리턴값을 그대로 함수로 만들어 반환한다는 의미를 가진다.
+
+```tsx
+const obj = { name: "vicky" };
+function bindTest(this: Window | typeof obj, param: string) {
+  console.log(this); // window
+}
+bindTest.bind(obj); 
+
+type T = ThisParameterType<typeof bindTest>; // type T = Window | { name: string; }
+type NoThis = OmitThisParameter<typeof bindTest>; // type NoThis = (param: string) => void
+```
+
+NoThis는 this만 제외한 나머지를 반환한다.
