@@ -556,4 +556,109 @@ type T = ThisParameterType<typeof bindTest>; // type T = Window | { name: string
 type NoThis = OmitThisParameter<typeof bindTest>; // type NoThis = (param: string) => void
 ```
 
-NoThis는 this만 제외한 나머지를 반환한다.
+NoThis는 this만 제외한 나머지를 반환한다. 이제 bind를 자세히 알아보자
+
+bind는 this를 쓰는 경우와 this를 쓰지 않는 경우가 나눠진다.
+
+```tsx
+const vicky = {
+  name: "vicky",
+  sayHello(this: { name: string }) {
+    console.log(`hi ${this.name}`);
+  },
+};
+
+const sayHello = vicky.sayHello; // const sayHello: (this: { name: string; }) => void
+const sayHi = vicky.sayHello.bind({ name: "wonny" }); // const sayHi: () => void
+sayHi(); // hi wonny
+```
+
+위의 경우 this를 쓰는 경우이다. 초기 sayHello는 `this: { name: string; }` 이란 정보를 가지고 있는데, bind로 새롭게 묶어준 sayHi는 this를 잃어버린 상태로 `() ⇒ void`로 추론된다. 
+이는 bind 함수의 아래 타이핑 코드가 실행된 것이라고 보면 됨
+
+`bind<T>(this: T, thisArg: ThisParameterType<T>): OmitThisParameter<T>;`
+
+- OmitThisParameter로 This를 제외한 원래 함수가 튀어나온다.
+
+```tsx
+function addd(a: number, b: number, c: number, d: number, e: number, f: number) {
+  return a + b + c + d + e + f;
+}
+
+const add1 = addd.bind(null);
+add1(1, 2, 3, 4, 5, 6);
+
+const add2 = addd.bind(null, 1); // 매개변수에 값을 넣어줌, a = 1
+add2(2, 3, 4, 5, 6);
+
+const add3 = addd.bind(null, 1, 2); // a = 1, b = 2
+add3(3, 4, 5, 6);
+
+const add4 = addd.bind(null, 1, 2, 3);
+add4(4, 5, 6);
+
+const add5 = addd.bind(null, 1, 2, 3, 4);
+add5(5, 6);
+```
+
+위 예시는 this를 사용하지 않는 경우이다. bind의 첫번째 인수인 null은 this 값을 의미하며, 그 이후 값부터 a 값에 대입되는 것이다. 위와 같이 처리할 경우 알아서 매개변수 데이터가 추론된다.
+
+![a 값을 전달인자로 먼저 넣어줬기 때문에 매개변수 추론은 b부터 된다.](../img/230103-1.png)
+
+그런데 아래의 경우 에러가 난다.
+
+```tsx
+const add6 = addd.bind(null, 1, 2, 3, 4, 5);
+add6(6); // Error '6' 형식의 인수는 '1 | 2 | 3 | 4 | 5' 형식의 매개 변수에 할당될 수 없습니다.
+```
+
+왜일까? 이는 bind 타입을 보면 이해가 될 것이다. 먼저 add2 bind 경우부터 보자
+
+```tsx
+const add2 = addd.bind(null, 1); // 매개변수에 값을 넣어줌, a = 1
+add2(2, 3, 4, 5, 6);
+```
+
+위 `add2`의 경우 아래의 bind 타이핑이 실행된다고 할 수 있다.
+
+`bind<T, A0, A extends any[], R>(this: (this: T, arg0: A0, ...args: A) => R, thisArg: T, arg0: A0): (...args: A) => R;`
+
+- thisArg=null, arg0은 전달된 1을 의미한다. 그 외의 실행 시 넣는 매개변수는 `…args: A` 에 속함
+
+```tsx
+const add3 = addd.bind(null, 1, 2); // a = 1, b = 2
+add3(3, 4, 5, 6);
+```
+
+비슷하게 위 `add3`은 아래의 bind 타이핑이 실행된다.
+
+`bind<T, A0, A1, A extends any[], R>(this: (this: T, arg0: A0, arg1: A1, ...args: A) => R, thisArg: T, arg0: A0, arg1: A1): (...args: A) => R;`
+
+- thisArg=null, arg0, arg1에 각각 1, 2값이 들어간다. 그 외 실행시 넣는 매개변수가 `…args: A` 에 속한다.
+
+```tsx
+const add4 = addd.bind(null, 1, 2, 3);
+add4(4, 5, 6);
+
+// bind<T, A0, A1, A2, A extends any[], R>(this: (this: T, arg0: A0, arg1: A1, arg2: A2, ...args: A) => R, thisArg: T, arg0: A0, arg1: A1, arg2: A2): (...args: A) => R;
+
+const add5 = addd.bind(null, 1, 2, 3, 4);
+add5(5, 6);
+
+// bind<T, A0, A1, A2, A3, A extends any[], R>(this: (this: T, arg0: A0, arg1: A1, arg2: A2, arg3: A3, ...args: A) => R, thisArg: T, arg0: A0, arg1: A1, arg2: A2, arg3: A3): (...args: A) => R;
+```
+
+나머지 `add4`, `add5`도 설정된 타이핑으로 실행된다. 
+하지만 전달인자가 4개가 넘어가는 시점에는 아래의 타이핑 코드가 실행된다.
+
+```tsx
+bind<T, AX, R>(this: (this: T, ...args: AX[]) => R, thisArg: T, ...args: AX[]): (...args: AX[]) => R;
+```
+
+4개 이후의 전달인자는 추론하지 않는 코드인 것이다. 
+이 때문에 `addd.bind(null, 1, 2, 3, 4, 5)(6);`에서 타입 에러가 발생한다.
+
+타입스크립트는 여전히 보완하고 있으며 아직 완성형이라고 할 수 없다. 
+즉, 위와 같은 케이스처럼 표현력의 한계가 존재하는 것이다. (매개변수에 따른 동적 추론)
+
+정리하자면, bind 함수의 경우 타입스크립트에서는 4개까지만 타입 추론을 지원하고 그 이후부터는 타입 추론을 지원하지 않는다는 것을 알 수 있다. 그럴 일이 빈번하지는 않겠지만 만약 발생한다면, 이는 다른 방법으로 개선해야할 수도 있다.

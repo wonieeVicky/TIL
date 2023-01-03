@@ -126,7 +126,40 @@ function bindTest(this: Window | typeof obj, param: string) {
 
 const obj = { name: "vicky" };
 const b = bindTest.bind(obj);
-b(); // vicky
+// b(); // vicky
 
 type T = ThisParameterType<typeof bindTest>; // type T = Window | { name: string; }
 type NoThis = OmitThisParameter<typeof bindTest>; // type NoThis = (param: string) => void
+
+const vicky = {
+  name: "vicky",
+  sayHello(this: { name: string }) {
+    console.log(`hi ${this.name}`);
+  },
+};
+
+const sayHello = vicky.sayHello; // const sayHello: (this: { name: string; }) => void
+const sayHi = vicky.sayHello.bind({ name: "wonny" }); // const sayHi: () => void
+sayHi(); // hi wonny
+
+function addd(a: number, b: number, c: number, d: number, e: number, f: number) {
+  return a + b + c + d + e + f;
+}
+
+const add1 = addd.bind(null);
+add1(1, 2, 3, 4, 5, 6);
+
+const add2 = addd.bind(null, 1); // 매개변수에 값을 넣어줌, a = 1
+add2(2, 3, 4, 5, 6);
+
+const add3 = addd.bind(null, 1, 2); // a = 1, b = 2
+add3(3, 4, 5, 6);
+
+const add4 = addd.bind(null, 1, 2, 3);
+add4(4, 5, 6);
+
+const add5 = addd.bind(null, 1, 2, 3, 4);
+add5(5, 6);
+
+const add6 = addd.bind(null, 1, 2, 3, 4, 5);
+add6(6);
