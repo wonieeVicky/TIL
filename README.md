@@ -61,7 +61,11 @@
     - [타입스크립트를 배워야 하는 이유](Typescript/4-1-ts-all-in-one-intro.md)
     - [기본 문법 리마인드](Typescript/4-2-ts-all-in-one-basic.md)
     - [lib.es5.d.ts 분석](Typescript/4-3-ts-all-in-one-lib-es5-d-ts.md)
-    - [Utility Types 분석](Typescript/4-4-ts-all-in-one-utility-types.md)
+    - [Utility 타입 분석](Typescript/4-4-ts-all-in-one-utility-types.md)
+
+5.  타입스크립트 올인원 - 실전 분석편
+
+    - [제이쿼리 타입 분석](Typescript/4-5-ts-all-in-one-jquery-types.md)
 
 ## JavaScript
 
