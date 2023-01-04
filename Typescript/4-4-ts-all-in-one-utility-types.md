@@ -517,7 +517,7 @@ bind 타입을 이해하기 위해서는 ThisParameterType, OmitParameterType을
 type ThisParameterType<T> = T extends (this: infer U, ...args: never) => any ? U : unknown;
 ```
 
-`ThisParameterType` 는 this를 추론해내는 파라미터이다. 
+`ThisParameterType` 는 this를 추론해내는 파라미터이다.
 즉 위 파라미터로 아래와 같은 타입 추론이 가능해진다.
 
 ```tsx
@@ -538,7 +538,11 @@ type T = ThisParameterType<typeof bindTest>; // type T = Window | { name: string
 /**
  * Removes the 'this' parameter from a function type.
  */
-type OmitThisParameter<T> = unknown extends ThisParameterType<T> ? T : T extends (...args: infer A) => infer R ? (...args: A) => R : T;
+type OmitThisParameter<T> = unknown extends ThisParameterType<T>
+  ? T
+  : T extends (...args: infer A) => infer R
+  ? (...args: A) => R
+  : T;
 ```
 
 `OmitThisParameter` 는 this 파라미터가 unknown일 때(this 추론이 안될 때) 타이핑을 의미한다.
@@ -550,7 +554,7 @@ const obj = { name: "vicky" };
 function bindTest(this: Window | typeof obj, param: string) {
   console.log(this); // window
 }
-bindTest.bind(obj); 
+bindTest.bind(obj);
 
 type T = ThisParameterType<typeof bindTest>; // type T = Window | { name: string; }
 type NoThis = OmitThisParameter<typeof bindTest>; // type NoThis = (param: string) => void
@@ -573,7 +577,7 @@ const sayHi = vicky.sayHello.bind({ name: "wonny" }); // const sayHi: () => void
 sayHi(); // hi wonny
 ```
 
-위의 경우 this를 쓰는 경우이다. 초기 sayHello는 `this: { name: string; }` 이란 정보를 가지고 있는데, bind로 새롭게 묶어준 sayHi는 this를 잃어버린 상태로 `() ⇒ void`로 추론된다. 
+위의 경우 this를 쓰는 경우이다. 초기 sayHello는 `this: { name: string; }` 이란 정보를 가지고 있는데, bind로 새롭게 묶어준 sayHi는 this를 잃어버린 상태로 `() ⇒ void`로 추론된다.
 이는 bind 함수의 아래 타이핑 코드가 실행된 것이라고 보면 됨
 
 `bind<T>(this: T, thisArg: ThisParameterType<T>): OmitThisParameter<T>;`
@@ -648,17 +652,110 @@ add5(5, 6);
 // bind<T, A0, A1, A2, A3, A extends any[], R>(this: (this: T, arg0: A0, arg1: A1, arg2: A2, arg3: A3, ...args: A) => R, thisArg: T, arg0: A0, arg1: A1, arg2: A2, arg3: A3): (...args: A) => R;
 ```
 
-나머지 `add4`, `add5`도 설정된 타이핑으로 실행된다. 
+나머지 `add4`, `add5`도 설정된 타이핑으로 실행된다.
 하지만 전달인자가 4개가 넘어가는 시점에는 아래의 타이핑 코드가 실행된다.
 
 ```tsx
 bind<T, AX, R>(this: (this: T, ...args: AX[]) => R, thisArg: T, ...args: AX[]): (...args: AX[]) => R;
 ```
 
-4개 이후의 전달인자는 추론하지 않는 코드인 것이다. 
+4개 이후의 전달인자는 추론하지 않는 코드인 것이다.
 이 때문에 `addd.bind(null, 1, 2, 3, 4, 5)(6);`에서 타입 에러가 발생한다.
 
-타입스크립트는 여전히 보완하고 있으며 아직 완성형이라고 할 수 없다. 
+타입스크립트는 여전히 보완하고 있으며 아직 완성형이라고 할 수 없다.
 즉, 위와 같은 케이스처럼 표현력의 한계가 존재하는 것이다. (매개변수에 따른 동적 추론)
 
 정리하자면, bind 함수의 경우 타입스크립트에서는 4개까지만 타입 추론을 지원하고 그 이후부터는 타입 추론을 지원하지 않는다는 것을 알 수 있다. 그럴 일이 빈번하지는 않겠지만 만약 발생한다면, 이는 다른 방법으로 개선해야할 수도 있다.
+
+### 완전 복잡한 타입 분석하기(flat 편)
+
+지난 시간에 bind 함수를 통해 typescript의 한계점에 대해 알 수 있었다.
+이번에는 flat 함수에 대해서 알아보자. flat 함수는 배열의 depth를 낮춰준다.
+
+```tsx
+// const flatTest1: (number | number[])[] 로 추론
+const flatTest1 = [1, 2, 3, [1, 2], [[1], [2]]].flat(); // [1, 2, 3, 1, 2, [1], [2]]
+
+// const flatTest2: number[] 로 추론
+const flatTest2 = [1, 2, 3, [1, 2], [[1], [2]]].flat(2); // [1, 2, 3, 1, 2, 1, 2]
+
+// const flatTest3: number[] 로 추론
+const flatTest3 = [1, 2, 3, [1, 2]].flat(); // [1, 2, 3, 1, 2]
+```
+
+위와 같이 typescript에서 이미 반환될 값에 대한 추론을 적절하게 해주고 있는 것을 볼 수 있다.
+어떻게 타입스크립트는 해당 값에 대한 추론을 할 수 있는걸까? 해당 타입은 2019.array.d.ts에 있다.
+
+```tsx
+interface Array<T> {
+  /**
+   * Returns a new array with all sub-array elements concatenated into it recursively up to the
+   * specified depth.
+   *
+   * @param depth The maximum recursion depth
+   */
+  flat<A, D extends number = 1>(this: A, depth?: D): FlatArray<A, D>[];
+}
+```
+
+실제 flat은 위와 같은데 depth는 한번에 줄여줄 단계를 설정하는 것으로 위 flatTest2를 보면 그 역할을 이해할 수 있다. 그렇다면 위 타이핑에서 가장 핵심은 FlatArray일 것이다! 한번 살펴보자
+
+```tsx
+type FlatArray<Arr, Depth extends number> = {
+  done: Arr;
+  recur: Arr extends ReadonlyArray<infer InnerArr>
+    ? FlatArray<InnerArr, [-1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20][Depth]>
+    : Arr;
+}[Depth extends -1 ? "done" : "recur"];
+```
+
+위 코드는 객체 타이핑에 접근자를 직접넣어서 “done” 혹은 “recur” 타입을 가져오는 구조이다.
+`({ "done": 1, "recur": 2 })['done'] = 1`, `({ "done": 1, "recur": 2 })['recur'] = 2` 와 같은 구조임
+
+즉, Depth가 -1이면 done을 가져오고 그게 아니면 recur을 가져오는 문법인 것이다.
+
+```tsx
+type A = {
+  name: string;
+  age: number;
+};
+
+type B = A["age"]; // number
+type C = A[1 extends number ? "age" : "name"]; // number
+type D = A["1" extends number ? "age" : "name"]; // string
+```
+
+위와 같다. done은 다 풀었다는 의미이고, recur은 재귀적으로 depth를 하나씩 낮추는 것을 의미한다.
+그렇다면 핵심은 recur 영역의 타이핑을 봐야할 것이다.
+
+실제 flat은 depth를 하나씩 낮춰주므로 즉 마이너스(-)에 대한 타이핑을 해야하는데, type 에서 마이너스 역할을 하는 메서드가 없다. 따라서 이를 아래와 같이 표현해주고 있다.
+
+```tsx
+type FlatArray<Arr, Depth extends number> = {
+		// ..
+    "recur": Arr extends ReadonlyArray<infer InnerArr>
+        ? FlatArray<InnerArr, [-1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20][Depth]>
+        : Arr
+}[..];
+```
+
+즉 이 마이너스를 `[-1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20][Depth]` 코드로 처리한다. 만약 depth가 24, 25까지 간다면 해당 조건에 대한 타입 추론이 불가할 것이다. 물론 22depth 까지 고려한 것은 그 이상의 경우가 거의 없다고 볼 수 있겠지만 완벽한 타입추론이 불가하다는 한계점을 보여주는 다른 사례라고 할 수 있다.
+
+`ReadonlyArray<infer InnerArr>`의 경우 배열의 요소를 추론하라는 코드라고 할 수 있다.
+ReadonlyArray가 `readonly [n: number]: T;` 로 타이핑이 되고 있기 때문이다.
+
+```tsx
+const a = [1, 2, 3, [1, 2], [[1], [2]]].flat(2);
+
+// 1. FlatArray<(number[] | number[][] | number[][][]), 2>[]
+// 2. Depth === 2 이므로 recur을 계승
+// 3. FlatArray<(number | number[] | number[][]), 1>[]
+// 4. Depth === 1 이므로 recur을 계승
+// 5. FlatArray<(number | number[]), 0>[]
+// 6. Depth === 0 이므로 recur을 계승
+// 7. FlatArray<(number), -1>[]
+// 결과: number[]
+```
+
+위 타이핑을 직접 만들어내는 것은 쉽지 않다.
+구현에 목적을 두기보다는 이해하는 것에 초점을 맞추는 것이 바람직함
