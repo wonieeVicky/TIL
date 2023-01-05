@@ -1,4 +1,6 @@
-﻿$("p").removeClass("myClass noClass").addClass("yourClass");
+﻿const element = $("p");
+
+$("p").removeClass("myClass noClass").addClass("yourClass");
 
 $(["p", "t"]).text("hello");
 const tag = $("ul li").addClass(function (index) {
