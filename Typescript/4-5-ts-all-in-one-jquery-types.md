@@ -208,3 +208,140 @@ declare namespace Vicky {
 ![](../img/230105-3.png)
 
 즉 위 내용을 통해 `$(”p”)`가 `JQuery<HTMLElement>`로 추론된다는 것을 이해할 수 있다.
+
+### 메서드와 this 타이핑
+
+이번에는 removeClass에 대한 타이핑 코드를 보자
+
+```tsx
+// removeClass(className_function?: JQuery.TypeOrArray<string> | ((this: TElement, index: number, className: string) => string)): this;
+$("p").removeClass("myClass noClass").addClass("yourClass");
+```
+
+위 내용에 들어가는 인자값에 대해 들여다보면 먼저 `JQuery.TypeOrArray<string>`이다. 
+
+```tsx
+declare namespace JQuery {
+    type TypeOrArray<T> = T | T[];
+		// ..
+}
+```
+
+위 코드로 해석했을 때 T에 들어오는 값은 string이므로 `TypeOrArray<string>`은 string 혹은 string[] 타입을 의미한다. 이를 위 타이핑에 반영해본다.
+
+```tsx
+// removeClass(className_function?: string | string[] | ((this: TElement, index: number, className: string) => string)): this;
+$("p").removeClass("myClass noClass").addClass("yourClass";; // ok
+$("p").removeClass(["myClass", "noClass"]).addClass("yourClass"); // ok
+```
+
+이러한 타이핑으로 인해 removeClass에 들어가는 값이 문자열로 구성된 배열도 가능하다는 것을 알 수 있다.
+다음 타입은 `(this: TElement, index: number, className: string) => string)` 이다. `removeClass` 안에 함수 형태도 들어갈 수 있다는 것을 알 수 있음
+
+```tsx
+// $("p").removeClass((this: TElement, index: number, className: string) => string);
+$("p").removeClass((index: number, className: string) => className); // Ok! this 어디감?
+```
+
+실제 this, index, className이 순차적으로 들어간다고 생각하겠지만 this는 빼고 생각해야 한다. this는 내부 안에서 바깥에 상속되는 this 값을 추론할 수 있도록 해주는 역할을 담당하기 때문이다.
+
+예를 들어보자
+
+```tsx
+document.querySelector('h1').addEventListener(() => {
+	console.log(this); // this: HTMLHeadingElement로 추론됨
+});
+```
+
+위 코드가 있을 때 이벤트 리스너 내부의 this는 타입스크립트가 HTMLHeadingElement로 정확하게 추론한다. 
+어떻게 타입스크립트가 이를 추론할 수 있을까?
+
+```tsx
+// addEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLHeadingElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+```
+
+`addEventListener`의 첫 번째 인자에 `this`로 `HTMLHeadingElement`가 타이핑 되어있기 때문이다.
+즉, 타입스크립트에서 함수의 첫 번째 매개변수로 this가 적혀있다는 것은 실제 매개변수에 대한 타이핑이 아닌 this 존재에 따른 타이핑을 넣어준 것이며, 그 다음 index 값부터 매개변수로 인식해야 한다.
+
+```tsx
+const tag = $("ul li").removeClass(function (index) {
+  return "item-" + index; // ok
+});
+```
+
+때문에 위 removeClass의 첫 번째 인자에 index가 들어와 정상적으로 동작하게 된다.
+즉 이러한 것들로 인해 removeClass는 아래와 같이 작성할 수도 있다는 것을 알 수 있었다.
+
+```tsx
+$("p")
+	.removeClass(( index: number, className: string ) => 'my Class noClass')
+	.addClass("yourClass"); // ok
+```
+
+다음으로 removeClass 이후 addClass로 어떻게 메서드 체이닝이 가능한 것일까?
+이는 removeClass의 반환값이 this이기 때문이다. 
+
+```tsx
+$("p").removeClass("myClass noClass"); // $("p")로 반환
+$("p").addClass("yourClass"); // $("p")로 반환
+```
+
+때문에 메서드 체이닝이 이어질 수 있음. 다음으로 아래와 같은 형태의 코드도 보자
+
+```tsx
+$(["p", "t"]).text("hello");
+// <T extends JQuery.PlainObject>(object: T): JQuery<T>;
+```
+
+제이쿼리 내 배열 값은 JQuery.PlainObject로 추론된다. PlainObject는 아래와 같다.
+
+```tsx
+interface PlainObject<T = any> {
+    [key: string]: T;
+}
+```
+
+이는 즉 PlainObject는 어떤 타입이든 다 받아준다는 것을 의미한다. 또한 text 메서드는 아래와 같음
+
+```tsx
+text(text_function: 
+	string | number | boolean | ((this: TElement, index: number, text: string) => string | number | boolean)
+): this;
+```
+
+text 메서드에는 string, number, boolean, 그리고 string, number, boolean 값이 반환되는 함수가 들어갈 수 있음을 의미하므로 즉 아래의 코드는 성립하는 코드가 된다.
+
+```tsx
+$(["p", "t"]).text(function(){
+	console.log(this);
+	return true; // ok
+});
+```
+
+아래 코드도 보자
+
+```tsx
+$(tag).html(function (i: number) {
+  console.log(this);
+  return $(this).data("name") + "입니다";
+});
+```
+
+html 메서드 타입은 아래와 같다.
+
+```tsx
+html(htmlString_function: JQuery.htmlString |
+                          JQuery.Node |
+                          ((this: TElement, index: number, oldhtml: JQuery.htmlString) => JQuery.htmlString | JQuery.Node)): this;
+```
+
+위와 같은 타이핑으로 노드 엘리먼트, htmlString, 이를 반환해주는 함수형태가 매개변수로 들어올 수 있다는 점이며 이것이 this를 그대로 반환한다는 것을 알 수 있다.
+
+```tsx
+const div = document.createElement("div");
+// const div = document.createDocumentFragment("div"); 도 가능
+div.innerHTML = "hello";
+$(tag).html(div); // ok
+```
+
+즉 위와 같은 코드도 성립하게 된다.
