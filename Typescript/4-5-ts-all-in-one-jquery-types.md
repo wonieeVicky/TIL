@@ -369,3 +369,22 @@ $tag.text(function (index) {
 위처럼 다양한 경우에 대한 코드를 만들어주고 해당 타입을 vQuery로 준 뒤 기존 jQuery 타입이 적용되지 않도록 as unknown as로 처리해준 뒤 작업하면 된다.
 
 하나씩 타입을 맞춰나가면 비슷한 꼴이 완성되고, 이를 jQuery 원형 타입과 비교하는 과정으로 많이 배울 수 있음
+
+### 매개변수와 인수의 사용법
+
+```tsx
+function add(x: string, y: string): string { retrun x + y }
+add('1', '2'); // Ok
+add('1'); // Error
+```
+
+위와 같은 함수 구조는 정해진 인수가 모두 들어가지 않으면 타입 에러가 발생한다.
+하지만 아래처럼 매개변수에 들어가는 함수의 경우는 조금 다름
+
+```tsx
+$(tag2).html(function (index, oldHtml) {
+  return "<div>vicky</div>"; // Ok, index, oldHtml 을 사용하지 않음
+});
+```
+
+위와 같은 매개변수에 들어가는 함수는 그 내부의 인수를 모두 사용하지 않아도 에러가 발생하지 않는다.
