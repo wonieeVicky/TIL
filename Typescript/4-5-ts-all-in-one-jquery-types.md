@@ -218,12 +218,12 @@ declare namespace Vicky {
 $("p").removeClass("myClass noClass").addClass("yourClass");
 ```
 
-위 내용에 들어가는 인자값에 대해 들여다보면 먼저 `JQuery.TypeOrArray<string>`이다. 
+위 내용에 들어가는 인자값에 대해 들여다보면 먼저 `JQuery.TypeOrArray<string>`이다.
 
 ```tsx
 declare namespace JQuery {
-    type TypeOrArray<T> = T | T[];
-		// ..
+  type TypeOrArray<T> = T | T[];
+  // ..
 }
 ```
 
@@ -248,12 +248,12 @@ $("p").removeClass((index: number, className: string) => className); // Ok! this
 예를 들어보자
 
 ```tsx
-document.querySelector('h1').addEventListener(() => {
-	console.log(this); // this: HTMLHeadingElement로 추론됨
+document.querySelector("h1").addEventListener(() => {
+  console.log(this); // this: HTMLHeadingElement로 추론됨
 });
 ```
 
-위 코드가 있을 때 이벤트 리스너 내부의 this는 타입스크립트가 HTMLHeadingElement로 정확하게 추론한다. 
+위 코드가 있을 때 이벤트 리스너 내부의 this는 타입스크립트가 HTMLHeadingElement로 정확하게 추론한다.
 어떻게 타입스크립트가 이를 추론할 수 있을까?
 
 ```tsx
@@ -274,12 +274,12 @@ const tag = $("ul li").removeClass(function (index) {
 
 ```tsx
 $("p")
-	.removeClass(( index: number, className: string ) => 'my Class noClass')
-	.addClass("yourClass"); // ok
+  .removeClass((index: number, className: string) => "my Class noClass")
+  .addClass("yourClass"); // ok
 ```
 
 다음으로 removeClass 이후 addClass로 어떻게 메서드 체이닝이 가능한 것일까?
-이는 removeClass의 반환값이 this이기 때문이다. 
+이는 removeClass의 반환값이 this이기 때문이다.
 
 ```tsx
 $("p").removeClass("myClass noClass"); // $("p")로 반환
@@ -297,14 +297,14 @@ $(["p", "t"]).text("hello");
 
 ```tsx
 interface PlainObject<T = any> {
-    [key: string]: T;
+  [key: string]: T;
 }
 ```
 
 이는 즉 PlainObject는 어떤 타입이든 다 받아준다는 것을 의미한다. 또한 text 메서드는 아래와 같음
 
 ```tsx
-text(text_function: 
+text(text_function:
 	string | number | boolean | ((this: TElement, index: number, text: string) => string | number | boolean)
 ): this;
 ```
@@ -312,9 +312,9 @@ text(text_function:
 text 메서드에는 string, number, boolean, 그리고 string, number, boolean 값이 반환되는 함수가 들어갈 수 있음을 의미하므로 즉 아래의 코드는 성립하는 코드가 된다.
 
 ```tsx
-$(["p", "t"]).text(function(){
-	console.log(this);
-	return true; // ok
+$(["p", "t"]).text(function () {
+  console.log(this);
+  return true; // ok
 });
 ```
 
@@ -345,3 +345,27 @@ $(tag).html(div); // ok
 ```
 
 즉 위와 같은 코드도 성립하게 된다.
+
+### jQuery 타입 직접 만들어보기
+
+이제 대략적인 jQuery 타이핑 흐름을 알아봤다면 실제 직접 만들어본다. `vQuery`
+
+```tsx
+interface vQuery<T> {
+  text(param?: string | number | ((this: T, index: number) => string | number | boolean)): this;
+  html(param: string | Document | DocumentFragment): void;
+}
+
+const $tag: vQuery<HTMLElement> = $(["p", "t"]) as unknown as vQuery<HTMLElement>;
+$tag.text("123");
+$tag.text(123);
+$tag.text().html(document);
+$tag.text(function (index) {
+  console.log(this, index);
+  return true; // ok
+});
+```
+
+위처럼 다양한 경우에 대한 코드를 만들어주고 해당 타입을 vQuery로 준 뒤 기존 jQuery 타입이 적용되지 않도록 as unknown as로 처리해준 뒤 작업하면 된다.
+
+하나씩 타입을 맞춰나가면 비슷한 꼴이 완성되고, 이를 jQuery 원형 타입과 비교하는 과정으로 많이 배울 수 있음
