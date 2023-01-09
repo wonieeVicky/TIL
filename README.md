@@ -65,7 +65,8 @@
 
 5.  타입스크립트 올인원 - 실전 분석편
 
-    - [제이쿼리 타입 분석](Typescript/4-5-ts-all-in-one-jquery-types.md)
+    - [jQuery 타입 분석](Typescript/4-5-ts-all-in-one-jquery-types.md)
+    - [Axios 타입 분석](Typescript/4-6-ts-all-in-one-axios-types.md)
 
 ## JavaScript
 
