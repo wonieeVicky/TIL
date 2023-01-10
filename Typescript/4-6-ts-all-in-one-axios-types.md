@@ -88,3 +88,73 @@ axios.get(); // axios의 객체로 생성 가능
 ```
 
 이처럼 다양한 사용방법이 있을 경우 위와 같은 타입 구조로 표현해뒀다는 것을 배워볼 수 있다.
+
+### ts-node 사용하기
+
+이제 get 메서드의 타입에 대해 알아보자
+
+```tsx
+export class Axios {
+  // ..
+  get<T = any, R = AxiosResponse<T>, D = any>(url: string, config?: AxiosRequestConfig<D>): Promise<R>;
+}
+```
+
+위와 같은 구조이다. AxiosResponse에 대한 것을 확인해보면 아래와 같음
+
+```tsx
+export interface AxiosResponse<T = any, D = any> {
+  data: T;
+  status: number;
+  statusText: string;
+  headers: RawAxiosResponseHeaders | AxiosResponseHeaders;
+  config: AxiosRequestConfig<D>;
+  request?: any;
+}
+```
+
+그렇다면 아래 코드에서 실제 response가 어떻게 담겨오는지 확인해보자
+
+```tsx
+import axios from "axios";
+
+(async () => {
+  try {
+    const response = await axios.get("https://jsonplaceholder.typicode.com/post/1");
+    console.log(response);
+  } catch (err) {}
+})();
+```
+
+위와 같이 작성 후 아래 명령어 실행
+
+```bash
+> npx tsc axios.ts
+> node axios.js
+```
+
+위 명령어 치는 과정이 귀찮으면 아래와 ts-node를 사용한다.
+
+```bash
+> npm i ts-node
+> ts-node axios.ts
+
+{
+  status: 200,
+  statusText: 'OK',
+  headers: AxiosHeaders {
+    // ..
+  },
+  data: {
+    userId: 1,
+    id: 1,
+    title: 'sunt aut facere repellat provident occaecati excepturi optio reprehenderit',
+    body: 'quia et suscipit\n' +
+      'suscipit recusandae consequuntur expedita et cum\n' +
+      'reprehenderit molestiae ut ut quas totam\n' +
+      'nostrum rerum est autem sunt rem eveniet architecto'
+  }
+}
+```
+
+위처럼 실행시키면 한번에 axios 파일이 js파일로 번들링되어 node로 돌아가게 된다.
