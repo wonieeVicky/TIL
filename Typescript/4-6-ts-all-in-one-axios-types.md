@@ -243,3 +243,147 @@ interface Data {
 
 위처럼 post 메서드에 대한 타이핑 코드를 보고 적절한 위치에 적절한 타입을 추가하면 됨.
 전달되는 데이터(D)의 경우 이후 사용되는 바가 없어 any로 처리되어도 무방하나 모든 타입이 추론되길 원하면 타이핑을 해주면 된다.
+
+### AxiosError와 unknown error 대처법
+
+서버에 요청을 보낼 때 항상 에러가 발생할 수 있다. 서버 혹은 브라우저의 문제가 다양하게 발생함
+이러한 상황을 고려해야 하는데, 이때 axios.error는 어떻게 타이핑되어있는지 확인하자.
+
+```tsx
+export class AxiosError<T = unknown, D = any> extends Error {
+  constructor(
+    message?: string,
+    code?: string,
+    config?: AxiosRequestConfig<D>,
+    request?: any,
+    response?: AxiosResponse<T, D>
+  );
+
+  config?: AxiosRequestConfig<D>;
+  code?: string;
+  request?: any;
+  response?: AxiosResponse<T, D>;
+  isAxiosError: boolean;
+  status?: number;
+  toJSON: () => object;
+  cause?: Error;
+  static from<T = unknown, D = any>(
+    error: Error | unknown,
+    code?: string,
+    config?: AxiosRequestConfig<D>,
+    request?: any,
+    response?: AxiosResponse<T, D>,
+    customProps?: object
+  ): AxiosError<T, D>;
+  static readonly ERR_FR_TOO_MANY_REDIRECTS = "ERR_FR_TOO_MANY_REDIRECTS";
+  static readonly ERR_BAD_OPTION_VALUE = "ERR_BAD_OPTION_VALUE";
+  static readonly ERR_BAD_OPTION = "ERR_BAD_OPTION";
+  static readonly ERR_NETWORK = "ERR_NETWORK";
+  static readonly ERR_DEPRECATED = "ERR_DEPRECATED";
+  static readonly ERR_BAD_RESPONSE = "ERR_BAD_RESPONSE";
+  static readonly ERR_BAD_REQUEST = "ERR_BAD_REQUEST";
+  static readonly ERR_NOT_SUPPORT = "ERR_NOT_SUPPORT";
+  static readonly ERR_INVALID_URL = "ERR_INVALID_URL";
+  static readonly ERR_CANCELED = "ERR_CANCELED";
+  static readonly ECONNABORTED = "ECONNABORTED";
+  static readonly ETIMEDOUT = "ETIMEDOUT";
+}
+```
+
+위와 같은 데이터들이 AxiosError라는 클래스 타이핑으로 선언됨. 실제 error를 핸들링하는 곳을 보자
+
+```tsx
+(async () => {
+  try {
+    // axios codes..
+  } catch (err) {
+    console.error(err.response.data); // Error, 'err'은(는) 'unknown' 형식입니다.
+  }
+})();
+```
+
+위와 같이 err.response.data를 잡아보면 err가 unknown이라는 에러가 발생한다.
+try 구조 안에 axios 가 아닌 다른 문법 에러가 발생할 수도 있기 때문에 unknown임(실행해야만 알 수 있다.)
+
+따라서 위 에러는 아래와 같이 타입을 추가해서 처리할 수 있다.
+
+```tsx
+import axios, { AxiosError } from "axios";
+
+(async () => {
+  try {
+    // axios codes..
+  } catch (err) {
+    const errorResponse = (err as AxiosError).response;
+    console.log(errorResponse?.data); // Ok
+  }
+})();
+```
+
+하지만 위 방식도 100% 완전한 코드는 아니다. AxiosError가 아닐 경우에 대한 고려가 되어있지 않음
+따라서 아래와 같이 바꿔본다.
+
+```tsx
+import axios, { AxiosError } from "axios";
+
+(async () => {
+  try {
+    // axios codes..
+  } catch (err) {
+    // AxiosError를 타입가드로 사용하기 위해 클래스로 만들어진 것으로 보임
+    if (err instanceof AxiosError) {
+      // 커스텀 타입 가드
+      err.response?.data; // (property) AxiosResponse<any, any>.data: any
+    }
+  }
+})();
+```
+
+AxiosError의 클래스 방식으로 타입을 제공하므로 위와 같이 `instanceof`로 axios 에러만 골라낼 수 있다.
+뿐만 아니라 axiosInstance를 보다보면 더 괜찮은 방법이 제공되는 것을 확인할 수 있다.
+
+```tsx
+export function isAxiosError<T = any, D = any>(payload: any): payload is AxiosError<T, D>;
+
+export interface AxiosStatic extends AxiosInstance {
+  create(config?: CreateAxiosDefaults): AxiosInstance;
+  Cancel: CancelStatic;
+  CancelToken: CancelTokenStatic;
+  Axios: typeof Axios;
+  AxiosError: typeof AxiosError;
+  HttpStatusCode: typeof HttpStatusCode;
+  readonly VERSION: string;
+  isCancel: typeof isCancel;
+  all: typeof all;
+  spread: typeof spread;
+  isAxiosError: typeof isAxiosError; // 여기에 이런게 있네
+  toFormData: typeof toFormData;
+  formToJSON: typeof formToJSON;
+  CanceledError: typeof CanceledError;
+  AxiosHeaders: typeof AxiosHeaders;
+}
+
+declare const axios: AxiosStatic;
+```
+
+즉 위 isAxiosError를 통해 아래와 같이 쓸 수도 있다.
+
+```tsx
+import axios, { AxiosError } from "axios";
+
+(async () => {
+  try {
+    // axios codes..
+  } catch (err) {
+    if (axios.isAxiosError(err)) {
+      err.response?.data; // (property) AxiosResponse<any, any>.data: any
+
+      // { data: { result: 'Server Error' } }
+      // 만약 예상치 못한 데이터로 인해 타입 에러가 발생하면 아래와 같이 처리한다.
+      (err.response as AxiosResponse<{ result: string }>)?.data.result;
+    }
+  }
+})();
+```
+
+위와 같이 반환 데이터에 대한 타이핑을 제네릭으로 추가해줄 수 있다. (하지만 최대한 as를 쓰지 않도록 한다.)
