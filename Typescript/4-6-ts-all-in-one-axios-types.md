@@ -88,3 +88,158 @@ axios.get(); // axios의 객체로 생성 가능
 ```
 
 이처럼 다양한 사용방법이 있을 경우 위와 같은 타입 구조로 표현해뒀다는 것을 배워볼 수 있다.
+
+### ts-node 사용하기
+
+이제 get 메서드의 타입에 대해 알아보자
+
+```tsx
+export class Axios {
+  // ..
+  get<T = any, R = AxiosResponse<T>, D = any>(url: string, config?: AxiosRequestConfig<D>): Promise<R>;
+}
+```
+
+위와 같은 구조이다. AxiosResponse에 대한 것을 확인해보면 아래와 같음
+
+```tsx
+export interface AxiosResponse<T = any, D = any> {
+  data: T;
+  status: number;
+  statusText: string;
+  headers: RawAxiosResponseHeaders | AxiosResponseHeaders;
+  config: AxiosRequestConfig<D>;
+  request?: any;
+}
+```
+
+그렇다면 아래 코드에서 실제 response가 어떻게 담겨오는지 확인해보자
+
+```tsx
+import axios from "axios";
+
+(async () => {
+  try {
+    const response = await axios.get("https://jsonplaceholder.typicode.com/post/1");
+    console.log(response);
+  } catch (err) {}
+})();
+```
+
+위와 같이 작성 후 아래 명령어 실행
+
+```bash
+> npx tsc axios.ts
+> node axios.js
+```
+
+위 명령어 치는 과정이 귀찮으면 아래와 ts-node를 사용한다.
+
+```bash
+> npm i ts-node
+> ts-node axios.ts
+
+{
+  status: 200,
+  statusText: 'OK',
+  headers: AxiosHeaders {
+    // ..
+  },
+  data: {
+    userId: 1,
+    id: 1,
+    title: 'sunt aut facere repellat provident occaecati excepturi optio reprehenderit',
+    body: 'quia et suscipit\n' +
+      'suscipit recusandae consequuntur expedita et cum\n' +
+      'reprehenderit molestiae ut ut quas totam\n' +
+      'nostrum rerum est autem sunt rem eveniet architecto'
+  }
+}
+```
+
+위처럼 실행시키면 한번에 axios 파일이 js파일로 번들링되어 node로 돌아가게 된다.
+
+### 제네릭을 활용한 Response 타이핑
+
+```tsx
+(async () => {
+  try {
+    const response = await axios.get("https://jsonplaceholder.typicode.com/posts/1");
+    console.log(response.data); // AxiosResponse<any, any>.data: any
+    console.log(response.data.userId); // any
+    console.log(response.data.id); // any
+    console.log(response.data.title); // any
+    console.log(response.data.body); // any
+  } catch (err) {}
+})();
+```
+
+위 구조에서 response.data는 any 타입이므로 하위 userId, id, title, body 등의 값들도 모두 any로 추론되어 에러가 발생하지 않음. 에러가 발생하지 않으면 끝이 아니다. 현재는 애니스크립트. 이를 타입스크립트로 만들어야 한다. 어떻게 만들 수 있을까?
+
+```tsx
+get<T = any, R = AxiosResponse<T>, D = any>(url: string, config?: AxiosRequestConfig<D>): Promise<R>;
+```
+
+위 axios.get 메서드에서 우리는 `AxiosResponse<T>`를 채워줘야한다. T는 get의 첫 번째 제네릭으로 들어가므로 올바른 위치에 타입을 추가해준다. (현재 T의 기본값이 any 이므로 하위 모든 속성이 any로 추론됨)
+
+```tsx
+import axios, { AxiosResponse } from "axios";
+
+// type Post = { userId: number; id: number; title: string; body: string };
+interface Post {
+  userId: number;
+  id: number;
+  title: string;
+  body: string;
+}
+
+(async () => {
+  try {
+    const response = await axios.get<Post, AxiosResponse<Post>>("https://jsonplaceholder.typicode.com/posts/1");
+    console.log(response.data);
+    console.log(response.data.userId); // number
+    console.log(response.data.id); // number
+    console.log(response.data.title); // string
+    console.log(response.data.body); // string
+  } catch (err) {}
+})();
+```
+
+위와 같이 타입을 제네릭으로 적용해주면 적절한 데이터가 내려오게 됨. 이번엔 post를 보자
+
+```tsx
+import axios, { AxiosResponse } from "axios";
+
+interface Created {}
+interface Data {
+  title: string;
+  body: string;
+  userId: number;
+}
+
+(async () => {
+  try {
+    // post<T = any, R = AxiosResponse<T>, D = any>(url: string, data?: D, config?: AxiosRequestConfig<D>): Promise<R>;
+
+    // 방법 1
+    await axios.post<Created, AxiosResponse<Created>, Data>("https://jsonplaceholder.typicode.com/posts", {
+      title: "foo",
+      body: "bar",
+      userId: 1,
+    });
+    // 방법 2
+    await axios<Created, AxiosResponse<Created>, Data>({
+      method: "post",
+      url: "https://jsonplaceholder.typicode.com/posts",
+      data: {
+        title: "foo",
+        body: "bar",
+        userId: 1,
+      },
+    });
+  } catch (err) {}
+})();
+```
+
+위처럼 post 메서드에 대한 타이핑 코드를 보고 적절한 위치에 적절한 타입을 추가하면 됨.
+전달되는 데이터(D)의 경우 이후 사용되는 바가 없어 any로 처리되어도 무방하나 모든 타입이 추론되길 원하면 타이핑을 해주면 된다.
