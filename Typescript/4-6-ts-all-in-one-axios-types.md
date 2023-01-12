@@ -387,3 +387,73 @@ import axios, { AxiosError } from "axios";
 ```
 
 위와 같이 반환 데이터에 대한 타이핑을 제네릭으로 추가해줄 수 있다. (하지만 최대한 as를 쓰지 않도록 한다.)
+
+### Axios 타입 직접 만들기
+
+이제 직접 Axios 타입을 만들어보자. 시작은 아래처럼 하면 됨
+
+```tsx
+import { AxiosError, AxiosResponse } from "axios";
+
+interface A {
+  // 여기서부터 시작!
+}
+
+const a: A = axios;
+
+// 하위 모든 axios 메서드를 a로 변경
+(async () => {
+  try {
+    // get
+    await a.get<Post, AxiosResponse<Post>>("https://jsonplaceholder.typicode.com/posts/1");
+    // post
+    await a.post<Created, AxiosResponse<Created>, Data>("https://jsonplaceholder.typicode.com/posts", {
+      title: "foo",
+      body: "bar",
+      userId: 1,
+    });
+    // another case post
+    await a<Created, AxiosResponse<Created>, Data>({
+      method: "post",
+      url: "https://jsonplaceholder.typicode.com/posts",
+      data: {
+        title: "foo",
+        body: "bar",
+        userId: 1,
+      },
+    });
+  } catch (err) {
+    if (a.isAxiosError(err)) {
+      console.log((err.response as AxiosResponse<{ result: string }>)?.data.result);
+    }
+  }
+})();
+```
+
+아래 케이스에 대한 모든 타입 정의를 직접해본다.
+
+```tsx
+import { AxiosError, AxiosResponse } from "axios";
+
+interface Config<D = any> {
+  method?: "get" | "post" | "put" | "delete" | "head" | "options" | "patch";
+  url?: string;
+  data?: D;
+}
+
+interface A {
+  // 한번 선택값이 나오면 뒤에는 모두 선택값이 나와야한다.
+  // 즉, R = AxiosResponse<T>로 선택값이므로, D = any로 선택값 처리
+  get: <T = any, R = AxiosResponse<T>>(url: string) => Promise<R>;
+  post: <T = any, R = AxiosResponse<T>, D = any>(url: string, data: D) => Promise<R>;
+  <T, R = AxiosResponse<T>, D = any>(config: Config): Promise<R>;
+  isAxiosError: (err: unknown) => err is AxiosError;
+  (url: string, config: Config): void;
+}
+
+const a: A = axios;
+// ...
+```
+
+위 내용이 axios의 모든 타입을 반영하지는 못하지만 기본적인 구조에 대한 이해를 할 수 있다.
+특히 axios는 사용방법이 다양한 라이브러리이므로, 다양한 케이스에 대한 방어가 필요할 때 참고해보면 좋겠음
