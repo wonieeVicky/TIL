@@ -115,3 +115,82 @@ type DetailedHTMLProps<E extends HTMLAttributes<T>, T> = ClassAttributes<T> & E;
 ```
 
 위 타입을 이루는 하위 속성들은 계속 타고 들어가면서 확인해보면 된다.
+
+### 함수 컴포넌트(FC vs VFC), Props 타이핑
+
+위 FunctionComponent를 안써주면 JSX.Element로 타입 추론이 된다.
+
+```tsx
+declare global {
+  namespace JSX {
+    interface Element extends React.ReactElement<any, any> {}
+    // ..
+  }
+}
+```
+
+JSX.Element 도 타입을 살펴보면 위와 같이 ReactElement로 타입추론되므로 결국 같은 거라고 보면 되겠다.
+
+함수형 컴포넌트를 타이핑 하는 방법은 크게 두가지가 있다.
+
+1. 매개변수와 리턴 값을 각각 타이핑해주는 방법(리턴 값은 선택적)
+
+   ```tsx
+   interface P {
+     name: string;
+     title: string;
+   }
+   const WordRelay = (props: P): JSX.Element => { ... };
+   ```
+
+2. 이미 만들어진 FunctionComponent를 활용하는 방법
+
+   ```tsx
+   import React, { FunctionComponent, FC } from "react";
+
+   interface P {
+     name: string;
+     title: string;
+   }
+
+   const WordRelay: FunctionComponent<P> = (props) => {
+     console.log(props.name, props.title);
+   };
+
+   // 혹은
+
+   const WordRelay: FC<P> = (props) => {
+     console.log(props.name, props.title);
+   };
+   ```
+
+개인적으로 2번이 더 좋아보인다.
+
+또, 기존에는 VFC, FC가 분리되어 사용했었는데, FC로 통합되버림. 즉, children 값에 대해 모두 별도 타이핑을 해줘야한다. (하위 P interface 참고)
+
+```tsx
+interface P {
+  name: string;
+  title: string;
+  children?: React.ReactNode | undefined;
+}
+
+const WordRelay: FC<P> = (props) => {
+  return (
+    <>
+      {/* ok */}
+      <div>{props.children}</div>
+    </>
+  );
+};
+
+const Parent = () => {
+  return (
+    <WordRelay name="vicky" title="react">
+      <div>vicky</div>
+    </WordRelay>
+  );
+};
+```
+
+위와 같은 P 타이핑을 통해 children 상속을 구현할 수 있게된다.

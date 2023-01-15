@@ -1,8 +1,14 @@
-﻿import React, { useState, useCallback, useRef, useEffect, FunctionComponent } from "react";
+﻿import React, { useState, useCallback, useRef, useEffect, FC } from "react";
 
 // (prop) => JSX
+interface P {
+  name: string;
+  title: string;
+  children?: React.ReactNode;
+}
 
-const WordRelay: FunctionComponent = () => {
+const WordRelay: FC<P> = (props) => {
+  console.log(props.name, props.title);
   const [word, setWord] = useState("제로초");
   const [value, setValue] = useState("");
   const [result, setResult] = useState("");
@@ -41,12 +47,21 @@ const WordRelay: FunctionComponent = () => {
   return (
     <>
       <div>{word}</div>
+      <div>{props.children}</div>
       <form onSubmit={onSubmitForm}>
         <input ref={inputEl} value={value} onChange={onChange} />
         <button>입력!</button>
       </form>
       <div>{result}</div>
     </>
+  );
+};
+
+const Parent = () => {
+  return (
+    <WordRelay name="vicky" title="react">
+      <div>vicky</div>
+    </WordRelay>
   );
 };
 
