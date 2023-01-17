@@ -1,4 +1,4 @@
-﻿import React, { useState, useCallback, useRef, useEffect, FC } from "react";
+﻿import React, { useState, useCallback, useRef, useEffect, FC, FormEvent, ChangeEvent } from "react";
 
 // (prop) => JSX
 interface P {
@@ -7,26 +7,18 @@ interface P {
   children?: React.ReactNode;
 }
 
-const WordRelay: FC = (props) => {
+const WordRelay: FC = () => {
   const [word, setWord] = useState("vicky");
   const [value, setValue] = useState("");
   const [result, setResult] = useState("");
-  const inputEl = useRef(null);
+  const inputEl = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     console.log("useEffect");
-    const func = async () => {
-      await axios.post();
-    };
-    func();
-
-    return () => {
-      console.log("useEffect cleanup");
-    };
   }, []);
 
   const onSubmitForm = useCallback(
-    (e) => {
+    (e: FormEvent<HTMLFormElement>) => {
       e.preventDefault();
       const input = inputEl.current;
       if (word[word.length - 1] === value[0]) {
@@ -47,7 +39,7 @@ const WordRelay: FC = (props) => {
     [word, value]
   );
 
-  const onChange = useCallback((e) => {
+  const onChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
     setValue(e.currentTarget.value);
   }, []);
 
@@ -55,19 +47,11 @@ const WordRelay: FC = (props) => {
     <>
       <div>{word}</div>
       <form onSubmit={onSubmitForm}>
-        <input ref={inputEl} value={value} onChange={onChange} />
+        <input className="input" ref={inputEl} value={value} onChange={onChange} />
         <button>입력!</button>
       </form>
       <div>{result}</div>
     </>
-  );
-};
-
-const Parent = () => {
-  return (
-    <WordRelay name="vicky" title="react">
-      <div>vicky</div>
-    </WordRelay>
   );
 };
 

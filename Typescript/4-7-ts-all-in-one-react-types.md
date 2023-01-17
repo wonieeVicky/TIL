@@ -325,3 +325,144 @@ euroToUsd(bankAccount); // Ok, 2.36
 ```
 
 위와 같이 타입스크립트의 브랜딩 기법을 통해 새로운 타입을 만들어낼 수 있고, EUR 데이터만 사용될 수 있도록 오류 없이 구현할 수 있다.
+
+### useCallback, useRef 타이핑
+
+useCallback 타입을 보면 아래와 같음
+
+```tsx
+// v17 버전에서는 이랬다
+// function useCallback<T extends (...args: any[]) => any>(callback: T, deps: DependencyList): T;
+function useCallback<T extends Function>(callback: T, deps: DependencyList): T;
+```
+
+T가 Function 타입으로 정해져있는데, 해당 타입의 경우 callback과 리턴값을 별도로 설정해주지 않으면 에러를 뿜는다. (원래 v17버전에는 모든 타입을 any로 처리해서 에러가 나지 않았음)
+
+```tsx
+const WordRelay: FC = (props) => {
+  // ..
+
+  const onSubmitForm = useCallback(
+    (e) => {
+      // error
+      // ..
+    },
+    [word, value]
+  );
+
+  const onChange = useCallback((e) => {
+    // error
+    setValue(e.currentTarget.value);
+  }, []);
+
+  return <></>;
+};
+```
+
+따라서 위와 같은 useCallback 함수에도 에러가 뿜어져나온다. 이는 아래와 같이 정확히 기입해준다.
+
+```tsx
+const WordRelay: FC = (props) => {
+  const inputEl = useRef(null);
+  // ..
+
+  const onSubmitForm = useCallback(
+    (e: FormEvent<HTMLFormElement>) => {
+      // ok
+      e.preventDefault();
+      const input = inputEl.current;
+      if (word[word.length - 1] === value[0]) {
+        setResult("딩동댕");
+        setWord(value);
+        setValue("");
+        if (input) {
+          input.focus(); // error
+        }
+      } else {
+        setResult("땡");
+        setValue("");
+        if (input) {
+          input.focus(); // error
+        }
+      }
+    },
+    [word, value]
+  );
+
+  const onChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
+    // ok
+    setValue(e.currentTarget.value);
+  }, []);
+
+  return <></>;
+};
+```
+
+이 밖에도 onSubmitForm 이벤트 내의 input.focus(); 영역에 타입 에러가 발생한다.
+위 타입 에러는 useRef에서 뿜는 에러로 useRef 타입 정의는 아래와 같이 3개가 있다.
+
+```tsx
+function useRef<T>(initialValue: T): MutableRefObject<T>;
+function useRef<T>(initialValue: T | null): RefObject<T>;
+function useRef<T = undefined>(): MutableRefObject<T | undefined>;
+```
+
+지금 위에서 에러가 나는 부분은 MutableRefObject가 아닌 RefObject가 되도록 해야한다.
+위와 같이 바꾸는 방법은 제네릭을 사용해서 바꿔주는 방법이 있음
+
+```tsx
+const WordRelay: FC = (props) => {
+  // 직접 HTMLInputElement 라는 타입을 준다.
+  const inputEl = useRef<HTMLInputElement>(null);
+
+  const onSubmitForm = useCallback(
+    (e: FormEvent<HTMLFormElement>) => {
+      e.preventDefault();
+      const input = inputEl.current;
+      if (word[word.length - 1] === value[0]) {
+        setResult("딩동댕");
+        setWord(value);
+        setValue("");
+        if (input) {
+          input.focus(); // ok
+        }
+      } else {
+        setResult("땡");
+        setValue("");
+        if (input) {
+          input.focus(); // ok
+        }
+      }
+    },
+    [word, value]
+  );
+
+  return <></>;
+};
+```
+
+![RefObject로 잘 변경되었음. input.focus(); 타입 에러 없어짐](../img/230118-1.png)
+
+그런데 위 코드가 왜 MutableRefObject가 아닌 RefObject로 처리될 수 있는걸까?
+
+```tsx
+function useRef<T>(initialValue: T): MutableRefObject<T>;
+const inputEl = useRef<HTMLInputElement>(null); // T = null..?
+const mutaRef = useRef<number>(0); // ok, MutableRefObject!
+```
+
+위 타입일 경우 initialValue인 T가 그대로 값에 적용되기 때문.
+하지만 초기값은 null이고 T로 전달 준 타입은 HTMLInputElement 이므로 아래 타입으로 적용된다.
+
+```tsx
+function useRef<T>(initialValue: T | null): RefObject<T>; // T = null | HTMLInputElement
+```
+
+만약 inputEl에 초깃값을 모두 안넣어주면 세 번째 타입으로 처리된다.
+
+```tsx
+function useRef<T = undefined>(): MutableRefObject<T | undefined>;
+const inputEl = useRef<HTMLInputElement>(); // React.MutableRefObject<HTMLInputElement | undefined>
+```
+
+즉 RefObject로 처리하려면 반드시 null 값을 넣어줘야 한다는 것을 깨달을 수 있음
