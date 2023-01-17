@@ -269,3 +269,57 @@ const WordRelay: FC = (props) => {
   return <></>;
 };
 ```
+
+### 타입스크립트 브랜딩 기법
+
+useEffect의 return 값에 속하는 Destructor에 대해 더 알아본다
+
+```tsx
+function useEffect(effect: EffectCallback, deps?: DependencyList): void;
+type EffectCallback = () => void | Destructor;
+type Destructor = () => void | { [UNDEFINED_VOID_ONLY]: never };
+```
+
+위 내용에서 `{ [UNDEFINED_VOID_ONLY]: never }` 이 코드는 어떤 것일까? 바로 타입스크립트의 브랜딩 개념이다. 타입스크립트에는 브랜딩 기법을 통해 별도의 타입 케이스를 구현할 수 있다. 아래 코드를 보자.
+
+```tsx
+const usd = 10;
+const eur = 10;
+const krw = 2000;
+
+// 유로를 달러로 바꾸는 함수이다.
+function euroToUsd(euro: number): number {
+  return (euro * 1.18) as USD;
+}
+
+euroToUsd(eur); // Ok, 2.36
+euroToUsd(krw); // Ok, 만약 타입이 없다면 반드시 유로만 들어가야하는 자리에 krw이 들어감! 오류다!!
+```
+
+유로를 달러로 바꿔서 리턴하는 함수가 있다고 하자.
+
+위 구조 대로라면 euroToUsd 함수에 krw가 들어가도 문제가 없을 것이며 이는 옳지않는 계산으로 값이 도출될 것이다. 코드가 복잡한 가운데에세 전무한 지식 상태로 위 함수를 건들인다면 충분히 생길 수 있는 오류이다.
+
+이를 브랜딩 기법으로 아래와 같이 개선할 수 있다.
+
+```tsx
+type BRAND<K, T> = K & { __brand: T };
+
+type USD = BRAND<number, "USD">;
+type EUR = BRAND<number, "EUR">;
+type KRW = BRAND<number, "KRW">;
+
+const usd = 10 as USD; // 강제 타입 변환
+const eur = 10 as EUR; // 강제 타입 변환
+const krw = 2000; // 혹은 2000 as KRW도 가능
+const bankAccount = 20 as EUR;
+
+function euroToUsd(euro: EUR): USD {
+  return (euro * 1.18) as USD;
+}
+
+euroToUsd(krw); // Error! 'number' 형식의 인수는 'EUR' 형식의 매개 변수에 할당될 수 없습니다.
+euroToUsd(bankAccount); // Ok, 2.36
+```
+
+위와 같이 타입스크립트의 브랜딩 기법을 통해 새로운 타입을 만들어낼 수 있고, EUR 데이터만 사용될 수 있도록 오류 없이 구현할 수 있다.
