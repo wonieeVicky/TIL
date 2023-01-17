@@ -270,6 +270,8 @@ const WordRelay: FC = (props) => {
 };
 ```
 
+또한 useEffect의 두 번째 인자 타입인 DependencyList는 ReadonlyArray<unknown>으로 읽기전용 배열을 의미한다는 것을 알 수 있다.
+
 ### 타입스크립트 브랜딩 기법
 
 useEffect의 return 값에 속하는 Destructor에 대해 더 알아본다
