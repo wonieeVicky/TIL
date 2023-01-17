@@ -65,3 +65,48 @@ webGL을 쉽고 간편하게 사용하기 위해 Three.js가 나옴. webGL을 �
 위를 live server로 실행 시키면 정상적으로 초록 상자가 노출된다.
 
 ![](../../img/230114-2.png)
+
+### 자바스크립트 module 기본
+
+작업하기 전에 JavaScript의 module에 대한 이해를 해야한다.
+
+`index.html`
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <!-- ... -->
+  </head>
+  <body>
+    <script type="module" src="main.js"></script>
+  </body>
+</html>
+```
+
+위와 같이 작성한 경우 일반 javaScript을 모듈 형태로 쓸 수 있음
+
+`hello.js`
+
+```jsx
+export default function hello1() {
+  console.log("hello 1!");
+}
+
+export function hello2() {
+  console.log("hello 2!");
+}
+```
+
+위와 같이 export default, export 로 모듈 내보내기를 처리해 준 뒤 main.js에서 아랭와 같이 씀
+
+```jsx
+// import { hello1, hello2 } from "./hello.js";
+// import hello1 from "./hello.js";
+import * as hello from "./hello.js";
+
+hello.hello1();
+hello.hello2();
+```
+
+3D 애니메이션 구현 시에는 `import * as alias` 형태로 많이 사용하는 편. 알고 있지만 한번 더 짚고 넘어감
