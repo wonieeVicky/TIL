@@ -7,15 +7,22 @@ interface P {
   children?: React.ReactNode;
 }
 
-const WordRelay: FC<P> = (props) => {
-  console.log(props.name, props.title);
-  const [word, setWord] = useState("제로초");
+const WordRelay: FC = (props) => {
+  const [word, setWord] = useState("vicky");
   const [value, setValue] = useState("");
   const [result, setResult] = useState("");
   const inputEl = useRef(null);
 
   useEffect(() => {
     console.log("useEffect");
+    const func = async () => {
+      await axios.post();
+    };
+    func();
+
+    return () => {
+      console.log("useEffect cleanup");
+    };
   }, []);
 
   const onSubmitForm = useCallback(
@@ -47,7 +54,6 @@ const WordRelay: FC<P> = (props) => {
   return (
     <>
       <div>{word}</div>
-      <div>{props.children}</div>
       <form onSubmit={onSubmitForm}>
         <input ref={inputEl} value={value} onChange={onChange} />
         <button>입력!</button>

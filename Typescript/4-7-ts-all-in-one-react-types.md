@@ -194,3 +194,78 @@ const Parent = () => {
 ```
 
 위와 같은 P 타이핑을 통해 children 상속을 구현할 수 있게된다.
+
+### useState, useEffect 타이핑
+
+useState에 대한 타이핑을 한번 살펴보자
+
+```tsx
+function useState<S>(initialState: S | (() => S)): [S, Dispatch<SetStateAction<S>>];
+
+type SetStateAction<S> = S | ((prevState: S) => S);
+type Dispatch<A> = (value: A) => void;
+```
+
+위 내용만 보면 initialState에 함수도 넣을 수 있는 것으로 보인다. lazy init을 할 때 위 방법을 사용한다.
+setState는 S 나 함수가 들어가므로 위 타입에 따라 아래와 같은 코드 구현이 가능해진다.
+
+```tsx
+const WordRelay: FC = (props) => {
+  const [word, setWord] = useState("vicky");
+  // ..
+
+  useEffect(() => {
+    // setState에 함수를 아래와 같이 쓸 수 있음
+    setWord((prev) => {
+      return prev + "2";
+    });
+  }, []);
+
+  return <>{/* ... */}</>;
+};
+
+export default WordRelay;
+```
+
+setState에 함수가 들어있는 형태가 가능한 이유임. 다음으로 useEffect 타입을 보자
+
+```tsx
+function useEffect(effect: EffectCallback, deps?: DependencyList): void;
+type EffectCallback = () => void | Destructor;
+```
+
+useEffect의 반환타입은 void 혹은 Destructor로 고정되어 있다.
+따라서 typescript는 아래와 같이 사용 시 에러를 뿜는다
+
+```tsx
+const WordRelay: FC = (props) => {
+	// ..
+
+  useEffect(async () => { // type Error
+		await func() ...
+  }, []);
+
+  return (
+    <>
+      {/* ... */}
+    </>
+  );
+};
+```
+
+async 함수의 리턴값은 무조건 Promise이므로 에러가 발생함.. 따라서 async ~ await 구조는 이렇게 쓴다
+
+```tsx
+const WordRelay: FC = (props) => {
+  // ..
+
+  useEffect(() => {
+    const func = async () => {
+      await axios.post();
+    };
+    func(); // func라는 async ~ await 함수를 생성 후 별도 실행
+  }, []);
+
+  return <></>;
+};
+```
