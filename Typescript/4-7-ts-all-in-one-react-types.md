@@ -466,3 +466,168 @@ const inputEl = useRef<HTMLInputElement>(); // React.MutableRefObject<HTMLInputE
 ```
 
 즉 RefObject로 처리하려면 반드시 null 값을 넣어줘야 한다는 것을 깨달을 수 있음
+
+### 클래스 컴포넌트 타이핑
+
+이번에는 클래스 컴포넌트에 대한 타이핑을 해본다.
+
+`WordRelayClass.tsx`
+
+```tsx
+import React, { Component } from "react";
+
+class WordRelay extends Component {
+  state = {
+    word: "비키",
+    value: "",
+    result: "",
+  };
+
+  onSubmitForm = (e) => {
+    // e: error
+    e.preventDefault();
+    if (this.state.word[this.state.word.length - 1] === this.state.value[0]) {
+      this.setState({
+        result: "딩동댕!",
+        word: this.state.value,
+        value: "",
+      });
+      this.input.focus(); // this.input: error
+    } else {
+      this.setState({
+        result: "땡",
+        value: "",
+      });
+      this.input.focus(); // this.input: error
+    }
+  };
+
+  onChange = (e) => {
+    // e: error
+    this.setState({ value: e.currentTarget.value });
+  };
+
+  onRefInput = (c) => {
+    // c: error
+    this.input = c; // this.input: error
+  };
+
+  render() {
+    return <>{/* ... */}</>;
+  }
+}
+```
+
+위 코드에서 에러가 나는 영역은 매개변수자리이다. 가장 먼저 Component에 대한 타입을 타고 들어가면 아래와 같다.
+
+```tsx
+// Base component for plain JS classes
+interface Component<P = {}, S = {}, SS = any> extends ComponentLifecycle<P, S, SS> { }
+class Component<P, S> { .. }
+```
+
+위와 같이 Compnent 타이핑에는 <P, S> 즉 props와 state 값이 들어간다는 것을 알 수 있다.
+이를 활용해 타입을 넣는다면 아래와 같이 넣을 수 있겠다.
+
+```tsx
+import React, { ChangeEvent, Component, FormEvent } from "react";
+
+interface P {
+  name: string;
+  title: string;
+}
+
+interface S {
+  word: string;
+  value: string;
+  result: string;
+}
+
+class WordRelay extends Component<P, S> {
+	// 나머지 타입 에러도 아래와 같이 개선
+	state = {
+    word: "비키",
+    value: "",
+    result: "",
+  };
+
+  onSubmitForm = (e: FormEvent) => {
+    e.preventDefault();
+    const input = this.input;
+    // ..
+    }
+  };
+
+  onChange = (e: ChangeEvent<HTMLInputElement>) => {
+    this.setState({ value: e.currentTarget.value });
+  };
+
+  input: HTMLInputElement | null = null; // this.input을 생성
+
+  onRefInput = (c: HTMLInputElement) => {
+    this.input = c;
+  };
+
+	render(){
+		// ..
+	}
+}
+```
+
+![state에 대한 명확한 타이핑이 있을 경우 setState의 타입 추론](../img/230120-1.png)
+
+위와 같은 Component 내 제네릭 타이핑으로 통해 아래에 이어지는 다양한 이벤트 코드에서 실행될 setState에도 위처럼 명확한 타입 전달이 가능해진다.
+만약 state 에 주입하는 타입이 따로 없을 경우에는 아래와 같이 never로 추론된다.
+
+![state에 대한 타이핑이 없을 경우 setState의 타입이 never로 추론됨](../img/230120-2.png)
+
+사실 위 부분을 제거해도 크게 타입 에러가 날 경우는 없지만 뭐든 명확하게 구분하는게 좋다. 다다익타이핑..?
+이에 연결해서 setState에 대한 타이핑은 아래와 같다.
+
+```tsx
+setState<K extends keyof S>(
+    state: ((prevState: Readonly<S>, props: Readonly<P>) => (Pick<S, K> | S | null)) | (Pick<S, K> | S | null),
+    callback?: () => void
+): void;
+```
+
+K는 keyof S에서 확장되었다. keyof S는 state 타이핑의 key값을 의미하므로 이는 즉 word, value, result이 된다는 것을 쉽게 이해할 수 있다.
+
+state 자리에는 `(prevState: Readonly<S>, props: Readonly<P>) => (Pick<S, K> | S | null)` 라는 함수 형태 혹은 `Pick<S, K> | S | null` 값이 들어갈 수 있다는 걸 확인할 수 있다. (null도 들어갈 수 있네..? 몰랐음)
+
+이 밖에 `render()` 에 대한 타입도 보자.
+
+```tsx
+type ReactNode = ReactElement | string | number | ReactFragment | ReactPortal | boolean | null | undefined;
+render(): ReactNode;
+```
+
+위 타이핑 코드를 보면 React render에는 React 엘리먼트만이 아닌 string, number, boolean 등의 원시값도 들어가는 것을 확인할 수 있다.
+
+```tsx
+class WordRelay extends Component<P> {
+  // ..
+
+  render() {
+    return "vicky";
+  }
+}
+```
+
+위와 같이 render 내에 리액트 엘리먼트를 제외한 값이 들어갈 수 있다는 점 ! 타입을 봄으로서 알 수 있다. 함수형 컴포넌트는 불가능. 아래 타이핑을 보면 알 수 있다.
+
+```tsx
+type FC<P = {}> = FunctionComponent<P>;
+
+interface FunctionComponent<P = {}> {
+  (props: P, context?: any): ReactElement<any, any> | null; // 반환값이 ReactElement or null
+  // ..
+}
+
+// 즉 아래의 경우 에러가 발생
+const WordRelay: FC = () => {
+  // Error! return 값이 ReactElement가 아님!
+  // ..
+  return "vicky";
+};
+```
