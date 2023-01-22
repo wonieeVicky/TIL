@@ -68,6 +68,7 @@
     - [jQuery 타입 분석](Typescript/4-5-ts-all-in-one-jquery-types.md)
     - [Axios 타입 분석](Typescript/4-6-ts-all-in-one-axios-types.md)
     - [React 타입 분석](Typescript/4-7-ts-all-in-one-react-types.md)
+    - [Redux 타입 분석](Typescript/4-8-ts-all-in-one-redux-types.md)
 
 ## JavaScript
 
