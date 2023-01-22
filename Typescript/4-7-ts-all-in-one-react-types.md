@@ -631,3 +631,40 @@ const WordRelay: FC = () => {
   return "vicky";
 };
 ```
+
+### Ref 타이핑 내 타입 객체에 직접 접근하는 경우
+
+useRef 타입을 확인하기 위해 index.d.ts 파일을 타고 올라가던 중 아래 `RefCallback` 타입을 보게 되었다.
+
+```tsx
+type RefCallback<T> = { bivarianceHack(instance: T | null): void }["bivarianceHack"];
+type Ref<T> = RefCallback<T> | RefObject<T> | null;
+```
+
+위 타이핑을 보면 `{ bivarianceHack(instance: T | null): void }["bivarianceHack"]` 이 타이핑 방법은 새로보는 방식처럼 보임
+좀 더 쉽게 이해하자면 아래 구조와 비슷하다.
+
+```tsx
+type AA = {
+	aa: string;
+	bb: (x: number): string;
+}
+
+type AAA = AA["aa"]; // type AAA = string;
+type AAA = { aa: string; bb: (x: number): string; }["aa"]; // 이렇게 쓸 수도 있음
+
+type BBB = AA["bb"]; // type BBB = (x: number) => string
+type BBB = { aa: string; bb: (x: number): string; }["bb"]; // 이렇게 쓸 수도 있음
+```
+
+즉 위와 같이 직접 타입 객체 key 값에 접근하는 타이핑 방법을 사용했다는 것을 알 수 있다.
+
+```tsx
+type RefCallback<T> = {
+  bivarianceHack(instance: T | null): void;
+}["bivarianceHack"];
+```
+
+위 사용 방법에 대해 조금 친숙해질 필요가 있다 🙂 (`type AAA = AA["aa"]`)와 같은 구조로 작성하지 않은 이유는? gitblame을 보고 그 이유를 알아갈 수도 있다.
+
+덧, 다른 컴포넌트에 존재하는 ref에 접근하는 방법: [useImperativeHandle](https://developer-alle.tistory.com/372)(함수형), forwardRef(클래스형) 사용

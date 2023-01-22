@@ -1,5 +1,20 @@
 ﻿import React, { ChangeEvent, Component, FormEvent } from "react";
 
+type TT = {
+  aa: string;
+  bb(x: number): string;
+};
+type AA = TT["aa"]; // type AA = string
+type BB = TT["bb"]; // type BB = (x: number) => string
+
+interface Test {
+  a(): void;
+  b: () => void;
+}
+
+type AAA = Test["a"]; // type AAA = () => void
+type BBB = Test["b"]; // type BBB = () => void
+
 interface P {
   name: string;
   title: string;
