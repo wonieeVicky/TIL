@@ -42,7 +42,7 @@ export function combineReducers<M extends ReducersMapObject<any, any>>(
 // ..
 ```
 
-리턴 값이 `Reducer<CombinedState<StateFromReducersMapObject<M>>, ActionFromReducersMapObject<M>>` 형식이라는 것을 확인할 수 있다. 그럼 Reducer 타입을 보자
+오버로딩된 3가지 타입이 위와 같이 적혀있음.. 위 타입 중 Reducer 타입을 상세히 보자
 
 ```
 export type Reducer<S = any, A extends Action = AnyAction> = (
@@ -55,12 +55,37 @@ export type Reducer<S = any, A extends Action = AnyAction> = (
 
 ```tsx
 const reducer = combineReducers({
-  user: (state, action) => {},
-  posts: (state, action) => {},
+  user: (state, action) => state,
+  posts: (state, action) => state,
 });
-
-const store = createStore(reducer, initialState); // Type error
 ```
 
-위와 같이 타이핑 해주면 reducer 타입 에러가 사라진 것을 확인할 수 있다.
-그러면 다음으로 store의 initialState에서 타입 에러가 발생한다.
+이에 따라 위와 같이 combineReducers에 필요한 데이터를 넣어주면 reducer 타입 에러가 사라짐.
+이 밖에도 `combineReducers` 타입에 적용된 `ReducersMapObject` 타입을 보면 아래와 같다.
+
+```tsx
+/**
+ * Object whose values correspond to different reducer functions.
+ *
+ * @template A The type of actions the reducers can potentially respond to.
+ */
+export type ReducersMapObject<S = any, A extends Action = Action> = {
+  [K in keyof S]: Reducer<S[K], A>;
+};
+```
+
+위 타이핑으로 코드에 적용된 정보를 대입해보면 아래와 같다.
+
+```tsx
+const initialState = {
+  // S = initialState
+  user: {
+    // S[k] or keyof S
+    isLoggingIn: true,
+    data: null,
+  },
+  posts: [], // S[k] or keyof S
+};
+```
+
+위 타입 적용 구조를 이해해두고, 사용법을 알아둬야 나중에 직접 타이핑 시 활용할 수 있음
