@@ -89,3 +89,187 @@ const initialState = {
 ```
 
 위 타입 적용 구조를 이해해두고, 사용법을 알아둬야 나중에 직접 타이핑 시 활용할 수 있음
+
+### action, reducer 타이핑하기
+
+reducer 내부에 posts 데이터를 업데이트하는 코드를 작성하던 중 에러가 발생한다.
+
+```tsx
+// ..
+const reducer = combineReducers({
+  user: (state, action) => {
+    // ..
+  },
+  posts: (state, action) => {
+    switch (action.type) {
+      case "ADD_POST":
+        return [...state, action.data]; // state is unknown
+      default:
+        return state;
+    }
+  },
+});
+```
+
+위 이슈는 아래와 같은 타입 가드를 넣어 해결할 수 있다.
+
+```tsx
+// ..
+const reducer = combineReducers({
+  user: (state, action) => {
+    // ..
+  },
+  posts: (state, action) => {
+    if (!Array.isArray(state)) return; // type guard 추가
+    switch (action.type) {
+      case "ADD_POST":
+        return [...state, action.data]; // state is unknown
+      default:
+        return state;
+    }
+  },
+});
+```
+
+또 다른 방법으로는 애초에 해당 데이터에 대한 타이핑을 하는 것이 있음
+(위 이슈 확인을 위해 스토어구조를 아래와 같이 구조화한다.)
+
+```tsx
+.
+├── actions
+│   ├── post.ts
+│   └── user.ts
+├── reducers
+│   ├── index.ts
+│   ├── post.ts
+│   └── user.ts
+└── redux.ts (이 파일에 스토어 파일 포함)
+```
+
+먼저 reducers에 발생하는 타입에러부터 수정해본다.
+
+`./reducers/user.ts`
+
+```tsx
+const initialState = {
+  isLoggingIn: false,
+  data: null,
+};
+
+const userReducer = (prevState = initialState, action) => {
+  // action에서 Error 발생
+  // 새로운 state 만들어주기
+  switch (action.type) {
+    case "LOG_IN_SUCCESS":
+      return {
+        ...prevState,
+        data: action.data,
+      };
+    case "LOG_OUT":
+      return {
+        ...prevState,
+        data: null,
+      };
+    default:
+      return prevState;
+  }
+};
+
+export default userReducer;
+```
+
+위 action를 정의하기 위해서는 우선 아래와 같이 타입을 만들어서 넣어준다.
+
+```tsx
+import { LogInSuccessData, LogInSuccessAction, LogoutAction } from "../actions/user";
+
+interface InitialState {
+  isLoggingIn: boolean;
+  data: LogInSuccessData | null;
+}
+
+// ..
+const userReducer: Reducer<InitialState, LogInSuccessAction | LogoutAction> =
+	(prevState = initialState, action) => { .. };
+```
+
+`./actions/user.ts`
+
+```tsx
+// ..
+
+// 필요한 LogInSuccessAction 타입 생성
+export type LogInSuccessData = { userId: number; nickname: string };
+export type LogInSuccessAction = {
+  type: "LOG_IN_SUCCESS";
+  data: LogInSuccessData;
+};
+
+// LogInSuccessData 타입 적용
+const logInSuccess = (data: LogInSuccessData): LogInSuccessAction => {
+  return {
+    type: "LOG_IN_SUCCESS",
+    data,
+  };
+};
+
+// 필요한 LogoutAction 타입 생성
+export type LogoutAction = { type: "LOG_OUT" };
+
+// LogoutAction 타입 적용
+export const logOut = (): LogoutAction => {
+  return {
+    type: "LOG_OUT",
+  };
+};
+```
+
+위와 같이 처리하면 에러가 사라지며, action.data에 정의한 data 타입이 잘 들어오는 것을 확인할 수 있다.
+
+![](../img/230124-1.png)
+
+만약 LOG_OUT 이벤트의 data 부분에 null이 아닌 action.data를 넣어주면 LogoutAction 타입에 전달되는 data 값이 없으므로 에러가 발생할 것이다. ('LogoutAction' 형식에 'data' 속성이 없습니다.) 이렇게 코드 실수를 막아주는 것이 유용한 것임
+
+따라서 AnyAction으로 처리해버리지말고 최대한 상세히 타입을 넣어주는 것이 좋겠다.
+post reducer도 동일하게 타이핑을 해준다.
+
+`./reducers/post.ts`
+
+```tsx
+import { Reducer } from "redux";
+import { AddPostAction, AddPostData } from "../actions/post";
+
+const initialState: AddPostData[] = [];
+
+// Reducer generic typing 추가
+const postReducer: Reducer<AddPostData[], AddPostAction> = (prevState = initialState, action) => {
+  // 새로운 state 만들어주기
+  switch (action.type) {
+    case "ADD_POST":
+      return [...prevState, action.data];
+    default:
+      return prevState;
+  }
+};
+```
+
+`./actions/post.ts`
+
+```tsx
+// 필요한 AddPostAction 타입 생성
+export type AddPostData = { title: string; content: string };
+export type AddPostAction = {
+  type: "ADD_POST";
+  data: AddPostData;
+};
+
+// AddPostAction 타입 적용
+export const addPost = (data: AddPostData): AddPostAction => {
+  return {
+    type: "ADD_POST",
+    data,
+  };
+};
+```
+
+위와 같이 state 와 action에 대한 타이핑을 순차적으로 처리해주면 된다.
