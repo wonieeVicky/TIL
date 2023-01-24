@@ -273,3 +273,156 @@ export const addPost = (data: AddPostData): AddPostAction => {
 ```
 
 위와 같이 state 와 action에 대한 타이핑을 순차적으로 처리해주면 된다.
+
+### thunkMiddleware 타이핑
+
+다음으로 redux.ts 내부의 dispatch 함수에서 발생하는 타입 에러를 고쳐보자
+thunkMiddleware는 액션이 스토어로 전달되기 전에 무언가를 수행하는 역할을 한다. 간단히 생각할 것
+
+원래 actions은 아래와 같이 객체 형태이다.
+
+```
+export const logOut = (): LogoutAction => ({ type: "LOG_OUT" });
+```
+
+그런데 thunkMiddleware는 객체 형태의 action을 함수로 만들어준다.
+
+`./redux.ts`
+
+```
+const firstMiddleware:Middleware = (store) => (next) => (action) => {
+  console.log("로깅", action);
+  next(action);
+};
+
+const thunkMiddleware:Middleware = (store) => (next) => (action) => {
+  if (typeof action === "function") {
+    // 비동기
+    return action(store.dispatch, store.getState);
+  }
+  return next(action); // 동기
+};
+
+// '(dispatch: any, getState: any) => void' 형식의 인수는
+// 'LogInSuccessAction | LogoutAction | AddPostAction' 형식의 매개 변수에 할당될 수 없습니다.
+store.dispatch( // Type Error
+  logIn({
+    id: 1,
+    name: "vicky",
+    admin: true,
+  })
+);
+```
+
+그래서 위 thunkMiddleware의 코드를 보면 action이 함수(function)이면 action을 실행해주는 함수를 실행하는 것을 확인할 수 있다. 이처럼 thunkMiddleware는 객체와 함수의 액션을 받는 미들웨어이다. 그런데 이 객체를 함수 형태로 받으면 코드를 비동기 적으로 실행할 수 있게된다.
+
+```tsx
+export const logIn = (data) => {
+  // data type error
+  return (dispatch, getState) => {
+    // dispatch, getState type Error
+    dispatch(logInRequest(data));
+    try {
+      setTimeout(() => {
+        dispatch(
+          logInSuccess({
+            userId: 1,
+            nickname: "vicky",
+          })
+        );
+      }, 2000);
+    } catch (e) {
+      dispatch(logInFailure(e));
+    }
+  };
+};
+```
+
+위 logIn 액션을 보면 액션이 함수 형태로 되어 여러가지 액션을 수행할 수 있게된 것을 알 수 있다.
+thunkMiddleware의 Middleware 타입 코드를 보면 아래와 같다.
+
+```tsx
+/**
+ * A middleware is a higher-order function that composes a dispatch function
+ * to return a new dispatch function. It often turns async actions into
+ * actions.
+ *
+ * Middleware is composable using function composition. It is useful for
+ * logging actions, performing side effects like routing, or turning an
+ * asynchronous API call into a series of synchronous actions.
+ *
+ * @template DispatchExt Extra Dispatch signature added by this middleware.
+ * @template S The type of the state supported by this middleware.
+ * @template D The type of Dispatch of the store where this middleware is
+ *   installed.
+ */
+export interface Middleware<DispatchExt = {}, S = any, D extends Dispatch = Dispatch> {
+  (api: MiddlewareAPI<D, S>): (next: Dispatch<AnyAction>) => (action: any) => any;
+}
+```
+
+위 api는 store고, next는 dispatch와 같다.
+그럼 이를 바탕으로 위 logIn 액션의 타입에러를 개선하면 아래와 같다.
+
+```tsx
+import { AnyAction, Dispatch } from "redux";
+
+export type LogInRequestData = { nickname: string; password: string };
+
+export const logIn = (data: LogInRequestData) => {
+  // async action creator
+  return (dispatch: Dispatch<AnyAction>, getState: () => any) => {
+    // async action
+    dispatch(logInRequest(data));
+    try {
+      setTimeout(() => {
+        dispatch(
+          logInSuccess({
+            userId: 1,
+            nickname: "vicky",
+          })
+        );
+      }, 2000);
+    } catch (e) {
+      dispatch(logInFailure(e));
+    }
+  };
+};
+```
+
+각 dispatch와 getState에 대한 타이핑을 모두 해주었다. 하지만 위처럼 했다고 해서 dispatch 실행부의 타입 에러가 사라지지 않는다. thunk 액션을 어떤 타입으로 받아야 할지 몰라서 에러가 발생하는 것이다.
+
+이때는 `redux-thunk` 라이브러리를 설치 한 뒤 store의 enhancer 부분에 thunkMiddleware 삽입 영역에 ThunkMiddleware 타입을 추가해준다. (강제로 thunkMiddleware의 타입을 바꿔준 것이다.)
+
+`redux.ts`
+
+```tsx
+import { ThunkMiddleware } from "redux-thunk";
+
+// ..
+const enhancer = applyMiddleware(firstMiddleware, thunkMiddleware as ThunkMiddleware);
+
+store.dispatch(
+  logIn({
+    nickname: "vicky",
+    password: "1234",
+  })
+);
+console.log("2nd", store.getState());
+```
+
+위와 같이 넣어주면 그 전에 발생하던 타입에러가 모두 사라진 것을 확인할 수 있다.
+
+```tsx
+export declare type ThunkMiddleware<
+  State = any,
+  BasicAction extends Action = AnyAction,
+  ExtraThunkArg = undefined
+> = Middleware<
+  ThunkDispatch<State, ExtraThunkArg, BasicAction>,
+  State,
+  ThunkDispatch<State, ExtraThunkArg, BasicAction>
+>;
+```
+
+ThunkMiddleware 타입을 보면 기존 ThunkDispatch에 State, ExtraThunkArg, BasicAction 타입을 모두 넣어둔 것을 볼 수 있음.. 오버라이드로 타입 확장
