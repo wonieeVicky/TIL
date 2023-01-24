@@ -426,3 +426,103 @@ export declare type ThunkMiddleware<
 ```
 
 ThunkMiddleware 타입을 보면 기존 ThunkDispatch에 State, ExtraThunkArg, BasicAction 타입을 모두 넣어둔 것을 볼 수 있음.. 오버라이드로 타입 확장
+
+### react-redux 타이핑
+
+react-redux 의 useSelector, useDispatch, connect도 typing도 분석해보자. 테스트 코드는 아래와 같다.
+
+```tsx
+import React from "react";
+import { useSelector, useDispatch } from "react-redux";
+import { logIn, logOut } from "./actions/user";
+
+const App = () => {
+  //
+  const { loading, data } = useSelector((state) => state.user); // Type error, 'state'은(는) 'unknown' 형식입니다.
+  const dispatch = useDispatch();
+
+  const onClick = () => {
+    // Type error, '(dispatch: Dispatch<AnyAction>, getState: () => any) => void' 형식의 인수는
+    // 'AnyAction' 형식의 매개 변수에 할당될 수 없습니다.
+    dispatch(
+      logIn({
+        nickname: "vicky",
+        password: "비밀번호",
+      })
+    );
+  };
+
+  const onLogout = () => {
+    dispatch(logOut());
+  };
+
+  return (
+    <div>
+      {loading ? <div>로그인 중</div> : data ? <div>{data.nickname}</div> : "로그인 해주세요."}
+      {!data ? <button onClick={onClick}>로그인</button> : <button onClick={onLogout}>로그아웃</button>}
+    </div>
+  );
+};
+
+export default App;
+```
+
+먼저 useSelector, useDispatch 타입은 아래와 같다.
+
+```tsx
+**export declare const useSelector: <TState = unknown, Selected = unknown>(selector: (state: TState) => Selected, equalityFn?: EqualityFn<Selected> | undefined) => Selected;
+export declare const useDispatch: <AppDispatch extends Dispatch<AnyAction> = Dispatch<AnyAction>>() => AppDispatch;**
+```
+
+위 구조로 되어있으므로 unknown, AnyAction 데이터가 그대로 들어가서 타입 에러가 발생.
+위 타입에러를 쉽게 바꾸는 방법은 없다. 조금 복잡함.
+store 코드가 있는 곳에서 아래 타입을 추가해준다.
+
+`redux.ts`
+
+```tsx
+const store = createStore(reducer, initialState, enhancer);
+// ..
+
+// RootState, AppDispatch 타입 추가
+export type RootState = ReturnType<typeof store.getState>;
+export type AppDispatch = typeof store.dispatch;
+```
+
+그리고 위 타입은 `useSelector`, `useDispatch`에서 사용해줌
+
+```tsx
+import { AppDispatch, RootState } from "./redux";
+
+const App = () => {
+  const { loading, data } = useSelector((state: RootState) => state.user);
+  const dispatch: AppDispatch = useDispatch();
+
+  // ..
+
+  return ( ... )
+};
+```
+
+참고로 useSelector와 useDispatch는 Provider 하위의 인스턴스 컴포넌트에서만 사용할 수 있음..
+
+```tsx
+import { AppDispatch, RootState, store } from "./redux";
+
+const App = () => {
+  const { loading, data } = useSelector((state: RootState) => state.user);
+  const dispatch: AppDispatch = useDispatch();
+
+  // ..
+
+  return ( ... )
+};
+
+const Parent = () => {
+	return (
+		<Provider store={store}>
+			<App />
+		</Provider>
+	)
+}
+```
