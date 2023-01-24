@@ -15,6 +15,7 @@
   "dependencies": {
     "axios": "^1.2.2",
     "jquery": "^3.6.3",
+    "react-redux": "^8.0.5",
     "redux": "^4.2.0",
     "redux-thunk": "^2.4.2",
     "ts-node": "^10.9.1"
