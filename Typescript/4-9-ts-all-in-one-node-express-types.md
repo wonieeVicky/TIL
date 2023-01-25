@@ -1,0 +1,72 @@
+﻿## Node, Express 타입
+
+### @types/node
+
+Node 서버 코드에 대한 타이핑을 추가적으로 배워본다. node의 경우 node 모듈들에 대한 타이핑을 하는 개념
+먼저 node 모듈들에 대한 타입을 설치해야 한다.
+
+```bash
+> npm i -D @types/node
+```
+
+`node.ts`
+
+```tsx
+import fs = require("fs");
+import http = require("http");
+import path = require("path");
+
+http
+  .createServer((req, res) => {
+    // brower는 number로 리턴, node는 NodeJS.Timeout 리턴
+    const id = setTimeout(() => {
+      console.log("hello");
+    }, 1000);
+    // ..
+  })
+  .listen(8080, () => {
+    console.log("server started");
+  });
+```
+
+위와 같은 구조에서 node 파일의 경우 setTimeout이 `NodeJS.Timeout`으로 반환 값이 추론된다.
+즉 브라우저에서의 setTimeout과 노드 안에서의 setTimeout은 조금 다른 개념..
+
+다음으로 path모듈을 타입으로 찾아가보면 아래와 같은 구조로 되어있다.
+
+`@types/node/path.d.ts`
+
+```tsx
+declare module "path" {
+  namespace path {
+    // ..
+  }
+}
+```
+
+위와 같이 타입 선언만 있고 구현이 없는 것을 앰비언트라고 한다. 즉, `declare module …` 이걸 앰비언트(ambient) 모듈이라고 할 수 있다. 모듈 타이핑을 해주는 방식으로 이해. 이 구조는 fs도 마찬가지이다.
+
+`@types/node/fs.d.ts`
+
+```tsx
+declare module "fs" {
+  import * as stream from "node:events";
+  // ..
+}
+// ..
+declare module "node:fs" {
+  export * from "fs";
+}
+```
+
+해당 방식은 `@types/node`에서 node에 대한 모듈을 모두 구현하므로, 이런 모듈 단위의 타이핑이 들어간 것이라고 이해하면 된다.
+
+또한 마지막에 node:fs라는 모듈정의가 fs를 모두 포함하도록 처리되고 있는데, 이는 즉 node 모듈 import 시 아래와 같은 방식을 지원함을 의미한다.
+
+```tsx
+import fs = require("node:fs");
+import http = require("node:http");
+import path = require("node:path");
+```
+
+실제 node에서는 위 방식을 더 추천함
