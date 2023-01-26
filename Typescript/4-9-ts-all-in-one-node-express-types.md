@@ -108,3 +108,60 @@ http
 ```
 
 위에서 `http.createServer`, `fs.readFile`. `path.join` 등에 대한 메서드의 타입을 모두 확인할 수 있으며, 필요에 따라 내부에 어떤 타입이 적용되는지 확인해보면 좋겠다.
+
+### @types/express
+
+node는 위처럼 하나씩 메서드를 열어보면서 타입을 확인해보면 된다. 중점적으로 볼 것은 express이다.
+
+```bash
+> npm i express
+> npm i -D @types/express
+```
+
+`express.ts`
+
+```tsx
+import express from "express";
+
+const app = express();
+
+app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
+app.use("/", express.static("./public"));
+
+app.get("/", (req, res) => {});
+
+app.listen(8080, () => {});
+```
+
+위 구조의 express 기본 코드에서 express는 함수인데 타입스크립트? 라고 생각하면 안됨.
+아마도 구조는 아래와 같은 꼴일 것이다.
+
+```tsx
+// 예시용. 샘플 코드
+interface ExpressFunction {
+	(): App;
+}
+
+interface Express extends ExpressFunction {
+	json: () => Middleware;
+	urlEncoded: ({ extended?: boolean }) => Middleware;
+	static: (path: string) => Middleware;
+}
+```
+
+실제 `express/index.d.ts`는 아래와 같다.
+
+```tsx
+import * as bodyParser from "body-parser";
+import * as serveStatic from "serve-static";
+import * as core from "express-serve-static-core"; // 핵심 로직이 몰려있다.
+import * as qs from "qs";
+
+declare function e(): core.Express;
+
+// ..
+export = e;
+```
+
+위 export 구조를 통해 모듈 형태로 타입이 정의되었다는 것을 알 수 있음 (import e from “express”; 도 가능)
