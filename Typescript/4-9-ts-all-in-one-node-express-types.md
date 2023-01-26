@@ -69,4 +69,42 @@ import http = require("node:http");
 import path = require("node:path");
 ```
 
-실제 node에서는 위 방식을 더 추천함
+실제 node에서는 위 방식을 더 추천함.
+위와 같이 처리 후 이제 http, fs, path 모듈 타입 분석을 하나씩 해나가면 된다.
+우선 서버 시작을 위해 위와 같이 코드 작성 후 `npx ts-node node.ts` 로 아래 파일을 실행시켜 준다.
+
+`node.ts`
+
+```tsx
+import fs from "fs";
+import http from "http";
+import path from "path";
+
+http
+  .createServer((req, res) => {
+    fs.readFile(path.join(__dirname, "index.html"), (err, data) => {
+      res.writeHead(200);
+      res.end(data);
+    });
+  })
+  .listen(8080, () => {
+    console.log("server started");
+  });
+```
+
+`index.html`
+
+```tsx
+<html>
+	<head>
+	  <meta charset="UTF-8">
+	  <title>Vicky TS 연습</title>
+	</head>
+
+	<body>
+	  <div>TS 연습해봅시다.</div>
+	</body>
+</html>
+```
+
+위에서 `http.createServer`, `fs.readFile`. `path.join` 등에 대한 메서드의 타입을 모두 확인할 수 있으며, 필요에 따라 내부에 어떤 타입이 적용되는지 확인해보면 좋겠다.
