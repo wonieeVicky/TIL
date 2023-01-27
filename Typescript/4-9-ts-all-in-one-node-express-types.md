@@ -165,3 +165,232 @@ export = e;
 ```
 
 위 export 구조를 통해 모듈 형태로 타입이 정의되었다는 것을 알 수 있음 (import e from “express”; 도 가능)
+
+### express middlware 타이핑
+
+위 index.d.ts에서 본 것처럼 핵심로직이 별도 타입 모듈로 분리되어 있음.
+express-serve-static-core를 이루는 index.d.ts 파일을 보면 아래와 같음
+
+```tsx
+declare global {
+  namespace Express {
+    // These open interfaces may be extended in an application-specific manner via declaration merging.
+    // See for example method-override.d.ts (https://github.com/DefinitelyTyped/DefinitelyTyped/blob/master/types/method-override/index.d.ts)
+    interface Request {}
+    interface Response {}
+    interface Locals {}
+    interface Application {}
+  }
+}
+```
+
+위와 같이 해당 모듈이 global로 선언된 것을 확인할 수 있는데, 이는 express를 사용하는 모든 곳에서 활용이 가능하다는 의미가 된다. 또한, `declare global`, `declare namespace ~`, `declare module ~` 이런 아이들은 타입이 합쳐지는 특성이 있다. 합쳐진다는 것은 큰 장점을 지니는데, 나중에 수정이나 확장이 가능한 것을 의미한다. (즉, global로 선언했다는 것은 사용자가 직접 수정할 수 있도록 열어둔 개념이라고 보면 된다.)
+
+즉 아래와 같은 구조가 가능해진다.
+
+```tsx
+import express, { Request, Response, NextFunction } from "express";
+
+interface ResponseTest extends Response {
+  vicky: string;
+}
+
+const middleware = (req: Request, res: ResponseTest, next: NextFunction) => {
+  res.vicky;
+};
+```
+
+express는 사실 미들웨어가 전부임
+
+![드래그 해 둔 부분이 미들웨어라고 보면 됨](../img/230127-1.png)
+
+우리는 미들웨어와 이러한 미들웨어를 장착할 수 있는 use, get, post, all 등의 메서드를 훑어봐야 한다.
+먼저 get 메서드에 대해 타입 정의를 살펴보면 아래와 같다.
+
+```tsx
+export interface IRouterMatcher<
+  T,
+  Method extends "all" | "get" | "post" | "put" | "delete" | "patch" | "options" | "head" = any
+> {
+  <
+    Route extends string,
+    P = RouteParameters<Route>,
+    ResBody = any,
+    ReqBody = any,
+    ReqQuery = ParsedQs,
+    LocalsObj extends Record<string, any> = Record<string, any>
+  >(
+    // (it's used as the default type parameter for P)
+    // eslint-disable-next-line no-unnecessary-generics
+    path: Route,
+    // (This generic is meant to be passed explicitly.)
+    // eslint-disable-next-line no-unnecessary-generics
+    ...handlers: Array<RequestHandler<P, ResBody, ReqBody, ReqQuery, LocalsObj>>
+  ): T;
+  <
+    Path extends string,
+    P = RouteParameters<Path>,
+    ResBody = any,
+    ReqBody = any,
+    ReqQuery = ParsedQs,
+    LocalsObj extends Record<string, any> = Record<string, any>
+  >(
+    // (it's used as the default type parameter for P)
+    // eslint-disable-next-line no-unnecessary-generics
+    path: Path,
+    // (This generic is meant to be passed explicitly.)
+    // eslint-disable-next-line no-unnecessary-generics
+    ...handlers: Array<RequestHandlerParams<P, ResBody, ReqBody, ReqQuery, LocalsObj>>
+  ): T;
+  <
+    P = ParamsDictionary,
+    ResBody = any,
+    ReqBody = any,
+    ReqQuery = ParsedQs,
+    LocalsObj extends Record<string, any> = Record<string, any>
+  >(
+    path: PathParams,
+    // (This generic is meant to be passed explicitly.)
+    // eslint-disable-next-line no-unnecessary-generics
+    ...handlers: Array<RequestHandler<P, ResBody, ReqBody, ReqQuery, LocalsObj>>
+  ): T;
+  <
+    P = ParamsDictionary,
+    ResBody = any,
+    ReqBody = any,
+    ReqQuery = ParsedQs,
+    LocalsObj extends Record<string, any> = Record<string, any>
+  >(
+    path: PathParams,
+    // (This generic is meant to be passed explicitly.)
+    // eslint-disable-next-line no-unnecessary-generics
+    ...handlers: Array<RequestHandlerParams<P, ResBody, ReqBody, ReqQuery, LocalsObj>>
+  ): T;
+  (path: PathParams, subApplication: Application): T;
+}
+```
+
+갱장히 어렵다 🥲 그런데 위 문법에 공통점이 있다. 방식이 조금씩 다른 같은 형태의 값들.. 즉 오버로딩 형태의 타이핑 구조라는 것을 알 수 있음. 이를 사용하는 쪽은 어디인지 좀 더 타고들어가보면 아래와 같음
+
+```tsx
+export interface IRouter extends RequestHandler {
+  param(name: string, handler: RequestParamHandler): this;
+  param(callback: (name: string, matcher: RegExp) => RequestParamHandler): this;
+
+  /**
+   * Special-cased "all" method, applying the given route `path`,
+   * middleware, and callback to _every_ HTTP method.
+   */
+  all: IRouterMatcher<this, "all">;
+  get: IRouterMatcher<this, "get">;
+  post: IRouterMatcher<this, "post">;
+  put: IRouterMatcher<this, "put">;
+  delete: IRouterMatcher<this, "delete">;
+  patch: IRouterMatcher<this, "patch">;
+  options: IRouterMatcher<this, "options">;
+  head: IRouterMatcher<this, "head">;
+
+  checkout: IRouterMatcher<this>;
+  connect: IRouterMatcher<this>;
+  copy: IRouterMatcher<this>;
+  lock: IRouterMatcher<this>;
+  merge: IRouterMatcher<this>;
+  mkactivity: IRouterMatcher<this>;
+  mkcol: IRouterMatcher<this>;
+  move: IRouterMatcher<this>;
+  "m-search": IRouterMatcher<this>;
+  notify: IRouterMatcher<this>;
+  propfind: IRouterMatcher<this>;
+  proppatch: IRouterMatcher<this>;
+  purge: IRouterMatcher<this>;
+  report: IRouterMatcher<this>;
+  search: IRouterMatcher<this>;
+  subscribe: IRouterMatcher<this>;
+  trace: IRouterMatcher<this>;
+  unlock: IRouterMatcher<this>;
+  unsubscribe: IRouterMatcher<this>;
+
+  use: IRouterHandler<this> & IRouterMatcher<this>;
+
+  route<T extends string>(prefix: T): IRoute<T>;
+  route(prefix: PathParams): IRoute;
+  stack: any[];
+}
+```
+
+즉 IRouter에서 각 메서드들에게 부여하는 값이라는 것을 알 수 있음
+
+```tsx
+export interface IRouterMatcher<
+    T,
+    Method extends 'all' | 'get' | 'post' | 'put' | 'delete' | 'patch' | 'options' | 'head' = any
+>
+```
+
+IRouterMatcher는 위와 같이 시작하므로 T는 this가 되고, 다음 메서드들은 all, get, post 값 등을 가지게 된다.
+그리고 실제 사용한 값에서 정의로 이동했을 때 실제 사용되는 값으로 아래와 같이 매칭이 되기 때문에 처음부터 겁먹을 필요는 없다.
+
+![](../img/230127-2.png)
+
+```tsx
+export interface IRouterMatcher<
+  T,
+  Method extends "all" | "get" | "post" | "put" | "delete" | "patch" | "options" | "head" = any
+> {
+  <
+    Route extends string,
+    P = RouteParameters<Route>,
+    ResBody = any,
+    ReqBody = any,
+    ReqQuery = ParsedQs,
+    LocalsObj extends Record<string, any> = Record<string, any>
+  >(
+    // (it's used as the default type parameter for P)
+    // eslint-disable-next-line no-unnecessary-generics
+    path: Route,
+    // (This generic is meant to be passed explicitly.)
+    // eslint-disable-next-line no-unnecessary-generics
+    ...handlers: Array<RequestHandler<P, ResBody, ReqBody, ReqQuery, LocalsObj>>
+  ): T;
+}
+```
+
+위 구조가 매칭되는 타이핑이라면 path는 Route 타입이고, Route는 string 타입이라고 명시되어 있으므로 `app.get("/", (req, res) => {});` 에서 `/` 를 의미하는 것임을 알 수 있다.
+
+다음으로 handlers에 전개연산자가 붙어있는데 보통 저런 형태의 경우 배열을 의미하며, 이는 RequestHandler 타입이며 이러한 값이 여러 개 될 수 있음을 시사해준다. 즉 아래와 같은 코드 작성이 가능한 것임
+
+```tsx
+// 미들웨어는 RequestHandler이다.
+app.get(
+  "/",
+  cors(),
+  multer(),
+  (req, res, next) => {
+    // ..
+  },
+  (req, res, next) => {
+    // ..
+  },
+  (req, res, next) => {
+    // ..
+  },
+  (req, res, next) => {
+    // ..
+  }
+);
+```
+
+실제 코드를 작성하다보면 저 미들웨어 내부의 인자를 타입스크립트에서 대부분 추론해 줌
+이는 `RequestHandler<P, ResBody, ReqBody, ReqQuery, LocalsObj>` 이러한 정보를 모두 타입으로 가지고 있기 때문이다.
+
+문제는 저 미들웨어를 별도로 바깥으로 분리했을 때 타입스크립트가 express middleware임을 잘 알지 못한다.
+
+```tsx
+const middleware = (req: Express.Request, res: Express.Response, next: express.NextFunction) => {};
+
+// 혹은
+import express, { Request, Response, NextFunction } from "express";
+const middleware = (req: Request, res: Response, next: NextFunction) => {};
+```
+
+그 때는 위처럼 직접 인자에 타입을 지정해주는 방법으로 해결할 수 있음
