@@ -191,15 +191,18 @@ declare global {
 ```tsx
 import express, { Request, Response, NextFunction } from "express";
 
+// interface 합치기 위해 global - Express 내부로 선언
+// 이를 인터페이스 확장이라고 한다.
 declare global {
-  // interface 합치기 위해 global 내부로 선언
-  interface Response {
-    vicky: string;
+  namespace Express {
+    interface Response {
+      vicky: string;
+    }
   }
 }
 
 const middleware = (req: Request, res: Response, next: NextFunction) => {
-  res.vicky;
+  res.vicky; // string
 };
 ```
 
@@ -400,3 +403,51 @@ const middleware: RequestHandler = (req, res, next) => {};
 ```
 
 그 때는 위처럼 직접 인자에 타입을 지정해주는 방법으로 해결할 수 있음
+
+### req, res 속성 타이핑
+
+해당 middleware에서 req, res 인자를 사용해 아래와 같은 데이터들을 가져다 쓸 수 있다.
+
+```tsx
+const middleware: RequestHandler = (req, res, next) => {
+  req.body.bodyType; // any
+  req.params.paramType; // ParamsDictionary[string]: string
+  req.query.queryType; // string | QueryString.ParsedQs | string[] | QueryString.ParsedQs[] | undefined
+  res.locals.localType; // any
+};
+```
+
+그런데 위와 같이 타입이 정확하지 않게 any로 추론되는 것들이 많음.
+RequestHandler 타입을 보면 아래와 같이 제네릭을 사용해 다양한 타이핑이 가능하도록 되어있다.
+
+```tsx
+interface RequestHandler<
+  P = core.ParamsDictionary,
+  ResBody = any,
+  ReqBody = any,
+  ReqQuery = core.Query,
+  Locals extends Record<string, any> = Record<string, any>
+> extends core.RequestHandler<P, ResBody, ReqBody, ReqQuery, Locals> {}
+```
+
+따라서 위 방법을 그대로 차용해 사용하는 메서드에 대한 상세한 타입을 정의해주는 것이 바람직함
+
+```tsx
+const middleware: RequestHandler<
+  { paramType: string },
+  { message: string },
+  { bodyType: number },
+  { queryType: boolean },
+  { localType: unknown }
+> = (req, res, next) => {
+  req.params.paramType; // string
+  req.body.bodyType; // number
+  req.query.queryType; // boolean
+  res.locals.localType; // unknown
+  res.json({
+    message: "hello", // string
+  });
+};
+```
+
+위와 같이 제네릭에 각 위치별로 정확한 타이핑을 추가해주면 하위 실제 코드에서 원하는 대로 타입이 추론되는 것을 확인할 수 있다.
