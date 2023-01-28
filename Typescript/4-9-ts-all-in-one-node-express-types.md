@@ -391,6 +391,9 @@ const middleware = (req: Express.Request, res: Express.Response, next: express.N
 // 혹은
 import express, { Request, Response, NextFunction } from "express";
 const middleware = (req: Request, res: Response, next: NextFunction) => {};
+
+// 혹은
+const middleware: RequestHandler = (req, res, next) => {};
 ```
 
 그 때는 위처럼 직접 인자에 타입을 지정해주는 방법으로 해결할 수 있음
