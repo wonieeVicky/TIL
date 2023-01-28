@@ -191,11 +191,14 @@ declare global {
 ```tsx
 import express, { Request, Response, NextFunction } from "express";
 
-interface ResponseTest extends Response {
-  vicky: string;
+declare global {
+  // interface 합치기 위해 global 내부로 선언
+  interface Response {
+    vicky: string;
+  }
 }
 
-const middleware = (req: Request, res: ResponseTest, next: NextFunction) => {
+const middleware = (req: Request, res: Response, next: NextFunction) => {
   res.vicky;
 };
 ```
