@@ -1,4 +1,4 @@
-﻿import express, { Request, Response, NextFunction } from "express";
+﻿import express, { Request, Response, NextFunction, RequestHandler } from "express";
 
 const app = express();
 
@@ -6,12 +6,31 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use("/", express.static("./public"));
 
-interface ResponseTest extends Response {
-  vicky: string;
+declare global {
+  namespace Express {
+    interface Response {
+      vicky: string;
+    }
+    interface Request {
+      vicky: string;
+    }
+  }
 }
 
-const middleware = (req: Request, res: ResponseTest, next: NextFunction) => {
-  res.vicky;
+const middleware: RequestHandler<
+  { paramType: string },
+  { message: string },
+  { bodyType: number },
+  { queryType: boolean },
+  { localType: unknown }
+> = (req, res, next) => {
+  req.params.paramType; // string
+  req.body.bodyType; // number
+  req.query.queryType; // boolean
+  res.locals.localType; // unknown
+  res.json({
+    message: "hello", // string
+  });
 };
 
 app.get("/", (req, res) => {});
