@@ -1,21 +1,10 @@
-﻿import express, { Request, Response, NextFunction, RequestHandler } from "express";
+﻿import express, { Request, Response, NextFunction, RequestHandler, ErrorRequestHandler } from "express";
 
 const app = express();
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use("/", express.static("./public"));
-
-declare global {
-  namespace Express {
-    interface Response {
-      vicky: string;
-    }
-    interface Request {
-      vicky: string;
-    }
-  }
-}
 
 const middleware: RequestHandler<
   { paramType: string },
@@ -24,6 +13,7 @@ const middleware: RequestHandler<
   { queryType: boolean },
   { localType: unknown }
 > = (req, res, next) => {
+  req.vicky = "vicky"; // Ok
   req.params.paramType; // string
   req.body.bodyType; // number
   req.query.queryType; // boolean
@@ -33,10 +23,12 @@ const middleware: RequestHandler<
   });
 };
 
-app.get("/", (req, res) => {});
+app.get("/", middleware);
 
-app.use((err, req, res, next) => {
+const errMiddleware: ErrorRequestHandler = (err: Error, req, res, next) => {
   console.log(err.status);
-});
+};
+
+app.use(errMiddleware);
 
 app.listen(8080, () => {});
