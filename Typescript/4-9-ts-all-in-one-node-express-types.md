@@ -451,3 +451,180 @@ const middleware: RequestHandler<
 ```
 
 위와 같이 제네릭에 각 위치별로 정확한 타이핑을 추가해주면 하위 실제 코드에서 원하는 대로 타입이 추론되는 것을 확인할 수 있다.
+
+### d.ts에서의 declare global
+
+앞서 declare global로 선언한 타입은 같은 모양(꼴)으로 타입을 선언해주면 확장이 가능하다는 것을 배웠다.
+아래 케이스로 더 자세히 알아보자.
+
+![](../img/230129-1.png)
+
+위와 같은 app.use 메서드 사용 시 err, req, res, next에 모두 타입 에러가 발생하는 것을 알 수 있음
+위 코드에 middleware 자리에 타이핑을 해주기 위해 분리를 한다면 아래와 같을 것이다.
+
+```tsx
+const errMiddleware: RequestHandler = (err, req, res, next) => {
+  console.log(err.status);
+};
+app.use(errMiddleware); // 똑같이 에러가 발생하고 있음
+```
+
+이는 4개의 매개변수를 사용하는 ErrorRequestHandler 타입을 써주면 된다.
+
+```tsx
+const errMiddleware: ErrorRequestHandler = (err, req, res, next) => {
+  console.log(err.status);
+};
+app.use(errMiddleware); // Ok
+```
+
+이 방법을 찾아가는 과정은 아래와 같다.
+
+```tsx
+export interface IRouterHandler<T, Route extends string = string> {
+    (...handlers: Array<RequestHandler<RouteParameters<Route>>>): T;
+    (...handlers: Array<RequestHandlerParams<RouteParameters<Route>>>): T;
+ //	...
+```
+
+위에서 RequestHandlerParams의 타입 정의로 이동
+
+```tsx
+export type RequestHandlerParams<
+  P = ParamsDictionary,
+  ResBody = any,
+  ReqBody = any,
+  ReqQuery = ParsedQs,
+  LocalsObj extends Record<string, any> = Record<string, any>
+> =
+  | RequestHandler<P, ResBody, ReqBody, ReqQuery, LocalsObj>
+  | ErrorRequestHandler<P, ResBody, ReqBody, ReqQuery, LocalsObj>
+  | Array<RequestHandler<P> | ErrorRequestHandler<P>>;
+
+type RemoveTail<S extends string, Tail extends string> = S extends `${infer P}${Tail}` ? P : S;
+type GetRouteParameter<S extends string> = RemoveTail<
+  RemoveTail<RemoveTail<S, `/${string}`>, `-${string}`>,
+  `.${string}`
+>;
+```
+
+위에서 ErrorRequestHandler를 발견. 해당 타입정의로 이동
+
+```tsx
+export type ErrorRequestHandler<
+  P = ParamsDictionary,
+  ResBody = any,
+  ReqBody = any,
+  ReqQuery = ParsedQs,
+  LocalsObj extends Record<string, any> = Record<string, any>
+> = (
+  err: any,
+  req: Request<P, ResBody, ReqBody, ReqQuery, LocalsObj>,
+  res: Response<ResBody, LocalsObj>,
+  next: NextFunction
+) => void;
+```
+
+4가지 매개변수를 사용하는 타입이라는 것을 알게되었음. 이를 사용할 수 있구나를 알게됨
+그런데 실제 해당 타입을 보면 err 타입이 any로 되어있다. 따라서 아래와 같이 개선할 수 있음
+
+```tsx
+const errMiddleware: ErrorRequestHandler = (err: unknown, req, res, next) => {
+  console.log(err.status);
+};
+
+// 혹은
+const errMiddleware: ErrorRequestHandler = (err: NodeJS.ErrnoException, req, res, next) => {
+  console.log(err.status);
+};
+
+// 혹은
+const errMiddleware: ErrorRequestHandler = (err: Error, req, res, next) => {
+  console.log(err.status); // Error!,  'Error' 형식에 'status' 속성이 없습니다.
+};
+
+// Error는 아래와 같음
+interface Error {
+  name: string;
+  message: string;
+  stack?: string;
+}
+```
+
+그런데 위와 같이 하면 Error 타입에 status가 없기 때문에 타입에러가 발생한다. 이는 아래와 같이 개선
+
+```tsx
+interface Error {
+  status: number;
+}
+
+const errMiddleware: ErrorRequestHandler = (err: Error, req, res, next) => {
+  console.log(err.status); // Ok!
+};
+```
+
+만약 Error가 import 구조여서 타입명이 중복된다는 에러가 발생한다면 global 처리해주면 된다. (아래와 같이)
+또, 만약 Error의 구조가 namespace까지 겹쳐지는 포맷으로 되어있다면 그것도 맞춰준다.
+
+```tsx
+// 아래는 예시임! Error는 lib 이라서 별도 import 되지 않으므로 global 선언이 필요없다.
+// 하지만 닥히 위 코드로 적어넣어도 에러는 발생하지 않음
+declare global {
+  interface Error {
+    status: number;
+  }
+}
+```
+
+위와 같은 커스텀 타입이 많이 생길 경우 각 파일에서 관리하기가 어려워지므로 이는 한 파일로 분리해서 관리하는 것이 좋다. root 선상에 `types.d.ts`파일 생성하여 커스텀 타입 코드는 그쪽으로 옮겨준다.
+
+`types.d.ts`
+
+```tsx
+// Error
+declare global {
+  interface Error {
+    status: number;
+  }
+}
+```
+
+그런데 위와 같이 넣으면 에러가 발생한다. global 선언을 제외한 interface Error 코드만 넣으면 정상 동작
+이는 global 선언의 특징 때문인데 반드시 import가 되는 위치에서 사용해야지만 global 선언이 먹힌다.
+
+위 types.d.ts는 별도 import 하는 구석이 없으므로 global 선언 시 에러가 난다.
+
+`types.d.ts`
+
+```tsx
+interface Error {
+  status: number;
+}
+```
+
+위처럼 써야 에러안남. 좀 전에 다뤘던 Express.Response, Express.Request도 동일하게 옮겨줘야함
+
+`types.d.ts`
+
+```tsx
+// declare global { // Error
+namespace Express {
+  interface Response {
+    vicky: string;
+  }
+  interface Request {
+    vicky: string;
+  }
+}
+// }
+```
+
+`express.ts`
+
+```tsx
+const middleware: RequestHandler<...> = (req, res, next) => {
+  req.vicky = "vicky"; // Ok
+};
+
+app.get("/", middleware);
+```
