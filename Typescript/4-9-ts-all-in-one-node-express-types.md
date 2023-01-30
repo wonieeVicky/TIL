@@ -608,15 +608,30 @@ interface Error {
 
 ```tsx
 // declare global { // Error
-namespace Express {
-  interface Response {
-    vicky: string;
+  namespace Express {
+    interface Response {
+      vicky: string;
+    }
+    interface Request {
+      vicky: string;
+    }
   }
-  interface Request {
-    vicky: string;
+// }
+
+// 혹은 아래와 같이 해도 됨
+declare global {
+  namespace Express {
+    interface Response {
+      vicky: string;
+    }
+    interface Request {
+      vicky: string;
+    }
   }
 }
-// }
+
+export {}; // 별도 export
+```
 ```
 
 `express.ts`
