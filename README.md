@@ -70,6 +70,7 @@
     - [React 타입 분석](Typescript/4-7-ts-all-in-one-react-types.md)
     - [Redux 타입 분석](Typescript/4-8-ts-all-in-one-redux-types.md)
     - [Node, Express 타입 분석](Typescript/4-9-ts-all-in-one-node-express-types.md)
+    - [타입 지원이 안되는 라이브러리 직접 타이핑하기](Typescript/4-10-ts-all-in-one-library-self-typing.md)
 
 ## JavaScript
 
