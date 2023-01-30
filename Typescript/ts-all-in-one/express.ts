@@ -1,10 +1,19 @@
 ﻿import express, { Request, Response, NextFunction, RequestHandler, ErrorRequestHandler } from "express";
+import cookieParser from "cookie-parser";
+import session from "express-session";
+import passport from "passport";
 
 const app = express();
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use("/", express.static("./public"));
+app.use(cookieParser("SECRET"));
+app.use(session({ secret: "SECRET" }));
+app.use(passport.initialize());
+app.use(passport.session());
+
+type R = Express.Request;
 
 const middleware: RequestHandler<
   { paramType: string },
@@ -21,6 +30,11 @@ const middleware: RequestHandler<
   res.json({
     message: "hello", // string
   });
+
+  req.cookies;
+  req.session;
+  req.isAuthenticated();
+  req.user?.vicky;
 };
 
 app.get("/", middleware);
