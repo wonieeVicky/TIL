@@ -608,14 +608,14 @@ interface Error {
 
 ```tsx
 // declare global { // Error
-  namespace Express {
-    interface Response {
-      vicky: string;
-    }
-    interface Request {
-      vicky: string;
-    }
+namespace Express {
+  interface Response {
+    vicky: string;
   }
+  interface Request {
+    vicky: string;
+  }
+}
 // }
 
 // 혹은 아래와 같이 해도 됨
@@ -630,15 +630,136 @@ declare global {
   }
 }
 
-export {}; // 별도 export
+export {}; // 별도 export - 모듈타입으로 만드는 것임, 없으면 스크립트 타입으로 이해
 ```
-```
+
+````
 
 `express.ts`
 
 ```tsx
 const middleware: RequestHandler<...> = (req, res, next) => {
   req.vicky = "vicky"; // Ok
+};
+
+app.get("/", middleware);
+````
+
+### passport에서 req.user 타이핑하기
+
+이 밖에도 passport에서도 타입 확장을 구현해볼 수 있다. 먼저 설치해준다.
+
+```bash
+> npm i cookie-parser express-session passport passport-local
+> npm i -D @types/cookie-parser @types/passport @types/passport-local @types/express-session
+```
+
+위 패키지를 설치해주면 express middleware를 추가해준 개념이므로 아래와 같은 메서드들에 대한 사용이 가능해진다.
+
+```tsx
+import cookieParser from "cookie-parser";
+import session from "express-session";
+import passport from "passport";
+
+const app = express();
+// ...
+app.use(cookieParser("SECRET"));
+app.use(session({ secret: "SECRET" }));
+app.use(passport.initialize());
+app.use(passport.session());
+
+const middleware: RequestHandler<{...}> = (req, res, next) => {
+  req.cookies; // Ok
+  req.session; // Ok
+  req.isAuthenticated(); // Ok
+  req.user; // Ok
+};
+
+app.get("/", middleware);
+```
+
+실제 코드에서는 app.use메서드로 passport 미들웨어를 추가해줘야 하단의 `req.cookies`, `req.session` 등이 정상적으로 동작하지만, 타입스크립트에서는 이를 알지 못하므로 `app.use(passport middleware)` 없이도 타입에러는 발생하지 않는다. (타입 내 undefined가 존재)
+
+그런데 해당 라이브러리를 설치했다고 해서 어떻게 위 인자들이 타입에러가 발생하지 않는 것일까?
+타이핑 구조를 보고 이해해보자. express-session의 타입정의를 들어가면 아래와 같다.
+
+`node_modules/@types/express-session/index.d.ts`
+
+```tsx
+declare global {
+  namespace Express {
+    type SessionStore = session.Store & { generate: (req: Request) => void };
+    interface Request {
+      session: session.Session & Partial<session.SessionData>;
+      sessionID: string;
+      sessionStore: SessionStore;
+    }
+  }
+}
+
+export = session;
+
+// ..
+```
+
+위에서 작업했던 것처럼 Express 타이핑에 확장이 될 수 있는 포맷을 그대로 계승하고 있는 것을 확인할 수 있다. (declare global > namespace express > 내부로 타이핑 추가)
+
+즉 express에서 애초에 타입설계를 확장 가능하도록 설계해두었기 때문에 위 구조가 가능하다.
+
+![](../img/230130-1.png)
+
+실제 Express.Request에 대한 타입 정의를 보기 위해 위 코드 입력 후 타입 정의를 찾아보면 express.Request로 확장된 다양한 타이핑 코드들이 합쳐진 구조라는 것을 확인할 수 있다.
+
+그렇다면 실제 타입을 확장도 해보자.
+
+```tsx
+const middleware: RequestHandler<{...}> = (req, res, next) => {
+  req.user.vicky; // Error
+};
+
+app.get("/", middleware);
+```
+
+위와 같이 req.user에 vicky라는 확장 메서드가 정상 동작하게 하고 싶다면 어떻게 하면 될까?
+실제 user 타이핑은 아래와 같음(`@types/passport/index.d.ts`)
+
+```tsx
+declare global {
+  namespace Express {
+    interface AuthInfo {}
+    interface User {} // 이 부분을 확장해야 함
+
+    interface Request {
+      authInfo?: AuthInfo | undefined;
+      user?: User | undefined;
+      // ..
+    }
+    // ..
+  }
+}
+```
+
+`types.d.ts`
+
+```tsx
+namespace Express {
+  interface Response {
+    vicky: string;
+  }
+  interface Request {
+    vicky: string;
+  }
+
+  interface User {
+    // User 타입 확장
+    vicky: string;
+  }
+}
+```
+
+```tsx
+ const middleware: RequestHandler<{...}> = (req, res, next) => {
+  req.user.vicky; // Ok
 };
 
 app.get("/", middleware);
