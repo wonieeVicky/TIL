@@ -1,7 +1,8 @@
-﻿import express, { Request, Response, NextFunction, RequestHandler, ErrorRequestHandler } from "express";
+﻿import express, { RequestHandler, ErrorRequestHandler } from "express";
 import cookieParser from "cookie-parser";
 import session from "express-session";
 import passport from "passport";
+import flash from "connect-flash";
 
 const app = express();
 
@@ -12,6 +13,7 @@ app.use(cookieParser("SECRET"));
 app.use(session({ secret: "SECRET" }));
 app.use(passport.initialize());
 app.use(passport.session());
+app.use(flash());
 
 type R = Express.Request;
 
@@ -31,10 +33,10 @@ const middleware: RequestHandler<
     message: "hello", // string
   });
 
-  req.cookies;
-  req.session;
-  req.isAuthenticated();
-  req.user?.vicky;
+  req.flash("플래시메시지");
+  req.flash("1회성", "플래시메시지");
+  const a = req.flash(); // [key: string]: string[];
+  req.flash();
 };
 
 app.get("/", middleware);
