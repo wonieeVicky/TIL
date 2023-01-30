@@ -764,3 +764,148 @@ namespace Express {
 
 app.get("/", middleware);
 ```
+
+### passport Strategy 타입 분석
+
+passport Strategy 타입을 분석해보자
+
+`local.ts`
+
+```tsx
+import passport from "passport";
+import { Strategy } from "passport-local";
+
+export default () => {
+  passport.use(
+    "local",
+    new Strategy(
+      {
+        usernameField: "userId",
+        passwordField: "password",
+      },
+      async (userId, password, done) => {
+        try {
+          return done(null, false, { message: "비밀번호가 틀렸습니다." });
+        } catch (err) {
+          console.error(err);
+          return done(err);
+        }
+      }
+    )
+  );
+};
+```
+
+위와 같은 코드가 있다고 했을 때, Strategy에 대한 타입은 아래와 같음
+
+```tsx
+declare class Strategy extends PassportStrategy {
+  constructor(options: IStrategyOptionsWithRequest, verify: VerifyFunctionWithRequest);
+  constructor(options: IStrategyOptions, verify: VerifyFunction);
+  constructor(verify: VerifyFunction);
+
+  name: string;
+}
+```
+
+위와 같이 contructor가 오버로딩 되어있다. 이는 Strategy가 가진 특징 때문임.
+만약 위 Strategy 코드가 아래와 같다면 연결 인자도 변경된다.
+
+```tsx
+export default () => {
+  passport.use(
+    "local",
+    new Strategy(
+      {
+        usernameField: "userId",
+        passwordField: "password",
+        passReqToCallback: true,
+      },
+      async (req, userId, password, done) => {
+        // req 인자 추가
+        // ..
+      }
+    )
+  );
+};
+```
+
+`passReqToCallback`는 Request를 Callback에 전달한다는 옵션이므로 해당 req 인자가 추가로 전달되는 것임.
+
+```tsx
+interface IStrategyOptionsWithRequest {
+  usernameField?: string | undefined;
+  passwordField?: string | undefined;
+  session?: boolean | undefined;
+  passReqToCallback: true;
+}
+
+interface VerifyFunctionWithRequest {
+  (
+    req: express.Request, // 2. req가 반환됨을 알 수 있다.
+    username: string,
+    password: string,
+    done: (error: any, user?: Express.User | false, options?: IVerifyOptions) => void
+  ): void;
+}
+
+declare class Strategy extends PassportStrategy {
+  // 1. 즉 아래 constructor가 적용되었단 걸 알 수 있다.
+  constructor(options: IStrategyOptionsWithRequest, verify: VerifyFunctionWithRequest);
+  constructor(options: IStrategyOptions, verify: VerifyFunction);
+  constructor(verify: VerifyFunction);
+
+  name: string;
+}
+```
+
+위 타이핑을 직접 구현해본다.
+
+```tsx
+interface Option {
+  usernameField: string;
+  passwordField: string;
+  passReqToCallback?: false;
+}
+interface OptionWithReq {
+  usernameField: string;
+  passwordField: string;
+  passReqToCallback?: true;
+}
+
+interface Done {
+  (err: unknown | null, user?: Express.User | false, info?: unknown): void;
+}
+interface Callback {
+  (userId: string, password: string, done: Done): void;
+}
+interface CallbackWithReq {
+  (req: Express.Request, userId: string, password: string, done: Done): void;
+}
+declare class S {
+  constructor(option: Option, callback: Callback);
+  constructor(option: OptionWithReq, callback: CallbackWithReq);
+
+  authenticate(): void; // extends PassportStrategy 에 들어있음
+}
+
+const s: S = new S(
+  {
+    usernameField: "userId",
+    passwordField: "password",
+    passReqToCallback: true,
+  },
+  async (req, userId, password, done) => {
+    try {
+      return done(null, false, { message: "비밀번호가 틀렸습니다." });
+    } catch (err) {
+      console.error(err);
+      return done(err);
+    }
+  }
+);
+
+export default () => {
+  passport.use("local", s);
+};
+```
