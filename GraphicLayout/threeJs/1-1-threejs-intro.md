@@ -110,3 +110,47 @@ hello.hello2();
 ```
 
 3D 애니메이션 구현 시에는 `import * as alias` 형태로 많이 사용하는 편. 알고 있지만 한번 더 짚고 넘어감
+
+### three.js 사용 방법(모듈 사용 방법)
+
+이번에는 three.js를 모듈 방법으로 사용하는 것을 배워본다.
+새로운 작업 폴더를 생성 후 module 방식의 `three.module.js` 를 다운로드 받아 추가해준다.
+다음 index.html을 생성 후 아래처럼 반영
+
+`index.html`
+
+```html
+<!DOCTYPE html>
+<html>
+  <!-- ... -->
+  <body>
+    <script type="module">
+      import * as THREE from "./three.module.js";
+      const scene = new THREE.Scene();
+      const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+
+      const renderer = new THREE.WebGLRenderer();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      document.body.appendChild(renderer.domElement);
+
+      const geometry = new THREE.BoxGeometry(1, 1, 1);
+      const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
+      const cube = new THREE.Mesh(geometry, material);
+      scene.add(cube);
+
+      camera.position.z = 5;
+
+      function animate() {
+        requestAnimationFrame(animate);
+
+        cube.rotation.x += 0.01;
+        cube.rotation.y += 0.01;
+
+        renderer.render(scene, camera);
+      }
+
+      animate();
+    </script>
+  </body>
+</html>
+```
