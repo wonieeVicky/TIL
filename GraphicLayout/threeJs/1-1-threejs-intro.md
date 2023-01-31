@@ -154,3 +154,175 @@ hello.hello2();
   </body>
 </html>
 ```
+
+### 웹팩(webpack) 살펴보기
+
+이번에는 간단히 웹팩을 짚고 넘어간다. 웹팩을 알려면 번들링을 해준다. 배포용으로 소스코드를 만들어줌
+이번에는 간단하게 js파일을 번들링하는 정도로만 학습한다.(빠르게 넘어가자)
+
+프로젝트 작업 폴더에 `package.json`은 아래와 같음
+
+```json
+{
+  "name": "threejs-study",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "cross-env NODE_ENV=production webpack --progress",
+    "start": "webpack serve --progress"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@babel/cli": "^7.20.7",
+    "@babel/core": "^7.20.12",
+    "@babel/preset-env": "^7.20.2",
+    "babel-loader": "^9.1.2",
+    "clean-webpack-plugin": "^4.0.0",
+    "copy-webpack-plugin": "^11.0.0",
+    "core-js": "^3.27.2",
+    "cross-env": "^7.0.3",
+    "html-webpack-plugin": "^5.5.0",
+    "source-map-loader": "^4.0.1",
+    "terser-webpack-plugin": "^5.3.6",
+    "webpack": "^5.75.0",
+    "webpack-cli": "^5.0.1",
+    "webpack-dev-server": "^4.11.1"
+  }
+}
+```
+
+`npm i`로 패키지들을 모두 설치해준다.
+
+`webpack.config.js`
+
+```jsx
+const path = require("path");
+const webpack = require("webpack");
+const HtmlWebpackPlugin = require("html-webpack-plugin");
+const { CleanWebpackPlugin } = require("clean-webpack-plugin");
+const TerserPlugin = require("terser-webpack-plugin");
+const CopyWebpackPlugin = require("copy-webpack-plugin");
+
+const webpackMode = process.env.NODE_ENV || "development";
+
+module.exports = {
+  mode: webpackMode,
+  entry: {
+    main: "./src/main.js",
+  },
+  output: {
+    path: path.resolve("./dist"),
+    filename: "[name].min.js",
+  },
+  // es5로 빌드 해야 할 경우 주석 제거
+  // 단, 이거 설정하면 webpack-dev-server 3번대 버전에서 live reloading 동작 안함
+  // target: ['web', 'es5'],
+  devServer: {
+    liveReload: true,
+  },
+  optimization: {
+    minimizer:
+      webpackMode === "production"
+        ? [
+            new TerserPlugin({
+              terserOptions: {
+                compress: {
+                  drop_console: true,
+                },
+              },
+            }),
+          ]
+        : [],
+    splitChunks: {
+      chunks: "all",
+    },
+  },
+  module: {
+    rules: [
+      {
+        test: /\.js$/,
+        loader: "babel-loader",
+        exclude: /node_modules/,
+      },
+      {
+        test: /\.js$/,
+        enforce: "pre",
+        use: ["source-map-loader"],
+      },
+    ],
+  },
+  plugins: [
+    new HtmlWebpackPlugin({
+      template: "./src/index.html",
+      minify:
+        process.env.NODE_ENV === "production"
+          ? {
+              collapseWhitespace: true,
+              removeComments: true,
+            }
+          : false,
+    }),
+    new CleanWebpackPlugin(),
+    // CopyWebpackPlugin: 그대로 복사할 파일들을 설정하는 플러그인
+    // 아래 patterns에 설정한 파일/폴더는 빌드 시 dist 폴더에 자동으로 생성됩니다.
+    // patterns에 설정한 경로에 해당 파일이 없으면 에러가 발생합니다.
+    // 사용하는 파일이나 폴더 이름이 다르다면 변경해주세요.
+    // 그대로 사용할 파일들이 없다면 CopyWebpackPlugin을 통째로 주석 처리 해주세요.
+    // new CopyWebpackPlugin({
+    // 	patterns: [
+    // 		{ from: "./src/main.css", to: "./main.css" },
+    // 		// { from: "./src/images", to: "./images" },
+    // 		// { from: "./src/models", to: "./models" },
+    // 		// { from: "./src/sounds", to: "./sounds" }
+    // 	],
+    // })
+  ],
+};
+```
+
+이후 최소한의 구조를 src 폴더에 추가
+
+`./src/index.html`
+
+```jsx
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+
+<body>
+
+</body>
+
+</html>
+```
+
+`./src/message.js`
+
+```jsx
+export function message(msg) {
+  const elem = document.createElement("p");
+  elem.innerHTML = msg;
+  document.body.append(elem);
+}
+```
+
+`./src/main.js`
+
+```jsx
+import { message } from "./message.js";
+
+message("Hello Vicky");
+```
+
+위와 같이 추가 후 npm start를 하면 localhost:8080에 정상적으로 Hello Vicky가 노출됨
+npm build를 하면 dist 폴더에 `index.html`, `main.min.js` 파일이 정상 빌드되어 저장됨
+(추가 옵션들은 웹팩 설정으로 추가해준다)
