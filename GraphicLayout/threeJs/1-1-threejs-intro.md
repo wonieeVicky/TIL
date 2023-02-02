@@ -326,3 +326,102 @@ message("Hello Vicky");
 위와 같이 추가 후 npm start를 하면 localhost:8080에 정상적으로 Hello Vicky가 노출됨
 npm build를 하면 dist 폴더에 `index.html`, `main.min.js` 파일이 정상 빌드되어 저장됨
 (추가 옵션들은 웹팩 설정으로 추가해준다)
+
+### three.js 사용 방법 - webpack 으로 열기
+
+위에서 webpack 설정을 했으므로 three.js 프로젝트를 시작해본다.
+
+```bash
+> npm i three
+```
+
+이후 module 타입으로 생성한 main.js 소스를 옮겨온다.
+
+```jsx
+import * as THREE from "three"; // import 방식이 변경
+
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+
+// ..
+
+animate();
+```
+
+이후 기본 `index.html` 파일을 추가해준 뒤 devServer를 실행시키면 정상적으로 초록 박스가 노출되는 것을 확인할 수 있다. css 파일도 아래와 추가해준다.
+
+`./src/main.css`
+
+```css
+body {
+  margin: 0;
+}
+```
+
+`./src/index.html`
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <!-- ... -->
+    <!-- main.css import -->
+    <link rel="stylesheet" href="./main.css" />
+  </head>
+
+  <!-- ... -->
+</html>
+```
+
+`webpack.config.js`
+
+```jsx
+module.exports = {
+  // ..
+  plugins: [
+    // ..
+    new CopyWebpackPlugin({
+      patterns: [
+        { from: "./src/main.css", to: "./main.css" }, // 열어준다.
+        // { from: "./src/images", to: "./images" },
+        // { from: "./src/models", to: "./models" },
+        // { from: "./src/sounds", to: "./sounds" }
+      ],
+    }),
+  ],
+};
+```
+
+위와 같이 반영 후 데브서버 띄우면 정상 반영됨 ! 파일 빌드도 정상적으로 되는 것을 확인할 수 있다.
+
+```bash
+.
+├── 75.min.js
+├── 75.min.js.LICENSE.txt
+├── index.html
+├── main.css
+└── main.min.js
+```
+
+빌드 파일 구조
+
+```jsx
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Document</title>
+  <link rel="stylesheet" href="./main.css">
+  <script defer="defer" src="75.min.js"></script>
+  <script defer="defer" src="main.min.js"></script>
+</head>
+
+<body></body>
+
+</html>
+```
+
+html에 잘 담겨있음
