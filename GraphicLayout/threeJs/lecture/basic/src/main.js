@@ -15,13 +15,33 @@ renderer.setSize(window.innerWidth, window.innerHeight);
 
 // scene 생성
 const scene = new THREE.Scene();
-// camera 생성 - PerspectiveCamera(시야각fov, 종횡비aspect, near, far)
-const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+// camera 생성 - 원근 카메라 PerspectiveCamera(시야각fov, 종횡비aspect, near, far)
+// const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+
+// camera 생성 - 직교 카메라 OrthographicCamera(left, right, top, bottom, near, far)
+const camera = new THREE.OrthographicCamera(
+  -(window.innerWidth / window.innerHeight), // left
+  window.innerWidth / window.innerHeight, // right
+  1, // top
+  -1, // bottom
+  0.1, // near
+  1000
+);
 
 // camera 위치 설정
 camera.position.x = 1;
 camera.position.y = 2;
 camera.position.z = 5;
+
+// 카메라가 바라보는 위치 설정 - 큐브 원점을 바라보도록 설정
+camera.lookAt(0, 0, 0);
+
+// 카메라 zoom 설정
+camera.zoom = 0.5;
+
+// 카메라 설정 업데이트
+camera.updateProjectionMatrix();
+
 // 무대에 올리기
 scene.add(camera);
 
