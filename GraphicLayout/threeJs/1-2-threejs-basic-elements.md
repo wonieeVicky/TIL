@@ -153,3 +153,81 @@ scene.add(camera);
 
 위에서 5라는 숫자는 사물의 크기에 비례해서 작업자가 설정한 값이다.
 만약 카메라의 위치를 물체로 부터 5미터 뒤라고 했을 때 사람의 크기는 1.8미터라고 가정한다면 우리가 상상하는 사람을 바라보는 기준이 될 것임.. 이처럼 비율에 근거해서 가정하는 값
+
+### 기본 장면 만들기 - Mesh
+
+다음에는 물체를 만들어본다. mesh는 무대 위에 올려져있는 객체 하나하나를 의미한다.
+Geometry모양과 Material재질을 조합함
+
+`src/main.js`
+
+```jsx
+// Mesh 설정 - Geometry + Material
+const geometry = new THREE.BoxGeometry(1, 1, 1); // 1 * 1 * 1 정육면체 생성
+const material = new THREE.MeshBasicMaterial({
+  // color: 0x00ff00,
+  // color: "#00ff00",
+  color: "green",
+}); // 재질에 대한 속성을 객체에 설정함. 위와 같이 다양한 방법으로 넣을 수 있다.
+
+// Mesh 생성
+const mesh = new THREE.Mesh(geometry, material);
+// 무대에 올리기
+scene.add(mesh);
+```
+
+위 BoxGeometry, MeshBasicMaterial 는 모양과 재질을 표현하는 가장 기본적인 메서드임
+각 모양과 재질을 따로 설정해준 뒤 Mesh를 생성해서 Scene에 연결시키는 개념
+
+위와 같이 설정하여도 화면에는 아무것도 보이지 않는다. 바로 Renderer가 해당 코드를 렌더링시키지 않았기 때문
+따라서 아래와 같이 렌더러에게 연결시켜준다.
+
+`src/main.js`
+
+```jsx
+// ..
+
+// 그리기
+renderer.render(scene, camera);
+```
+
+앞서 설정한 scene과 camera를 연결시켜주는 개념임. 그러면 화면에 아래와 같이 보인다.
+
+![](../../img/230205-2.png)
+
+직육면체를 만들었는데 그냥 2D 네모로만 보인다. 카메라의 위치가 정면을 바라보고 있어서 그렇다.
+z 축으로만 뒤로 5 당겨놓음. y 축을 조정해서 위에서 바라보도록, x 축을 조정해서 오른쪽에서 바라보도록 설정해본다.
+
+`src/main.js`
+
+```jsx
+// ..
+// camera 위치 추가
+camera.position.x = 1;
+camera.position.y = 2;
+camera.position.z = 5;
+
+scene.add(camera);
+```
+
+![](../../img/230205-3.png)
+
+위와 같이 보인다 ㅋㅋ 위 내용이 three.js 아주 기본 내용을 조합한 것이다.
+매우 단순해 보일 수 있으나 그러하다. 재질 표현에서 사용한 MeshBasicMaterial의 경우 빛Light에 영향을 안받는 메서드이므로, 이 때문에 별도의 조명이 없어도 박스를 확인할 수 있는 것이다.
+
+그런데 자세히보면 물체의 아웃라인이 살짝 깨져보인다.
+계단식으로 거칠게 표현됨. 이는 렌더러 설정으로 부드럽게antialiasing 보이도록 설정할 수 있다.
+
+`src/main.js`
+
+```jsx
+// ..
+const renderer = new THREE.WebGLRenderer({
+  canvas,
+  antialias: true, // 추가
+});
+
+renderer.setSize(window.innerWidth, window.innerHeight);
+```
+
+추가적인 연산이 필요하므로 성능저하는 발생할 수 있다. 부드럽게 보이는 것이 필요할 때는 해당 옵션을 추가해서 노출해준다.
