@@ -231,3 +231,88 @@ renderer.setSize(window.innerWidth, window.innerHeight);
 ```
 
 추가적인 연산이 필요하므로 성능저하는 발생할 수 있다. 부드럽게 보이는 것이 필요할 때는 해당 옵션을 추가해서 노출해준다.
+
+### 직교 카메라(Orthographic Camera)
+
+이번에는 직교 카메라를 배워보자. 기존의 원근 카메라PerspectiveCamera 코드는 주석처리 해준다.
+우선 이 둘의 차이를 먼저 짚고 넘어가보자
+
+![](../../img/230205-4.png)
+
+PerspectiveCamera는 자연스럽게 사람의 눈으로 보는 것처럼 원근이 적용되어 있다.
+반면에 OrthographicCamera는 원근에 따라 물체의 크기가 다르게 표현되지 않는다. 거리에 상관없이 크기가 동일하게 표현
+
+OrthographicCamera 이를 가장 대표적으로 사용하는 케이스가 디아블로나 롤, 룰더스카이 같은 게임들에서 사용한다.
+기본적으로 사용하지는 않고 특정 조건에서만 사용하는 카메라라고 볼 수 있다.
+
+OrthographicCamera에 대한 [문서에서 설명](https://threejs.org/docs/index.html?q=camera#api/ko/cameras/OrthographicCamera)도 [렌더링된 이미지에서 객체의 크기는 카메라와의 거리에 관계없이 일정하게 유지된다.] 라고 적혀 있음. 생성자는 아래와 같다.
+
+**OrthographicCamera( left : Number, right : Number, top : Number, bottom : Number, near : Number, far : Number )**
+
+- `left` — 카메라 절두체 좌평면.
+- `right` — 카메라 절두체 우평면.
+- `top` — 카메라 절두체 상평면.
+- `bottom` — 카메라 절두체 하평면.
+- `near` — 카메라 절두체 근평면.
+- `far` — 카메라 절두체 원평면.
+
+ㅊ
+
+`src/main.js`
+
+```jsx
+// camera 생성 - 직교 카메라 OrthographicCamera(left, right, top, bottom, near, far)
+const camera = new THREE.OrthographicCamera(
+  -(window.innerWidth / window.innerHeight), // left
+  window.innerWidth / window.innerHeight, // right
+  1, // top
+  -1, // bottom
+  0.1, // near
+  1000
+);
+
+// camera 위치 설정
+camera.position.x = 1;
+camera.position.y = 2;
+camera.position.z = 5;
+
+// 카메라가 바라보는 위치 설정 - 큐브 원점을 바라보도록 설정
+camera.lookAt(0, 0, 0);
+
+// 무대에 올리기
+scene.add(camera);
+```
+
+기존 원근카메라와 동일한 조건으로 x, y, z 축의 위치를 설정하면 화면에 물체가 보이지 않는다.
+카메라가 너무 위에서 바라보고 있기 때문인데, 이를 큐브 원점(0, 0, 0)을 바라보도록 lookAt 메서드를 이용해 설정해준다.
+
+![](../../img/230205-6.png)
+
+뭔가 굉장히 무시무시하고, 이해하기 어려운 직육면체가 나타났다. 뚜둥.. 어색한 3D 같음
+이를 개선하기 위해 camera의 zoom 설정을 추가해준 뒤 update 해준다.
+
+`src/main.js`
+
+```jsx
+// ..
+camera.position.x = 1;
+camera.position.y = 2;
+camera.position.z = 5; // 직교 카메라에서는 원근을 z 값으로 조정하지 않는다.
+
+camera.lookAt(0, 0, 0);
+
+// 카메라 zoom 설정
+camera.zoom = 0.5;
+
+// 카메라 설정 업데이트
+camera.updateProjectionMatrix();
+
+scene.add(camera);
+```
+
+OrthographicCamera의 경우 특정한 상황에서만 사용하게 되므로, 주로 원근 카메라를 이용한다고 가정하고 진행함
+
+이해를 높기 위한 이미지 추가.. ([https://www.oreilly.com/library/view/learn-threejs/9781788833288/75c09eef-2a7d-47b2-8965-e3cd1fe1e6fe.xhtml](https://www.oreilly.com/library/view/learn-threejs/9781788833288/75c09eef-2a7d-47b2-8965-e3cd1fe1e6fe.xhtml))
+
+![](../../img/230205-7.png)
+![](../../img/230205-8.png)
