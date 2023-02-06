@@ -316,3 +316,28 @@ OrthographicCamera의 경우 특정한 상황에서만 사용하게 되므로, �
 
 ![](../../img/230205-7.png)
 ![](../../img/230205-8.png)
+
+### 소스코드 구조 잡기
+
+좀 더 깊이 있는 배움을 위해 프로젝트 구조를 조금 변경해본다.
+
+`src/ex01.js` (신규 파일 생성)
+
+```jsx
+import * as THREE from "three";
+
+// --- 주제: 기본 장면
+export default function example() {
+  // main.js source 여기에 복붙
+}
+```
+
+`src/main.js`
+
+```jsx
+import example from "./ex01";
+
+example();
+```
+
+위와 같은 모듈 구조로 변경
