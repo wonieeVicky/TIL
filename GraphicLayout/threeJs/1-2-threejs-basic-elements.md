@@ -449,3 +449,79 @@ export default function example() {
 위와 같이 처리하면 크기는 달라지지 않으나 훨씬 더 고밀도의 화면을 구현할 수 있게 된다.
 
 ![실제 더 선명해진 것 같기도..?](../../img/230206-1.png)
+
+### 배경의 색, 투명도 설정하기
+
+시커먼 배경색을 좀 수정해보자.
+
+`src/ex03.js`
+
+```jsx
+import * as THREE from "three";
+
+// --- 주제: 배경의 색, 투명도 설정하기
+
+export default function example() {
+  const canvas = document.querySelector("#three-canvas");
+  // alpha 화면을 투명하게 처리
+  const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  renderer.setPixelRatio(window.devicePixelRatio > 1 ? 2 : 1);
+  // 배경색 불투명도 설정 - 0.5만큼 불투명하게!
+  renderer.setClearAlpha(0.5);
+
+  // ..
+}
+```
+
+위와 같이 배경색을 투명하게, 불투명도를 50%로 줬더니 아래와 같이 노출된다.
+
+![](../../img/230207-1.png)
+
+이번엔 색을 지정해보자.
+
+```jsx
+import * as THREE from "three";
+
+// --- 주제: 배경의 색, 투명도 설정하기
+
+export default function example() {
+  // ..
+
+  const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+  // ..
+
+  // renderer.setClearColor(0x00ff00); // 아래와 같은 표현
+  renderer.setClearColor("#00ff00");
+  renderer.setClearAlpha(0.5);
+}
+```
+
+![박스는 빨간색으로 바꿔줬다. (****MeshBasicMaterial)****](../../img/230207-2.png)
+
+이번에는 다른 방법으로 바꿔본다. renderer 설정이 아닌 scene에 설정해본다.
+renderer 위에 scene이 존재하므로 scene에 배경색을 설정하면 renderer 설정은 무시된다.
+
+```jsx
+import * as THREE from "three";
+
+// --- 주제: 배경의 색, 투명도 설정하기
+
+export default function example() {
+  // ..
+
+  const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+  renderer.setClearColor("#00ff00");
+  renderer.setClearAlpha(0.5);
+
+  // scene
+  const scene = new THREE.Scene();
+  scene.background = new THREE.Color("blue"); // 위 renderer 설정은 무시됨
+}
+```
+
+위와 같이 배경색을 파란색으로 처리해버린 뒤 화면을 보면 위 renderer 설정은 완전 무시되어 덮여진 것을 알 수 있다.
+
+![덮어썻기 때문에 기존 설정은 보이지 않는다.](../../img/230207-3.png)
+
+배경색에 투명도 등의 설정을 할 경우 renderer 메서드를 사용하고, 간단한 색감만 사용할 경우 scene에서 처리해준다.
