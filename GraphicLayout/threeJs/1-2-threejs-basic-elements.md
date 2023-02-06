@@ -341,3 +341,111 @@ example();
 ```
 
 위와 같은 모듈 구조로 변경
+
+### 브라우저 창 사이즈 변경에 대응하기
+
+이번에는 창 사이즈 변경 시 거기에 맞춰서 대응되도록 개선해본다. 지금은 그대로 있음..
+일단 기본 소스코드를 ex02.js 파일로 생성하여 위치시킨다.
+
+`src/ex02.js`
+
+```jsx
+import * as THREE from "three";
+
+// --- 주제: 브라우저 창 사이즈 변경에 대응하기
+
+export default function example() {
+  // renderer
+  const canvas = document.querySelector("#three-canvas");
+  const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+  renderer.setSize(window.innerWidth, window.innerHeight);
+
+  // scene
+  const scene = new THREE.Scene();
+  // camera
+  const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+
+  camera.position.x = 1;
+  camera.position.y = 2;
+  camera.position.z = 5;
+  scene.add(camera);
+
+  // Mesh
+  const geometry = new THREE.BoxGeometry(1, 1, 1);
+  const material = new THREE.MeshBasicMaterial({ color: "green" });
+  const mesh = new THREE.Mesh(geometry, material);
+  scene.add(mesh);
+
+  // 그리기
+  renderer.render(scene, camera);
+}
+```
+
+초기 renderer.render 이후 resize에 대한 이벤트를 아래와 같이 그려준다.
+
+```jsx
+export default function example() {
+  // ...
+  renderer.render(scene, camera);
+
+  // resize 시 변화하는 것들을 새로 설정해준다.
+  function setSize() {
+    // camera
+    camera.aspect = window.innerWidth / window.innerHeight;
+    // updateProjectionMatrix 카메라 투영에 관련된 값에 변화가 있을 때는 실행해야 함
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.render(scene, camera);
+  }
+
+  // Event
+  window.addEventListener("resize", setSize); // setSize 적용
+}
+```
+
+위처럼 처리하면 브라우저 리사이즈 시 알아서 규격이 대응되는 것을 확인할 수 있다.
+그런데 실제 적용된 캔버스 사이즈를 보면 초기에 적용된 가로, 세로 값이 그대로 적용되어 있음
+
+![](../../img/230206-1.png)
+
+캔버스도 고해상도 표현을 위해서는 크기를 크게 만든 뒤 줄여서 표현해주어야 한다.
+어떻게? 뷰포트에서 표현하는 사이즈와 실제 물리적인 픽셀 개수가 다르게 처리하는 방법으로 고해상도 표현이 가능함.
+만약 픽셀 밀도 즉, 집적도가 2배인 디스플레이라면 가로가 100px인 이미지를 표현 시
+실제 이미지의 크기를 2배 크기인 200px로 만든 뒤 100px로 줄여 표현하면 훨씬 더 고해상도로 보여지게 할 수 있다.
+캔버스도 마찬가지임. 캔버스 크기를 2배로 잡아주면 훨씬 더 고해상도로 구현할 수 있을 것이다.
+
+이를 구현하기 위해서는 현재 나의 기기의 픽셀 밀도가 몇인지 알면 좋다.
+
+```jsx
+export default function example() {
+  // ..
+  console.log(window.devicePixelRatio); // 해당 기기의 픽셀 밀도를 나타냄
+}
+```
+
+위와 같이 window.devicePixelRatio라는 메서드를 통해 해당 기기의 픽셀 밀도(비율)를 숫자로 나타낼 수 있는데, 현재 맥북을 사용하므로 2가 출력되고 있다. 현재 나의 기기가 100px를 표현할 때 200px를 사용한다는 것을 의미함.
+
+이 메서드를 왜 이용할까? 사람마다 각자 디바이스의 픽셀 밀도는 다를것이므로 각 디바이스별 값으로 세팅을 해주도록 하면 모든 기기에 최적화가 될 수 있을 것이기 때문이다.
+
+`src/ex02.js`
+
+```jsx
+export default function example() {
+  const canvas = document.querySelector("#three-canvas");
+  const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  // 렌더링 품질을 높이기 위해 픽셀 밀도를 설정함
+  // 비율이 1인 경우 그냥 1을 쓰고, 그 이상일 경우 2배로 처리하는 삼항 조건자 추가 - 성능에 유리함
+  renderer.setPixelRatio(window.devicePixelRatio > 1 ? 2 : 1);
+
+  // ..
+}
+```
+
+위와 같이 적용해준 뒤 화면을 확인해보면 canvas 사이즈가 2배로 커져서 적용된 것을 확인할 수 있다.
+
+![](../../img/230206-1.png)
+
+위와 같이 처리하면 크기는 달라지지 않으나 훨씬 더 고밀도의 화면을 구현할 수 있게 된다.
+
+![실제 더 선명해진 것 같기도..?](../../img/230206-1.png)
