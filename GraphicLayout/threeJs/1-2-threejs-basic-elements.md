@@ -641,3 +641,127 @@ export default function example() {
 ![](../../img/230208-5.png)
 
 이러한 조명은 많이 넣을 수 있다. (너무 많이 넣음 성능에 좋지 않으니 적당히 사용)
+
+### 애니메이션 기본
+
+이번에는 움직임. 애니메이션을 만들어본다.
+three.js도 캔버스와 마찬가지로 애니메이션을 구현할 때 requestAnimationFrame 메서드를 사용한다.
+window 전역 객체가 가진 메서드로 브라우저에게 수행하길 원하는 애니메이션을 알리고, 다음 repaint(브라우저의 연산이 완료되어 object의 위치가 결정되어 실제 브라우저에 그림이 그려지는 과정)가 진행되기 전에 해당 애니메이션을 업데이트하는 함수를 호출하도록 한다.
+
+[https://www.youtube.com/watch?v=9XnqDSabFjM](https://www.youtube.com/watch?v=9XnqDSabFjM)
+
+먼저 renderer.render를 draw라는 이름의 함수로 가둬준 뒤 실행시키는 구조로 바꾼다.
+
+`src/ex05.js`
+
+```jsx
+import * as THREE from "three";
+
+// --- 주제: 애니메이션 기본
+
+export default function example() {
+  // ..
+
+  // 그리기
+  function draw() {
+    renderer.render(scene, camera);
+  }
+
+  draw();
+}
+```
+
+여기에 애니메이션을 아래와 같이 적용시켜준다.
+
+```jsx
+export default function example() {
+  // ..
+
+  // 그리기
+  function draw() {
+    mesh.rotation.y += 0.1;
+    renderer.render(scene, camera);
+    window.requestAnimationFrame(draw); // requestAnimationFrame(draw);
+  }
+
+  draw();
+}
+```
+
+그럼 주르르륵 y 축을 기준으로 잘 돌아간다.
+
+![](../../img/230208-1.gif)
+
+위에서 0.1이라고 함은 360도 기반이 아닌 초도각Radian(2π) 기준이다.
+360도는 2π임. 3.14159 \* 2 = 약 6.28
+
+위 값 이용이 어렵다면 three.js 내장 기능을 이용해 각도를 직접 넣어줄 수있다.
+
+```jsx
+export default function example() {
+  // ..
+
+  // 그리기
+  function draw() {
+    // mesh.rotation.y += 0.1;
+    mesh.rotation.y += THREE.MathUtils.degToRad(1); // three.js 내장 기능 - 각도를 라디안으로 변환
+    renderer.render(scene, camera);
+    window.requestAnimationFrame(draw);
+  }
+
+  draw();
+}
+```
+
+![](../../img/230208-2.gif)
+
+이러면 정말 1도씩 돌아가게 된다. 좀 더 활용해보자
+
+```jsx
+export default function example() {
+  // ..
+
+  // 그리기
+  function draw() {
+    // mesh.rotation.y += 0.1;
+    mesh.rotation.y += THREE.MathUtils.degToRad(1);
+    mesh.position.y += 0.05;
+    if (mesh.position.y > 3) {
+      mesh.position.y = 0;
+    }
+    renderer.render(scene, camera);
+    window.requestAnimationFrame(draw);
+  }
+
+  draw();
+}
+```
+
+위와 같이 회전을 하면서 y 축으로 이동하는 효과를 주고, 일정한 값을 초과하면 다시 리셋을 시켜주면
+
+![](../../img/230208-3.gif)
+
+이렇게 됨. requestAnimationFrame에 draw가 계속 호출되므로 애니메이션이 반복된다.
+위 방법말고도 three.js에서 제공하는 애니메이션 메서드가 있다.
+
+```jsx
+export default function example() {
+  // ..
+  function draw() {
+    // mesh.rotation.y += 0.1;
+    mesh.rotation.y += THREE.MathUtils.degToRad(1);
+    mesh.position.y += 0.05;
+    if (mesh.position.y > 3) {
+      mesh.position.y = 0;
+    }
+    renderer.render(scene, camera);
+
+    // window.requestAnimationFrame(draw);
+    renderer.setAnimationLoop(draw); // setAnimtaionLoop
+  }
+
+  draw();
+}
+```
+
+requestAnimationFrame와 호환되지만 WebXR(VR, AI 컨텐츠)를 만들 때에는 일반적인 웹 개발 환경과는 다르므로 그땐 setAnimationLoop를 써줘야 한다.
