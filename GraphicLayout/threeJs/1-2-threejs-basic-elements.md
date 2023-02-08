@@ -525,3 +525,119 @@ export default function example() {
 ![덮어썻기 때문에 기존 설정은 보이지 않는다.](../../img/230207-3.png)
 
 배경색에 투명도 등의 설정을 할 경우 renderer 메서드를 사용하고, 간단한 색감만 사용할 경우 scene에서 처리해준다.
+
+### 빛(조명, Light)
+
+이번에는 조명light을 추가해본다. 빛의 여러가지가 있는데 DirectionalLight를 사용함
+
+`src/ex04.js`
+
+```jsx
+import * as THREE from "three";
+
+// --- 주제: 조명 추가하기
+
+export default function example() {
+  // ..
+
+  // 추가
+  const light = new THREE.DirectionalLight(0xffffff, 1);
+  scene.add(light);
+
+  const geometry = new THREE.BoxGeometry(1, 1, 1);
+  // const material = new THREE.MeshBasicMaterial({ color: "red" });
+  const material = new THREE.MeshStandardMaterial({ color: "red" }); // material 변경
+  const mesh = new THREE.Mesh(geometry, material);
+  scene.add(mesh);
+
+  renderer.render(scene, camera);
+}
+```
+
+위와 같이 DirectionalLight로 조명을 설정 후 scene.add로 조명을 적용해주면 됨.
+하지만 화면에 조명은 추가되지 않는다. 왜? MeshBasicMaterial 메서드를 사용했기 때문이다.
+MeshBasicMaterial은 빛에 반응을 하지 않는 객체이다. 영향을 받지 않음.
+
+따라서 위 material을 빛에 영향을 받는 MeshStandardMaterial 메서드로 변경해준다.
+
+![](../../img/230208-1.png)
+
+그럼 이렇게 보여진다. 갑자기 위에서 바라보는 사각형처럼 보인다. three.js에서 DirectionalLight는 태양빛과 비슷하다. 무대에 존재하는 객체들에게 빛을 전체적으로 비춰주는데 빛의 위치가 위에 있는 상태라고 보면 됨
+
+정육면체가 살짝 좌측으로 이동되어 있는 것 같은 것은 camera의 x 축이 1만큼 이동되어 있기 때문이다.
+해당 적용을 제외하면 아래와 같이 변경된다.
+
+![](../../img/230208-2.png)
+
+이번에는 빛도 포지션을 좀 움직여줘본다.
+
+```jsx
+import * as THREE from "three";
+
+// --- 주제: 조명 추가하기
+
+export default function example() {
+  // ..
+  const light = new THREE.DirectionalLight(0xffffff, 1);
+  light.position.z = 2;
+  scene.add(light);
+
+  // ..
+  renderer.render(scene, camera);
+}
+```
+
+![](../../img/230208-3.png)
+
+camera의 위치와 light의 위치를 커스텀하여 좌측면도 비치게 할 수 있다.
+
+```jsx
+import * as THREE from "three";
+
+// --- 주제: 조명 추가하기
+
+export default function example() {
+  // ..
+  // camera
+  const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+
+  camera.position.x = 2; // 추가
+  camera.position.y = 2;
+  camera.position.z = 5;
+  scene.add(camera);
+
+  const light = new THREE.DirectionalLight(0xffffff, 1);
+  light.position.x = 1; // 추가
+  light.position.z = 2;
+  scene.add(light);
+
+  // ..
+  renderer.render(scene, camera);
+}
+```
+
+![mesh, camera, light 모두 scene.add 메서드로 무대 위에 올리며, position 속성으로 그 위치를 조정하는 것이다.](../../img/230208-4.png)
+
+빛의 강도도 DirectionalLight의 인자 숫자를 변경해서 다양하게 바꿀 수 있음
+
+```jsx
+import * as THREE from "three";
+
+// --- 주제: 조명 추가하기
+
+export default function example() {
+  // ..
+
+  // const light = new THREE.DirectionalLight(0xffffff, 1);
+  // const light = new THREE.DirectionalLight(0xffffff, 0.1);
+  // const light = new THREE.DirectionalLight(0xffffff, 10);
+  const light = new THREE.DirectionalLight(0xffffff, 0.5);
+  // ..
+
+  renderer.render(scene, camera);
+}
+```
+
+![](../../img/230208-5.png)
+
+이러한 조명은 많이 넣을 수 있다. (너무 많이 넣음 성능에 좋지 않으니 적당히 사용)
