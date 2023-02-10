@@ -31,11 +31,14 @@ export default function example() {
 
   // 그리기
   function draw() {
-    const time = clock.getElapsedTime();
+    // const time = clock.getElapsedTime();
+    const delta = clock.getDelta(); // draw 프레임 실행마다 시간을 측정(이전 draw에서 현재 draw까지의 시간), getElapsedTime와 혼용하지 않아야 함
+
     // mesh.rotation.y += 0.1;
     // mesh.rotation.y += THREE.MathUtils.degToRad(time); // three.js 내장 기능 - 각도를 라디안으로 변환
-    mesh.rotation.y = time * 2;
-    mesh.position.y = time;
+    mesh.rotation.y += delta * 2;
+    mesh.position.y += delta;
+
     if (mesh.position.y > 3) {
       mesh.position.y = 0;
     }
