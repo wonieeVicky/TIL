@@ -765,3 +765,119 @@ export default function example() {
 ```
 
 requestAnimationFrame와 호환되지만 WebXR(VR, AI 컨텐츠)를 만들 때에는 일반적인 웹 개발 환경과는 다르므로 그땐 setAnimationLoop를 써줘야 한다.
+
+### 애니메이션 성능 보정
+
+위처럼 애니메이션을 기본적으로 구현해봤는데, 위 코드는 살짝 문제가 있을 수 있음
+디바이스별로 성능 차이가 발생할 수 있다는 점. 좋은 컴터에서는 잘돌아가고, 안좋은 컴터는 버벅일 것이다.
+
+따라서 이런 성능 관련은 보정을 해줘야 한다. clock을 활용해서 보정함
+아까 draw 함수에 아래의 코드를 추가해준다.
+
+`src/ex05.js`
+
+```jsx
+export default function example() {
+  // ..
+
+  const clock = new THREE.Clock(); // 시간을 측정하는 기능
+
+  // 그리기
+  function draw() {
+    console.log(clock.getElapsedTime()); // 시간이 흘러가는 것이 log에 찍힌다.
+    // ..
+  }
+
+  draw();
+}
+```
+
+성능이 좋은 컴퓨터, 예를 들어 1초에 10회 돌아가는 컴퓨터라면 0초부터 1초까지 10번의 로그가 찍힐 것임. 1초에 5회 돌아가는 성능이라면? 0초부터 1초까지 5번의 로그가 찍히게 된다. 이 값을 활용하여 y값을 부여하면 디바이스별 성능 차이를 없앨 수 있다.
+
+```jsx
+export default function example() {
+  // ..
+
+  const clock = new THREE.Clock(); // 시간 측정, 경과시간을 나타냄
+
+  // 그리기
+  function draw() {
+    const time = clock.getElapsedTime();
+
+    // mesh.rotation.y += THREE.MathUtils.degToRad(time); // 각도를 라디안으로 변환
+    mesh.rotation.y = time * 2; // time은 시간에 따라 증가하는 값이므로 +=가 아닌 time을 그대로 넣어줌
+    mesh.position.y = time;
+
+    if (mesh.position.y > 3) {
+      mesh.position.y = 0; // 여기서 문제 발생!
+    }
+    // ..
+  }
+
+  draw();
+}
+```
+
+위처럼 하면 브라우저별로 들어가는 성능과 상관없이 경과시간에 따라 애니메이션이 구현될 것이다. (물론 1초에 10회와 1초에 5회의 움직임은 훨씬 다르겠지만 결과는 같아지도록 할 수 있음) 그런데, 문제는 position값이 3이상이면 0으로 회귀하는 로직이 무한 반복된다는 점에 있다. time은 계속 증가하므로..
+
+이를 개선하는 두번째 방법도 있다.
+
+```jsx
+export default function example() {
+  // ..
+
+  const clock = new THREE.Clock(); // 시간 측정, 경과시간을 나타냄
+
+  // 그리기
+  function draw() {
+    // const time = clock.getElapsedTime();
+    // draw 프레임 실행마다 시간을 측정(이전 draw에서 현재 draw까지의 시간차)
+    // getElapsedTime와 혼용하지 않아야 함
+    const delta = clock.getDelta();
+
+    mesh.rotation.y += delta * 2;
+    mesh.position.y += delta;
+
+    if (mesh.position.y > 3) {
+      // 정상 동작함
+      mesh.position.y = 0;
+    }
+    // ..
+  }
+
+  draw();
+}
+```
+
+getElapsedTime의 경우 총 경과시간을 나타내는 반면 getDelta는 이전 draw 함수에서 현재 draw 함수가 생성되는 시간 차를 의미한다. 각 프레임 실행마다 시간을 측정하는 것으로 계속 증가하는 값이 아님
+
+이를 활용해 코드를 구현하면, 이상없는 애니메이션을 구현할 수 있다. 단, getElapsedTime과 함께 사용할 수 없으므로 프로젝트에 적절한 것을 선택적으로 사용하여야 함 (프로젝트에서 getDelta를 많이 사용함)
+
+3번째 개선방법이 있다. 이 방법은 javaScript의 내장 객체인 Date를 활용함
+
+```jsx
+export default function example() {
+  // ..
+
+  let oldTime = Date.now(); // javaScript 내장객체 사용
+
+  // 그리기
+  function draw() {
+    const newTime = Date.now();
+    const deltaTime = newTime - oldTime;
+    oldTime = newTime; // initialize
+
+    mesh.rotation.y += deltaTime * 0.005; // deltaTime 적용
+    mesh.position.y += deltaTime * 0.001; // deltaTime 적용
+
+    if (mesh.position.y > 3) {
+      mesh.position.y = 0;
+    }
+    // ..
+  }
+
+  draw();
+}
+```
+
+위와 같이하면 찍히는 숫자에 따른 적절한 움직임이 예상된다. 위 방법이 좋은 점은 굳이 three.js를 쓰지 않고도 캔버스 애니메이션에서 동일하게 구현할 수 있다는 점임. 각 상황에서 적절한 걸 가져다 쓰자
