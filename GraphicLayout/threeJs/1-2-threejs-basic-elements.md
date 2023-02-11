@@ -881,3 +881,105 @@ export default function example() {
 ```
 
 위와 같이하면 찍히는 숫자에 따른 적절한 움직임이 예상된다. 위 방법이 좋은 점은 굳이 three.js를 쓰지 않고도 캔버스 애니메이션에서 동일하게 구현할 수 있다는 점임. 각 상황에서 적절한 걸 가져다 쓰자
+
+### 안개(Fog)
+
+안개 효과를 내기 위해 기본 소스를 조금 변경해본다. 위에서 만들었던 draw 애니메이션은 삭제처리. 사각형을 여러 개 만들어준다.
+
+`src/ex07.js`
+
+```jsx
+import * as THREE from "three";
+
+// --- 주제: 안개(Fog) 효과
+
+export default function example() {
+  // ..
+  const scene = new THREE.Scene();
+
+  const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+  camera.position.y = 1;
+  camera.position.z = 5;
+  scene.add(camera);
+
+  const light = new THREE.DirectionalLight(0xffffff, 1);
+  light.position.x = 1;
+  light.position.y = 3;
+  light.position.z = 5;
+  scene.add(light);
+
+  const geometry = new THREE.BoxGeometry(1, 1, 1);
+  const material = new THREE.MeshStandardMaterial({ color: "red" });
+
+  // 반복문으로 10개의 박스를 만들어준다.
+  const meshes = [];
+  let mesh;
+  for (let i = 0; i < 10; i++) {
+    mesh = new THREE.Mesh(geometry, material);
+    mesh.position.x = Math.random() * 5 - 2.5;
+    mesh.position.z = Math.random() * 5 - 2.5;
+    scene.add(mesh);
+    meshes.push(mesh);
+  }
+
+  // ..
+}
+```
+
+위와 같이 하면 새로고침할 때마다 위치가 다른 10개의 박스들이 노출된다.
+![](../../img/230211-1.png)
+
+이제 안개 효과를 줘보자. scene에 fog 메서드를 추가해주면 된다.
+
+```jsx
+export default function example() {
+  // ..
+  const scene = new THREE.Scene();
+
+  // Fog
+  scene.fog = new THREE.Fog("black", 3, 7); // fog(color, near, far)
+
+  // ..
+}
+```
+
+위와 같이 하면 검정색 그라데이션이 3 - 7 정도로 퍼져있는 그라데이션이 생성된다. 그럴 듯한 ui가 만들어짐
+
+![](../../img/230211-2.png)
+
+원근감이 더 살아나면서 완성도가 높아진다. 다음으로 아까 중단한 애니메이션도 meshes 배열에 적용시켜본다.
+
+```jsx
+export default function example() {
+  const meshes = [];
+  let mesh;
+  for (let i = 0; i < 10; i++) {
+    mesh = new THREE.Mesh(geometry, material);
+    mesh.position.x = Math.random() * 5 - 2.5;
+    mesh.position.z = Math.random() * 5 - 2.5;
+    scene.add(mesh);
+    meshes.push(mesh);
+  }
+
+  let oldTime = Date.now();
+  function draw() {
+    const newTime = Date.now();
+    const deltaTime = newTime - oldTime;
+    oldTime = newTime;
+
+    // meshes에 애니메이션 부여
+    meshes.forEach((mesh) => {
+      mesh.rotation.y += deltaTime * 0.001;
+    });
+
+    renderer.render(scene, camera);
+    renderer.setAnimationLoop(draw);
+  }
+
+  // ..
+
+  draw();
+}
+```
+
+![자연스러운 그라데이션이 그대로 살아서 애니메이션이 돌아감](../../img/230211-1.gif)
