@@ -983,3 +983,47 @@ export default function example() {
 ```
 
 ![자연스러운 그라데이션이 그대로 살아서 애니메이션이 돌아감](../../img/230211-1.gif)
+
+### 라이브러리를 이용한 애니메이션
+
+앞서 적절한 값을 Date 객체나 getDelta 메서드를 사용해 도출해서 애니메이션을 구현했다면 이번에는 애니메이션 구현을 돕는 외부 라이브러리를 이용해 구현해본다.
+
+라이브러리를 직접 애니메이션을 구현하지 않아도 되므로 퀄리티가 매우 좋다. 굳이 고생하지 않아도 됨.
+라이브러리로 구현이 어려운 것은 직접 구현해줘야 하지만, 웬만한 애니메이션은 만들어진 것을 참고하는 편이 좋다.
+
+라이브러리는 GreenSock을 사용할 것임. 유료, 무료 나뉘어져있음
+
+```jsx
+> npm i gsap
+> npm start
+```
+
+gsap는 기존 애니메이션과 별개로 움직이는 코드임
+
+```jsx
+import * as THREE from "three";
+import gsap from "gsap"; // import
+
+// --- 주제: 라이브러리를 이용한 애니메이션
+
+export default function example() {
+  // ..
+  // Mesh
+  const geometry = new THREE.BoxGeometry(1, 1, 1);
+  const material = new THREE.MeshStandardMaterial({ color: "red" });
+
+  const mesh = new THREE.Mesh(geometry, material); // mesh 1개 생성
+  scene.add(mesh);
+
+  // gsap: duration 재생시간, y, x: y, x축으로 2만큼 이동
+  gsap.to(mesh.position, { y: 2, x: 3, duration: 1, delay: 1 });
+
+  // ..
+}
+```
+
+위와 같이 코드를 동작시키면 부드러운 애니메이션 이동이 가능함
+
+![](../../img/230212-1.gif)
+
+다양한 애니메이션은 [문서](https://greensock.com/docs/) 참고
