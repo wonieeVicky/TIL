@@ -84,3 +84,48 @@ export default function example() {
 ```
 
 ![](../../img/230212-2.png)
+
+### 초당 프레임 수(FPS) 체크하기
+
+이번에는 초당 프레임 수(FPS)를 체크하는 유틸리티를 구현해본다.
+이는 three.js 내장 기능이 아니므로 따로 설치해줘야 한다.
+
+```
+> npm i stats.js
+```
+
+`src/ex02.js`
+
+```jsx
+import * as THREE from "three";
+import Stats from "stats.js";
+
+// ----- 주제: 초당 프레임 수 보기(Stats)
+
+export default function example() {
+  // ..
+
+  // Stats
+  const stats = new Stats();
+  document.body.appendChild(stats.domElement); // 화면에 프레임 수 노출
+
+  // 그리기
+  const clock = new THREE.Clock();
+
+  function draw() {
+    const time = clock.getElapsedTime();
+    stats.update(); // update를 시켜줘야 함
+
+    mesh.rotation.y = time;
+
+    renderer.render(scene, camera);
+    renderer.setAnimationLoop(draw);
+  }
+
+  draw();
+}
+```
+
+![](../../img/230212-3.png)
+
+화면에 정상적으로 FPS 노출. 콘솔로 찍어보는 것은 성능 저하를 일으킬 가능성이 있으므로 얠 이용하면 실제 이용 화면과 가장 비슷하게 확인 가능
