@@ -129,3 +129,70 @@ export default function example() {
 ![](../../img/230212-3.png)
 
 화면에 정상적으로 FPS 노출. 콘솔로 찍어보는 것은 성능 저하를 일으킬 가능성이 있으므로 얠 이용하면 실제 이용 화면과 가장 비슷하게 확인 가능
+
+### GUI 컨트롤
+
+이번에는 카메라 위치 수정 시 테스트하는 것이 편하도록 마우스 조절로 가능한 GUI 컨트롤러를 설치해본다. 설치가 필요함
+
+```
+> npm i dat.gui
+```
+
+`src/ex03.js`
+
+```jsx
+import * as THREE from "three";
+import dat from "dat.gui";
+
+// ----- 주제: GUI 컨트롤(from. dat.gui)
+
+export default function example() {
+  // Renderer, Scene, Camera, Mesh ..
+
+  // Dat.GUI
+  const gui = new dat.GUI();
+  // 어떤 것을 조절할지, 변경할 값, 최소값, 최대값, 단계
+  gui.add(mesh.position, "y", -5, 5, 0.01).name("큐브 Y");
+  gui.add(camera.position, "x", -10, 10, 0.01).name("카메라 X");
+
+  // 아래와 같이 써줘도 된다.
+  // gui.add(mesh.position, "z").min(-5).max(5).step(0.01).name("mesh의 위치");
+
+  // ..
+}
+```
+
+위와 같이 넣으면 아래와 같이 조절할 수 있게됨.
+
+![](../../img/230212-2.gif)
+
+그런데 움직일 때마다 박스의 위치가 고정되지 않으므로 mesh를 바라보도록 아래와 같이 코드를 추가해줄 수도 있다.
+
+```jsx
+export default function example() {
+  // Renderer, Scene, Camera, Mesh ..
+
+  // Dat.GUI
+  const gui = new dat.GUI();
+  gui.add(mesh.position, "y", -5, 5, 0.01).name("큐브 Y");
+  gui.add(camera.position, "x", -10, 10, 0.01).name("카메라 X");
+  camera.lookAt(mesh.position); // 추가
+
+  const clock = new THREE.Clock();
+  function draw() {
+    const time = clock.getElapsedTime();
+
+    mesh.rotation.y = time;
+    camera.lookAt(mesh.position); // 추가
+
+    renderer.render(scene, camera);
+    renderer.setAnimationLoop(draw);
+  }
+
+  // ..
+}
+```
+
+위와 같이 넣어주면 계속 mesh를 바라보면서 위치가 조정되도록 구현 가능
+
+![](../../img/230212-3.gif)
