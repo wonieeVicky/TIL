@@ -1027,3 +1027,70 @@ export default function example() {
 ![](../../img/230212-1.gif)
 
 다양한 애니메이션은 [문서](https://greensock.com/docs/) 참고
+
+### npm, webpack을 사용하지 않고 개발하는 방법
+
+npm과 webpack을 사용하지 않고 개발하는 방법에 대해 알아보자. (쓴다면 상관 없음)
+
+1. `three.js-master.zip` 파일 다운로드
+2. 해당 파일을 호출하는 방법을 아래와 같이 바꾼다.
+
+   `main.js`
+
+   ```jsx
+   import * as THREE from "./three.module.js";
+   import { OrbitControls } from "./OrbitControls.js";
+   ```
+
+   `index.html`
+
+   ```html
+   <!DOCTYPE html>
+   <html lang="en">
+     <head>
+       <!-- ... -->
+       <link rel="stylesheet" href="./main.css" />
+     </head>
+
+     <body>
+       <canvas id="three-canvas"></canvas>
+       <script src="./main.js" type="module"></script>
+     </body>
+   </html>
+   ```
+
+   위와 같이 파일 경로를 모두 상대경로로 수정해서 넣어주면 된다.
+
+아예 모듈을 사용하지 않고 만드는 방법도 있다.
+
+`index.html`
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <!-- ... -->
+    <link rel="stylesheet" href="./main.css" />
+  </head>
+
+  <body>
+    <canvas id="three-canvas"></canvas>
+    <script src="./three.min.js"></script>
+    <!-- 직접 파일 호출 -->
+    <script src="./OrbitControls.js"></script>
+    <!-- 직접 파일 호출 -->
+    <script src="./main.js"></script>
+  </body>
+</html>
+```
+
+`main.js`
+
+```jsx
+// import * as THREE from './three.module.js';
+// import { OrbitControls } from './OrbitControls.js';
+
+const renderer = new THREE.WebGLRenderer(); // 항상 앞에 THREE라는 객체값을 써줘야 함
+```
+
+위 방법은 추천하는 방법이 아님.. 모듈을 기반으로 개발되므로 작업의 편의성을 위해서는 웹팩과 npm을 사용하자.
