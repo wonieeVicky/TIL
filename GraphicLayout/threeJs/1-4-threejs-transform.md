@@ -112,3 +112,62 @@ export default function example() {
 위와 같이 설정하면 아래와 같은 납작한 박스의 크기를 가진 mesh가 노출됨
 
 ![](../../img/230214-1.png)
+
+### 회전
+
+`src/ex03.js`
+
+```jsx
+import * as THREE from "three";
+import dat from "dat.gui";
+
+// ----- 주제: 회전
+
+export default function example() {
+  // ..
+
+  function draw() {
+    const delta = clock.getDelta();
+
+    // Math.PI(3.14) = 180도
+    mesh.rotation.x = THREE.MathUtils.degToRad(45); // 45도를 x축 기준으로 회전
+    mesh.rotation.x = Math.PI / 4; // 위와 동일한 효과, 45도를 x축 기준으로 회전
+    mesh.rotation.x = 1; // 30도 정도 회전
+    mesh.rotation.y += delta; // 30도씩 회전
+
+    renderer.render(scene, camera);
+    renderer.setAnimationLoop(draw);
+  }
+
+  draw();
+}
+```
+
+위와 같이 draw에 넣지 않고, 사물을 바깥에서 위치를 변경시켜보자.
+
+```jsx
+import * as THREE from "three";
+import dat from "dat.gui";
+
+// ----- 주제: 회전
+
+export default function example() {
+  // ..
+
+  mesh.rotation.reorder("YXZ"); // 축 중심을 reorder로 설정
+  mesh.rotation.y = THREE.MathUtils.degToRad(45);
+  mesh.rotation.x = THREE.MathUtils.degToRad(10);
+
+  // ..
+}
+```
+
+위와 같이 y, x 축을 45, 10도씩 각 회전시키고 reorder로 x축 회전을 잘 잡아줌
+
+![](../../img/230214-2.png)
+
+만약 `mesh.rotation.reorder(”YXZ”)`가 없다면 아래와 같은 결과가 도출됨
+
+![](../../img/230214-3.png)
+
+축 이동을 적절히 해주어야 함
