@@ -78,3 +78,37 @@ export default function example() {
   draw();
 }
 ```
+
+### 크기 조정
+
+이번에는 크기를 조정해봄 mesh.scale로 변경하거나 mesh.scale.set 메서드로 변경가능
+
+`src/ex02.js`
+
+```jsx
+import * as THREE from "three";
+import dat from "dat.gui";
+
+// ----- 주제: 크기 조정
+
+export default function example() {
+  // ..
+
+  function draw() {
+    mesh.scale.x = 2;
+    mesh.scale.y = 0.5;
+
+    // 혹은
+    mesh.scale.set(2, 0.5, 1); // x, y, z
+
+    renderer.render(scene, camera);
+    renderer.setAnimationLoop(draw);
+  }
+
+  draw();
+}
+```
+
+위와 같이 설정하면 아래와 같은 납작한 박스의 크기를 가진 mesh가 노출됨
+
+![](../../img/230214-1.png)
