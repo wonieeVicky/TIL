@@ -171,3 +171,66 @@ export default function example() {
 ![](../../img/230214-3.png)
 
 축 이동을 적절히 해주어야 함
+
+### 그룹 만들기(Scene Graph)
+
+이번에는 그룹 만들기에 대해 알아본다. 여러 개의 mesh를 그룹으로 만들 수 있는 개념이다.
+세트로 관리할 수 있다는 이점이 있음. 팔을 올리는 것을 구현한다고 했을 때 팔목과, 팔뚝이 그룹으로 묶여 움직인다면 훨씬 자연스러울 것이다. 이를 하나하나 따로 움직임을 구현해준다고 하면.. 어딘가 어색해질 수 있음
+
+좋은 예로 태양과 지구, 달의 공전을 예시로 구현해본다.
+
+`src/ex04.js`
+
+```jsx
+import * as THREE from "three";
+import dat from "dat.gui";
+
+// ----- 주제: 그룹 만들기(Scene Graph)
+
+export default function example() {
+  // ..
+  const geometry = new THREE.BoxGeometry(1, 1, 1);
+  const material = new THREE.MeshStandardMaterial({ color: "hotpink" });
+
+  // 그룹 만들기
+  const group1 = new THREE.Group();
+  const box1 = new THREE.Mesh(geometry, material); // 태양
+
+  const group2 = new THREE.Group();
+  const box2 = box1.clone(); // 지구
+  box2.scale.set(0.3, 0.3, 0.3); // 태양의 0.3 크기로 만들어준다.
+  group2.position.x = 2; // box1로부터 거리를 2만큼
+
+  // const group3 = new THREE.Object3D(); // Object3D로도 만들 수 있음
+  const group3 = new THREE.Group();
+  const box3 = box2.clone(); // 달
+  box3.scale.set(0.15, 0.15, 0.15); // 지구의 0.15 크기로 만들어준다.
+  box3.position.x = 0.5; // box2로부터 거리를 0.5만큼
+
+  group3.add(box3); // group3에 box3 추가
+  group2.add(box2, group3); // group2에 box2와 group3 추가
+  group1.add(box1, group2); // group1에 box1과 group2 추가
+  scene.add(group1);
+
+  // ..
+  // 그리기
+  const clock = new THREE.Clock();
+
+  function draw() {
+    const delta = clock.getDelta();
+
+    group1.rotation.y += delta; // group1 회전
+    group2.rotation.y += delta; // group2 회전
+    group3.rotation.y += delta; // group3 회전
+
+    renderer.render(scene, camera);
+    renderer.setAnimationLoop(draw);
+  }
+  // ..
+}
+```
+
+그룹 만드는 순서는 위를 참고하자. group1 > group2 > group3이 해당 그룹을 포함하도록 작업함
+최종 scene에 add는 group1만 넣으면 자동으로 group2, group3이 반영되고, draw 함수에서 각 그룹별로 회전하도록 설정해주면 각 그룹이 공전하고, 스스로 자전하는 구조를 구현할 수 있게된다.
+
+![](../../img/230215-1.gif)
