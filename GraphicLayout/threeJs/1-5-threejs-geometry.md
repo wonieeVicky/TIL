@@ -103,3 +103,47 @@ export default function example() {
 segment는 wireframe 속성을 off 하면 보이지 않음. 그런데 이걸 왜 쓸까? segment를 만든다는 것은 점들을 다양하게 추가한다는 것이다. 이러한 점의 좌표를 바꾸면 멋있는 것들을 많이 만들 수 있다.
 
 [문서](https://threejs.org/docs/index.html?q=geometry#api/en/geometries/BoxGeometry)를 보고 확인해보자. CircleGeometry(원 모양), ConeGeometry (콘 모양), CylinderGeometry(원기둥 모양) 등 다양한 기본 모양들이 존재한다. 모두 다 익히려고 하지 말고 이런게 있구나 확인 위주로 이해하자
+
+### Geometry 형태 조작하기 1
+
+지난 시간에 알아본 segment를 통해 만들어진 정점(vertex)를 이용해 다양하게 Geometry 형태를 조작해본다.
+이번에는 [SphereGeometry](https://threejs.org/docs/index.html?q=SphereGeometry#api/en/geometries/SphereGeometry)를 이용해서 만들어본다.
+
+`src/ex02.js`
+
+```jsx
+import * as THREE from "three";
+import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
+
+// ----- 주제: Geometry 정점(Vertex) position 이용하기
+
+export default function example() {
+  // ..
+  // Controls
+  const controls = new OrbitControls(camera, renderer.domElement);
+
+  // Mesh
+  const geometry = new THREE.SphereGeometry(5, 64, 64); // 원모양 구 생성
+  const material = new THREE.MeshStandardMaterial({
+    color: "orangered",
+    side: THREE.DoubleSide,
+    flatShading: true,
+  });
+  const mesh = new THREE.Mesh(geometry, material);
+  scene.add(mesh);
+
+  console.log(geometry.attributes.position.array);
+
+  // ..
+}
+```
+
+우선 64개의 segment를 가진 원형 구를 만들었다.
+
+![](../../img/230218-1.png)
+
+위 geometry를 console로 찍어보면 attribute 내용이 나오는데 그 안에 position 속성을 이용해서 애니메이션을 주려고 한다. position의 값은 Float32Array로 담겨있음. 위 값이 이미지에서 `geometry.attributes.position.array` 값을 콘솔로 찍으면 아래와 같음
+
+![](../../img/230218-2.png)
+
+총 12,675개의 배열 값으로 존재. 위 값은 3개 묶음이 [x, y, z] 라는 점 하나의 값을 이룬다.
