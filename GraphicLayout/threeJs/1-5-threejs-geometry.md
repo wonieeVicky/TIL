@@ -147,3 +147,43 @@ export default function example() {
 ![](../../img/230218-2.png)
 
 총 12,675개의 배열 값으로 존재. 위 값은 3개 묶음이 [x, y, z] 라는 점 하나의 값을 이룬다.
+
+이제 배열을 이용해 각 점의 좌표를 변경하여 모양을 변경해본다.
+
+`src/ex02.js`
+
+```jsx
+export default function example() {
+  // ..
+  const controls = new OrbitControls(camera, renderer.domElement);
+
+  // Mesh
+  const geometry = new THREE.SphereGeometry(5, 64, 64); // 원모양 구 생성
+  const material = new THREE.MeshStandardMaterial({
+    color: "orangered",
+    side: THREE.DoubleSide,
+    flatShading: true,
+  });
+  const mesh = new THREE.Mesh(geometry, material);
+  scene.add(mesh);
+
+  // console.log(geometry.attributes.position.array);
+  const positionArray = geometry.attributes.position.array;
+
+  // loop 한번 돌 때마다 정점(vertex) 한 개의 x, y, z 좌표를 랜덤 조정
+  for (let i = 0; i < positionArray.length; i += 3) {
+    // 값들이 [ x, y, z, x, y, z, ... ]이므로 3의 배수로 처리 후 i, i+1, i+2로 값 변경
+    // 음, 양이 조화롭도록 0.5를 빼준다. 0이면 -0.5, 1이면 0.5
+    positionArray[i] = positionArray[i] + (Math.random() - 0.5) * 0.2; // x축
+    positionArray[i + 1] = positionArray[i + 1] + (Math.random() - 0.5) * 0.2; // y축
+    positionArray[i + 2] = positionArray[i + 2] + (Math.random() - 0.5) * 0.2; // z축
+  }
+  // ..
+}
+```
+
+위 코드에서 `Math.random()`만 넣어주면 구의 변형이 우측으로만 쏠리게 된다.
+Math.random은 0~1 사이의 값이므로.. x축이 무조건 양수로 커짐. 이를 방지하기 위해 0.5를 빼준다.
+그러면 값의 변화가 양 쪽으로 평균을 이루게 됨. `0.2`를 곱한 것은 변화의 폭을 조정하기 위함.
+
+![](../../img/230219-1.png)
