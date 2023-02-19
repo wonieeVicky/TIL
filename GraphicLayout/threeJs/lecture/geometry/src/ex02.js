@@ -48,16 +48,22 @@ export default function example() {
   for (let i = 0; i < positionArray.length; i += 3) {
     // loop 한번 돌 때마다 정점(vertex) 한 개의 x, y, z 좌표를 랜덤 조정
     // i, i+1, i+2
-    positionArray[i] = positionArray[i] + (Math.random() - 0.5) * 0.2; // x축, 음, 양이 조화롭도록 0.5를 빼준다. 0이면 -0.5, 1이면 0.5
-    positionArray[i + 1] = positionArray[i + 1] + (Math.random() - 0.5) * 0.2; // y축
-    positionArray[i + 2] = positionArray[i + 2] + (Math.random() - 0.5) * 0.2; // z축
+    positionArray[i] += (Math.random() - 0.5) * 0.2; // x축, 음, 양이 조화롭도록 0.5를 빼준다. 0이면 -0.5, 1이면 0.5
+    positionArray[i + 1] += (Math.random() - 0.5) * 0.2; // y축
+    positionArray[i + 2] += (Math.random() - 0.5) * 0.2; // z축
   }
 
   // 그리기
   const clock = new THREE.Clock();
 
   function draw() {
-    const delta = clock.getDelta();
+    const time = clock.getElapsedTime() * 3;
+
+    for (let i = 0; i < positionArray.length; i += 3) {
+      // 삼각 함수를 이용
+      positionArray[i] += Math.sin(time) * 0.002;
+    }
+    geometry.attributes.position.needsUpdate = true;
 
     renderer.render(scene, camera);
     renderer.setAnimationLoop(draw);
