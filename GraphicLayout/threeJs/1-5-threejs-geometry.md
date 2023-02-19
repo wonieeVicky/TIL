@@ -187,3 +187,37 @@ Math.random은 0~1 사이의 값이므로.. x축이 무조건 양수로 커짐. 
 그러면 값의 변화가 양 쪽으로 평균을 이루게 됨. `0.2`를 곱한 것은 변화의 폭을 조정하기 위함.
 
 ![](../../img/230219-1.png)
+
+애니메이션은 draw 함수 안에서 갱신해준다. 이 때 값 변경을 기존 코드 그대로 구현하면 안됨
+값이 계속 변경되어야 하므로.. 삼각 함수(sine graph)를 이용한다. (cosine으로 사용해도 됨)
+삼각 함수는 y 값에 따라 지속적으로 값이 같은 폭으로 변경됨..
+
+![](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/4d753c59-cef3-4e96-b968-e72ba1e8b814/Untitled.png)
+
+`src/ex02.js`
+
+```jsx
+export default function example() {
+  // ..
+  // 그리기
+  const clock = new THREE.Clock();
+
+  function draw() {
+    const time = clock.getElapsedTime() * 3;
+
+    for (let i = 0; i < positionArray.length; i += 3) {
+      positionArray[i] += Math.sin(time) * 0.002; // 삼각함수(Math.sin)를 이용
+    }
+    geometry.attributes.position.needsUpdate = true; // update를 해줘야 geometry 변경이 있다.
+
+    renderer.render(scene, camera);
+    renderer.setAnimationLoop(draw);
+  }
+
+  draw();
+}
+```
+
+위와 같이 x 축에 삼각함수를 이용해서 값을 변경해주면, 미세하게 값이 좌우로 움직이는 구를 확인할 수 있다.
+
+![](../../img/230219-1.gif)
