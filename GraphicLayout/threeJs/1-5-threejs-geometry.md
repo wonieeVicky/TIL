@@ -221,3 +221,53 @@ export default function example() {
 위와 같이 x 축에 삼각함수를 이용해서 값을 변경해주면, 미세하게 값이 좌우로 움직이는 구를 확인할 수 있다.
 
 ![](../../img/230219-1.gif)
+
+이는 즉, 미리 세팅된 값이 있어야 한다는 의미임. 이는 초기 변환을 주는 positionArray 세팅 시 함께 해준다.
+
+그런데 내가 원하는 것은 좌우의 움직임이 아닌 구를 이루는 점(vertex)에 대한 변화이다.
+x에 대한 랜덤값을 어떻게 적용하는게 좋을까? 우선 math.random 값이 매번 draw 함수에서 갱신되는 것은 옳지 않다. 각각의 점들에 적용되는 값은 고정된 상태에서 일괄적으로 움직이는 것이 좋을 것 같다.
+
+```jsx
+export default function example() {
+  // ..
+
+  const positionArray = geometry.attributes.position.array;
+  const randomArray = []; // randomArray 생성
+  for (let i = 0; i < positionArray.length; i += 3) {
+    positionArray[i] += (Math.random() - 0.5) * 0.2;
+    positionArray[i + 1] += (Math.random() - 0.5) * 0.2;
+    positionArray[i + 2] += (Math.random() - 0.5) * 0.2;
+
+    randomArray[i] = (Math.random() - 0.5) * 0.2; // x축에 랜덤값 저장
+    randomArray[i + 1] = (Math.random() - 0.5) * 0.2; // y축에 랜덤값 저장
+    randomArray[i + 2] = (Math.random() - 0.5) * 0.2; // z축에 랜덤값 저장
+  }
+
+  // console.log(positionArray.length, randomArray.length); // 12675, 12675
+
+  // 그리기
+  const clock = new THREE.Clock();
+
+  function draw() {
+    const time = clock.getElapsedTime() * 3;
+
+    for (let i = 0; i < positionArray.length; i += 3) {
+      // 삼각함수 적용 시 time값에 randomArray에 담은 랜덤 값을 넣어준다.
+      positionArray[i] += Math.sin(time + randomArray[i] * 100) * 0.0015;
+      positionArray[i + 1] += Math.sin(time + randomArray[i + 1] * 100) * 0.0015;
+      positionArray[i + 2] += Math.sin(time + randomArray[i + 2] * 100) * 0.0015;
+    }
+    geometry.attributes.position.needsUpdate = true;
+
+    renderer.render(scene, camera);
+    renderer.setAnimationLoop(draw);
+  }
+
+  // ..
+}
+```
+
+![눈이 아파서 seagreen으로 색상 변경함 ㅎ..](../../img/230220-1.gif)
+
+위와 같이 randomArray에 넣은 랜덤 값을 time 적용 시 넣어주면 위와 같은 애니메이션이 구현된다.
+증감 폭은 기호에 맞게 곱해주는 값을 조절해준다.
