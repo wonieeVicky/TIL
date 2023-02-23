@@ -162,3 +162,43 @@ export default function example() {
 ![](../../img/230223-1.gif)
 
 주로 쓰이는 옵션도 같이 체크해주자
+
+### FlyControls
+
+FlyControls는 키보드 자판키에 따라 움직이는 카메라 옵션이다.
+
+`src/ex03.js`
+
+```jsx
+import * as THREE from "three";
+import { FlyControls } from "three/examples/jsm/controls/FlyControls";
+
+// ----- 주제: FlyControls
+
+export default function example() {
+  // Renderer, Scene, Camera, Light...
+
+  // Controls
+  const controls = new FlyControls(camera, renderer.domElement);
+  controls.rollSpeed = 0.5; // 카메라 이동 속도
+  controls.movementSpeed = 3; // 키보드 입력 시 카메라 이동 속도
+  controls.dragToLook = true; // 드래그로만 카메라가 이동
+
+  // ..
+
+  // 그리기
+  const clock = new THREE.Clock();
+
+  function draw() {
+    const delta = clock.getDelta();
+    controls.update(delta); // FlyControls는 update 시 delta 값을 넣어줘야 한다.
+
+    renderer.render(scene, camera);
+    renderer.setAnimationLoop(draw);
+  }
+
+  // ..
+}
+```
+
+W(앞), A(왼쪽), S(뒤), D(오른쪽), R(위로), F(아래로), 마우스 왼쪽 앞으로, 오른쪽 클릭하면 뒤로 이동하는 이벤트가 기본적으로 적용된 메서드임. rollSpeed, movementSpeed, dragToLook 등의 옵션이 있으므로 적절한 것을 찾아서 구현한다.
