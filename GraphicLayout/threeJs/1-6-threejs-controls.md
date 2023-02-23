@@ -122,3 +122,43 @@ enableZoom은 줌 이용 여부를 설정하는 옵션, maxDistance, minDistance
 ![autoRotate, autoRotateSpeed 적용](../../img/230222-4.gif)
 
 이처럼 다양한 옵션이 있음. 문서를 보고 필요한 옵션을 적절히 활용하자!
+
+### TrackballControls
+
+이번에는 TrackballControls를 해본다. OrbitControls와 비슷한데 회전 방향이 세로도 가능하다는 점이다.
+
+`src/ex02.js`
+
+```jsx
+import * as THREE from "three";
+import { TrackballControls } from "three/examples/jsm/controls/TrackballControls";
+
+// ----- 주제: TrackballControls
+
+export default function example() {
+  // Renderer, Scene, Camera, Light...
+
+  // Controls
+  // 기본적으로 enableDamping 효과는 적용되어 있다.
+  const controls = new TrackballControls(camera, renderer.domElement);
+  controls.maxDistance = 20; // 줌 아웃 최대
+  controls.minDistance = 5; // 줌 인 최대
+  controls.target.set(3, 3, 3); // draw에서 update를 해줘야 한다.
+
+  function draw() {
+    const delta = clock.getDelta();
+    controls.update(); // update 꼭 해준다.
+
+    renderer.render(scene, camera);
+    renderer.setAnimationLoop(draw);
+  }
+
+  // ..
+}
+```
+
+위와 같이 TrackballControls을 적용하면 위로도 360도 회전이 가능한 구조가 됨.
+
+![](../../img/230223-1.gif)
+
+주로 쓰이는 옵션도 같이 체크해주자
