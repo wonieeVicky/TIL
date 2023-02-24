@@ -242,3 +242,46 @@ export default function example() {
 ```
 
 이 밖에도 다양한 속성이 있으니 문서로 확인
+
+### PointerLockControls
+
+PointerLockControls는 유저액션을 정의하는 메서드임. 그냥 메서드만 적용하면 아무 움직임이 없다.
+
+`src/ex05.js`
+
+```jsx
+import * as THREE from "three";
+import { PointerLockControls } from "three/examples/jsm/controls/PointerLockControls";
+
+// ----- 주제: PointerLockControls
+
+export default function example() {
+  // Renderer, Scene, Camera, Light...
+
+  // Controls
+  const controls = new PointerLockControls(camera, renderer.domElement);
+  console.log(controls.domElement); // <canvas id="three-canvas" data-engine="three.js r149" width="2506" height="2608" style="width: 1253px; height: 1304px;"></canvas>
+  console.log(controls.domElement === renderer.domElement); // true
+
+  controls.domElement.addEventListener("click", () => {
+    controls.lock(); // pointer lock api 활용함
+  });
+
+  controls.addEventListener("lock", () => {
+    console.log("lock"); // pointer lock api 실행 시
+  });
+  controls.addEventListener("unlock", () => {
+    console.log("unlock"); // pointer lock api 중단 시
+  });
+
+  // ..
+}
+```
+
+PointerLockControls는 domElement에 유저 액션을 추가하여 사용하는데, 우선 controls.domElement는 canvas를 의미하며, 이는 renderer.domElement와 같은 아이를 바라보고 있음
+
+여기에 클릭 이벤트를 넣어서 `controls.lock()` 메서드를 실행해주는데 이때 실행되는 것은 [pointer lock api](https://developer.mozilla.org/en-US/docs/Web/API/Pointer_Lock_API)로 자바스크립트에서 제공되는 메서드를 쉽게 구현할 수 있게된다.
+
+![](../../img/230224-1.gif)
+
+esc 키를 누르면 빠져나올 수 있으며, 진입 시 이벤트를 `lock`으로, 중단 시 이벤트를 `unlock`으로 체크해서 원하는 이벤트를 수행하도록 할 수 있다.
