@@ -202,3 +202,43 @@ export default function example() {
 ```
 
 W(앞), A(왼쪽), S(뒤), D(오른쪽), R(위로), F(아래로), 마우스 왼쪽 앞으로, 오른쪽 클릭하면 뒤로 이동하는 이벤트가 기본적으로 적용된 메서드임. rollSpeed, movementSpeed, dragToLook 등의 옵션이 있으므로 적절한 것을 찾아서 구현한다.
+
+### FirstPersonControls
+
+FirstPersonControls 앞서 구현한 FlyControls 대체 구현 메서드이다. 즉 비슷함
+기능을 추가하거나 살짝 바꾼 느낌임
+
+`src/ex04.js`
+
+```jsx
+import * as THREE from "three";
+import { FirstPersonControls } from "three/examples/jsm/controls/FirstPersonControls";
+
+// ----- 주제: FirstPersonControls
+
+export default function example() {
+  // Renderer, Scene, Camera, Light...
+
+  // Controls
+  const controls = new FirstPersonControls(camera, renderer.domElement);
+  controls.movementSpeed = 10; // 키보드 입력 시 카메라 이동 속도
+  controls.activeLook = false; // 주변을 둘러볼 수 있는지 유무. false면 각도 변경이 불가. 움직일 수만 있다.
+  controls.lookSpeed = 0.05; // 카메라 이동 속도
+  controls.autoForward = true; // 자동 앞으로 이동
+
+  // 그리기
+  const clock = new THREE.Clock();
+
+  function draw() {
+    const delta = clock.getDelta();
+    controls.update(delta); // FirstPersonControls도 update 시 delta 값을 넣어줘야 함
+
+    renderer.render(scene, camera);
+    renderer.setAnimationLoop(draw);
+  }
+
+  // ..
+}
+```
+
+이 밖에도 다양한 속성이 있으니 문서로 확인
