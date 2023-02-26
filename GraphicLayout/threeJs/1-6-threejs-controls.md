@@ -285,3 +285,96 @@ PointerLockControls는 domElement에 유저 액션을 추가하여 사용하는�
 ![](../../img/230224-1.gif)
 
 esc 키를 누르면 빠져나올 수 있으며, 진입 시 이벤트를 `lock`으로, 중단 시 이벤트를 `unlock`으로 체크해서 원하는 이벤트를 수행하도록 할 수 있다.
+
+### DragControls
+
+기존에 살펴봤던 메서드와 달리 DragControls은 사용법이 조금 다르다. 
+어떤 mesh에 DragControls를 적용할 것인지를 결정해야 함.
+
+`src/ex06.js`
+
+```jsx
+import * as THREE from "three";
+import { DragControls } from "three/examples/jsm/controls/DragControls";
+
+// ----- 주제: DragControls
+
+export default function example() {
+  // Renderer, Scene, Camera, Light...
+
+  // Mesh
+  const geometry = new THREE.BoxGeometry(1, 1, 1);
+  const meshes = [];
+  let mesh;
+  let material;
+  for (let i = 0; i < 20; i++) {
+    material = new THREE.MeshStandardMaterial({
+      color: `rgb(${50 + Math.floor(Math.random() * 205)}, ${50 + Math.floor(Math.random() * 205)}, ${
+        50 + Math.floor(Math.random() * 205)
+      })`,
+    });
+    mesh = new THREE.Mesh(geometry, material);
+    mesh.position.x = (Math.random() - 0.5) * 4;
+    mesh.position.y = (Math.random() - 0.5) * 4;
+    mesh.position.z = (Math.random() - 0.5) * 4;
+    scene.add(mesh);
+    meshes.push(mesh); // meshes라는 배열에 mesh들을 담는다.
+  }
+
+  // Controls - DragControls에 meshes 저장
+  const controls = new DragControls(meshes, camera, renderer.domElement);
+
+	// ..
+}
+```
+
+위와 같이 meshes를 배열로 담아서 DragControls에 적용하면, 생성된 20개의 mesh 들에 드래그 속성이 생김
+
+![](../../img/230226-1.gif)
+
+자동적으로 잘 생김. 이걸 직접 구현해야한다면 무지 까다로울 것이다..
+만약 웹사이트에서 구동되어야 할 때, 콘텐츠 하나하나가 담긴 박스가 될 수도 있는데, 현재 어떤 박스가 드래그가 되는지 알 필요가 있다. 이때 dragStart라는 이벤트 리스너를 통해 알 수 있다.
+
+```jsx
+import * as THREE from "three";
+import { DragControls } from "three/examples/jsm/controls/DragControls";
+
+// ----- 주제: DragControls
+
+export default function example() {
+  // Renderer, Scene, Camera, Light...
+
+  // Mesh
+  const geometry = new THREE.BoxGeometry(1, 1, 1);
+  const meshes = [];
+  let mesh;
+  let material;
+  for (let i = 0; i < 20; i++) {
+    material = new THREE.MeshStandardMaterial({
+      color: `rgb(${50 + Math.floor(Math.random() * 205)}, ${50 + Math.floor(Math.random() * 205)}, ${
+        50 + Math.floor(Math.random() * 205)
+      })`,
+    });
+    mesh = new THREE.Mesh(geometry, material);
+    mesh.position.x = (Math.random() - 0.5) * 4;
+    mesh.position.y = (Math.random() - 0.5) * 4;
+    mesh.position.z = (Math.random() - 0.5) * 4;
+		mesh.name = `box-${i}`; // mesh에 name 추가
+    scene.add(mesh);
+    meshes.push(mesh);
+  }
+
+  const controls = new DragControls(meshes, camera, renderer.domElement);
+
+	controls.addEventListener("dragstart", (e) => {
+    console.log(e); // 
+    console.log(e.object.name);
+  });
+
+	// ..
+}
+```
+
+mesh.name에 각 아이템별 이름을 부여한다고 했을 때, dragstart 이벤트로 e.object.name에 내용이 담기는 것을 확인할 수 있음. 이렇게 된다면 각 이벤트마다 적절한 이벤트를 다양하게 줄 수 있게 된다.
+
+![](../../img/230226-1.png)
