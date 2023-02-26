@@ -288,7 +288,7 @@ esc 키를 누르면 빠져나올 수 있으며, 진입 시 이벤트를 `lock`�
 
 ### DragControls
 
-기존에 살펴봤던 메서드와 달리 DragControls은 사용법이 조금 다르다. 
+기존에 살펴봤던 메서드와 달리 DragControls은 사용법이 조금 다르다.
 어떤 mesh에 DragControls를 적용할 것인지를 결정해야 함.
 
 `src/ex06.js`
@@ -324,7 +324,7 @@ export default function example() {
   // Controls - DragControls에 meshes 저장
   const controls = new DragControls(meshes, camera, renderer.domElement);
 
-	// ..
+  // ..
 }
 ```
 
@@ -359,22 +359,120 @@ export default function example() {
     mesh.position.x = (Math.random() - 0.5) * 4;
     mesh.position.y = (Math.random() - 0.5) * 4;
     mesh.position.z = (Math.random() - 0.5) * 4;
-		mesh.name = `box-${i}`; // mesh에 name 추가
+    mesh.name = `box-${i}`; // mesh에 name 추가
     scene.add(mesh);
     meshes.push(mesh);
   }
 
   const controls = new DragControls(meshes, camera, renderer.domElement);
 
-	controls.addEventListener("dragstart", (e) => {
-    console.log(e); // 
+  controls.addEventListener("dragstart", (e) => {
+    console.log(e); //
     console.log(e.object.name);
   });
 
-	// ..
+  // ..
 }
 ```
 
 mesh.name에 각 아이템별 이름을 부여한다고 했을 때, dragstart 이벤트로 e.object.name에 내용이 담기는 것을 확인할 수 있음. 이렇게 된다면 각 이벤트마다 적절한 이벤트를 다양하게 줄 수 있게 된다.
 
 ![](../../img/230226-1.png)
+
+### 마인크래프트 스타일 컨트롤
+
+좀 전에 배웟던 PointerLockControls에 이동기능을 추가해보자. 마인크래프트와 같은 움직임을 구현할 수 잇음
+PointerLockControls의 moveForward, moveRight 메서드를 활용함.
+
+가장 먼저 키 컨트롤을 담당할 클래스를 만드는 것부터 시작해보자.
+
+`src/KeyController.js`
+
+```jsx
+export class KeyController {
+  constructor() {
+    // 생성자
+    this.keys = [];
+
+    window.addEventListener("keydown", (e) => {
+      console.log(e.code + " 누름");
+      this.keys[e.code] = true; // 키보드 누르면 true - 예를 들어 w키를 누르면 this.keys["KeyW"] = true;
+    });
+
+    window.addEventListener("keyup", (e) => {
+      console.log(e.code + " 뗌");
+      delete this.keys[e.code]; // 키보드 뗄 때 this.keys["KeyW"] 삭제
+    });
+  }
+}
+```
+
+위와 같이 keydown, keyup 이벤트를 각각 만들어서 키를 누를 때 해당값을 keys에 저장 및 해지하는 코드임
+이를 ex07.js 파일에서 아래와 같이 적용한다.
+
+`src/ex07.js`
+
+```jsx
+import * as THREE from "three";
+import { PointerLockControls } from "three/examples/jsm/controls/PointerLockControls";
+import { KeyController } from "./KeyController";
+
+// ----- 주제: 마인크래프트 스타일 컨트롤
+
+export default function example() {
+  // Renderer, Scene, Camera, Light...
+
+  const controls = new PointerLockControls(camera, renderer.domElement);
+
+  controls.domElement.addEventListener("click", () => {
+    controls.lock(); // pointer lock api 활용함
+  });
+  controls.addEventListener("lock", () => {
+    console.log("lock"); // pointer lock api 실행 시
+  });
+  controls.addEventListener("unlock", () => {
+    console.log("unlock"); // pointer lock api 중단 시
+  });
+
+  // 키보드 컨트롤 인스턴스 생성!
+  const keyController = new KeyController();
+
+  // 실제 컨트롤 액션 추가
+  function walk() {
+    // 눌렀을 때 this.keys[e.code] = true; 이므로 moveForward 실행됨
+    if (keyController.keys["KeyW"] || keyController.keys["ArrowUp"]) {
+      controls.moveForward(0.02);
+    }
+    if (keyController.keys["KeyS"] || keyController.keys["ArrowDown"]) {
+      controls.moveForward(-0.02);
+    }
+    if (keyController.keys["KeyA"] || keyController.keys["ArrowLeft"]) {
+      controls.moveRight(-0.02);
+    }
+    if (keyController.keys["KeyD"] || keyController.keys["ArrowRight"]) {
+      controls.moveRight(0.02);
+    }
+  }
+
+  // ..
+
+  // 그리기
+  const clock = new THREE.Clock();
+
+  function draw() {
+    const delta = clock.getDelta();
+
+    walk(); // walk는 계~속 실행되고 있다.
+
+    renderer.render(scene, camera);
+    renderer.setAnimationLoop(draw);
+  }
+
+  // ..
+}
+```
+
+위와 같이 KeyController 인스턴스를 생성 후 walk 함수에 가둬서 액션을 부여하는데
+기본 w, a, s, d 이벤트와 더불어 방향키 키보드에도 동일한 이벤트를 부여하면 키보드를 통한 애니메이션 구현이 가능해진다.
+
+![](../../img/230227-1.gif)
