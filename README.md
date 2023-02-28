@@ -610,3 +610,4 @@
    - [Three.js Transform(변환)](GraphicLayout/threeJs/1-4-threejs-transform.md)
    - [Three.js Geometry(모양)](GraphicLayout/threeJs/1-5-threejs-geometry.md)
    - [Three.js Controls(카메라 컨트롤)](GraphicLayout/threeJs/1-6-threejs-controls.md)
+   - [Three.js Material(재질)](GraphicLayout/threeJs/1-7-threejs-material.md)
