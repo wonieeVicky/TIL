@@ -175,3 +175,38 @@ export default function example() {
 
 성능은 MeshPhongMaterial이 살짝 빠른 편, 원하는 메서드를 골라서 사용한다.
 이 밖에도 매우 다양한 메서드와 옵션 들이 있으니 그 중에서 필요한 걸로 골라쓴다.
+
+### 각지게 표현하기, flatShading
+
+각지게 표현하는 것에 대해 확인하고 넘어간다. 자주 쓰인다.
+
+`src/ex04.js`
+
+```jsx
+// ----- 주제: flatShading
+
+export default function example() {
+  // Renderer, Scene, Camera, Controls ...
+
+  // Mesh
+  const geometry = new THREE.SphereGeometry(1, 16, 16);
+  const material1 = new THREE.MeshPhongMaterial({
+    color: "orangered",
+    shininess: 800,
+    flatShading: true,
+  });
+  const material2 = new THREE.MeshStandardMaterial({
+    color: "orangered",
+    roughness: 0.2,
+    metalness: 0.3,
+    flatShading: true,
+  });
+
+  // mesh.add...
+  // ..
+}
+```
+
+위와 같이 넣으면 각진 구 모양 생성! 요즘 다양하게 사용하는 스타일인 것 같당
+
+![](../../img/230301-1.gif)
