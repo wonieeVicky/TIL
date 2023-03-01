@@ -110,3 +110,68 @@ export default function example() {
 ![](../../img/230301-2.png)
 
 위 shininess 값을 0으로 주면 해당 속성을 사용하지 않는 개념이므로 MeshLambertMaterial과 동일하게 노출
+
+### **MeshStandardMaterial**
+
+앞서 배웠던 MeshPhongMaterial과 MeshStandardMaterial을 비교해본다.
+
+`src/ex03.js`
+
+```jsx
+// ----- 주제: MeshStandardMaterial
+
+export default function example() {
+  // Renderer, Scene, Camera, Controls ...
+
+  // Mesh
+  const geometry = new THREE.SphereGeometry(1, 16, 16);
+
+  // MeshPhongMaterial 하이라이트, 반사광 표현 가능한 재질
+  const material1 = new THREE.MeshPhongMaterial({ color: "orangered" });
+  // MeshStandardMaterial 하이라이트, 반사광 표현 가능한 재질
+  const material2 = new THREE.MeshStandardMaterial({ color: "orangered" });
+
+  // mesh.add...
+  // ..
+}
+```
+
+![왼쪽이 MeshPhongMaterial, 오른쪽이 MeshStandardMaterial](../../img/230301-3.png)
+
+위 두 속성은 모두 하이라이트와 반사광 표현이 가능한 재질이다. 단, 사용방법과 노출되는 느낌이 살짝 다름
+
+`src/ex03.js`
+
+```jsx
+// ----- 주제: MeshStandardMaterial
+
+export default function example() {
+  // Renderer, Scene, Camera, Controls ...
+
+  // Mesh
+  const geometry = new THREE.SphereGeometry(1, 16, 16);
+
+  // MeshPhongMaterial 하이라이트, 반사광 표현 가능한 재질
+  const material1 = new THREE.MeshPhongMaterial({
+    color: "orangered",
+    shininess: 800, // 재질 표현(shininess)
+  });
+
+  // MeshStandardMaterial 하이라이트, 반사광 표현 가능한 재질
+  const material2 = new THREE.MeshStandardMaterial({
+    color: "orangered",
+    roughness: 0.5, // 재질 표현 (roughness)
+    metalness: 0.5, // 재질 표현 - 쇠느낌(?)
+  });
+
+  // mesh.add...
+  // ..
+}
+```
+
+위와 같이 효과를 넣으면 아래와 같이 결과가 나온다.
+
+![](../../img/230301-4.png)
+
+성능은 MeshPhongMaterial이 살짝 빠른 편, 원하는 메서드를 골라서 사용한다.
+이 밖에도 매우 다양한 메서드와 옵션 들이 있으니 그 중에서 필요한 걸로 골라쓴다.
