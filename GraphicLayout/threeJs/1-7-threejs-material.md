@@ -210,3 +210,59 @@ export default function example() {
 위와 같이 넣으면 각진 구 모양 생성! 요즘 다양하게 사용하는 스타일인 것 같당
 
 ![](../../img/230301-1.gif)
+
+### Mesh의 앞뒷면
+
+이번에는 Mesh의 앞, 뒷면에 대해 알아본다. Meterial은 점(vertext), 선(edge), 면(face)으로 이루어져있다. 위 설정에 따라 앞, 뒷면을 다양하게 설정할 수 있음. 아래와 같은 mesh가 구현되어 있다고 하자.
+
+`src/ex05.js`
+
+```jsx
+// ----- 주제: Side
+
+export default function example() {
+  // Renderer, Scene, Camera, Controls ...
+  // Mesh
+  const geometry = new THREE.BoxGeometry(2, 2, 2);
+  const material = new THREE.MeshStandardMaterial({
+    color: "orangered",
+    roughness: 0.2,
+    metalness: 0.3,
+  });
+
+  const mesh = new THREE.Mesh(geometry, material);
+  scene.add(mesh);
+
+  // ..
+}
+```
+
+기본적인 BoxGeometry와 MeshStandardMaterial이 연결되어있음. 사물의 뒷면이 별도로 노출되지 않는다.
+여기에 뒷면을 보이게 옵션을 추가해본다.
+
+![](../../img/230302-1.gif)
+
+```jsx
+export default function example() {
+  // Renderer, Scene, Camera, Controls ...
+  // Mesh
+  const geometry = new THREE.BoxGeometry(2, 2, 2);
+  const material = new THREE.MeshStandardMaterial({
+    color: "orangered",
+    roughness: 0.2,
+    metalness: 0.3,
+    // side: THREE.FrontSide, // default value
+    // side: THREE.BackSide, // 뒷 면만 보이게
+    side: THREE.DoubleSide, // 큐브 안쪽까지 모두 다 보이게
+  });
+
+  const mesh = new THREE.Mesh(geometry, material);
+  scene.add(mesh);
+
+  // ..
+}
+```
+
+위와 같이 side란 옵션으로 큐브 안쪽, 혹은 뒷면만 보이도록 설정 가능
+
+![side: THREE.DoubleSide](../../img/230302-2.gif)
