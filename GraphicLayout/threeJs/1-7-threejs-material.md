@@ -266,3 +266,93 @@ export default function example() {
 위와 같이 side란 옵션으로 큐브 안쪽, 혹은 뒷면만 보이도록 설정 가능
 
 ![side: THREE.DoubleSide](../../img/230302-2.gif)
+
+### 텍스쳐 이미지 로드하기
+
+외부 이미지를 로드한 뒤 객체에 입혀본다. (포장)
+
+이왕이면 3D 모델을 위해 만들어진 이미지를 가져다 쓰면 더 그럴싸해 보일 것 같다.
+구글에 3d texture라고 검색하면 다양한 이미지들이 많이 나옴. 여기 [사이트](https://3dtextures.me/)를 참고했음
+
+벽돌 텍스쳐 이미지를 [여기](https://3dtextures.me/2020/09/17/brick-wall-019/)에서 다운로드 한 뒤 src/textures/brick 폴더에 옮겨둔다.
+코드 작업을 하기에 앞서 src 폴더 내부에 넣어둔 이미지를 사용하기 위해 webpack 설정을 추가한다.
+
+`material/webpack.config.js`
+
+```jsx
+// ..
+module.exports = {
+  // ..
+  plugins: [
+    // ..
+    // CopyWebpackPlugin: 그대로 복사할 파일들을 설정하는 플러그인
+    // 아래 patterns에 설정한 파일/폴더는 빌드 시 dist 폴더에 자동으로 생성됩니다.
+    // patterns에 설정한 경로에 해당 파일이 없으면 에러가 발생합니다.
+    // 사용하는 파일이나 폴더 이름이 다르다면 변경해주세요.
+    // 그대로 사용할 파일들이 없다면 CopyWebpackPlugin을 통째로 주석 처리 해주세요.
+    new CopyWebpackPlugin({
+      patterns: [
+        { from: "./src/main.css", to: "./main.css" },
+        { from: "./src/textures", to: "./textures" }, // textures 폴더 추가
+      ],
+    }),
+  ],
+};
+```
+
+`src/ex06.js`
+
+```jsx
+// ----- 주제: 텍스쳐 이미지 로드하기
+
+export default function example() {
+  // 텍스쳐 이미지 로드
+  const textureLoader = new THREE.TextureLoader();
+  // 이미지 호출 - 예시 1
+  const texture = textureLoader.load("/textures/brick/Brick_Wall_019_basecolor.jpg");
+  // 이미지 호출 - 예시 2
+  const texture = textureLoader.load(
+    "/textures/brick/Brick_Wall_019_basecolor123123.jpg"
+    // () => console.log("로드 완료"),
+    // () => console.log("로드 중"),
+    // () => console.log("로드 실패")
+  );
+
+  // ..
+}
+```
+
+텍스쳐 이미지 로드는 위와 같이 THREE.TextureLoader 메서드를 호출해서 사용한다. 기본적으로 이미지 경로만 적어줘도 되고, 조건에 따라 체크할 수 있는 함수를 로드 중, 로드 완료, 로드 실패 조건으로 3가지 함수를 넣을 수 있다. 위에서 생성한 texture를 material에 적용해본다.
+
+`src/ex06.js`
+
+```jsx
+// ----- 주제: 텍스쳐 이미지 로드하기
+
+export default function example() {
+  // 텍스쳐 이미지 로드
+  const textureLoader = new THREE.TextureLoader();
+  // 이미지 호출
+  const texture = textureLoader.load("/textures/brick/Brick_Wall_019_basecolor.jpg");
+
+  // Mesh
+  const geometry = new THREE.BoxGeometry(1, 1, 1);
+
+  const material1 = new THREE.MeshStandardMaterial({ map: texture });
+  const material2 = new THREE.MeshBasicMaterial({ map: texture });
+
+  const mesh1 = new THREE.Mesh(geometry, material1);
+  const mesh2 = new THREE.Mesh(geometry, material2);
+
+  mesh1.position.x = -1;
+  mesh2.position.x = 1;
+
+  scene.add(mesh1, mesh2);
+
+  // ..
+}
+```
+
+위와 같이 MeshStandardMaterial, MeshBasicMaterial에 texture를 매핑해주면 각 속성을 그대로 유지한 채 texture만 매핑된 사물을 확인할 수 있다.
+
+![왼쪽이 MeshStandardMaterial 오른쪽이 MeshBasicMaterial](../../img/230303-1.png)
