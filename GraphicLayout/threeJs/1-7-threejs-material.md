@@ -425,3 +425,182 @@ export default function example() {
 ![좌 normalTex, 우 heightTex](../../img/230304-1.png)
 
 ![좌 ambientTex, 우 roughnessTex](../../img/230304-1.png)
+
+### 텍스쳐 변환
+
+이번에는 텍스쳐 이미지의 위치를 이동하거나 회전하는 등의 변환을 해본다.
+해골 모양의 [새로운 텍스쳐 이미지](https://3dtextures.me/2021/03/11/ground-skull-001/)를 사용해본다.
+
+`src/ex08.js`
+
+```jsx
+// ----- 주제: 텍스쳐 이미지 변환
+
+export default function example() {
+  const textureLoader = new THREE.TextureLoader();
+  const texture = textureLoader.load("/textures/skull/Ground Skull_basecolor.jpg");
+
+  // Renderer, Scene, Camera, Light, Controls ..
+
+  // Mesh
+  const geometry = new THREE.BoxGeometry(1, 1, 1);
+  const material = new THREE.MeshStandardMaterial({ map: texture });
+
+  const mesh = new THREE.Mesh(geometry, material);
+  scene.add(mesh);
+
+  // ..
+}
+```
+
+위와 같이 새로운 텍스쳐를 적용하면 아래와 같다.
+
+![](../../img/230305-1.png)
+
+무시무시한 해골이 노출되었다. 이제 이 텍스쳐 이미지에 변환을 하나씩 해보자.
+먼저 텍스쳐의 위치를 x 축 위치로 0.3만큼 이동시켜본다.
+
+`src/ex08.js`
+
+```jsx
+export default function example() {
+  const textureLoader = new THREE.TextureLoader();
+  const texture = textureLoader.load("/textures/skull/Ground Skull_basecolor.jpg");
+  texture.offset.x = 0.3; // 텍스쳐의 위치를 이동시킴
+
+  // ..
+}
+```
+
+위와 같이 offset으로 위치를 이동시키면 아래와 같이 노출된다.
+
+![](../../img/230305-2.png)
+
+0.3만큼 이동 후 남은 부분이 이상함.. x 축에 대한 여백을 기존 텍스쳐로 노출되도록 아래와 같이 설정한다.
+
+```jsx
+export default function example() {
+  const textureLoader = new THREE.TextureLoader();
+  const texture = textureLoader.load("/textures/skull/Ground Skull_basecolor.jpg");
+
+  texture.wrapS = THREE.RepeatWrapping; // 추가
+  texture.offset.x = 0.3;
+
+  // ..
+}
+```
+
+그러면 원래대로 첫 번째 이미지와 동일하게 노출됨, offset.y로 0.3 움직여주면 아래와 위에 동일한 현상 발생
+
+```jsx
+export default function example() {
+  const textureLoader = new THREE.TextureLoader();
+  const texture = textureLoader.load("/textures/skull/Ground Skull_basecolor.jpg");
+
+  texture.wrapS = THREE.RepeatWrapping; // 추가
+
+  texture.offset.x = 0.3;
+  texture.offset.y = 0.3;
+
+  // ..
+}
+```
+
+![](../../img/230305-3.png)
+
+```jsx
+export default function example() {
+  const textureLoader = new THREE.TextureLoader();
+  const texture = textureLoader.load("/textures/skull/Ground Skull_basecolor.jpg");
+
+  texture.wrapS = THREE.RepeatWrapping; // x축
+  texture.wrapT = THREE.RepeatWrapping; // y축
+
+  texture.offset.x = 0.3;
+  texture.offset.y = 0.3;
+
+  // ..
+}
+```
+
+위와 같이하면 모든 면이 첫 번째 이미지와 동일하게 노출된다. RepeatWrapping은 texture 변환 시 거의 기본적으로 넣어줘야하는 메서드임! 기억해두자.
+
+```jsx
+export default function example() {
+  const textureLoader = new THREE.TextureLoader();
+  const texture = textureLoader.load("/textures/skull/Ground Skull_basecolor.jpg");
+
+  texture.wrapS = THREE.RepeatWrapping; // x축
+  texture.wrapT = THREE.RepeatWrapping; // y축
+
+  texture.offset.x = 0.3;
+  texture.offset.y = 0.3;
+
+  // ..
+}
+```
+
+다음으로 repeat에 대해 배워본다.
+
+```jsx
+export default function example() {
+  const textureLoader = new THREE.TextureLoader();
+  const texture = textureLoader.load("/textures/skull/Ground Skull_basecolor.jpg");
+
+  texture.wrapS = THREE.RepeatWrapping;
+  texture.wrapT = THREE.RepeatWrapping;
+
+  texture.offset.x = 0.3;
+  texture.offset.y = 0.3;
+
+  texture.repeat.x = 2; // repeat
+  texture.repeat.y = 2; // repeat
+
+  // ..
+}
+```
+
+![](../../img/230305-4.png)
+
+가로세로 2번의 반복을 주어 총 4개의 텍스트 이미지가 한 면에 노출되는 것을 확인할 수 있음 다음은 rotate이다.
+
+```jsx
+export default function example() {
+  const textureLoader = new THREE.TextureLoader();
+  const texture = textureLoader.load("/textures/skull/Ground Skull_basecolor.jpg");
+
+  texture.wrapS = THREE.RepeatWrapping;
+  texture.wrapT = THREE.RepeatWrapping;
+
+  // texture.rotation = Math.PI * 0.25; // 텍스쳐의 회전
+  texture.rotation = THREE.MathUtils.degToRad(45); // 텍스쳐의 회전
+
+  // ..
+}
+```
+
+이러면 아래와 같이 회전함
+
+![](../../img/230305-5.png)
+
+그런데 뭔가 이상하다. 회전 축이 박스의 가운데에서 돌아가지 않아서.. 원하는대로 해골이 회전하지 않음 따라서 회전 중심축을 가운데로 바꿔준다.
+
+```jsx
+export default function example() {
+  const textureLoader = new THREE.TextureLoader();
+  const texture = textureLoader.load("/textures/skull/Ground Skull_basecolor.jpg");
+
+  texture.wrapS = THREE.RepeatWrapping;
+  texture.wrapT = THREE.RepeatWrapping;
+
+  texture.rotation = THREE.MathUtils.degToRad(65);
+  texture.center.x = 0.5; // 텍스쳐의 중심점 변경 - x축 센터 정렬
+  texture.center.y = 0.5; // 텍스쳐의 중심점 뱐걍 - y축 센터 정렬
+
+  // ..
+}
+```
+
+위와 같이 [texture.center](http://texture.center) 의 x, y 값을 0.5로 설정하면 한 면의 센터로 정렬되며 원하는대로 구현 가능함
+
+![](../../img/230305-6.png)
