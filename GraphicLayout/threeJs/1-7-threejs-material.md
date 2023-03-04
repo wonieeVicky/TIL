@@ -356,3 +356,72 @@ export default function example() {
 위와 같이 MeshStandardMaterial, MeshBasicMaterial에 texture를 매핑해주면 각 속성을 그대로 유지한 채 texture만 매핑된 사물을 확인할 수 있다.
 
 ![왼쪽이 MeshStandardMaterial 오른쪽이 MeshBasicMaterial](../../img/230303-1.png)
+
+### 로딩 매니저(여러개의 텍스쳐 이미지)
+
+여러개의 텍스쳐 이미지를 불러올 때는 three.js에서 제공하는 로딩 매니저를 사용하면 매우 유용하다.
+
+`src/ex07.js`
+
+```jsx
+// ----- 주제: 로딩 매니저(여러개의 테스쳐 이미지를 로드할 때 사용)
+
+export default function example() {
+  // 텍스쳐 이미지 로더 생성
+  const loadingManager = new THREE.LoadingManager();
+
+  loadingManager.onStart = () => {
+    console.log("로드 시작");
+  };
+  loadingManager.onProgress = (img) => {
+    console.log(img + " 로드");
+  };
+  loadingManager.onLoad = () => {
+    console.log("로드 완료");
+  };
+  loadingManager.onError = () => {
+    console.log("로드 실패");
+  };
+
+  // 텍스쳐 로드 생성
+  const textureLoader = new THREE.TextureLoader(loadingManager);
+  const baseColorTex = textureLoader.load("/textures/brick/Brick_Wall_019_basecolor.jpg");
+  const ambientTex = textureLoader.load("/textures/brick/Brick_Wall_019_ambientOcclusion.jpg");
+  const normalTex = textureLoader.load("/textures/brick/Brick_Wall_019_normal.jpg");
+  const roughnessTex = textureLoader.load("/textures/brick/Brick_Wall_019_roughness.jpg");
+  const heightTex = textureLoader.load("/textures/brick/Brick_Wall_019_height.png");
+
+  // ..
+
+  // Mesh
+  const geometry = new THREE.BoxGeometry(1, 1, 1);
+  const material1 = new THREE.MeshStandardMaterial({ map: normalTex });
+  const material2 = new THREE.MeshStandardMaterial({ map: heightTex });
+
+  const mesh1 = new THREE.Mesh(geometry, material1);
+  const mesh2 = new THREE.Mesh(geometry, material2);
+  mesh1.position.x = -1;
+  mesh2.position.x = 1;
+  scene.add(mesh1, mesh2);
+
+  // ..
+}
+```
+
+위와 같이 코드를 넣으면 이미지 로드에 대한 정보를 각 onStart, onProgress, onLoad, onError 메서드를 통해서 가져올 수 있다.
+
+```bash
+로드 시작
+/textures/brick/Brick_Wall_019_basecolor.jpg 로드
+/textures/brick/Brick_Wall_019_ambientOcclusion.jpg 로드
+/textures/brick/Brick_Wall_019_normal.jpg 로드
+/textures/brick/Brick_Wall_019_roughness.jpg 로드
+/textures/brick/Brick_Wall_019_height.png 로드
+로드 완료
+```
+
+또한 각 메서드들이 잘 호출되어서 mesh에 입혀지는 것을 확인할 수 있음
+
+![좌 normalTex, 우 heightTex](../../img/230304-1.png)
+
+![좌 ambientTex, 우 roughnessTex](../../img/230304-1.png)
