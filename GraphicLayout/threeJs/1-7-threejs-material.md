@@ -686,3 +686,95 @@ export default function example() {
 ![](../../img/230306-2.gif)
 
 마인크래프 블럭과 흡사한 블럭하나가 만들어진 것을 확인할 수 있음
+
+### MeshToonMaterial(만화 느낌)
+
+MeshToonMaterial은 만화 느낌을 주는 메서드이다.
+
+`src/ex10.js`
+
+```jsx
+// ----- 주제: MeshToonMaterial (만화 느낌)
+
+export default function example() {
+  const textureLoader = new THREE.TextureLoader();
+  // ...
+
+  // Mesh
+  const geometry = new THREE.ConeGeometry(1, 2, 128);
+  const material = new THREE.MeshToonMaterial({
+    color: "plum", // 2톤으로 만화적 표현 구현
+  });
+  const mesh = new THREE.Mesh(geometry, material);
+  scene.add(mesh);
+
+  // ..
+}
+```
+
+위와 같이 ConeGeometry 모양에 MeshToonMaterial을 plum color로 적용하면 아래와 같다.
+
+![](../../img/230306-3.gif)
+
+```jsx
+
+```
+
+여기에서 좀 더 그라데이션을 주기 위해 작은 픽셀에 (검정색-회색-하얀색) 3단계의 그라데이션이 담긴 파일(gradient.png)을 적용해본다.  (포토샵을 이용해 간단히 생성 가능)
+
+![1px에 위와 같이 각 색깔이 담겨있음](../../img/230306-1.png)
+
+
+```jsx
+// ----- 주제: MeshToonMaterial (만화 느낌)
+
+export default function example() {
+  const textureLoader = new THREE.TextureLoader();
+	// gradientTex 이미지 로드
+  const gradientTex = textureLoader.load("/textures/gradient.png");
+
+  // ...
+
+  // Mesh
+  const geometry = new THREE.ConeGeometry(1, 2, 128);
+  const material = new THREE.MeshToonMaterial({
+    color: "plum",
+		gradientMap: gradientTex // gradientTex 적용
+  });
+  const mesh = new THREE.Mesh(geometry, material);
+  scene.add(mesh);
+
+  // ..
+}
+```
+
+위와 같이 gradientTex를 MeshToonMaterial의 gradientMap 속성에 적용하면 아래와 같이 노출된다.
+
+![](../../img/230306-4.gif)
+
+자연스러워졌으나 2D 만화의 느낌이 사라져버림. 이는 앞 시간에서 배운 magFilter를 적용하면 개선할 수 있다.
+
+```jsx
+// ----- 주제: MeshToonMaterial (만화 느낌)
+
+export default function example() {
+  const textureLoader = new THREE.TextureLoader();
+  const gradientTex = textureLoader.load("/textures/gradient.png");
+	gradientTex.magFilter = THREE.NearestFilter; // magFilter 적용
+
+  // Mesh
+  const geometry = new THREE.ConeGeometry(1, 2, 128);
+  const material = new THREE.MeshToonMaterial({
+    color: "plum",
+		gradientMap: gradientTex
+  });
+  const mesh = new THREE.Mesh(geometry, material);
+  scene.add(mesh);
+
+  // ..
+}
+```
+
+위와 같이 magFilter에 NearestFilter를 적용해주면 영역 구분이 확실하게 나뉜 3단계 색을 가진 원뿔모양으로 변경됨. 만화 느낌 다시 만들어졌따 (🤨)
+
+![](../../img/230306-5.gif)
