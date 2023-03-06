@@ -604,3 +604,85 @@ export default function example() {
 위와 같이 [texture.center](http://texture.center) 의 x, y 값을 0.5로 설정하면 한 면의 센터로 정렬되며 원하는대로 구현 가능함
 
 ![](../../img/230305-6.png)
+
+### 여러 이미지 텍스쳐가 적용된 큐브
+
+이번에는 여러가지 텍스쳐가 적용된 큐브를 만들어본다. 각각 면에 다른 이미지를 적용함
+이미지는 `images/mcstyle` 폴더에 있는 이미지를 가져다 쓴다.
+
+`src/ex09.js`
+
+```jsx
+// ----- 주제: 여러가지 텍스쳐가 적용된 큐브
+
+export default function example() {
+  const textureLoader = new THREE.TextureLoader();
+
+  // 각 면에 들어갈 텍스쳐 이미지 로드
+  const rightTexture = textureLoader.load("/textures/mcstyle/right.png");
+  const leftTexture = textureLoader.load("/textures/mcstyle/left.png");
+  const topTexture = textureLoader.load("/textures/mcstyle/top.png");
+  const bottomTexture = textureLoader.load("/textures/mcstyle/bottom.png");
+  const frontTexture = textureLoader.load("/textures/mcstyle/front.png");
+  const backTexture = textureLoader.load("/textures/mcstyle/back.png");
+
+  // 각 텍스쳐 원소로 가진 materials를 생성
+  const materials = [
+    new THREE.MeshBasicMaterial({ map: rightTexture }),
+    new THREE.MeshBasicMaterial({ map: leftTexture }),
+    new THREE.MeshBasicMaterial({ map: topTexture }),
+    new THREE.MeshBasicMaterial({ map: bottomTexture }),
+    new THREE.MeshBasicMaterial({ map: frontTexture }),
+    new THREE.MeshBasicMaterial({ map: backTexture }),
+  ];
+
+  // ..
+
+  // Mesh
+  const geometry = new THREE.BoxGeometry(1, 1, 1);
+  const mesh = new THREE.Mesh(geometry, materials); // Mesh 적용 시 materials를 적용하여 각 면에 해당하는 이미지를 넣어줌
+  scene.add(mesh);
+
+  // ...
+}
+```
+
+위와 같이 넣어주면 각 면에 맞는 이미지가 적용된 큐브가 만들어진다. (순서가 중요함)
+
+![](../../img/230306-1.gif)
+
+그런데 픽셀 크기의 이미지를 쓰니 화질이 영 떨어짐. 이를 개선하는 메서드가 있다.
+
+```jsx
+// ----- 주제: 여러가지 텍스쳐가 적용된 큐브
+
+export default function example() {
+  const textureLoader = new THREE.TextureLoader();
+
+  // 각 면에 들어갈 텍스쳐 이미지 로드
+  const rightTexture = textureLoader.load("/textures/mcstyle/right.png");
+  // ..
+
+  // 각 텍스쳐 원소로 가진 materials를 생성
+  const materials = [
+    new THREE.MeshBasicMaterial({ map: rightTexture }),
+    // ..
+  ];
+
+  // 픽셀 크기의 이미지 화소를 선명하게 표현
+  rightTexture.magFilter = THREE.NearestFilter;
+  leftTexture.magFilter = THREE.NearestFilter;
+  topTexture.magFilter = THREE.NearestFilter;
+  bottomTexture.magFilter = THREE.NearestFilter;
+  frontTexture.magFilter = THREE.NearestFilter;
+  backTexture.magFilter = THREE.NearestFilter;
+
+  // ..
+}
+```
+
+위처럼 각 texture의 magFilterfh NearestFilter를 적용해주면 아래와 같이 선명한 블럭이 생성된다.
+
+![](../../img/230306-2.gif)
+
+마인크래프 블럭과 흡사한 블럭하나가 만들어진 것을 확인할 수 있음
