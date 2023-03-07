@@ -720,17 +720,16 @@ export default function example() {
 
 ```
 
-여기에서 좀 더 그라데이션을 주기 위해 작은 픽셀에 (검정색-회색-하얀색) 3단계의 그라데이션이 담긴 파일(gradient.png)을 적용해본다.  (포토샵을 이용해 간단히 생성 가능)
+여기에서 좀 더 그라데이션을 주기 위해 작은 픽셀에 (검정색-회색-하얀색) 3단계의 그라데이션이 담긴 파일(gradient.png)을 적용해본다. (포토샵을 이용해 간단히 생성 가능)
 
 ![1px에 위와 같이 각 색깔이 담겨있음](../../img/230306-1.png)
-
 
 ```jsx
 // ----- 주제: MeshToonMaterial (만화 느낌)
 
 export default function example() {
   const textureLoader = new THREE.TextureLoader();
-	// gradientTex 이미지 로드
+  // gradientTex 이미지 로드
   const gradientTex = textureLoader.load("/textures/gradient.png");
 
   // ...
@@ -739,7 +738,7 @@ export default function example() {
   const geometry = new THREE.ConeGeometry(1, 2, 128);
   const material = new THREE.MeshToonMaterial({
     color: "plum",
-		gradientMap: gradientTex // gradientTex 적용
+    gradientMap: gradientTex, // gradientTex 적용
   });
   const mesh = new THREE.Mesh(geometry, material);
   scene.add(mesh);
@@ -760,13 +759,13 @@ export default function example() {
 export default function example() {
   const textureLoader = new THREE.TextureLoader();
   const gradientTex = textureLoader.load("/textures/gradient.png");
-	gradientTex.magFilter = THREE.NearestFilter; // magFilter 적용
+  gradientTex.magFilter = THREE.NearestFilter; // magFilter 적용
 
   // Mesh
   const geometry = new THREE.ConeGeometry(1, 2, 128);
   const material = new THREE.MeshToonMaterial({
     color: "plum",
-		gradientMap: gradientTex
+    gradientMap: gradientTex,
   });
   const mesh = new THREE.Mesh(geometry, material);
   scene.add(mesh);
@@ -778,3 +777,32 @@ export default function example() {
 위와 같이 magFilter에 NearestFilter를 적용해주면 영역 구분이 확실하게 나뉜 3단계 색을 가진 원뿔모양으로 변경됨. 만화 느낌 다시 만들어졌따 (🤨)
 
 ![](../../img/230306-5.gif)
+
+### MeshNormalMaterial
+
+이번에는 법선을 다루는 MeshNormalMaterial에 대해 알아본다.
+위 코드에서 불필요한 부분을 제거하고 기본적인 MeshNormalMaterial만 적용하면 아래와 같다.
+
+`src/ex11.js`
+
+```jsx
+// ----- 주제: MeshNormalMaterial(법선)
+
+export default function example() {
+  // ..
+  // Mesh
+  const geometry = new THREE.ConeGeometry(1, 2, 128);
+  const material = new THREE.MeshNormalMaterial();
+  const mesh = new THREE.Mesh(geometry, material);
+  scene.add(mesh);
+
+  // ..
+}
+```
+
+![](../../img/230307-1.gif)
+
+위와 같이 법선 방향에 따라서 rgba 로 방향을 색으로 표현하기 때문에 자연스럽다.
+위 원뿔을 큐브(`THREE.BoxGeometry(2,2,2)`)로 바꿔주면 방향에 따른 색 변화를 뚜렷하게 확인할 수 있다. (방향이 있으므로)
+
+![](../../img/230307-2.gif)
