@@ -849,3 +849,26 @@ export default function example() {
 `new THREE.ConeGeometry(1, 2, 64)` 적용 시에는 아래와 같은 효과를 낼 수 있다.
 
 ![](../../img/230308-2.gif)
+
+즉 구 형태에 입체감을 적용해놓으면 그것을 사용하여 mesh를 적용하는 개념이다.
+
+![](../../img/230309-1.png)
+
+위 이미지도 적용해보자.
+
+```jsx
+// ----- 주제: MeshMatcapMaterial
+
+export default function example() {
+  const textureLoader = new THREE.TextureLoader();
+  const matcapTex = textureLoader.load("/textures/matcap/GeneticView_Purple-Jade.png");
+
+  // 동일 ..
+}
+```
+
+보라색 구 형태가 가진 입체감이 아래와 같이 입혀진다.
+
+![](../../img/230309-1.gif)
+
+싱기방기 ㅎ
