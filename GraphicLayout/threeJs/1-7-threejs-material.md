@@ -806,3 +806,46 @@ export default function example() {
 위 원뿔을 큐브(`THREE.BoxGeometry(2,2,2)`)로 바꿔주면 방향에 따른 색 변화를 뚜렷하게 확인할 수 있다. (방향이 있으므로)
 
 ![](../../img/230307-2.gif)
+
+### MeshMatcapMaterial
+
+이번에는 MeshMatcapMaterial를 해본다. 구글에 matcap texture download라고 검색하면 여러가지 글이 나오는데, matcapmaterial은 동그란 이미지에 입체감이 있는 이미지로 이를 기반으로 3d 오브젝트 mesh에 적용할 수 있다.
+
+![](../../img/230308-1.png)
+
+[사이트](https://www.deviantart.com/sespider/art/163-FREE-MatCaps-258893793)에서 리소스를 다운로드 받은 뒤 `textures/matcap` 폴더에 옮긴 뒤 material3.jpg 파일을 적용한다.
+
+![이 이미지를 적용해본다.(material3.jpg)](../../img/230308-2.jpg)
+
+```jsx
+// ----- 주제: MeshMatcapMaterial
+
+export default function example() {
+  const textureLoader = new THREE.TextureLoader();
+  const matcapTex = textureLoader.load("/textures/matcap/material3.jpg");
+
+  // ..
+  // Mesh
+  const geometry = new THREE.BoxGeometry(2, 2, 2);
+  const material = new THREE.MeshMatcapMaterial({ matcap: matcapTex });
+  const mesh = new THREE.Mesh(geometry, material);
+  scene.add(mesh);
+
+  // ..
+}
+```
+
+위와 같이 MeshMatcapMaterial에 matcapTex 데이터를 넣어주면 아래와 같이 노출됨.
+
+![](../../img/230308-1.gif)
+
+위 구에 적용된 요소들이 자연스럽게 BoxGeometry에 적용되어있다.
+
+이를 `new THREE.SphereGeometry(1, 64, 64)`로 적용하면 아래와 같음
+(거의 material3.jpg와 동일한 구가 생성된 느낌)
+
+![](../../img/230308-3.png)
+
+`new THREE.ConeGeometry(1, 2, 64)` 적용 시에는 아래와 같은 효과를 낼 수 있다.
+
+![](../../img/230308-2.gif)
