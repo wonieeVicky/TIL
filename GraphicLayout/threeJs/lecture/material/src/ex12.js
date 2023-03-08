@@ -5,7 +5,7 @@ import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 
 export default function example() {
   const textureLoader = new THREE.TextureLoader();
-  const matcapTex = textureLoader.load("/textures/matcap/material3.jpg");
+  const matcapTex = textureLoader.load("/textures/matcap/GeneticView_Purple-Jade.png");
 
   // Renderer
   const canvas = document.querySelector("#three-canvas");
