@@ -872,3 +872,156 @@ export default function example() {
 ![](../../img/230309-1.gif)
 
 싱기방기 ㅎ
+
+### MeshStandardMaterial에 효과 더하기
+
+```jsx
+// ----- 주제: MeshStandardMaterial 에 효과 더하기
+
+export default function example() {
+  const textureLoader = new THREE.TextureLoader();
+  const baseColorTex = textureLoader.load("/textures/brick/Brick_Wall_019_basecolor.jpg");
+  // ..
+
+  // Mesh
+  const geometry = new THREE.BoxGeometry(3, 3, 3);
+  const material = new THREE.MeshStandardMaterial({ map: baseColorTex });
+
+  const mesh = new THREE.Mesh(geometry, material);
+  scene.add(mesh);
+
+  // ..
+}
+```
+
+위코드를 실행시켜 mesh를 확대해보면 사각형 박스에 해당 텍스쳐가 입혀진 상태로만 존재한다.
+
+![](../../img/230311-1.png)
+
+여기에 입체감을 조금 더해줄 수 있다.
+
+```jsx
+// ----- 주제: MeshStandardMaterial 에 효과 더하기
+
+export default function example() {
+  const textureLoader = new THREE.TextureLoader();
+  const baseColorTex = textureLoader.load("/textures/brick/Brick_Wall_019_basecolor.jpg");
+  // ..
+
+  // Mesh
+  const geometry = new THREE.BoxGeometry(3, 3, 3);
+  const material = new THREE.MeshStandardMaterial({
+    map: baseColorTex,
+    normalMap: normalTex, // 입체감 부여
+  });
+
+  const mesh = new THREE.Mesh(geometry, material);
+  scene.add(mesh);
+
+  // ..
+}
+```
+
+![](../../img/230311-2.png)
+
+입체감이 살짝 살아난 것을 확인할 수 있다. 여기에 저번 시간에 배운 roughness 효과를 주면
+
+```jsx
+// ----- 주제: MeshStandardMaterial 에 효과 더하기
+
+export default function example() {
+  const textureLoader = new THREE.TextureLoader();
+  const baseColorTex = textureLoader.load("/textures/brick/Brick_Wall_019_basecolor.jpg");
+  // ..
+
+  // Mesh
+  const geometry = new THREE.BoxGeometry(3, 3, 3);
+  const material = new THREE.MeshStandardMaterial({
+    map: baseColorTex,
+    normalMap: normalTex, // 입체감 부여
+    roughness: 0.3, // 거친 느낌 + 빛
+  });
+
+  const mesh = new THREE.Mesh(geometry, material);
+  scene.add(mesh);
+
+  // ..
+}
+```
+
+아래와 같은 진짜 벽돌벽 느낌이 난다..
+
+![](../../img/230311-3.png)
+
+빛에 비출 수록 더욱 그럴싸해보임
+
+![](../../img/230311-4.png)
+
+texture 세팅만으로 이러한 효과를 줄 수 있다.
+
+아래와 같이 roughnessMap, adMap, aoMapIntensity 속성을 활용해서 좀 더 그럴싸한 mesh구현이 가능함
+
+```jsx
+// ----- 주제: MeshStandardMaterial 에 효과 더하기
+
+export default function example() {
+  const textureLoader = new THREE.TextureLoader();
+  const baseColorTex = textureLoader.load("/textures/brick/Brick_Wall_019_basecolor.jpg");
+  // ..
+
+  // Mesh
+  const geometry = new THREE.BoxGeometry(3, 3, 3);
+  const material = new THREE.MeshStandardMaterial({
+    map: baseColorTex,
+    normalMap: normalTex, // 입체감 부여
+    roughness: 0.3,
+    metalness: 0.3,
+    roughnessMap: roughnessTex, // nomalMap과 같이 입체감 부여
+    aoMap: ambientTex, // 그림자 부분을 진하게
+    aoMapIntensity: 5, // aoMap의 정도를 설정
+  });
+
+  const mesh = new THREE.Mesh(geometry, material);
+  scene.add(mesh);
+
+  // ..
+}
+```
+
+![](../../img/230311-5.png)
+
+색을 넣으면 무시무시한 빨간색 벽돌 상자를 만들 수도 있음
+
+```jsx
+// ----- 주제: MeshStandardMaterial 에 효과 더하기
+
+export default function example() {
+  const textureLoader = new THREE.TextureLoader();
+  const baseColorTex = textureLoader.load("/textures/brick/Brick_Wall_019_basecolor.jpg");
+  // ..
+
+  // Scene
+  const scene = new THREE.Scene();
+  scene.background = new THREE.Color("black");
+
+  // Mesh
+  const geometry = new THREE.BoxGeometry(3, 3, 3);
+  const material = new THREE.MeshStandardMaterial({
+    map: baseColorTex,
+    normalMap: normalTex,
+    roughness: 0.3,
+    metalness: 0.3,
+    roughnessMap: roughnessTex,
+    aoMap: ambientTex,
+    aoMapIntensity: 5,
+    color: "red",
+  });
+
+  const mesh = new THREE.Mesh(geometry, material);
+  scene.add(mesh);
+
+  // ..
+}
+```
+
+![](../../img/230311-6.png)
