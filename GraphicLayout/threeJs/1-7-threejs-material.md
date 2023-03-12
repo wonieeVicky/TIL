@@ -1025,3 +1025,77 @@ export default function example() {
 ```
 
 ![](../../img/230311-6.png)
+
+### EnvironmentMap
+
+EnvironmentMap은 주변에 뭔가 있는 것처럼 mesh에 비치게 하는 효과를 준다.
+위 효과를 구현하기 위해 리소스를 [여기](https://polyhaven.com/a/dikhololo_night)에서 다운 받는다. (dikhololo_night_4k.hdr)
+
+다운 받은 이미지를 큐브 모양 mesh에 적용할 때 이미지를 그대로 사용하는게 아니라 6개의 조각으로 나눠야함.
+아래와 같이 말이다!
+
+![3D View](../../img/230312-1.png)
+
+![cubemap View](../../img/230312-2.png)
+
+위처럼 3d View hdr 이미지를 cubemap view로 변환하여 사용함.
+다운받은 이미지도 적용해보자.
+
+![3D View](../../img/230312-3.png)
+
+![Cubemap View](../../img/230312-4.png)
+
+변환하는 cubemap view를 저장하는 방식은 3가지 방식이 있는데, 가장 마지막 방식인 각각 조각으로 나뉘어진 방식으로 선택하여 save 한다. (nx, ny, nz, px, py, pz.png - negative(-), positive(+)를 의미
+
+![Cubemap View](../../img/230312-5.png)
+
+이를 src/textures/cubemap 폴더에 옮겨 넣어준 뒤 코드를 추가해본다.
+
+`src/ex14.js`
+
+```jsx
+// ----- 주제: EnvironmentMap
+
+export default function example() {
+  // 큐브 텍스쳐 이미지 로드
+  const cubeTextureLoader = new THREE.CubeTextureLoader();
+  const envMap = cubeTextureLoader
+    .setPath("/textures/cubemap/")
+    .load(["px.png", "nx.png", "py.png", "ny.png", "pz.png", "nz.png"]); // + - 순서
+
+  // ..
+  // Mesh
+  const geometry = new THREE.BoxGeometry(3, 3, 3);
+  const material = new THREE.MeshStandardMaterial({ metalness: 2, roughness: 0.1, envMap });
+  const mesh = new THREE.Mesh(geometry, material);
+  scene.add(mesh);
+
+  // ..****
+}
+```
+
+위와 같이 큐브 텍스쳐를 순서에 맞게 적용해서 넣은 뒤 화면에 렌더링하면 아래와 같이 노출된다.
+
+![](../../img/230312-1.gif)
+
+처음에는 하얀색 바탕에 아무것도 보이지 않지만, metalness, roughness 속성을 추가하면 아래와 같이 보임
+MeshStandardMaterial이 아닌 MeshBasicMaterial을 사용하면 또 다르게 보인다.
+
+```jsx
+export default function example() {
+  // 큐브 텍스쳐 이미지 로드
+  // ..
+
+  // Mesh
+  const geometry = new THREE.BoxGeometry(3, 3, 3);
+  const material = new THREE.MeshBasicMaterial({ envMap }); // Mesh 변경
+  const mesh = new THREE.Mesh(geometry, material);
+  scene.add(mesh);
+
+  // ..
+}
+```
+
+위 material 메서드를 변경하면 아래와 같이 노출됨.
+
+![](../../img/230312-2.gif)
