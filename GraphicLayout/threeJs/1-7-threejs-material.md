@@ -1140,3 +1140,40 @@ export default function example() {
 ![](../../img/230313-1.gif)
 
 저 큐브에 앞서 배웠던 envMap을 적용시켜 주변 환경이 비추는 효과를 준다면 더 그럴싸해 보일 것 같다.
+
+`src/ex16.js`
+
+```jsx
+// ----- 주제: Skybox와 EnvMap
+
+export default function example() {
+  // 큐브 텍스쳐 이미지 로드
+  const cubeTextureLoader = new THREE.CubeTextureLoader();
+  const cubeTexture = cubeTextureLoader
+    .setPath("/textures/cubemap/")
+    .load(["px.png", "nx.png", "py.png", "ny.png", "pz.png", "nz.png"]); // + - 순서
+
+  // ..
+
+  // Scene
+  const scene = new THREE.Scene();
+  scene.background = cubeTexture; // cubeTexture 배경화면 적용
+
+  // Mesh
+  const geometry = new THREE.BoxGeometry(1, 1, 1);
+  const material = new THREE.MeshBasicMaterial({
+    envMap: cubeTexture, // envMap 으로 mesh 적용
+    metalness: 2,
+    roughness: 0.1,
+  });
+
+  const mesh = new THREE.Mesh(geometry, material);
+  scene.add(mesh);
+
+  // ...
+}
+```
+
+위와 같이 처리해주면 배경화면 + 큐브에 비치는 배경 효과를 한번에 낼 수 있게된다.
+
+![](../../img/230313-2.gif)
