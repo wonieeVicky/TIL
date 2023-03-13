@@ -1086,7 +1086,7 @@ export default function example() {
   // 큐브 텍스쳐 이미지 로드
   // ..
 
-  // Mesh
+  // **Mesh**
   const geometry = new THREE.BoxGeometry(3, 3, 3);
   const material = new THREE.MeshBasicMaterial({ envMap }); // Mesh 변경
   const mesh = new THREE.Mesh(geometry, material);
@@ -1099,3 +1099,44 @@ export default function example() {
 위 material 메서드를 변경하면 아래와 같이 노출됨.
 
 ![](../../img/230312-2.gif)
+
+### Skybox
+
+위에서 배운 EnvironmentMap의 경우 mesh에 주변 환경이 보여지도록 설정한 예시.
+이번에는 배경에 주변 환경이 보여지도록(도배하는 느낌) 만들어본다. 실제 어떤 배경 공간을 만드는 의미임
+
+`src/ex15.js`
+
+```
+// ----- 주제: Skybox
+// https://polyhaven.com
+// matheowis.github.io/HDRI-to-CubeMap
+
+export default function example() {
+  // 큐브 텍스쳐 이미지 로드
+  const cubeTextureLoader = new THREE.CubeTextureLoader();
+
+  // ...
+
+  const scene = new THREE.Scene();
+	scene.background = cubeTextureLoader
+    .setPath("/textures/cubemap/")
+    .load(["px.png", "nx.png", "py.png", "ny.png", "pz.png", "nz.png"]);
+
+  // Mesh
+  const geometry = new THREE.BoxGeometry(1, 1, 1);
+  const material = new THREE.MeshStandardMaterial({ color: "gold" });
+
+  const mesh = new THREE.Mesh(geometry, material);
+  scene.add(mesh);
+
+  // ..
+}
+```
+
+위와 같이 기존 envMap 변수로 담았던 `cubeTextureLoader`를 scene.background로 지정해주면 됨
+결과는 아래와 같다.
+
+![](../../img/230313-1.gif)
+
+저 큐브에 앞서 배웠던 envMap을 적용시켜 주변 환경이 비추는 효과를 준다면 더 그럴싸해 보일 것 같다.
