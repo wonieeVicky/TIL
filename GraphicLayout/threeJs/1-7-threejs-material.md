@@ -1177,3 +1177,56 @@ export default function example() {
 위와 같이 처리해주면 배경화면 + 큐브에 비치는 배경 효과를 한번에 낼 수 있게된다.
 
 ![](../../img/230313-2.gif)
+
+### Material에 Canvas 사용하기
+
+이번 시간에는 메모리 상에 다른 캔버스를 하나 생성한 뒤 이 캔버스를 material의 texture로 활용해본다. canvas api를 사용해 애니메이션을 구현함(`ex01.js`를 기반으로 작업함)
+
+`src/ex17.js`
+
+```jsx
+// ----- 주제: CanvasTexture
+
+export default function example() {
+  // Renderer, Scene, Camera, Controls..
+
+  // CanvasTexture
+  const texCanvas = document.createElement("canvas");
+  const texContext = texCanvas.getContext("2d");
+  texCanvas.width = 500; // texContext에 크기 설정
+  texCanvas.height = 500; // texContext에 크기 설정
+  const canvasTexture = new THREE.CanvasTexture(texCanvas); // THREE.CanvasTexture에 적용
+
+  // Mesh
+  const geometry = new THREE.BoxGeometry(1, 1, 1);
+  const material = new THREE.MeshBasicMaterial({
+    map: canvasTexture, // canvasTexture 적용
+  });
+  const mesh = new THREE.Mesh(geometry, material);
+  scene.add(mesh);
+
+  function draw() {
+    const time = clock.getElapsedTime(); // 흘러가는 time만 가져온다.
+
+    material.map.needsUpdate = true; // needsUpdate 설정을 true로 해줘야 time * 50 정상 동작
+    texContext.fillStyle = "green";
+    texContext.fillRect(0, 0, texCanvas.width, texCanvas.height);
+    texContext.fillStyle = "white";
+    texContext.fillRect(time * 50, 100, 50, 50);
+    texContext.font = "bold 50px sans-serif";
+    texContext.fillText("Vicky", 200, 200);
+
+    // ..
+  }
+
+  // ..
+}
+```
+
+CanvasTexture를 위에서 생성한 뒤 이를 MeshBasicMaterial 에 map 요소로 추가해준다.
+실제 그려질 데이터는 draw 함수 안에서 추가해줌(fillStyle, fillRect, font, fillText)
+특히 draw 함수에서 특별한 애니메이션을 구현하기 위해서는 `material.map.needsUpdate`를 활성화해야 정상적으로 동작함.
+
+![](../../img/230314-1.gif)
+
+위 내용은 간단한 내용이지만 다양하게 활용하면 재미있는 큐브를 만들어낼 수 있을 것 같다.
