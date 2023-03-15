@@ -611,3 +611,4 @@
    - [Three.js Geometry(모양)](GraphicLayout/threeJs/1-5-threejs-geometry.md)
    - [Three.js Controls(카메라 컨트롤)](GraphicLayout/threeJs/1-6-threejs-controls.md)
    - [Three.js Material(재질)](GraphicLayout/threeJs/1-7-threejs-material.md)
+   - [Three.js Light(조명)](GraphicLayout/threeJs/1-8-threejs-light.md)
