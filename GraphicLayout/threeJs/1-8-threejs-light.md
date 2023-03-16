@@ -184,3 +184,53 @@ export default function example() {
 ![](../../img/230315-1.gif)
 
 light.position에 대한 이해를 깊게 해볼 수 있다.
+
+### Light 애니메이션
+
+이번에는 Light에 애니메이션을 넣어보자! 움직이는 것이니 draw 함수 안에서 구현한다.
+
+`src/ex02.js`
+
+```jsx
+// ----- 주제: Light 애니메이션
+
+export default function example() {
+  // ...
+
+  // DirectionalLight 추가 - 태양광과 같은 느낌(전체적으로 뿌려짐)
+  const light = new THREE.DirectionalLight("red", 0.5); // 위치 확인을 위해 색 변경
+  light.position.y = 3;
+  scene.add(light);
+
+  // ..
+  // 그리기
+  const clock = new THREE.Clock();
+
+  function draw() {
+    // const delta = clock.getDelta(); // 프레임마다 시간을 가져옴(항상 같은 값)
+    const time = clock.getElapsedTime(); // 시작후 경과된 시간을 가져옴(계속 증가하는 값)
+
+    // 삼각함수 사용 원리
+    // sin: 0 ~ 1 ~ 0 ~ -1 ~ 0 : a = 1일 때 b의 값을 의미(y)
+    // cos: 1 ~ 0 ~ -1 ~ 0 ~ 1 : a = 1일 때 c의 값을 의미(x)
+
+    light.position.x = Math.cos(time) * 3;
+    light.position.z = Math.sin(time) * 3;
+
+    renderer.render(scene, camera);
+    renderer.setAnimationLoop(draw);
+  }
+
+  // ..
+  draw();
+}
+```
+
+![light 위치 변화에 따른 사물의 빛 변화를 확인해보자](../../img/230316-1.gif)
+
+위와 같이 빛이 동그란 원형을 띄는 애니메이션으로 동작하는 것을 확인할 수 있다.
+이를 위 코드에서는 cos, sin 함수를 이용해서 구현했는데, 원래는 아래와 같다.
+
+![sin은 b/a이며 a=1일 때, b를 나타낸다. cos는 c/a이며 a=1d일 때, c를 나타낸다.](../../img/230316-1.png)
+
+![a값은 동일하므로 b의 값이 증감함에 따라 c값이 작아지므로, 이러한 원리를 통해 원형 애니메이션 동작이 가능해짐](../../img/230316-2.png)
