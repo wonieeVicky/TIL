@@ -234,3 +234,175 @@ export default function example() {
 ![sin은 b/a이며 a=1일 때, b를 나타낸다. cos는 c/a이며 a=1d일 때, c를 나타낸다.](../../img/230316-1.png)
 
 ![a값은 동일하므로 b의 값이 증감함에 따라 c값이 작아지므로, 이러한 원리를 통해 원형 애니메이션 동작이 가능해짐](../../img/230316-2.png)
+
+### 그림자(Shadow) 처리하기
+
+빛의 움직임에 따라 mesh들에 그림자가 자연스럽게 생기도록 처리해본다.
+기본적으로 빛에 따른 그림자 효과를 받으려면 receiveShadow 옵션을 활성화(true), 상대의 물체에 그림자 효과 영향을 주려면 castShadow 옵션을 활성화(true) 해줘야 한다.
+
+`src/ex03.js`
+
+```jsx
+// ----- 주제: Light와 Shadow
+
+export default function example() {
+  // Renderer
+  const canvas = document.querySelector("#three-canvas");
+  const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  renderer.setPixelRatio(window.devicePixelRatio > 1 ? 2 : 1);
+  renderer.shadowMap.enabled = true; // 1. 그림자를 사용할 수 있도록 설정
+
+  // Scene, Camera, AmbientLight, DirectionalLight ..
+  const lightHelper = new THREE.DirectionalLightHelper(light);
+  scene.add(lightHelper);
+
+  // 2. 그림자 설정
+  light.castShadow = true;
+
+  // Controls, Geometry, Material...
+  // Mesh
+  const plane = new THREE.Mesh(planeGeometry, material1);
+  const box = new THREE.Mesh(boxGeometry, material2);
+  const sphere = new THREE.Mesh(sphereGeometry, material3);
+
+  plane.rotation.x = Math.PI * -0.5; // 눞혀주기
+  box.position.set(1, 1, 0);
+  sphere.position.set(-1, 1, 0);
+
+  // 3. 그림자를 받을 수 있도록 설정
+  plane.receiveShadow = true;
+  box.castShadow = true;
+  box.receiveShadow = true;
+  sphere.castShadow = true;
+  sphere.receiveShadow = true;
+
+  scene.add(plane, box, sphere);
+
+  // ...
+}
+```
+
+위와 같이 1-2-3번 순서대로 그림자 설정을 하면 아래와 같은 그림자 효과를 확인할 수 있다.
+
+![](../../img/230318-1.gif)
+
+그런데 그림자를 확대해서 확인해보면 그림자가 조금 깨져서 노출된다.
+
+![](../../img/230318-1.png)
+
+좋은 퀄리티로 보이지 않음. 이러한 효과도 light에서 조정할 수 있다.
+
+```jsx
+export default function example() {
+  // Renderer
+  const canvas = document.querySelector("#three-canvas");
+  const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  renderer.setPixelRatio(window.devicePixelRatio > 1 ? 2 : 1);
+  renderer.shadowMap.enabled = true;
+
+  // Scene, Camera, AmbientLight, DirectionalLight ..
+  const lightHelper = new THREE.DirectionalLightHelper(light);
+  scene.add(lightHelper);
+
+  light.castShadow = true;
+  light.shadow.mapSize.width = 1024; // 기본 512
+  light.shadow.mapSize.height = 1024; // 기본 512
+
+  // ...
+}
+```
+
+`light.shadow.mapSize.width`, `light.shadow.mapSize.height` 속성을 기본 512에서 1024로 키우니까 명확한 shadow가 만들어짐. 더 크기를 키울 수 있으나 성능에 영향을 미치므로 적당히 한다.
+
+![](../../img/230318-2.png)
+
+만약 그림자가 딱딱해보이므로 자연스러운 블러효과도 줄 수 있다.
+
+```jsx
+export default function example() {
+  // Renderer
+  const canvas = document.querySelector("#three-canvas");
+  const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  renderer.setPixelRatio(window.devicePixelRatio > 1 ? 2 : 1);
+  renderer.shadowMap.enabled = true;
+
+  // Scene, Camera, AmbientLight, DirectionalLight ..
+  const lightHelper = new THREE.DirectionalLightHelper(light);
+  scene.add(lightHelper);
+
+  light.castShadow = true;
+  light.shadow.mapSize.width = 1024;
+  light.shadow.mapSize.height = 1024;
+  light.shadow.radius = 5; // 그림자 블러 처리
+
+  // ...
+}
+```
+
+위와 같이 `light.shadow.radius`값을 주면 자연스러운 효과를 줄 수 있겠다.
+
+![](../../img/230318-3.png)
+
+그 외에도 그림자 형태 자체를 조정할 수 있다. `light.shadow.radius`는 주석처리
+
+```jsx
+export default function example() {
+  // Renderer
+  const canvas = document.querySelector("#three-canvas");
+  const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  renderer.setPixelRatio(window.devicePixelRatio > 1 ? 2 : 1);
+  renderer.shadowMap.enabled = true;
+  // renderer.shadowMap.type = THREE.PCFShadowMap; // 기본값
+  renderer.shadowMap.type = THREE.BasicShadowMap; // antialiasing이 사라진 거친 느낌
+  renderer.shadowMap.type = THREE.PCFSoftShadowMap; // 좀 더 부드럽고 자연스러운 느낌
+
+  // ...
+}
+```
+
+기본 `THREE.PCFSoftShadowMap`에서 `THREE.BasicShadowMap`로 변경하면 아래와 같이 된다.
+
+![](../../img/230318-4.png)
+
+위 픽셀 효과를 조정하는 것은 하단 `light.shadow.mapSize`의 width, height 값으로 조정가능함
+
+![`light.shadow.mapSize.width`, `light.shadow.mapSize.height`를 64정도로 준 예시임](../../img/230318-5.png)
+
+단 위와 같이 기본값이 `PCFShadowMap`를 제외한 `BasicShadowMap`, `PCFSoftShadowMap`의 경우 하단 블러처리 효과를 위해 넣은 `light.shadow.radius`이 제대로 동작하지 않는다. 블러효과를 적용하고 싶다면 기본 값을 사용하자.
+
+다음으로 그림자를 생기게 해주는 영역에 제한을 걸어보자
+
+```jsx
+export default function example() {
+  // Renderer
+  // ..
+  renderer.shadowMap.enabled = true;
+  // renderer.shadowMap.type = THREE.PCFShadowMap;
+  // renderer.shadowMap.type = THREE.BasicShadowMap;
+  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+
+  // Scene, Camera, AmbientLight, DirectionalLight ..
+
+  light.castShadow = true;
+  light.shadow.mapSize.width = 1024;
+  light.shadow.mapSize.height = 1024;
+  // light.shadow.radius = 5;
+
+  light.shadow.camera.near = 1; // 영역 제한
+  light.shadow.camera.far = 5; // 영역 제한
+
+  // ...
+}
+```
+
+위와 같이 light.shadow.camera 값을 near, far로 설정하면 그림자 영역이 1~5사이에서만 동작함을 의미한다.
+실제 light.x값을 오른쪽으로 옮겨보면, 5이상의 범위에서는 그림자가 노출되지 않는 것을 볼 수 있음
+
+![](../../img/230318-6.png)
+
+이를 그림자가 잘 노출되는 범위 내에서 성능에 도움될 수 있도록 제한을 걸어주면 좋겠다.
+(위 예시의 경우 `light.shadow.camera.far = 10`정도면 적절함, 넉넉하게 잡아주자!)
