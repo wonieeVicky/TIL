@@ -406,3 +406,50 @@ export default function example() {
 
 이를 그림자가 잘 노출되는 범위 내에서 성능에 도움될 수 있도록 제한을 걸어주면 좋겠다.
 (위 예시의 경우 `light.shadow.camera.far = 10`정도면 적절함, 넉넉하게 잡아주자!)
+
+### PointLight
+
+[PointLight](https://threejs.org/docs/#api/en/lights/PointLight)는 어떤 지점에서 사방으로 퍼지는 전구와 같은 빛을 의미한다.
+
+- color: (optional) hexadecimal color of the light. Default is 0xffffff (white).
+- intensity: (optional) numeric value of the light's strength/intensity. Default is 1.
+- distance: Maximum range of the light. Default is 0 (no limit).
+- decay: The amount the light dims along the distance of the light. Default is 2.
+
+`src/ex04.js`
+
+```jsx
+// ----- 주제: PointLight
+
+export default function example() {
+  // Renderer, Scene, Camera..
+  // Light
+  const ambientLight = new THREE.AmbientLight("white", 0.5);
+  scene.add(ambientLight);
+
+  // PointLight 추가 - 전구와 같은 느낌
+  const light = new THREE.PointLight("white", 1);
+  light.position.x = -5;
+  light.position.y = 3;
+  scene.add(light);
+
+  // PointLightHelper 추가
+  const lightHelper = new THREE.PointLightHelper(light);
+  scene.add(lightHelper);
+
+  // ..
+}
+```
+
+위와 같이 PointLight와 PointLightHelper를 적용하면 아래와 같이 전구가 뿅 켜진 느낌을 줄 수 있다.
+
+![](../../img/230319-1.png)
+
+여기에 distance와,decay 요소를 각 100, 10만큼 주면 아래와 같다.
+(`new THREE.PointLight("white", 1, 100, 10`)
+
+![](../../img/230319-2.png)
+
+애니메이션 동작시켜보면 그럴싸함
+
+![](../../img/230319-1.gif)
