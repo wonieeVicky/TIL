@@ -453,3 +453,38 @@ export default function example() {
 애니메이션 동작시켜보면 그럴싸함
 
 ![](../../img/230319-1.gif)
+
+### SpotLight
+
+SpotLight는 무대 위에서 쏟아지는 단독적인 조명 같은 것을 의미한다.
+
+`src/ex05.js`
+
+```jsx
+// ----- 주제: SpotLight
+
+export default function example() {
+  // Renderer, Scene, Camera..
+
+  // Light
+  const ambientLight = new THREE.AmbientLight("white", 0.5);
+  scene.add(ambientLight);
+
+  // SpotLight 추가 - 무대 위 조명 같은 느낌
+  const light = new THREE.SpotLight("white", 1, 10, Math.PI / 6);
+  light.position.x = -5;
+  light.position.y = 3;
+  scene.add(light);
+
+  // SpotLightHelper 추가
+  const lightHelper = new THREE.SpotLightHelper(light);
+  scene.add(lightHelper);
+
+  // ...
+}
+```
+
+![](../../img/230321-1.png)
+
+위와 같이 PointLight 자리에 SpotLight를 적용해주고, 마지막 전달인자에는 빛의 각도를 설정하는 것임.
+위와 같이 설정 하며 고정해놓은 점에서 쏟아지는 단독 핀 조명으로 SpotLight가 구현된 것을 확인할 수 있다.
