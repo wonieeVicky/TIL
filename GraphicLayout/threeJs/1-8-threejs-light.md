@@ -488,3 +488,43 @@ export default function example() {
 
 위와 같이 PointLight 자리에 SpotLight를 적용해주고, 마지막 전달인자에는 빛의 각도를 설정하는 것임.
 위와 같이 설정 하며 고정해놓은 점에서 쏟아지는 단독 핀 조명으로 SpotLight가 구현된 것을 확인할 수 있다.
+
+### HemisphereLight
+
+HemisphereLight는 ambientLight와 비슷하게 전체적인 light에 영향을 미친다.
+두 면의 색을 다르게 지정해서 위치별로 적용되는 빛을 조절할 수 있는 것으로 보임
+
+`src/ex06.js`
+
+```jsx
+// ----- 주제: HemisphereLight
+
+export default function example() {
+  // Renderer, Scene, Camera..
+
+  // Light - 기존 ambientLight는 주석 처리
+  const light = new THREE.HemisphereLight("pink", "lime", 0.5);
+  light.position.x = -5;
+  light.position.y = 3;
+  scene.add(light);
+
+  // SpotLightHelper 추가
+  const lightHelper = new THREE.HemisphereLightHelper(light);
+  scene.add(lightHelper);
+
+  // 2. 그림자 설정 - 필요없음
+  // light.castShadow = true;
+  // light.shadow.mapSize.width = 1024;
+  // light.shadow.mapSize.height = 1024;
+  // light.shadow.radius = 15; // 그림자 블러 처리
+  // light.shadow.camera.near = 1;
+  // light.shadow.camera.far = 5;
+
+  // ...
+}
+```
+
+위와 같이 넣으면 아래와 같이 light X값에 따라 빛이 조절되는 것을 확인할 수 있다.
+이는 Y, Z 축에도 동일하게 적용됨. 두 가지 빛을 적용하여 각도에 따라 빛이 자연스럽게 변화하는 것을 구현할 때 활용해보면 좋을 것 같다
+
+![](../../img/230321-1.gif)
