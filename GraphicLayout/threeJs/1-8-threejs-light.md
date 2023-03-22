@@ -528,3 +528,40 @@ export default function example() {
 이는 Y, Z 축에도 동일하게 적용됨. 두 가지 빛을 적용하여 각도에 따라 빛이 자연스럽게 변화하는 것을 구현할 때 활용해보면 좋을 것 같다
 
 ![](../../img/230321-1.gif)
+
+### RectAreaLight
+
+RectAreaLight를 사용하면 사각형 모양에서 뿜어져나오는 조명 효과를 낼 수 있다.
+
+`src/ex07.js`
+
+```jsx
+// ..
+import { RectAreaLightHelper } from "three/examples/jsm/helpers/RectAreaLightHelper";
+
+// ----- 주제: RectAreaLight
+
+export default function example() {
+  // Renderer, Scene, Camera..
+
+  // Light
+  // RectAreaLight 적용
+  const light = new THREE.RectAreaLight("orange", 10, 2, 2);
+  light.position.y = 2;
+  light.position.z = 3;
+  scene.add(light);
+
+  // RectAreaLightHelper 추가 - 별도 import 하므로 THREE를 붙이지 않음
+  const lightHelper = new RectAreaLightHelper(light);
+  scene.add(lightHelper);
+
+  // ..
+}
+```
+
+위와 같이 RectAreaLight를 적용하면 사각형 조명에서 빛이 나오는 것을 확인할 수 있다.
+화면에 보이는 사각형은 RectAreaLightHelper이므로 위 코드를 삭제하면 보이지 않는다.
+
+![](../../img/230322-1.gif)
+
+위 조명으로 재미있는 효과를 많이 구현할 수 있을 것 같다!
