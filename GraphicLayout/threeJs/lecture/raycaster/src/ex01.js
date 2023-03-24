@@ -49,20 +49,42 @@ export default function example() {
   const boxGeometry = new THREE.BoxGeometry(1, 1, 1);
   const boxMaterial = new THREE.MeshBasicMaterial({ color: "plum" });
   const boxMesh = new THREE.Mesh(boxGeometry, boxMaterial);
+  boxMesh.name = "box";
 
   const torusGeometry = new THREE.TorusGeometry(2, 0.5, 16, 100);
   const torusMaterial = new THREE.MeshBasicMaterial({ color: "lime" });
   const torusMesh = new THREE.Mesh(torusGeometry, torusMaterial);
+  torusMesh.name = "torus";
 
   scene.add(boxMesh, torusMesh);
 
   const meshes = [boxMesh, torusMesh]; // ray에 맞을 mesh들을 모아둘 배열
+  const raycaster = new THREE.Raycaster(); // 광선 생성
 
   // 그리기
   const clock = new THREE.Clock();
 
   function draw() {
-    const delta = clock.getDelta();
+    // const delta = clock.getDelta();
+    const time = clock.getElapsedTime(); // 시간
+    boxMesh.position.y = Math.sin(time) * 2;
+    torusMesh.position.y = Math.cos(time) * 2;
+    boxMesh.material.color.set("plum");
+    torusMesh.material.color.set("lime");
+
+    const origin = new THREE.Vector3(0, 0, 100); // 광선의 시작점
+    // const direction = new THREE.Vector3(0, 0, -1); // 광선의 방향 - 정규화된 방향 -1을 적용
+    const direction = new THREE.Vector3(0, 0, -100);
+    direction.normalize(); // -100을 normalize처리, 1로 계산
+    raycaster.set(origin, direction); // 광선 생성
+
+    const intersects = raycaster.intersectObjects(meshes); // 광선과 교차하는 객체들을 반환
+    intersects.forEach((intersect) => {
+      console.log(intersect.object.name);
+      intersect.object.material.color.set("red");
+    }); // box
+
+    console.log(raycaster.intersectObjects(meshes)); // 배열 내 객체들의 광선과의 교차점을 반환
 
     renderer.render(scene, camera);
     renderer.setAnimationLoop(draw);
