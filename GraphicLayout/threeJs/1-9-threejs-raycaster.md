@@ -138,3 +138,75 @@ export default function example() {
 위 코드로 나오는 결과물은 아래와 같음
 
 ![](../../img/230326-1.gif)
+
+### 클릭한 메쉬 감지하기
+
+이번에는 마우스로 클릭했을 때 클릭한 메쉬를 감지해보자.
+우선 불필요한 line material과 draw 함수 내에서 이벤트 코드를 일부 삭제해주었다.
+
+`src/ex02.js`
+
+```jsx
+// ----- 주제: 클릭한 Mesh 선택하기
+
+export default function example() {
+  // Renderer, Scene, Camera, Light, Controls ..
+  const constrols = new OrbitControls(camera, renderer.domElement);
+
+  // Mesh
+  const boxGeometry = new THREE.BoxGeometry(1, 1, 1);
+  const boxMaterial = new THREE.MeshBasicMaterial({ color: "plum" });
+  const boxMesh = new THREE.Mesh(boxGeometry, boxMaterial);
+  boxMesh.name = "box";
+
+  const torusGeometry = new THREE.TorusGeometry(2, 0.5, 16, 100);
+  const torusMaterial = new THREE.MeshBasicMaterial({ color: "lime" });
+  const torusMesh = new THREE.Mesh(torusGeometry, torusMaterial);
+  torusMesh.name = "torus";
+
+  scene.add(boxMesh, torusMesh);
+
+  const meshes = [boxMesh, torusMesh];
+  const raycaster = new THREE.Raycaster();
+  const mouse = new THREE.Vector2(); // 마우스 좌표 - 어디를 찍었는지 알기 위해(초기값: x:0, y:0)
+
+  // ...
+
+  function checkIntersects() {
+    raycaster.setFromCamera(mouse, camera); // origin이 카메라 시점(위치)으로 설정한 뒤 광선의 시작점과 방향 설정
+    const intersects = raycaster.intersectObjects(meshes); // 광선에 맞은 mesh들을 배열로 반환
+
+    // 첫번째 선택된 메쉬만 선택하는 코드 - 방법 1
+    // 광선이므로 하나만 선택되지않고 광선에 맞은 모두 mesh들이 intersects에 담김
+    // for (const item of intersects) {
+    //   console.log(item.object.name);
+    //   item.object.material.color.set("red");
+    //   break;
+    // }
+
+    // 첫번째 선택된 메쉬만 선택하는 코드 - 방법 2
+    if (intersects[0]) {
+      console.log(intersects[0]?.object.name);
+    }
+  }
+
+  // 이벤트
+  window.addEventListener("resize", setSize);
+  window.addEventListener("click", (e) => {
+    // console.log(e.clientX, e.clientY); // 화면에서 찍은 x, y 좌표
+
+    // 2차원 좌표를 3차원 좌표로 정규화
+    mouse.x = (e.clientX / canvas.clientWidth) * 2 - 1; // -1 ~ 1
+    mouse.y = -((e.clientY / canvas.clientHeight) * 2 - 1); // -1 ~ 1
+    // console.log(mouse); // (-1 ~ 1, -1 ~ 1)
+
+    checkIntersects();
+  });
+}
+```
+
+위 코드는 선택된 메쉬를 가져오기 위해 마우스로 클릭한 좌표를 3차원 좌표로 가져오는 작업을 수행한다. mouse 객체 안에 click에 따른 `clientX`, `clientY` 값을 담는데 그대로 담지 않고, 비율에 의거한 3차원 좌표로 정규화한 데이터를 mouse 객체 안에 가둔 뒤 checkIntersects라는 함수를 실행시킨다.
+
+이때 `raycaster.setFromCamera` 메서드를 활용해 광선의 시작점이 카메라 시점으로 설정되도록 하고, 선택된 Intersects 배열의 첫번째 값을 담아오도록 구현하면 된다.
+
+![](../../img/230327-1.gif)
