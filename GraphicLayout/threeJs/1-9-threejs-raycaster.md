@@ -210,3 +210,80 @@ export default function example() {
 이때 `raycaster.setFromCamera` 메서드를 활용해 광선의 시작점이 카메라 시점으로 설정되도록 하고, 선택된 Intersects 배열의 첫번째 값을 담아오도록 구현하면 된다.
 
 ![](../../img/230327-1.gif)
+
+### 드래그 클릭 방지
+
+그런데 문제가 있다. 마우스로 mesh 위치를 움기인 뒤 마우스를 focusout하는 시점에 클릭되는 현상이 발생함.
+예상하지 못한 불편한 현상이므로 이를 고쳐본다.
+
+![](../../img/230328-1.gif)
+
+`src/ex02.js`
+
+```tsx
+import * as THREE from "three";
+import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
+
+// ----- 주제: 클릭한 Mesh 선택하기
+
+export default function example() {
+  // Renderer, Scene, Camera, Light, Controls, Mesh..
+
+  // 그리기
+  const clock = new THREE.Clock();
+
+  function draw() {
+    // ..
+  }
+
+  // ..
+
+  function checkIntersects() {
+    if (mouseMoved) return; // mouseMoved가 true면 함수 종료
+
+    raycaster.setFromCamera(mouse, camera);
+    const intersects = raycaster.intersectObjects(meshes);
+
+    if (intersects[0]) {
+      console.log(intersects[0]?.object.name);
+    }
+  }
+
+  window.addEventListener("resize", setSize);
+  window.addEventListener("click", (e) => {
+    mouse.x = (e.clientX / canvas.clientWidth) * 2 - 1;
+    mouse.y = -((e.clientY / canvas.clientHeight) * 2 - 1);
+    checkIntersects();
+  });
+
+  let mouseMoved;
+  let clickStartX;
+  let clickStartY;
+  let clickStartTime;
+
+  // mousedown 시 누른 시점을 clickStartX, clickStartY, clickStartTime에 저장
+  canvas.addEventListener("mousedown", (e) => {
+    clickStartX = e.clientX;
+    clickStartY = e.clientY;
+    clickStartTime = Date.now();
+  });
+
+  // mouseup 시 커서 위치를 감지하여 클릭 체크
+  canvas.addEventListener("mouseup", (e) => {
+    const xGap = Math.abs(e.clientX - clickStartX); // 얼마나 움직였는지 x 거리
+    const yGap = Math.abs(e.clientY - clickStartY); // 얼마나 움직였는지 y 거리
+    const timeGap = Date.now() - clickStartTime; // 클릭한 시간(드래그인지 판단)
+
+    // 위치 이동이 5 이하고, 클릭하고 뗀 시간차가 500이하면 클릭으로 간주!
+    if (xGap > 5 || yGap > 5 || timeGap > 500) {
+      mouseMoved = true;
+    } else {
+      mouseMoved = false;
+    }
+  });
+
+  draw();
+}
+```
+
+위와 같이 canvas의 mousedown, mouseup 이벤트로 클릭 위치의 차이와 클릭 시점 차이를 계산하여 클릭이라고 판단되는 시점을 mouseMoved 변수로 관리하도록 코드를 추가해주면 버그를 개선할 수 있다.
