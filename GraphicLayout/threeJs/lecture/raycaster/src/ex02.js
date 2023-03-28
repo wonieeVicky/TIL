@@ -62,10 +62,10 @@ export default function example() {
   function draw() {
     // const delta = clock.getDelta();
     const time = clock.getElapsedTime(); // 시간
-    boxMesh.position.y = Math.sin(time) * 2;
-    torusMesh.position.y = Math.cos(time) * 2;
-    boxMesh.material.color.set("plum");
-    torusMesh.material.color.set("lime");
+    // boxMesh.position.y = Math.sin(time) * 2;
+    // torusMesh.position.y = Math.cos(time) * 2;
+    // boxMesh.material.color.set("plum");
+    // torusMesh.material.color.set("lime");
 
     //
 
@@ -74,17 +74,14 @@ export default function example() {
   }
 
   function checkIntersects() {
+    if (mouseMoved) return; // mouseMoved가 true면 함수 종료
+
     raycaster.setFromCamera(mouse, camera); // origin이 카메라 시점(위치)으로 설정한 뒤 광선의 시작점과 방향 설정
     const intersects = raycaster.intersectObjects(meshes); // 광선과 충돌한 mesh들을 배열로 반환
 
-    // for (const item of intersects) {
-    //   console.log(item.object.name);
-    //   item.object.material.color.set("red");
-    //   break; // 첫번째 선택된 메쉬만 선택되도록
-    // }
-
     if (intersects[0]) {
       console.log(intersects[0]?.object.name);
+      intersects[0].object.material.color.set("red");
     }
   }
 
@@ -104,6 +101,29 @@ export default function example() {
     mouse.y = -((e.clientY / canvas.clientHeight) * 2 - 1); // -1 ~ 1
     // console.log(mouse); // (-1 ~ 1, -1 ~ 1)
     checkIntersects();
+  });
+
+  let mouseMoved;
+  let clickStartX;
+  let clickStartY;
+  let clickStartTime;
+
+  canvas.addEventListener("mousedown", (e) => {
+    clickStartX = e.clientX;
+    clickStartY = e.clientY;
+    clickStartTime = Date.now();
+  });
+  canvas.addEventListener("mouseup", (e) => {
+    // 마우스를 누른 상태에서 움직이지 않았을 때를 감지해서 클릭으로 간주
+    const xGap = Math.abs(e.clientX - clickStartX); // 얼마나 움직였는지 x 거리
+    const yGap = Math.abs(e.clientY - clickStartY); // 얼마나 움직였는지 y 거리
+    const timeGap = Date.now() - clickStartTime; // 클릭한 시간(드래그인지 판단)
+
+    if (xGap > 5 || yGap > 5 || timeGap > 500) {
+      mouseMoved = true;
+    } else {
+      mouseMoved = false;
+    }
   });
 
   draw();
