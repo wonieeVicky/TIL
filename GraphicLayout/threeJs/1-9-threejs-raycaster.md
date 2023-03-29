@@ -287,3 +287,61 @@ export default function example() {
 ```
 
 위와 같이 canvas의 mousedown, mouseup 이벤트로 클릭 위치의 차이와 클릭 시점 차이를 계산하여 클릭이라고 판단되는 시점을 mouseMoved 변수로 관리하도록 코드를 추가해주면 버그를 개선할 수 있다.
+
+### 드래그 클릭 방지 모듈로 만들기
+
+위 함수의 경우 다른 곳에서도 다양하게 사용될 수 있으므로 별도의 모듈로 만들어 사용해보도록 하자.
+새 파일을 생성한다.
+
+`srcPreventDragClick.js`
+
+```jsx
+export class PreventDragClick {
+  constructor(elem) {
+    this.mouseMoved; // 마우스를 드래그했는지 true / false로 판단 - 외부에서 사용하는 인스턴스 값
+
+    let clickStartX;
+    let clickStartY;
+    let clickStartTime;
+
+    elem.addEventListener("mousedown", (e) => {
+      clickStartX = e.clientX;
+      clickStartY = e.clientY;
+      clickStartTime = Date.now();
+    });
+
+    elem.addEventListener("mouseup", (e) => {
+      const xGap = Math.abs(e.clientX - clickStartX);
+      const yGap = Math.abs(e.clientY - clickStartY);
+      const timeGap = Date.now() - clickStartTime;
+
+      if (xGap > 5 || yGap > 5 || timeGap > 500) {
+        this.mouseMoved = true;
+      } else {
+        this.mouseMoved = false;
+      }
+    });
+  }
+}
+```
+
+위 코드를 작성하면 이제 새로운 js 파일에서 다음과 같이 모듈을 불러와 사용할 수 있다.
+
+```jsx
+import { PreventDragClick } from "./PreventDragClick";
+
+export default function example() {
+  // ..
+  function checkIntersects() {
+    // preventDragClick의 인스턴스인 mouseMouved를 상속
+    if (preventDragClick.mouseMoved) return;
+
+    // ..
+  }
+
+  // ..
+  const preventDragClick = new PreventDragClick(canvas);
+}
+```
+
+위 코드에서 `canvas`자리에 해당 이벤트를 발생시키는 element를 넘겨주어야 한다. 그리고 마우스 이벤트가 발생하면 `preventDragClick` 함수 내부에서는 인스턴스 객체인 `mouseMoved`를 체크하고, 이동한 거리와 시간을 비교하여 클릭 여부를 결정하게 된다.
