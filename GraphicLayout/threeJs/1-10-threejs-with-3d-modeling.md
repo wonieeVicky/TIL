@@ -217,7 +217,7 @@ Shift를 눌러 면 중복 선택 후 S를 누른 뒤 Y를 누른 채로 굵기�
 
 G + X 를 눌러서 x축으로 좀 분리해본다.
 
-![230408-1.gif](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/ab5c7542-622d-4fac-8e3b-198cd9f8f0e8/230408-1.gif)
+![](../../img/230408-1.gif)
 
 캐릭터에 비해 크기가 너무 크므로 사이즈 부터 줄여준다.
 내가 줄이고 싶은 메쉬를 전체 선택하려면 메쉬 위에 마우스를 올려두고 L 을 누르면 전체 선택이 된다.
@@ -226,7 +226,7 @@ G + X 를 눌러서 x축으로 좀 분리해본다.
 
 다음으로 Y축 상위로 정렬 후 S를 눌러 사이즈 줄이기 + G+x 조합으로 위치를 캐릭터 옆에 조정해 줌
 
-![230408-2.gif](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/2ca80fcf-62c6-4d54-bfa5-c1fdc1903da2/230408-2.gif)
+![](../../img/230408-2.gif)
 
 몸통 정도의 크기가 되도록 아래와 같이 줄여주었다.
 
@@ -236,7 +236,7 @@ G + X 를 눌러서 x축으로 좀 분리해본다.
 
 우선 길게(S + Shift + z) 만들어 준 다음. 굵기 조정(ctrl+R 후 굵기 위치 조정)도 해준다.
 
-![230408-3.gif](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/6cd9d833-7f1b-43a8-a2aa-0fc62498473a/230408-3.gif)
+![](../../img/230408-3.gif)
 
 뭉툭한 물병 모양의 어깨는 Edge mode(2번) 선택 바깥 쪽 선만 선택한 뒤 G + z로 수정해주면 아래와 같이 어깨 모양을 수정해줄 수 있음
 
@@ -252,16 +252,16 @@ G + X 를 눌러서 x축으로 좀 분리해본다.
 
 다음 원하는 영역만 선택해서 E를 눌러준 뒤 아래로 내려주면 아래와 같이 손 모양을 만들 수 있다.
 
-![230408-4.gif](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/d5edc73b-b959-4af8-965c-9cf79156ee0d/230408-4.gif)
+![](../../img/230408-4.gif)
 
 손바닥 부분도 자연스럽게 g + z의 조합으로 수정해줄 수 있다.
 
-![230408-5.gif](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/d5972131-3cf8-4596-85a0-1adeedce2ff8/230408-5.gif)
+![](../../img/230408-5.gif)
 
 앞서 조절한 방법을 사용해서 디테일하게 수정을 더해준다.
 팔 길이가 너무 기니까 S + Z를 눌러서 길이도 아래와 같이 수정
 
-![230408-6.gif](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/6415a115-9174-41bc-afbd-e2f338f4819d/230408-6.gif)
+![](../../img/230408-6.gif)
 
 다음 R + Y를 눌러 약간 기울게 회전해준 뒤 G + Z, G + X로 위치를 수정해준다.
 
@@ -273,7 +273,7 @@ G + X 를 눌러서 x축으로 좀 분리해본다.
 
 내부 라인을 선택 후 g+x를 통해 아래와 같이 수정
 
-![230408-7.gif](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/b79cce4f-2262-4c43-a7e8-87d934743fda/230408-7.gif)
+![](../../img/230408-7.gif)
 
 더 자연스러워졌다! 이처럼 모잘라보이거나 아쉬운 부분을 위에서 배운 방법대로 계속 가다듬어주면 몸통이 완성된다! Tab , Alt + z를 눌러서 Object로 나와보면 아래와 같이 몸통이 잘 만들어진 것을 확인할 수 있다.
 
