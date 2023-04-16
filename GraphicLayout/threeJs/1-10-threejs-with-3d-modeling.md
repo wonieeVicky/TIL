@@ -510,3 +510,16 @@ Dope Sheet의 셀렉트 박스를 눌러 Action Editor를 눌러준다. 그런 �
 ![](../../img/230416-4.gif)
 
 점프는 Three.js에서 물리 엔진으로 구현해줄 것이므로 애니메이션은 이렇게 완성하면 된다.
+
+### Blender 파일 내보내기
+
+이제 만들어진 블렌더 파일을 three.js로 가져다 쓰기 위해 export 해보자! 
+
+먼저 Object로 이동, Export할 메쉬를 선택 후 File > Export > `gLTF 2.0(.glb/.gltf)` 선택
+Export 하기 전 창 우측에 Selected Objects를 반드시 선택 한 다음, Transform > + Y Up도 선택해준다.
+
+![](../../img/230416-6.png)
+
+Blender에서는 x축이 위로가게 작업했지만, Three.js에서는 Y축이 기준이 되기 때문임 (Three.js와 방향이 같으니 편함)
+
+별도 설정은 필요할 때 추가해주면 되고, Export glTF 2.0을 눌러주면 고생한 glb파일이 생성된다!
