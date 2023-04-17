@@ -314,7 +314,7 @@ tab으로 Object mode로 나왔더니 오돌토돌 딱딱함. 마우스 오른�
 
 ![](../../img/230411-2.png)
 
-위 그림에 적용할 텍스쳐 이미지의 전개도를 만든다고 생각하면 된다. 
+위 그림에 적용할 텍스쳐 이미지의 전개도를 만든다고 생각하면 된다.
 전개도는 입체 형태를 평면에 쫙 펼친 형태를 의미한다.
 우선 오징어게임 복장을 만들어보는데 체육복의 흰 띄를 표현할 영역만 edit mode에서 선택해준다. (팔다리 좌우)
 
@@ -354,6 +354,7 @@ tab으로 Object mode로 나왔더니 오돌토돌 딱딱함. 마우스 오른�
 ![](../../img/230411-11.png)
 
 간격이 생김! 이제 색칠을 본격적으로 해본다.
+
 ### 색칠하기
 
 이제 정말 색칠을 해보자. 색칠은 Image Editor로 한다.
@@ -439,7 +440,7 @@ tab으로 Object mode로 나왔더니 오돌토돌 딱딱함. 마우스 오른�
 
 ![](../../img/230415-7.png)
 
-단순한 뼈대가 완성되었다. 이제 뼈대를 만들었으니 이를 연결해준다. 
+단순한 뼈대가 완성되었다. 이제 뼈대를 만들었으니 이를 연결해준다.
 
 Object Mode에서 mesh와 뼈대를 중복을 선택해준 뒤 Command + P를 누른 다음 Armature Deform - With Automatic Weights를 선택해주면 자동으로 뼈대가 이어진다.
 
@@ -466,10 +467,10 @@ Object Mode에서 mesh와 뼈대를 중복을 선택해준 뒤 Command + P를 �
 
 ![](../../img/230416-2.png)
 
-Dope Sheet의 셀렉트 박스를 눌러 Action Editor를 눌러준다. 그런 뒤 우측의 New 버튼을 클릭해보자. 
+Dope Sheet의 셀렉트 박스를 눌러 Action Editor를 눌러준다. 그런 뒤 우측의 New 버튼을 클릭해보자.
 이름은 default라고 적어준다. default는 좌우로 고개를 움직이는 것 애니메이션을 넣을 것임
 
-애니메이션은 기본적으로 변화가 있는 부분에 키 프레임을 삽입해주는 개념이다. 아래 숫자가 프레임 수이며, space를 누르면 재생이 시작된다. 재생을 시작한 뒤 변화를 줄 프레임을 선택 후 변경하고자 하는 대로 고개를 조금 움직여준 뒤 A 눌러서 전체 프레임 선택 + I를 누르면 Insert Keyframe Menu를 눌러 Location, Rotation & scale을 선택해준다. 
+애니메이션은 기본적으로 변화가 있는 부분에 키 프레임을 삽입해주는 개념이다. 아래 숫자가 프레임 수이며, space를 누르면 재생이 시작된다. 재생을 시작한 뒤 변화를 줄 프레임을 선택 후 변경하고자 하는 대로 고개를 조금 움직여준 뒤 A 눌러서 전체 프레임 선택 + I를 누르면 Insert Keyframe Menu를 눌러 Location, Rotation & scale을 선택해준다.
 
 ![](../../img/230416-3.png)
 
@@ -477,20 +478,20 @@ Dope Sheet의 셀렉트 박스를 눌러 Action Editor를 눌러준다. 그런 �
 
 ![](../../img/230416-4.png)
 
-다음으로 48프레임으로 옮겨 고개를 반대쪽으로 회전시킨 다음 A 선택 후 I → Location, Rotation & Scale을 다시 선택해준다.  그럼 아래와 같은 애니메이션이 생성됨
+다음으로 48프레임으로 옮겨 고개를 반대쪽으로 회전시킨 다음 A 선택 후 I → Location, Rotation & Scale을 다시 선택해준다. 그럼 아래와 같은 애니메이션이 생성됨
 
 ![](../../img/230416-1.gif)
 
-그런데 시작점이 중간이다보니 이어지는 느낌이 들지 않음 즉, 48에서 구현한 키프레임을 0에 복사해넣어주면 연결되는 동작으로 보여지게 구현이 가능하다. 
+그런데 시작점이 중간이다보니 이어지는 느낌이 들지 않음 즉, 48에서 구현한 키프레임을 0에 복사해넣어주면 연결되는 동작으로 보여지게 구현이 가능하다.
 
-48에 둔 상태에서 Shift + D를 누른 상태에서 마우스 이동으로 시작점으로 점을 이동해주면 된다. 
+48에 둔 상태에서 Shift + D를 누른 상태에서 마우스 이동으로 시작점으로 점을 이동해주면 된다.
 
 ![](../../img/230416-2.gif)
 
 그럼 뾰롱 왔다갔다하는 애니메이션이 완성됨. 이 애니메이션을 three.js에서 무한반복 시키면 계속 오뚜기처럼 움직이는 모델이 완성되는 것임. 이렇게 1번째 default animation 구현 완료!
 
 다음 두번째 애니메이션을 만들어본다. default 이름 우측의 New Action 버튼을 눌러서 생성함
-이름은 jump로 한다. 징검다리를 건너기 위함이다. 다음으로 앞서 만들어둔 24, 48초 애니메이션을 삭제해준다. 
+이름은 jump로 한다. 징검다리를 건너기 위함이다. 다음으로 앞서 만들어둔 24, 48초 애니메이션을 삭제해준다.
 (x 누른 뒤 Delete Keyframes 선택)
 
 기존에 첫번째 액션이 갸우뚱한 자세이므로 계속 갸우뚱한 상태로 존재한다. 이를 다시 제자리로 돌리기 위해서는 a 를 눌러 전체 선택 후 Alt + R을 누르면 돌아온다. 이 상태에서 I를 눌러 아까와 같이 Location, Rotation & Scale을 선택해야 정자세로 시작되는 애니메이션 키프레임이 완성됨
@@ -513,7 +514,7 @@ Dope Sheet의 셀렉트 박스를 눌러 Action Editor를 눌러준다. 그런 �
 
 ### Blender 파일 내보내기
 
-이제 만들어진 블렌더 파일을 three.js로 가져다 쓰기 위해 export 해보자! 
+이제 만들어진 블렌더 파일을 three.js로 가져다 쓰기 위해 export 해보자!
 
 먼저 Object로 이동, Export할 메쉬를 선택 후 File > Export > `gLTF 2.0(.glb/.gltf)` 선택
 Export 하기 전 창 우측에 Selected Objects를 반드시 선택 한 다음, Transform > + Y Up도 선택해준다.
@@ -523,3 +524,90 @@ Export 하기 전 창 우측에 Selected Objects를 반드시 선택 한 다음,
 Blender에서는 x축이 위로가게 작업했지만, Three.js에서는 Y축이 기준이 되기 때문임 (Three.js와 방향이 같으니 편함)
 
 별도 설정은 필요할 때 추가해주면 되고, Export glTF 2.0을 눌러주면 고생한 glb파일이 생성된다!
+
+### 커스텀 모델 로드하기
+
+blender에서 열심히 만든 캐릭터를 three.js에 로드해본다. src/models 내에 export한 파일을 호출하려면 webpack.config에 설정이 필요하다.
+
+`webpack.config.js`
+
+```jsx
+module.exports = {
+	// ..
+	plugins: [
+		new HtmlWebpackPlugin({
+			template: './src/index.html',
+			minify: process.env.NODE_ENV === 'production' ? {
+				collapseWhitespace: true,
+				removeComments: true,
+			} : false
+		}),
+		new CleanWebpackPlugin(),
+			patterns: [
+				{ from: "./src/main.css", to: "./main.css" },
+				{ from: "./src/models", to: "./models" }, // 추가
+				// { from: "./src/images", to: "./images" },
+				// { from: "./src/sounds", to: "./sounds" }
+			],
+		})
+	]
+};
+```
+
+다음 서버 구동을 해보면 빈 페이지가 나온다. gltf 파일을 import하려면 별도 GLTFLoader 로더가 필요하다.
+
+```jsx
+import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
+```
+
+위와 같이 import 후 실제 파일을 load해본다.
+
+```jsx
+// ----- 주제: glb 파일 불러오기
+
+export default function example() {
+  // Renderer, Scene, Camera, Light, Controls ..
+  const controls = new OrbitControls(camera, renderer.domElement);
+
+  // gltf loader
+  const gltfLoader = new GLTFLoader();
+  gltfLoader.load("/models/ilbuni.glb", (gltf) => {
+    console.log(gltf);
+    console.log(gltf.scene.children[0]); // Object3D {isObject3D: true, uuid: '22121302-940d-4e3a-b784-8232d72cf78e', name: 'Armature', type: 'Object3D', parent: Group, …}
+  });
+
+  // ..
+}
+```
+
+위와 같이 Load 메서드를 실행 후 두번째 인자에 함수를 넣을 수 있는데, gltf 인자를 콘솔로 찍어보면 아래와 같음
+
+![](../../img/230417-1.png)
+
+animations에 2개로 들어있는데 블렌더에서 만든 애니메이션 두 개가 담겨있는 것임. 내가 원하는 순간에 애니메이션이 동작하도록 배열 인자를 꺼내서 쓸 수 있다.
+
+가장 먼저 scene의 children에 존재하는 첫번째 object를 가져다가 호출하는 것이 먼저임
+
+```jsx
+// ----- 주제: glb 파일 불러오기
+
+export default function example() {
+  // Renderer, Scene, Camera, Light, Controls ..
+  const controls = new OrbitControls(camera, renderer.domElement);
+
+  // gltf loader
+  const gltfLoader = new GLTFLoader();
+  gltfLoader.load("/models/ilbuni.glb", (gltf) => {
+    const character = gltf.scene.children[0];
+    scene.add(character);
+  });
+
+  // ..
+}
+```
+
+위와 같이 호출 후 scene.add 해주면 화면에 잘 나타는 것을 볼 수 있음!
+
+![](../../img/230417-2.png)
+
+하나의 메쉬로 생각하고 기존에 배웠던 여러가지 효과를 주면 똑같이 반영된다.
