@@ -611,3 +611,64 @@ export default function example() {
 ![](../../img/230417-2.png)
 
 하나의 메쉬로 생각하고 기존에 배웠던 여러가지 효과를 주면 똑같이 반영된다.
+
+### 커스텀 모델 애니메이션
+
+다음엔 애니메이션도 구현해본다. 애니메이션을 넣으려면 THREE.AnimationMixer가 필요함
+
+`src/ex02.js`
+
+```jsx
+// ----- 주제: 커스텀 모델 애니메이션 구현
+
+export default function example() {
+  // Renderer, Scene, Camera, Light, Controls ..
+  const controls = new OrbitControls(camera, renderer.domElement);
+
+  // gltf loader
+  const gltfLoader = new GLTFLoader();
+  let mixer;
+  gltfLoader.load("/models/ilbuni.glb", (gltf) => {
+    const character = gltf.scene.children[0];
+    scene.add(character);
+
+    // console.log(gltf.animations); // 2개의 애니메이션을 가지고 있음
+
+    mixer = new THREE.AnimationMixer(character);
+    const actions = [];
+    actions[0] = mixer.clipAction(gltf.animations[0]); // default animation
+    actions[1] = mixer.clipAction(gltf.animations[1]); // jump animation
+
+    // 애니메이션 실행
+    actions[0].repetitions = 2; // 반복 횟수 (default Infinity)
+    actions[0].clampWhenFinished = true; // 애니메이션이 끝나면 멈춤
+    actions[0].play();
+  });
+
+  // 그리기
+  const clock = new THREE.Clock();
+
+  function draw() {
+    const delta = clock.getDelta();
+
+    // Mixer.update - 외부 리소스가 로드가 된 후 생성되도록 처리
+    mixer?.update(delta);
+
+    renderer.render(scene, camera);
+    renderer.setAnimationLoop(draw);
+  }
+
+  // ..
+}
+```
+
+mixer라는 변수에 각 idx로 애니메이션을 clipAction을 통해 지정해준 다음,
+이에 대한 상세 설정(repetitions, clampWhenFinished 등)을 한 뒤 play() 함수를 실행시켜주면 된다.
+
+화면 변경이 안되는 이유는 draw 함수 내에서 update를 안해줬기 때문! 따라서 draw 함수 내에서 mixer를 update해주면 된다.
+앞에 `?.` 연산자를 쓴 이유는 draw가 실행되는 시점과 mixer가 로드되는 시점이 상이한 케이스가 있기 때문으로
+모든 외부 리소스가 로드된 뒤 update 되도록 코드를 넣어주었다.
+
+![](../../img/230417-1.gif)
+
+완성스
