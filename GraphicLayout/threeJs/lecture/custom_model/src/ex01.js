@@ -32,12 +32,13 @@ export default function example() {
   directionalLight.position.z = 2;
   scene.add(directionalLight);
 
+
   // Controls
   const controls = new OrbitControls(camera, renderer.domElement);
 
   // gltf loader
   const gltfLoader = new GLTFLoader();
-  gltfLoader.load("/models/ilbuni.glb", (gltf) => {
+  gltfLoader.load("/models/dinosaur.glb", (gltf) => {
     const character = gltf.scene.children[0];
     scene.add(character);
   });
