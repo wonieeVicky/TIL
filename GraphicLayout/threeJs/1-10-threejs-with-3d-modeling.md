@@ -672,3 +672,35 @@ mixer라는 변수에 각 idx로 애니메이션을 clipAction을 통해 지정�
 ![](../../img/230417-1.gif)
 
 완성스
+
+### 다운로드 받은 파일 활용하기
+
+이번에는 다른 사람들이 만든 멋진 블렌더 메쉬를 사용해서 구현해보자
+구글에 free glb라고 치면 여러 사이트가 나온다. 샘플 사이트는 [Sketchfab](https://sketchfab.com/tags/glb)이라는 곳을 이용할 예정
+
+그 중 한가지 테스트 메쉬를 다운로드 받아본다. 대부분 퀄리티가 좋아서 큰 용량이다.(3.8MB)
+동일하게 호출해서 화면에 띄워보면된다.
+
+`src/ex01.js`
+
+```jsx
+export default function example() {
+  // Renderer, Scene, Camera, Light, Controls ..
+  const controls = new OrbitControls(camera, renderer.domElement);
+
+  // gltf loader
+  const gltfLoader = new GLTFLoader();
+  gltfLoader.load("/models/dinosaur.glb", (gltf) => {
+    const character = gltf.scene.children[0];
+    scene.add(character);
+  });
+
+  // ..
+}
+```
+
+무서운 공룡 노출
+
+![](../../img/230419-1.png)
+
+만들어진 파일마다 애니메이션도 이미 생성된 케이스가 있기 때문에 이런 것들을 활용해보면 좋다.
