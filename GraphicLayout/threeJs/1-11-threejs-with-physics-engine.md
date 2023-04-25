@@ -177,3 +177,202 @@ export default function example() {
 (Mesh가 넘어지는 상황을 보고 싶어서 box를 긴 형태로 만들었음)
 
 ![](../../img/230423-1.gif)
+
+### 재질에 따른 마찰력과 반발력
+
+cannon.js에서도 재질을 설정할 수 있다. 이를 Contact Material라고 함
+재질은 왜 필요할까? 어떤 물체에 힘이 가해졌을 때 재질에 따라서 마찰력이나 반발력 등이 모두 다르기 때문임
+
+더 리얼한 효과를 나타내기 위해서는 상세한 재질을 설정하는 것이 도움이 될 수 있음
+이번에는 위의 박스 형태가 아닌 공을 통통 튀게 만들어보겠다.
+
+`src/ex02.js`
+
+```jsx
+import * as THREE from "three";
+import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
+import * as CANNON from "cannon-es";
+
+// ----- 주제: Contact Material
+
+export default function example() {
+  // Renderer, Scene, Camera, Light ..
+
+  // Controls
+  const controls = new OrbitControls(camera, renderer.domElement);
+
+  // Cannon
+  const cannonWorld = new CANNON.World();
+  cannonWorld.gravity.set(0, -10, 0); // 중력 세팅
+
+  const floorShape = new CANNON.Plane(); // 바닥용 모양
+  const floorBody = new CANNON.Body({
+    // 무게를 가지는 바닥 - 물리엔진이 적용된 실체
+    mass: 0, // 무게 설정
+    position: new CANNON.Vec3(0, 0, 0), // 바닥의 위치
+    shape: floorShape // 바닥의 모양
+  });
+  floorBody.quaternion.setFromAxisAngle(new CANNON.Vec3(-1, 0, 0), Math.PI * 0.5); // 바닥의 회전
+  cannonWorld.addBody(floorBody); // 바닥 월드 추가
+
+  const sphereShape = new CANNON.Sphere(0.5); // 구의 반지름을 넣음
+  const sphereBody = new CANNON.Body({
+    mass: 1,
+    position: new CANNON.Vec3(0, 10, 0),
+    shape: sphereShape
+  });
+  cannonWorld.addBody(sphereBody); // 박스를 월드에 추가
+
+  // Mesh
+  const floorMesh = new THREE.Mesh(
+    new THREE.PlaneGeometry(10, 10),
+    new THREE.MeshStandardMaterial({ color: "slategray" })
+  );
+  floorMesh.rotation.x = -Math.PI * 0.5;
+  scene.add(floorMesh);
+
+  const sphereGeometry = new THREE.SphereGeometry(0.5); // 반지름 입력
+  const sphereMaterial = new THREE.MeshStandardMaterial({ color: "seagreen" });
+  const sphereMesh = new THREE.Mesh(sphereGeometry, sphereMaterial);
+  sphereMesh.position.y = 0.5;
+  scene.add(sphereMesh);
+
+  // 그리기
+  const clock = new THREE.Clock();
+  function draw() {
+    const delta = clock.getDelta();
+
+    let cannonStepTime = 1 / 60;
+    if (delta < 0.01) cannonStepTime = 1 / 120;
+
+    cannonWorld.step(cannonStepTime, delta, 3); // 물리 엔진을 계산(시간, 델타, 반복 횟수)
+    sphereMesh.position.copy(sphereBody.position); // 구의 위치를 구 메쉬에 적용
+    sphereMesh.quaternion.copy(sphereBody.quaternion); // 구의 회전을 구 메쉬에 적용
+
+    renderer.render(scene, camera);
+    renderer.setAnimationLoop(draw);
+  }
+
+  //..
+}
+```
+
+일단 기본적인 구 형태로 코드 작성..
+
+![](../../img/230425-1.gif)
+
+그런데 자세히 보니 구가 살짝 떠있는 느낌이다. 그림자가 없어서 그런 듯.. 그림자를 넣어준다.
+
+```jsx
+export default function example() {
+  // Renderer ...
+  renderer.shadowMap.enabled = true; // shadowMap 추가
+  renderer.shadowMap.type = THREE.PCFSoftShadowMap; // shadowMap 추가
+
+  // Light..
+  const directionalLight = new THREE.DirectionalLight("white", 1);
+  directionalLight.position.x = 1;
+  directionalLight.position.z = 2;
+  directionalLight.castShadow = true; // castShadow 추가
+  scene.add(directionalLight);
+
+  // Scene, Camera, Controls, Cannon, Mesh ..
+  const floorMesh = new THREE.Mesh(
+    new THREE.PlaneGeometry(10, 10),
+    new THREE.MeshStandardMaterial({ color: "slategray" })
+  );
+  floorMesh.rotation.x = -Math.PI * 0.5;
+  floorMesh.receiveShadow = true; // receiveShadow 추가
+  scene.add(floorMesh);
+
+  const sphereGeometry = new THREE.SphereGeometry(0.5);
+  const sphereMaterial = new THREE.MeshStandardMaterial({ color: "seagreen" });
+  const sphereMesh = new THREE.Mesh(sphereGeometry, sphereMaterial);
+  sphereMesh.position.y = 0.5;
+  sphereMesh.castShadow = true; //caseShadow 추가
+  scene.add(sphereMesh);
+
+  //..
+}
+```
+
+위와 같이 renderer, directionalLight, floorMesh, sphereMesh 등에 그림자 속성을 추가함
+
+![](../../img/230425-2.gif)
+
+그림자가 짜잔 만들어졌다. 자세히 보면 떨어질 때 충격에 의해 살짝 튀기는데.. 이제 이걸 앞서 얘기한 contactMaterial을 사용해서 변경해본다.
+
+```jsx
+export default function example() {
+  // Renderer, Light, Scene, Camera, Controls,
+
+  // Cannon
+  const cannonWorld = new CANNON.World();
+  cannonWorld.gravity.set(0, -10, 0);
+
+  // Contact Material
+  const defaultMaterial = new CANNON.Material("default");
+  const rubberMaterial = new CANNON.Material("rubber");
+  const ironMaterial = new CANNON.Material("iron");
+  const defaultContactMaterial = new CANNON.ContactMaterial(defaultMaterial, defaultMaterial, {
+    friction: 0.5, // 마찰력,
+    restitution: 0.5 // 반발력
+  }); // 부딪힐 재질을 두 개 넣음 + 상세 설정 추가
+  cannonWorld.defaultContactMaterial = defaultContactMaterial; // 재질 설정 적용
+
+  // floorShape, floorBody ..
+  // ..
+}
+```
+
+위와 같이 재질을 설정해서 넣는다. `CANNON.ContactMaterial`에는 각각 부딪힐 재질을 2개 설정하고, 이에 대한 상세 옵션을 세 번째 전달인자에 설정하면 됨
+
+![](../../img/230425-3.gif)
+
+이건 재질에 따라 액션이 다 달라진다. 만약 바닥은 defaultMaterial, 공은 고무공(rubberMatrial)이라면?
+
+```jsx
+export default function example() {
+  // ..
+  cannonWorld.defaultContactMaterial = defaultContactMaterial;
+
+  // 추가
+  const rubberDefaultContactMaterial = new CANNON.ContactMaterial(
+    rubberMaterial, // 튀기는 공은 rubberMaterial
+    defaultMaterial, // 바닥은 defaultMaterial
+    {
+      friction: 0.5,
+      restitution: 0.7
+    }
+  );
+  cannonWorld.addContactMaterial(rubberDefaultContactMaterial); // rubber 재질 추가
+
+  const floorShape = new CANNON.Plane();
+  const floorBody = new CANNON.Body({
+    mass: 0,
+    position: new CANNON.Vec3(0, 0, 0),
+    shape: floorShape,
+    material: defaultMaterial // 바닥 재질 설정
+  });
+  floorBody.quaternion.setFromAxisAngle(new CANNON.Vec3(-1, 0, 0), Math.PI * 0.5); // 바닥의 회전(축의 방향(x축으로 설정), 각도(90도))
+  cannonWorld.addBody(floorBody);
+
+  const sphereShape = new CANNON.Sphere(0.5);
+  const sphereBody = new CANNON.Body({
+    mass: 1,
+    position: new CANNON.Vec3(0, 10, 0),
+    shape: sphereShape,
+    material: rubberMaterial // 공 재질 설정
+  });
+  cannonWorld.addBody(sphereBody);
+
+  // ..
+}
+```
+
+위와 같이 `rubberDefaultContactMaterial`이라는 ContactMaterial 생성 후 이를 addContactMaterial에 추가, floorBody, sphereBody에 material로 각 재질 반영해주면 진짜 고무공이 튀는 효과를 주게된다.
+
+![](../../img/230425-4.gif)
+
+위와 같은 방식으로 ironMaterial을 설정하면 철 재질의 사물이 default floor에 부딪히는 효과를 줄 수 있게됨
+필요에 따라 적절한 material을 설정하여 사용하도록 하자!
