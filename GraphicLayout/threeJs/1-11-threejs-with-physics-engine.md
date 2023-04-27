@@ -376,3 +376,115 @@ export default function example() {
 
 위와 같은 방식으로 ironMaterial을 설정하면 철 재질의 사물이 default floor에 부딪히는 효과를 줄 수 있게됨
 필요에 따라 적절한 material을 설정하여 사용하도록 하자!
+
+### 힘(Force)
+
+힘은 물체의 위치에 영향을 주는 외부적 힘을 의미한다. 우선 기존 코드를 좀 다듬는다.
+기존 테스트하던 rubberMaterial, ironMaterial 삭제 후 defaultMaterial 로 적용
+
+이제 아무데나 클릭을 하면 바람이 불도록 해본다.
+
+`src/ex03.js`
+
+```jsx
+export default function example() {
+  // ..
+
+  // Contact Material
+  const defaultMaterial = new CANNON.Material("default");
+  const defaultContactMaterial = new CANNON.ContactMaterial(defaultMaterial, defaultMaterial, {
+    friction: 0.5, // 마찰력,
+    restitution: 0.3 // 반발력
+  }); // 부딪힐 재질을 두 개 넣음 + 상세 설정 추가
+  cannonWorld.defaultContactMaterial = defaultContactMaterial;
+
+  // ..
+
+  // 이벤트
+  window.addEventListener("click", () => {
+    sphereBody.applyForce(new CANNON.Vec3(-100, 0, 0), sphereBody.position);
+  });
+}
+```
+
+![](../../img/230427-1.gif)
+
+원을 클릭하면 힘의 방향 왼쪽으로 흘러가버림! 근데 끝도 없이 흘러가버린다.
+여기에 laycaster 에서 배웠던 드래그 시 이벤트가 발생하던 현상을 여기서도 동일하게 제거해본다.
+
+```jsx
+// ..
+import { PreventDragClick } from "./PreventDragClick";
+
+export default function example() {
+  // ..
+
+  // 이벤트
+  window.addEventListener("click", () => {
+    if (preventDragClick.mouseMoved) return;
+    sphereBody.applyForce(new CANNON.Vec3(-100, 0, 0), sphereBody.position);
+  });
+
+  const preventDragClick = new PreventDragClick(canvas);
+}
+```
+
+위와 같이 해주면 드래그 시 이벤트 발생 노
+
+또, 여러번 클릭 시 speed에 가속도가 붙는데, 이도 수정해준다.
+
+```jsx
+export default function example() {
+  // ..
+
+  // 이벤트
+  window.addEventListener("click", () => {
+    if (preventDragClick.mouseMoved) return;
+
+    // Speed 초기화
+    sphereBody.velocity.x = 0;
+    sphereBody.velocity.y = 0;
+    sphereBody.velocity.z = 0;
+    sphereBody.angularVelocity.x = 0;
+    sphereBody.angularVelocity.y = 0;
+    sphereBody.angularVelocity.z = 0;
+
+    sphereBody.applyForce(new CANNON.Vec3(-100, 0, 0), sphereBody.position);
+  });
+
+  const preventDragClick = new PreventDragClick(canvas);
+}
+```
+
+다음으로는 멈추게는 어떻게하면 될까? draw 함수에서 위 velocity를 점차 0으로 변경시켜 주면됨
+
+```jsx
+export default function example() {
+  // ..
+
+  function draw() {
+    // ..
+
+    // 속도 감소
+    sphereBody.velocity.x *= 0.98;
+    sphereBody.velocity.y *= 0.98;
+    sphereBody.velocity.z *= 0.98;
+    sphereBody.angularVelocity.x *= 0.98;
+    sphereBody.angularVelocity.y *= 0.98;
+    sphereBody.angularVelocity.z *= 0.98;
+
+    renderer.render(scene, camera);
+    renderer.setAnimationLoop(draw);
+  }
+
+  draw();
+
+  // ..
+}
+```
+
+0.98 곱해준다면 점차 값은 0에 수렴할 것이므로 자연스러운 정지가 완성됨
+
+![](../../img/230427-2.gif)
+
+이런 이벤트는 바람이 분다거나 와력에 의한 부드러운 움직임을 표현할 때 많이 사용함!
