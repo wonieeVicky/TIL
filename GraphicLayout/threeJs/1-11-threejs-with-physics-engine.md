@@ -488,3 +488,91 @@ export default function example() {
 ![](../../img/230427-2.gif)
 
 이런 이벤트는 바람이 분다거나 와력에 의한 부드러운 움직임을 표현할 때 많이 사용함!
+
+### 랜덤 위치에 공 생성하기
+
+뷰를 이루는 구성과 효과가 많아지면서 그만큼 부하가 늘어난다. 그래서 가능하다면 성능을 좋게 만들 수 있는 방법들을 적용하면서 작업하는게 좋다. 예시를 위해 클릭 할 때마다 공이 생기는 ui를 구현해본다.
+
+기존의 sphereMesh 구현 코드와 그와 관련된 draw 함수 내 코드 그리고 클릭 시 이벤트 코드를 모두 삭제해준다. 또한, 구를 생성하는 로직은 별도의 클래스 문법으로 작성한 뒤 import 하는 방식을 사용한다.
+
+`src/ex04.js`
+
+```jsx
+// ..
+import { MySphere } from "./MySphere";
+
+// ----- 주제: Performance(성능 좋게 하기)
+
+export default function example() {
+  // Renderer, Scene, Camera, Light, Controls ..
+  const cannonWorld = new CANNON.World();
+  cannonWorld.gravity.set(0, -10, 0);
+
+  // Contact Material
+  // CANNON defaultMaterial, floorShape, sphereShape...
+
+  // Mesh
+  // floorMesh, sphereGeometry, sphereMaterial, sphereMesh...
+
+  // 그리기
+  const clock = new THREE.Clock();
+
+  function draw() {
+    const delta = clock.getDelta();
+
+    let cannonStepTime = 1 / 60;
+    if (delta < 0.01) cannonStepTime = 1 / 120;
+    cannonWorld.step(cannonStepTime, delta, 3);
+
+    renderer.render(scene, camera);
+    renderer.setAnimationLoop(draw);
+  }
+
+  window.addEventListener("click", () => {
+    // 여기서부터 시작..
+    new MySphere({
+      scene,
+      geometry: sphereGeometry,
+      material: sphereMaterial,
+      x: (Math.random() - 0.5) * 2,
+      y: Math.random() * 5 + 2,
+      z: (Math.random() - 0.5) * 2,
+      scale: Math.random() + 0.2
+    });
+  });
+
+  // ..
+}
+```
+
+기본 포맷은 위와 같고, click 이벤트부터 MySphere 클래스의 인스턴스가 생성되도록 작업을 시작해주자
+
+`src/MySphere.js`
+
+```jsx
+import { Mesh } from "three";
+
+export class MySphere {
+  constructor(info) {
+    this.scene = info.scene;
+    this.geometry = info.geometry;
+    this.material = info.material;
+    this.x = info.x;
+    this.y = info.y;
+    this.z = info.z;
+    this.scale = info.scale;
+
+    this.mesh = new Mesh(this.geometry, this.material);
+    this.mesh.scale.set(this.scale, this.scale, this.scale);
+    this.mesh.castShadow = true;
+    // position 설정은 cannon body에서 설정하면 mesh가 따라가므로 무의미함
+    // 그러나 클릭 시 mesh가 제대로 생성되는지 확인을 위해 일단 넣음
+    this.mesh.position.set(this.x, this.y, this.z);
+    this.scene.add(this.mesh);
+  }
+}
+```
+
+위와 같이 코드를 작성하면, 아래처럼 원하는대로 구가 클릭했을 때마다 하나씩 생성된다.
+
+![](../../img/230428-1.gif)
