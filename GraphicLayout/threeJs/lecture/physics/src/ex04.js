@@ -80,14 +80,15 @@ export default function example() {
   floorMesh.receiveShadow = true;
   scene.add(floorMesh);
 
+  const spheres = [];
   const sphereGeometry = new THREE.SphereGeometry(0.5); // 반지름 입력
   const sphereMaterial = new THREE.MeshStandardMaterial({
     color: "seagreen"
   });
-  const sphereMesh = new THREE.Mesh(sphereGeometry, sphereMaterial);
-  sphereMesh.position.y = 0.5;
-  sphereMesh.castShadow = true;
-  scene.add(sphereMesh);
+  // const sphereMesh = new THREE.Mesh(sphereGeometry, sphereMaterial);
+  // sphereMesh.position.y = 0.5;
+  // sphereMesh.castShadow = true;
+  // scene.add(sphereMesh);
 
   // 그리기
   const clock = new THREE.Clock();
@@ -99,6 +100,11 @@ export default function example() {
     if (delta < 0.01) cannonStepTime = 1 / 120;
 
     cannonWorld.step(cannonStepTime, delta, 3); // 물리 엔진을 계산(시간, 델타, 반복 횟수)
+
+    spheres.forEach((item) => {
+      item.mesh.position.copy(item.cannonBody.position);
+      item.mesh.quaternion.copy(item.cannonBody.quaternion);
+    });
 
     renderer.render(scene, camera);
     renderer.setAnimationLoop(draw);
@@ -114,15 +120,18 @@ export default function example() {
   // 이벤트
   window.addEventListener("resize", setSize);
   window.addEventListener("click", () => {
-    new MySphere({
-      scene,
-      geometry: sphereGeometry,
-      material: sphereMaterial,
-      x: (Math.random() - 0.5) * 2,
-      y: Math.random() * 5 + 2,
-      z: (Math.random() - 0.5) * 2,
-      scale: Math.random() + 0.2
-    });
+    spheres.push(
+      new MySphere({
+        scene,
+        cannonWorld,
+        geometry: sphereGeometry,
+        material: sphereMaterial,
+        x: (Math.random() - 0.5) * 2,
+        y: Math.random() * 5 + 2,
+        z: (Math.random() - 0.5) * 2,
+        scale: Math.random() + 0.2
+      })
+    );
   });
 
   const preventDragClick = new PreventDragClick(canvas);
