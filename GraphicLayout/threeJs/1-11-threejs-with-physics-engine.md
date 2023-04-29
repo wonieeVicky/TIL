@@ -576,3 +576,121 @@ export class MySphere {
 위와 같이 코드를 작성하면, 아래처럼 원하는대로 구가 클릭했을 때마다 하나씩 생성된다.
 
 ![](../../img/230428-1.gif)
+
+이제 여기에 cannon.body를 적용해보자
+
+`src/MySphere.js`
+
+```jsx
+export class MySphere {
+  constructor(info) {
+    // ..
+
+    this.setCannonBody();
+  }
+
+  setCannonBody() {} // setCannonBody 메서드 추가
+}
+```
+
+위와 같이 MyShpere에 setCannonBody라는 이벤트를 추가 후 생성자 시 동작하도록 코드를 작성해줄 것임. 먼저 cannon body를 추가하기 위해서는 cannonWorld도 필요하므로 해당 데이터도 인스턴스 생성 시 가져올 수 있도록 추가해준다.
+
+```jsx
+export default function example() {
+  // ...
+  window.addEventListener("click", () => {
+    new MySphere({
+      scene,
+      cannonWorld, // cannonWorld argument 추가
+      geometry: sphereGeometry,
+      material: sphereMaterial,
+      x: (Math.random() - 0.5) * 2,
+      y: Math.random() * 5 + 2,
+      z: (Math.random() - 0.5) * 2,
+      scale: Math.random() + 0.2
+    });
+  });
+}
+```
+
+이어서 contructor 생성 시 info.cannonWorld를 반영한 뒤 setCannonBody를 구현해본다.
+
+```jsx
+// ..
+import { Body, Sphere, Vec3 } from "cannon-es";
+
+export class MySphere {
+  constructor(info) {
+    // ..
+    this.cannonWorld = info.cannonWorld;
+
+    this.setCannonBody();
+  }
+
+  setCannonBody() {
+    // Sphere의 크기가 모두 다른 상태 > 각 반지름을 구해야 함(기본 0.5 * 각 scale)
+    const shape = new Sphere(0.5 * this.scale);
+    this.cannonBody = new Body({
+      mass: 1,
+      position: new Vec3(this.x, this.y, this.z),
+      shape
+    });
+
+    this.cannonWorld.addBody(this.cannonBody);
+  }
+}
+```
+
+위와 같이 하면 cannonBody 적용 완료. 하지만 클릭해도 공은 떨어지지 않는다.
+아직 cannon이랑 mesh가 연결되지 않았기 때문. 그런데 이 동작은 draw 함수에서 구현해야 하므로, 인스턴스를 배열로 담아 관리할 필요가 있다.
+
+```jsx
+export default function example() {
+  // ...
+
+  const spheres = []; // sphere 인스턴스를 담을 배열 정의
+
+  // 그리기
+  const clock = new THREE.Clock();
+
+  function draw() {
+    const delta = clock.getDelta();
+
+    let cannonStepTime = 1 / 60;
+    if (delta < 0.01) cannonStepTime = 1 / 120;
+
+    cannonWorld.step(cannonStepTime, delta, 3);
+
+    // spheres를 배열마다 돌면서 cannonBody와 mesh를 연결해준다.
+    spheres.forEach((item) => {
+      item.mesh.position.copy(item.cannonBody.position);
+      item.mesh.quaternion.copy(item.cannonBody.quaternion);
+    });
+
+    renderer.render(scene, camera);
+    renderer.setAnimationLoop(draw);
+  }
+
+  window.addEventListener("click", () => {
+    // shperes에 인스턴스 추가
+    spheres.push(
+      new MySphere({
+        scene,
+        cannonWorld,
+        geometry: sphereGeometry,
+        material: sphereMaterial,
+        x: (Math.random() - 0.5) * 2,
+        y: Math.random() * 5 + 2,
+        z: (Math.random() - 0.5) * 2,
+        scale: Math.random() + 0.2
+      })
+    );
+  });
+}
+```
+
+위와 같이 추가해주면 원하는 구의 애니메이션까지 구현이 가능해진다.
+
+![](../../img/230429-1.gif)
+
+원래 목적인 성능 개선을 위한 사전 조건이 만들어졌다. 성능 관리 설정.. 해보자
