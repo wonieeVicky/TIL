@@ -43,6 +43,13 @@ export default function example() {
   const cannonWorld = new CANNON.World();
   cannonWorld.gravity.set(0, -10, 0); // 중력을 세팅(x, y, z축 설정)
 
+  // 성능을 위한 세팅
+  cannonWorld.allowSleep = true; // 물리엔진이 휴면 상태로 들어갈 수 있도록 허용
+  cannonWorld.broadphase = new CANNON.SAPBroadphase(cannonWorld); // 물리엔진의 충돌을 계산하는 방법을 SAP로 설정
+  // SAPBroadphase: 물리엔진이 충돌을 계산하는 방법 중 가장 효율적
+  // NativeBroadphase: 기본값
+  // GridBroadphase: 구역을 나누어 테스트, 물리엔진이 충돌을 계산하는 방법 중 가장 정확함
+
   // Contact Material
   const defaultMaterial = new CANNON.Material("default");
   const defaultContactMaterial = new CANNON.ContactMaterial(defaultMaterial, defaultMaterial, {
