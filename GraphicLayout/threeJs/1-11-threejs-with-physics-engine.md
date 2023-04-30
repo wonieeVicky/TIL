@@ -725,3 +725,95 @@ export default function example() {
 먼저 allowSleep은 물리엔진이 움짐임을 마쳤을 때 테스트를 하지않고, 휴면 상태로 들어가는 설정이다. 위 설정을 추가하지 않으면 테스트가 의미없는 아이들도 계속 테스트를 하고 있음.. 성능에 도움이 된다. 하지만 단점은 게임은 멈춰있을 때에도 계속 돌아가야하므로 필요한 경우에만 적용해야 한다.
 
 broadphase 설정은 연산과정에 대한 설정인데 SAPBroadphase의 경우 퀄리티를 저하시키지 않으면서 효율적으로 연산을 하는 설정으로 주로 사용함. 기본값은 NativeBroadphase이고, GridBroadphase라는 설정도 있음.
+
+### 충돌 사운드 넣기
+
+물리엔진마다 충돌 시 사운드를 넣어보자. 이벤트는 cannonBody에 해줘야 함
+즉 MySphere 인스턴스에 충돌 이벤트를 바인딩해주면 됨
+
+우선 사용할 mp3 파일을 webpack.config에 추가해주자
+
+`webpack.config.js`
+
+```jsx
+//..
+
+module.exports = {
+  // ..
+  plugins: [
+    // ..
+    new CopyWebpackPlugin({
+      patterns: [
+        { from: "./src/main.css", to: "./main.css" },
+        { from: "./src/sounds", to: "./sounds" } // add
+      ]
+    })
+  ]
+};
+```
+
+이후 나머지 mp3 파일을 이벤트로 아래와 같이 바인딩 해줌
+
+`src/ex05.js`
+
+```jsx
+import { MySphere } from "./MySphere";
+
+// ----- 주제: 충돌 이벤트, 사운드 넣기
+
+export default function example() {
+  // Renderer, Scene, Camera, Light, Controls ..
+
+  const sound = new Audio("/sounds/boing.mp3");
+
+  function collide(e) {
+    console.log(e); // {type: 'collide', body: Body, contact: ContactEquation, target: Body}
+    sound.currentTime = 0; //
+    sound.play(); // 소리가 난다.
+  }
+
+  // 이벤트
+  window.addEventListener("click", () => {
+    const mySphere = new MySphere({
+      scene,
+      cannonWorld,
+      geometry: sphereGeometry,
+      material: sphereMaterial,
+      x: (Math.random() - 0.5) * 2,
+      y: Math.random() * 5 + 2,
+      z: (Math.random() - 0.5) * 2,
+      scale: Math.random() + 0.2
+    });
+
+    spheres.push(mySphere);
+    mySphere.cannonBody.addEventListener("collide", collide); // 충돌 이벤트 coolide로 정의
+  });
+}
+```
+
+위와 같이 기존 인스턴스 생성을 `mySphere`라는 변수에 담아서, 해당 cannonBody에 collide로 이벤트 리스너를 추가해준다. 위 collide 함수 내 `sound.currentTime = 0;`은 충돌 시 연속적인 사운드 재생을 위해서 추가했다. (만약 위 속성이 없음 떨어질 때마다 맞춰서 사운드가 실행되지 않고 연속적으로 재생되기만 함.. 뾰뵤롤로뿅이 아님)
+
+그런데 위와 같은 설정으로 인해 조금만 충돌이 되도 소리가 나는 것이 거슬린다.
+아주 약하게 미세한 충돌일 때에는 사운드가 나지 않도록 하면 좋겠다.
+(충돌 속도가 임의의값 이상일 경우에만 재생)
+
+```jsx
+export default function example() {
+  // Renderer, Scene, Camera, Light, Controls ..
+
+  const sound = new Audio("/sounds/boing.mp3");
+
+  function collide(e) {
+    // 충돌한 물체의 속도
+    const velocity = e.contact.getImpactVelocityAlongNormal();
+    if (velocity > 3) {
+      sound.currentTime = 0;
+      sound.play(); //
+    }
+  }
+
+  // events...
+}
+```
+
+충돌한 물체의 속도를 `e.contact.getImpactVelocityAlongNormal();`로 구해올 수 있으므로 해당 값이 3이상일 때만 소리가 재생되도록 하면 자연스러운 소리 재생 구현 완료 !
