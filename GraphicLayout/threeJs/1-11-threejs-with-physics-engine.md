@@ -694,3 +694,34 @@ export default function example() {
 ![](../../img/230429-1.gif)
 
 원래 목적인 성능 개선을 위한 사전 조건이 만들어졌다. 성능 관리 설정.. 해보자
+
+### 성능 관리 설정
+
+이제 성능을 어떻게 좋게 만들어줄 수 있는지 확인해본다. 크게 2가지를 확인해볼 것임
+
+`src/ex04.js`
+
+```jsx
+import { MySphere } from "./MySphere";
+
+// ----- 주제: Performance(성능 좋게 하기)
+
+export default function example() {
+  // Renderer, Scene, Camera, Light, Controls ..
+  const cannonWorld = new CANNON.World();
+  cannonWorld.gravity.set(0, -10, 0);
+
+  // 성능을 위한 세팅
+  cannonWorld.allowSleep = true; // 물리엔진이 휴면 상태로 들어갈 수 있도록 허용
+  cannonWorld.broadphase = new CANNON.SAPBroadphase(cannonWorld); // 물리엔진의 충돌을 계산하는 방법을 SAP로 설정
+  // SAPBroadphase: 물리엔진이 충돌을 계산하는 방법 중 가장 효율적
+  // NativeBroadphase: 기본값
+  // GridBroadphase: 구역을 나누어 테스트, 물리엔진이 충돌을 계산하는 방법 중 가장 정확함
+
+  // ..
+}
+```
+
+먼저 allowSleep은 물리엔진이 움짐임을 마쳤을 때 테스트를 하지않고, 휴면 상태로 들어가는 설정이다. 위 설정을 추가하지 않으면 테스트가 의미없는 아이들도 계속 테스트를 하고 있음.. 성능에 도움이 된다. 하지만 단점은 게임은 멈춰있을 때에도 계속 돌아가야하므로 필요한 경우에만 적용해야 한다.
+
+broadphase 설정은 연산과정에 대한 설정인데 SAPBroadphase의 경우 퀄리티를 저하시키지 않으면서 효율적으로 연산을 하는 설정으로 주로 사용함. 기본값은 NativeBroadphase이고, GridBroadphase라는 설정도 있음.
