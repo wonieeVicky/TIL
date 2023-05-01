@@ -817,3 +817,34 @@ export default function example() {
 ```
 
 충돌한 물체의 속도를 `e.contact.getImpactVelocityAlongNormal();`로 구해올 수 있으므로 해당 값이 3이상일 때만 소리가 재생되도록 하면 자연스러운 소리 재생 구현 완료 !
+
+### 오브젝트 제거하기
+
+이번에는 생성된 메쉬들을 화면에서 지우는걸 만들어본다. 특정 버튼을 누르면 메쉬들이 지워지도록 만들어본다. canvas html을 추가하지 않고, 코드로 버튼을 주입해서 구현함
+
+`src/ex06.js`
+
+```jsx
+// ----- 주제: 오브젝트 제거하기
+
+export default function example() {
+  // Renderer, Scene, Camera, Light, Controls ..
+  // draws..
+
+  // 삭제하기
+  const btn = document.createElement("button");
+  btn.style.cssText = "position: absolute; left: 20px; top: 20px; fontsize: 20px";
+  btn.innerHTML = "삭제";
+  document.body.append(btn);
+
+  btn.addEventListener("click", () => {
+    spheres.forEach((item) => {
+      item.cannonBody.removeEventListener("collide", collide); // 충돌 사운드 이벤트 제거
+      cannonWorld.removeBody(item.cannonBody); // cannonBody remove
+      scene.remove(item.mesh); // mesh remove
+    });
+  });
+}
+```
+
+위와 같이 삭제버튼을 직접 html에 주입 후 해당 버튼을 클릭 시 spheres 배열을 순회하면서 해당 mesh와 cannnonBody, collide 이벤트를 모두 제거해주었다. 이렇게 해야 모든 리소스 자원을 회수할 수 있음. 꼼꼼하게 다 지워주는게 좋당
