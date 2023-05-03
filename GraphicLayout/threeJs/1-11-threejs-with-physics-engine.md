@@ -848,3 +848,103 @@ export default function example() {
 ```
 
 위와 같이 삭제버튼을 직접 html에 주입 후 해당 버튼을 클릭 시 spheres 배열을 순회하면서 해당 mesh와 cannnonBody, collide 이벤트를 모두 제거해주었다. 이렇게 해야 모든 리소스 자원을 회수할 수 있음. 꼼꼼하게 다 지워주는게 좋당
+
+### 도미노 만들기 - glb 배치
+
+이번에는 도미노를 만들어본다. 기존에 만들었던 btn, sphere, click 시 충돌 이벤트에 대한 코드는 모두 삭제함
+
+블렌더에서 만든 도미노 파일을 불러와서 20개를 세워보도록 한다.
+파일 호출을 하기 위해 우선 webpack 설정에 models 폴더를 추가해줌
+
+`webpack.config.js`
+
+```jsx
+//..
+
+module.exports = {
+  // ..
+  plugins: [
+    // ..
+    new CopyWebpackPlugin({
+      patterns: [
+        { from: "./src/main.css", to: "./main.css" },
+        { from: "./src/sounds", to: "./sounds" },
+        { from: "./src/models", to: "./models" }
+      ]
+    })
+  ]
+};
+```
+
+이후 실제 작업 파일에서 아래와 같이 gltfLoader를 Domino 객체에 상속해준 뒤 20개의 도미노를 일렬로 세워본다.
+
+`src/ex07.js`
+
+```jsx
+// ..
+import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
+import { Domino } from "./Domino";
+
+// ----- 주제: 도미노
+
+export default function example() {
+  // Renderer, Scene, Camera, Light, Controls ..
+
+  // Loader
+  const gltfLoader = new GLTFLoader();
+
+  // Cannon, Mesh ...
+
+  // 도미노 생성
+  const dominoes = [];
+  let domino;
+  for (let i = -3; i < 17; i++) {
+    domino = new Domino({
+      scene,
+      cannonWorld,
+      gltfLoader,
+      z: -i * 0.8
+    });
+    dominoes.push(domino);
+  }
+
+  //
+}
+```
+
+위 Domino 클래스 객체는 아래와 같다.
+
+`src/Domino.js`
+
+```jsx
+import { Mesh, BoxGeometry, MeshBasicMaterial } from "three";
+import { Body, Vec3, Box } from "cannon-es";
+
+export class Domino {
+  constructor(info) {
+    this.scene = info.scene;
+    this.cannonWorld = info.cannonWorld;
+
+    this.width = info.width || 0.6;
+    this.height = info.height || 1;
+    this.depth = info.depth || 0.2;
+
+    this.x = info.x || 0;
+    this.y = info.y || 0.5; // y가 0이면 절반이 파뭍혀버림
+    this.z = info.z || 0;
+
+    this.rotationY = info.rotationY || 0;
+
+    info.gltfLoader.load("/models/domino.glb", (glb) => {
+      this.modelMesh = glb.scene.children[0];
+      this.modelMesh.castShadow = true;
+      this.modelMesh.position.set(this.x, this.y, this.z);
+      this.scene.add(this.modelMesh);
+    });
+  }
+}
+```
+
+위와 같이 contructor에서 gltfLoader를 통해 메쉬를 생성하여, scene.add 해주면 정상 노출됨
+
+![](../../img/230503-1.gif)
