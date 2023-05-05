@@ -1052,3 +1052,108 @@ export default function example() {
 ![](../../img/230505-1.gif)
 
 물리엔진 적용 완료
+
+### 도미노 만들기 - 레이캐스팅을 통한 클릭된 도미노 가져오기
+
+이제 무너뜨려본다. 클릭이벤트를 생성하는 개념. 클릭이벤트는 Raycaster를 사용해서 구현한다.
+
+```jsx
+export default function example() {
+  // Renderer, Scene, Camera, Light, Controls, Cannon, Mesh ...
+
+  // Raycaster
+  const raycaster = new THREE.Raycaster();
+  const mouse = new THREE.Vector2();
+
+  function checkIntersects() {
+    raycaster.setFromCamera(mouse, camera);
+
+    const intersects = raycaster.intersectObjects(scene.children);
+  }
+
+  // 이벤트
+  canvas.addEventListener("click", (e) => {
+    if (preventDragClick.mouseMoved) return;
+
+    mouse.x = (e.clientX / canvas.clientWidth) * 2 - 1; // -1 ~ 1
+    mouse.y = -((e.clientY / canvas.clientHeight) * 2 - 1); // -1 ~ 1
+
+    checkIntersects(); // 클릭 시 도미노 정보 가져오기
+  });
+}
+```
+
+위와 같이 checkIntersects 이벤트 구현. 그런데 실제 클릭하면 클릭 시 좌표에 해당되어 있는 mesh를 모두 배열 내부 정보로 반환한다. 그런데 선택된 mesh에 대한 고유 정보가 필요함. 몇 번째 도미노인지 알 수가 있어야 한다! 따라서 선택된 mesh를 구분할 수 있는 정보로서 `n번 도미노`라는 object.name 속성을 추가해보자.
+
+```jsx
+export default function example() {
+  // Renderer, Scene, Camera, Light, Controls, Cannon, Mesh ...
+
+  const dominoes = [];
+  let domino;
+  for (let i = -3; i < 17; i++) {
+    domino = new Domino({
+      index: i, // 구분 정보를 위한 index를 전달인자로 넘겨준다.
+      scene,
+      cannonWorld,
+      gltfLoader,
+      z: -i * 0.8
+    });
+    dominoes.push(domino);
+  }
+
+  // ..
+}
+```
+
+`src/Domino.js`
+
+```jsx
+import { Mesh, BoxGeometry, MeshBasicMaterial } from "three";
+import { Body, Vec3, Box } from "cannon-es";
+
+export class Domino {
+  constructor(info) {
+    this.scene = info.scene;
+    this.cannonWorld = info.cannonWorld;
+
+    this.index = info.index; // index 정보 추가
+
+    // ..
+
+    info.gltfLoader.load("/models/domino.glb", (glb) => {
+      this.modelMesh = glb.scene.children[0];
+      this.modelMesh.name = `${this.index}번 도미노`; // modelMesh.name 속성 추가
+      this.modelMesh.castShadow = true;
+      this.modelMesh.position.set(this.x, this.y, this.z);
+      this.scene.add(this.modelMesh);
+
+      this.setCannonBody();
+    });
+  }
+  // ..
+}
+```
+
+위와 같이 modelMesh에 name 속성으로 고유 정보를 저장해준 뒤 좀 전에 구현한 checkIntersects 이벤트에서 object.name을 콘솔로 찍어보면 정보가 잘 노출됨
+
+```jsx
+export default function example() {
+  // Renderer, Scene, Camera, Light, Controls, Cannon, Mesh ...
+
+  // Raycaster
+  const raycaster = new THREE.Raycaster();
+  const mouse = new THREE.Vector2();
+
+  function checkIntersects() {
+    raycaster.setFromCamera(mouse, camera);
+
+    const intersects = raycaster.intersectObjects(scene.children);
+    console.log(intersects[0].object.name); // n번 도미노
+  }
+
+  // 이벤트 ..
+}
+```
+
+![](../../img/230506-1.gif)
