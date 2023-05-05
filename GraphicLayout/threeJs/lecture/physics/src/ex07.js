@@ -24,9 +24,9 @@ export default function example() {
 
   // Camera
   const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-  camera.position.x = 13;
-  camera.position.y = 5.5;
-  camera.position.z = 10;
+  camera.position.y = 4.5;
+  camera.position.z = 15;
+
   scene.add(camera);
 
   // Light
@@ -70,21 +70,14 @@ export default function example() {
   floorBody.quaternion.setFromAxisAngle(new CANNON.Vec3(-1, 0, 0), Math.PI * 0.5);
   cannonWorld.addBody(floorBody);
 
-  const sphereShape = new CANNON.Sphere(0.5);
-  const sphereBody = new CANNON.Body({
-    mass: 1,
-    position: new CANNON.Vec3(0, 10, 0),
-    shape: sphereShape,
-    material: defaultMaterial
-  });
-  cannonWorld.addBody(sphereBody);
-
   // Mesh
   const floorMesh = new THREE.Mesh(
     new THREE.PlaneGeometry(100, 100),
-    new THREE.MeshStandardMaterial({ color: "slategray" })
+    new THREE.MeshStandardMaterial({
+      color: "slategray"
+    })
   );
-  floorMesh.rotation.x = -Math.PI * 0.5;
+  floorMesh.rotation.x = -Math.PI / 2;
   floorMesh.receiveShadow = true;
   scene.add(floorMesh);
 
@@ -93,10 +86,10 @@ export default function example() {
   let domino;
   for (let i = -3; i < 17; i++) {
     domino = new Domino({
+      index: i,
       scene,
       cannonWorld,
       gltfLoader,
-      y: 2,
       z: -i * 0.8
     });
     dominoes.push(domino);
@@ -108,15 +101,12 @@ export default function example() {
   function draw() {
     const delta = clock.getDelta();
 
-    let cannonStepTime = 1 / 60;
-    if (delta < 0.01) cannonStepTime = 1 / 120;
+    cannonWorld.step(1 / 60, delta, 3);
 
-    cannonWorld.step(cannonStepTime, delta, 3);
-
-    dominoes.forEach((domino) => {
-      if (domino.cannonBody) {
-        domino.modelMesh.position.copy(domino.cannonBody.position);
-        domino.modelMesh.quaternion.copy(domino.cannonBody.quaternion);
+    dominoes.forEach((item) => {
+      if (item.cannonBody) {
+        item.modelMesh.position.copy(item.cannonBody.position);
+        item.modelMesh.quaternion.copy(item.cannonBody.quaternion);
       }
     });
 
@@ -131,9 +121,27 @@ export default function example() {
     renderer.render(scene, camera);
   }
 
+  // Raycaster
+  const raycaster = new THREE.Raycaster();
+  const mouse = new THREE.Vector2();
+
+  function checkIntersects() {
+    raycaster.setFromCamera(mouse, camera);
+
+    const intersects = raycaster.intersectObjects(scene.children);
+    console.log(intersects[0].object.name); // n번 도미노
+  }
+
   // 이벤트
   window.addEventListener("resize", setSize);
-  window.addEventListener("click", () => {});
+  canvas.addEventListener("click", (e) => {
+    if (preventDragClick.mouseMoved) return;
+
+    mouse.x = (e.clientX / canvas.clientWidth) * 2 - 1;
+    mouse.y = -((e.clientY / canvas.clientHeight) * 2 - 1);
+
+    checkIntersects();
+  });
 
   const preventDragClick = new PreventDragClick(canvas);
 
