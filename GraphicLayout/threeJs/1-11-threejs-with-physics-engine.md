@@ -948,3 +948,107 @@ export class Domino {
 위와 같이 contructor에서 gltfLoader를 통해 메쉬를 생성하여, scene.add 해주면 정상 노출됨
 
 ![](../../img/230503-1.gif)
+
+### 도미노 만들기 - 물리엔진 적용
+
+이제 도노에 물리엔진을 적용해본다. cannon.js를 적용하는 것임
+
+`src/Domino.js`
+
+```jsx
+import { Mesh, BoxGeometry, MeshBasicMaterial } from "three";
+import { Body, Vec3, Box } from "cannon-es";
+
+export class Domino {
+  constructor(info) {
+    //..
+
+      this.setCannonBody();
+    });
+  }
+	// 물리엔진 적용 setCannonBody 메서드 구현
+  setCannonBody() {
+    const shape = new Box(new Vec3(this.width / 2, this.height / 2, this.depth / 2));
+    this.cannonBody = new Body({
+      mass: 1,
+      position: new Vec3(this.x, this.y, this.z),
+      shape
+    });
+    this.cannonBody.quaternion.setFromAxisAngle(new Vec3(0, 1, 0), this.rotationY); // (축, 각도)
+    this.cannonWorld.addBody(this.cannonBody);
+  }
+}
+```
+
+실제 물리엔진을 mesh에 연결하는 것은 draw 함수에서 한다.
+
+`src/ex07.js`
+
+```jsx
+export default function example() {
+  // Renderer, Scene, Camera, Light, Controls, Cannon, Mesh ...
+
+  // 도미노 생성
+  const dominoes = [];
+  let domino;
+  for (let i = -3; i < 17; i++) {
+    domino = new Domino({
+      scene,
+      cannonWorld,
+      gltfLoader,
+      z: -i * 0.8
+    });
+    dominoes.push(domino);
+  }
+
+  // 그리기
+  const clock = new THREE.Clock();
+
+  function draw() {
+    const delta = clock.getDelta();
+
+    let cannonStepTime = 1 / 60;
+    if (delta < 0.01) cannonStepTime = 1 / 120;
+    cannonWorld.step(cannonStepTime, delta, 3);
+
+    // 물리엔진을 mesh와 연결
+    dominoes.forEach((domino) => {
+      if (domino.cannonBody) {
+        domino.modelMesh.position.copy(domino.cannonBody.position);
+        domino.modelMesh.quaternion.copy(domino.cannonBody.quaternion);
+      }
+    });
+
+    // ..
+  }
+
+  //
+}
+```
+
+위와 같이 하면 아까와 같은 도미노 배열을 UI로 확인할 수 있는데, 실제 제대로 적용이 잘되었는지 확인해보기 위해 Domino의 객체 생성정보에 y값을 높게해서 덜어지는 효과를 내보기로 한다.
+
+```jsx
+export default function example() {
+  // Renderer, Scene, Camera, Light, Controls, Cannon, Mesh ...
+
+  const dominoes = [];
+  let domino;
+  for (let i = -3; i < 17; i++) {
+    domino = new Domino({
+      scene,
+      cannonWorld,
+      gltfLoader,
+      y: 2, // test용 데이터 추가
+      z: -i * 0.8
+    });
+    dominoes.push(domino);
+  }
+
+  // ..
+}
+```
+
+![](../../img/230505-1.gif)
+
+물리엔진 적용 완료
