@@ -1157,3 +1157,97 @@ export default function example() {
 ```
 
 ![](../../img/230506-1.gif)
+
+
+### 도미노 만들기 - 쓰러뜨리기
+
+이제 넘어뜨린다. 힘을 가하면 넘어진다. cannonBody가 가진 apply.force 메서드를 이용한다. 
+우선 modelMesh가 cannonBody를 가지도록 하려면 Domino 클래스 객체의 setCannonBody에 아래 코드를 추가해주어야 함
+
+`src/Domino.js`
+
+```jsx
+import { Mesh, BoxGeometry, MeshBasicMaterial } from "three";
+import { Body, Vec3, Box } from "cannon-es";
+
+export class Domino {
+  constructor(info) {
+    //.. 
+    });
+  }
+  setCannonBody() {
+		// ..
+    this.modelMesh.cannonBody = this.cannonBody; // add
+    this.cannonWorld.addBody(this.cannonBody);
+  }
+}
+```
+
+위와 같이 하면 mesh에서 cannonBody에 접근할 수 있게 된다.
+
+`src/ex07.js`
+
+```jsx
+export default function example() {
+  // Renderer, Scene, Camera, Light, Controls
+
+  // Contact Material
+  const defaultMaterial = new CANNON.Material("default");
+  const defaultContactMaterial = new CANNON.ContactMaterial(defaultMaterial, defaultMaterial, {
+    friction: 0.01, // 마찰력 약하게
+    restitution: 0.9 // 반발력 강하게
+  });
+  cannonWorld.defaultContactMaterial = defaultContactMaterial;
+
+  // Cannon, Mesh, draw ...
+  // Raycaster
+  const raycaster = new THREE.Raycaster();
+  const mouse = new THREE.Vector2();
+
+  function checkIntersects() {
+    raycaster.setFromCamera(mouse, camera);
+    const intersects = raycaster.intersectObjects(scene.children);
+    // console.log(intersects[0].object.name); // n번 도미노
+
+    intersects[0].object.cannonBody?.applyForce(new CANNON.Vec3(0, 0, -100), new CANNON.Vec3(0, 0, 0));
+  }
+
+  // 이벤트
+  window.addEventListener("resize", setSize);
+  canvas.addEventListener("click", (e) => {
+    if (preventDragClick.mouseMoved) return; // 드래그 시에는 동작하지 않도록 함
+
+    // ..
+    checkIntersects();
+  });
+
+	// ..
+}
+```
+
+다음으로는 `checkIntersects` 이벤트 내에서 `intersects[0].object`에 담긴 cannonBody를 가지고 applyForce를 해준다. 클릭한 도미노에 x가 뒤로가게끔 힘을 주기 때문에 `new CANNON.Vec3(0, 0, -100)`라는 값을 주고, 이후에는 `new CANNON.Vec3(0, 0, 0)` 힘으로 끝나도록 설정함
+
+![](../../img/230507-1.gif)
+
+위 applyForce 구문은 아래와 같이 for문을 사용해 수정할 수도 있다.
+
+```jsx
+export default function example() {
+  // ..
+
+  function checkIntersects() {
+    raycaster.setFromCamera(mouse, camera);
+    const intersects = raycaster.intersectObjects(scene.children);
+    // console.log(intersects[0].object.name); // n번 도미노
+
+		for (const item of intersects) {
+      item.object.cannonBody?.applyForce(new CANNON.Vec3(0, 0, -100), new CANNON.Vec3(0, 0, 0));
+      break; // 광선이 맞은 첫번째 것만 수행하도록
+    }
+  }
+
+	// ..
+}
+```
+
+앞선 도미노 애니메이션과 동일한 애니메이션 구현 가능
