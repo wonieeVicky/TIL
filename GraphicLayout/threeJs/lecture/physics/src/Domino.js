@@ -36,6 +36,8 @@ export class Domino {
       shape
     });
     this.cannonBody.quaternion.setFromAxisAngle(new Vec3(0, 1, 0), this.rotationY); // (축, 각도)
+
+    this.modelMesh.cannonBody = this.cannonBody;
     this.cannonWorld.addBody(this.cannonBody);
   }
 }

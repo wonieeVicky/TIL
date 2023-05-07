@@ -55,8 +55,8 @@ export default function example() {
   // Contact Material
   const defaultMaterial = new CANNON.Material("default");
   const defaultContactMaterial = new CANNON.ContactMaterial(defaultMaterial, defaultMaterial, {
-    friction: 0.5, // 마찰력,
-    restitution: 0.3 // 반발력
+    friction: 0.01, // 마찰력,
+    restitution: 0.9 // 반발력
   });
   cannonWorld.defaultContactMaterial = defaultContactMaterial;
 
@@ -127,9 +127,15 @@ export default function example() {
 
   function checkIntersects() {
     raycaster.setFromCamera(mouse, camera);
-
     const intersects = raycaster.intersectObjects(scene.children);
-    console.log(intersects[0].object.name); // n번 도미노
+    // console.log(intersects[0].object.name); // n번 도미노
+
+    for (const item of intersects) {
+      item.object.cannonBody?.applyForce(new CANNON.Vec3(0, 0, -100), new CANNON.Vec3(0, 0, 0));
+      break;
+    }
+
+    // intersects[0].object.cannonBody?.applyForce(new CANNON.Vec3(0, 0, -100), new CANNON.Vec3(0, 0, 0));
   }
 
   // 이벤트
