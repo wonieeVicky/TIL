@@ -36,10 +36,17 @@ export default function example() {
   controls.enableDamping = true;
 
   // Mesh
-  const geometry = new THREE.SphereGeometry(1, 32, 32);
-  const material = new THREE.MeshStandardMaterial();
-  const mesh = new THREE.Mesh(geometry, material);
-  scene.add(mesh);
+  const geometry = new THREE.BoxGeometry(2, 2, 2);
+  const material = new THREE.PointsMaterial({
+    // size: 2,
+    // sizeAttenuation:false
+  });
+  // 혹은 아래와 같은 설정 추가도 가능
+  material.size = 2;
+  material.sizeAttenuation = false;
+
+  const points = new THREE.Points(geometry, material); // mesh 대신 points 사용
+  scene.add(points);
 
   // 그리기
   const clock = new THREE.Clock();
