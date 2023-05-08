@@ -96,3 +96,54 @@ export default function example() {
 ![](../../img/230508-6.png)
 
 특이하다. 이러한 Particle rlsmddmf 활용해서 재미있는 형태의 UI를 구현할 수 있음
+
+### random Particle
+
+이번에는 랜덤한 위치에 Particle을 흩뿌려보자.
+아까는 정해진 형태의 Particle을 보여주기 위해 기본 제공되는 `SphereGeometry`를 이용했다. 
+
+이번에는 Geometry가 필요하지만, 형태가 정해져있지 않으므로 `BufferGeometry`를 사용한다.
+BufferGeometry는 기본으로 가진 형태가 없이 우선 geometry를 만든 뒤 vertex를 직접 세팅 할 경우 사용하는 메서드이다.
+
+`src/ex02.js`
+
+```jsx
+import * as THREE from "three";
+import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
+
+// ----- 주제: 랜덤 파티클
+
+export default function example() {
+  // Renderer, Scene, Camera, Light, Controls ..
+
+  // Mesh(Geometry + Material)
+  const geometry = new THREE.BufferGeometry();
+  const count = 1000;
+
+  // BufferGeometry에 노출할 포인트들의 위치 설정
+	// Float32Array position 배열은 x, y, z를 가지므로 3개씩 1000개 생성
+  const positions = new Float32Array(count * 3);
+  for (let i = 0; i < positions.length; i++) {
+    positions[i] = (Math.random() - 0.5) * 10; // -5 ~ 5 사이의 랜덤
+  }
+
+	// BufferAttribute에 positions 배열을 넣어줌(3은 x, y, z를 의미)
+  geometry.setAttribute("position", new THREE.BufferAttribute(positions, 3));
+
+  const material = new THREE.PointsMaterial({ size: 0.03, color: "plum" });
+  const particles = new THREE.Points(geometry, material);
+  scene.add(particles);
+
+  const points = new THREE.Points(geometry, material); // mesh 대신 points 사용
+  scene.add(points);
+
+  // ..
+}
+```
+
+위와 같이 BufferGeometry를 사용해서 랜덤 파티클을 구현할 수 있다.
+
+![](../../img/230509-1.gif)
+
+1000개의 점을 -5 ~ 5 사이의 값을 가지도록 랜덤하게 설정하여 PointsMaterial과 함께 조합함
+위 코드를 통해 우주 속의 별을 표현해볼 수 있다.
