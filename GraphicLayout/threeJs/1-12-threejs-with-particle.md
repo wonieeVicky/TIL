@@ -147,3 +147,97 @@ export default function example() {
 
 1000개의 점을 -5 ~ 5 사이의 값을 가지도록 랜덤하게 설정하여 PointsMaterial과 함께 조합함
 위 코드를 통해 우주 속의 별을 표현해볼 수 있다.
+
+### Particle Image
+
+이번에는 Particle에 이미지를 사용해보자. 우선 이미지를 로드해야 한다. 
+그러려면 webpack 설정부터 바꿔야지
+
+`webpack.config.js`
+
+```jsx
+module.exports = {
+	mode: webpackMode,
+	// ..
+	plugins: [
+		// ..
+		new CopyWebpackPlugin({
+			patterns: [
+				{ from: "./src/main.css", to: "./main.css" },
+				{ from: "./src/images", to: "./images" }, // 추가
+			],
+		})
+	]
+};
+```
+
+`src/ex03.js`
+
+```jsx
+import * as THREE from "three";
+import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
+
+// ----- 주제: 파티클 이미지
+
+export default function example() {
+  // Renderer, Scene, Camera, Light, Controls ..
+
+  // Particle
+  const geometry = new THREE.BufferGeometry();
+  const count = 1000;
+
+  const positions = new Float32Array(count * 3);
+  for (let i = 0; i < positions.length; i++) {
+    positions[i] = (Math.random() - 0.5) * 10;
+  }
+  geometry.setAttribute("position", new THREE.BufferAttribute(positions, 3));
+
+	// 파티클 이미지 로드
+  const textureLoader = new THREE.TextureLoader();
+  const particleTexture = textureLoader.load('/images/star.png');
+
+	const material = new THREE.PointsMaterial({ 
+    size: 0.3, 
+    map: particleTexture,
+  });
+
+  const particles = new THREE.Points(geometry, material);
+  scene.add(particles);
+  const points = new THREE.Points(geometry, material);
+  scene.add(points);
+
+  // ..
+}
+```
+
+textureLoader로 별 이미지를 로드해와서, 이를 PointMaterial의 map 속성에 추가해준다. 
+그러면 아래와 같이 랜덤 파티클 UI의 점들이 별 이미지로 노출되는 것을 확인할 수 있다.
+
+![](../../img/230510-1.png)
+
+그런데 자세히 보면, 배경이 투명하지가 않음. png를 썻는데도 그러네.. 이건 옵션으로 해결한다.
+
+```jsx
+export default function example() {
+  // Renderer, Scene, Camera, Light, Controls ..
+
+  // Particle ..
+  const textureLoader = new THREE.TextureLoader();
+  const particleTexture = textureLoader.load('/images/star.png');
+
+	const material = new THREE.PointsMaterial({ 
+    size: 0.3, 
+    map: particleTexture,
+		// 파티클 이미지를 투명하게 세팅
+    transparent: true,
+    alphaMap: particleTexture,
+    depthWrite: false
+  });
+
+  // ..
+}
+```
+
+위와 같이 transparent, alphaMap, depthWrite 옵션을 주면 투명하게 세팅이 된다.
+
+![좀 어색한 느낌이 있지만 은근 예쁨](../../img/230510-1.gif)
