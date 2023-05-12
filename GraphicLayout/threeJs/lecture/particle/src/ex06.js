@@ -44,19 +44,23 @@ export default function example() {
 
   // Points
   const sphereGeometry = new THREE.SphereGeometry(1, 8, 8);
-  const positionArray = sphereGeometry.attributes.position.array; // planeMesh의 position 정보
+  const spherePositionArray = sphereGeometry.attributes.position.array; // planeMesh의 position 정보
+  const randomPositionArray = []; // random position 정보
+  for (let i =0; i < spherePositionArray.length; i++) {
+    randomPositionArray.push((Math.random() - 0.5) * 10);
+  }
 
   // 여러 개의 Plane Mesh 생성
   let imagePanel;
-  for (let i = 0; i < positionArray.length; i += 3) {
+  for (let i = 0; i < spherePositionArray.length; i += 3) {
     imagePanel = new ImagePanel({
       textureLoader,
       scene,
       geometry: planeGeometry,
       imageSrc: `/images/0${Math.ceil(Math.random() * 5)}.jpg`,
-      x: positionArray[i],
-      y: positionArray[i + 1],
-      z: positionArray[i + 2]
+      x: spherePositionArray[i],
+      y: spherePositionArray[i + 1],
+      z: spherePositionArray[i + 2]
     });
   }
 
@@ -79,7 +83,39 @@ export default function example() {
     renderer.render(scene, camera);
   }
 
+  function setShape(e) {
+    const { type } = e.target.dataset;
+    switch (type) {
+      case "random":
+        imagePanel.setRandomShape();
+        break;
+      case "sphere":
+        imagePanel.setSphereShape();
+        break;
+    }
+  }
+
+  // 버튼 추가
+  const btnWrapper = document.createElement('div'); // addEventListener를 위한 div
+  btnWrapper.classList.add('btns');
+
+  const randomBtn = document.createElement('button');
+  randomBtn.dataset.type = 'random';
+  randomBtn.innerText = 'Random';
+  randomBtn.style.cssText = 'position: absolute; left: 20px; top: 20px; '
+  btnWrapper.append(randomBtn);
+
+  const sphereBtn = document.createElement('button');
+  sphereBtn.dataset.type = 'sphere';
+  sphereBtn.innerText = 'Sphere';
+  sphereBtn.style.cssText = 'position: absolute; left: 20px; top: 50px; '
+  btnWrapper.append(sphereBtn);
+
+  document.body.append(btnWrapper);
+
+
   // 이벤트
+  btnWrapper.addEventListener('click', setShape)
   window.addEventListener("resize", setSize);
 
   draw();
