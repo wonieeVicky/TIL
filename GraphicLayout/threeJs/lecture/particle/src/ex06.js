@@ -1,5 +1,6 @@
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
+import { ImagePanel } from "./ImagePanel";
 
 // ----- 주제: 형태가 바뀌는 이미지 패널
 
