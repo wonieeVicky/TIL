@@ -446,3 +446,73 @@ export default function example() {
 ```
 
 위와 같이 ImagePanel 구현을 위해 textureLoader, scene, geometry, imageSrc, position 좌표를 인자값으로 넣어주면 될 것으로 보임. 이제 실제 ImagePanel 클래스를 구현해보자
+
+### 형태가 바뀌는 이미지 패널 구현
+
+위 구에서 빨간색 planeMesh 하나하나에 이미지 패널을 구현하고, 버튼을 클릭하면 랜덤한 위치로 이동되었다가 회귀하는 애니메이션을 구현해보고자 한다. 먼저 기존의 PlaneMesh 구현을 모듈로 분리해볼 것이다. 
+상세한 클래스 모듈을 생성하기 전 어떤 전달인자가 만들어져야하는지 클래스 생성부부터 작업해본다.
+
+`src/ex06.js`
+
+```jsx
+import * as THREE from "three";
+import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
+import { ImagePanel } from "./ImagePanel";
+
+// ----- 주제: 형태가 바뀌는 이미지 패널
+
+export default function example() {
+  // Renderer, Scene, Camera, Light, Controls ..
+
+  // Mesh
+  const planeGeometry = new THREE.PlaneGeometry(0.3, 0.3);
+
+  // textureLoader
+  const textureLoader = new THREE.TextureLoader();
+
+  // Points
+  const sphereGeometry = new THREE.SphereGeometry(1, 8, 8);
+  const positionArray = sphereGeometry.attributes.position.array;
+
+  // ImagePanel 클래스 객체 생성
+  let imagePanel;
+  for (let i = 0; i < positionArray.length; i += 3) {
+    imagePanel = new ImagePanel({
+      textureLoader,
+      scene,
+      geometry: planeGeometry,
+      imageSrc: `/images/0${Math.ceil(Math.random() * 5)}.jpg`, // 1 ~ 5 random
+      x: positionArray[i],
+      y: positionArray[i + 1],
+      z: positionArray[i + 2]
+    });
+  }
+
+  // ...
+}
+```
+
+위와 같이 ImagePanel 구현을 위해 textureLoader, scene, geometry, imageSrc, position 좌표를 인자값으로 넣어주면 될 것으로 보임. 이제 실제 ImagePanel 클래스를 구현해보자
+
+`src/ImagePanel.js`
+
+```jsx
+import { DoubleSide, MeshBasicMaterial, Mesh } from "three";
+
+export class ImagePanel {
+  constructor(info) {
+    const texture = info.textureLoader.load(info.imageSrc); // texture 생성
+    const material = new MeshBasicMaterial({ map: texture, side: DoubleSide }); // material 생성
+
+    this.mesh = new Mesh(info.geometry, material); // mesh 생성
+    this.mesh.position.set(info.x, info.y, info.z); // mesh 위치 설정
+    this.mesh.lookAt(0, 0, 0); // mesh의 z축을 카메라 방향으로 설정
+
+    info.scene.add(this.mesh); // scene에 mesh 추가
+  }
+}
+```
+
+그러면 원하는 이미지가 갤러리처럼 노출되는 것을 확인할 수 있다.
+
+![](../../img/230512-1.gif)
