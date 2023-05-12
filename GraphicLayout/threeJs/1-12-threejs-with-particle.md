@@ -516,3 +516,64 @@ export class ImagePanel {
 그러면 원하는 이미지가 갤러리처럼 노출되는 것을 확인할 수 있다.
 
 ![](../../img/230512-1.gif)
+
+위와 같이 이미지 적용까지 완료. 이제 Random, Sphere 버튼을 누르면 랜덤한 위치로 퍼졌다가 다시 모이도록 구현해보겠다. 우선 버튼을 2개 만들어봄
+
+`src/ex06.js`
+
+위와 같이 ex06.js 에서 자체적으로 random, sphere 버튼을 생성하고, 버튼을 감싸고 있는 btns wrapper에 클릭 이벤트를 추가하여 처리한다. 
+
+```jsx
+export default function example() {
+  // Renderer, Scene, Camera, Light, Controls, Mesh ..
+
+	// Points
+  const sphereGeometry = new THREE.SphereGeometry(1, 8, 8);
+  const spherePositionArray = sphereGeometry.attributes.position.array;
+  const randomPositionArray = []; // random position 정보
+  for (let i =0; i < spherePositionArray.length; i++) {
+    randomPositionArray.push((Math.random() - 0.5) * 10);
+	}
+
+	// ..
+
+  function setShape(e) {
+    const { type } = e.target.dataset;
+    switch (type) {
+      case "random":
+				// ..
+        break;
+      case "sphere":
+				// ..
+        break;
+    }
+  }
+
+  // 버튼 추가
+  const btnWrapper = document.createElement('div'); // addEventListener를 위한 div
+  btnWrapper.classList.add('btns');
+
+  const randomBtn = document.createElement('button');
+  randomBtn.dataset.type = 'random';
+  randomBtn.innerText = 'Random';
+  randomBtn.style.cssText = 'position: absolute; left: 20px; top: 20px; '
+  btnWrapper.append(randomBtn);
+
+  const sphereBtn = document.createElement('button');
+  sphereBtn.dataset.type = 'sphere';
+  sphereBtn.innerText = 'Sphere';
+  sphereBtn.style.cssText = 'position: absolute; left: 20px; top: 50px; '
+  btnWrapper.append(sphereBtn);
+
+  document.body.append(btnWrapper);
+
+  // 이벤트
+  btnWrapper.addEventListener('click', setShape)
+	// ..
+}
+```
+
+랜덤 위치에 흩뿌릴 random position도 추가 생성, setShape라는 함수가 클릭이벤트 관리하도록 구현
+이제 상세한 setShape 부분을 구현해보자
+
+![](../../img/230512-1.png)
