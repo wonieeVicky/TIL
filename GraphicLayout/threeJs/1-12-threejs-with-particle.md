@@ -399,3 +399,50 @@ mesh도 lookAt 메서드가 있음
 ![](../../img/230511-3.gif)
 
 그러면 위와 같이된다. mesh는 그냥 점이 아니므로 각각 다른 texture를 입힐 수 있으므로 다양한 활용이 가능하다. 다음엔 이걸 이용해서 갤러리도 한번 만들어보자
+
+### 형태가 바뀌는 이미지 패널 구현
+
+위 구에서 빨간색 planeMesh 하나하나에 이미지 패널을 구현하고, 버튼을 클릭하면 랜덤한 위치로 이동되었다가 회귀하는 애니메이션을 구현해보고자 한다. 먼저 기존의 PlaneMesh 구현을 모듈로 분리해볼 것이다. 
+상세한 클래스 모듈을 생성하기 전 어떤 전달인자가 만들어져야하는지 클래스 생성부부터 작업해본다.
+
+`src/ex06.js`
+
+```jsx
+import * as THREE from "three";
+import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
+import { ImagePanel } from "./ImagePanel";
+
+// ----- 주제: 형태가 바뀌는 이미지 패널
+
+export default function example() {
+  // Renderer, Scene, Camera, Light, Controls ..
+
+  // Mesh
+  const planeGeometry = new THREE.PlaneGeometry(0.3, 0.3);
+
+  // textureLoader
+  const textureLoader = new THREE.TextureLoader();
+
+  // Points
+  const sphereGeometry = new THREE.SphereGeometry(1, 8, 8);
+  const positionArray = sphereGeometry.attributes.position.array;
+
+  // ImagePanel 클래스 객체 생성
+  let imagePanel;
+  for (let i = 0; i < positionArray.length; i += 3) {
+    imagePanel = new ImagePanel({
+      textureLoader,
+      scene,
+      geometry: planeGeometry,
+      imageSrc: `/images/0${Math.ceil(Math.random() * 5)}.jpg`, // 1 ~ 5 random
+      x: positionArray[i],
+      y: positionArray[i + 1],
+      z: positionArray[i + 2]
+    });
+  }
+
+  // ...
+}
+```
+
+위와 같이 ImagePanel 구현을 위해 textureLoader, scene, geometry, imageSrc, position 좌표를 인자값으로 넣어주면 될 것으로 보임. 이제 실제 ImagePanel 클래스를 구현해보자
