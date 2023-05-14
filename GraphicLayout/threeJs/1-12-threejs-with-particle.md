@@ -577,3 +577,155 @@ export default function example() {
 이제 상세한 setShape 부분을 구현해보자
 
 ![](../../img/230512-1.png)
+
+이제 버튼 클릭 시 패널 이동이 되도록 구현해본다.
+
+```bash
+> npm i gsap
+```
+
+```jsx
+import gsap from "gsap";
+
+export default function example() {
+  // Renderer, Scene, Camera, Light, Controls, Mesh..
+
+	// 여러 개의 Plane Mesh 생성
+  const imagePanels = []; // gsap 액션을 위한 추가
+  let imagePanel;
+  for (let i = 0; i < spherePositionArray.length; i += 3) {
+    imagePanel = new ImagePanel({
+      textureLoader,
+      scene,
+      geometry: planeGeometry,
+      imageSrc: `/images/0${Math.ceil(Math.random() * 5)}.jpg`,
+      x: spherePositionArray[i],
+      y: spherePositionArray[i + 1],
+      z: spherePositionArray[i + 2]
+    });
+
+    imagePanels.push(imagePanel); // imagePanel 인스턴스를 모은다.
+  }
+
+	// ..
+
+  function setShape(e) {
+    let array;
+    const { type } = e.target.dataset;
+    switch (type) {
+      case "random":
+        array = randomPositionArray; // array에 randomPositionArray 적용
+        break;
+      case "sphere":
+        array = spherePositionArray; // array에 spherePositionArray 적용
+        break;
+    }
+
+    for(let i=0; i<imagePanels.length; i++){
+      // gasp.to(대상, {속성, 속성값, 속성, 속성값, ...}, 옵션(지속시간, delay, ease 등))
+      gsap.to(imagePanels[i].mesh.position, {
+        duration: 2,
+        x: array[i * 3], 
+        y: array[i * 3 + 1],
+        z: array[i * 3 + 2],
+      });
+    }
+  }
+
+  // Buttons..
+
+  // 이벤트
+  btnWrapper.addEventListener('click', setShape)
+	// ..
+}
+```
+
+위와 같이 setShape 함수 내부를 각 imagePanels의 값에 따라 분산되었다가 다시 제자리로 돌아가도록 처리하면 아래와 같은 애니메이션이 구현된다. 
+
+![](../../img/230514-1.gif)
+
+그런데 살짝 마음에 안드는 부분은 흐트러진 형태가 너무 중구난방이라는 점.. 
+
+![](../../img/230514-1.png)
+
+각 mesh의 각도가 모두 다르기 때문에 위와 같이 노출됨. 이걸 좀 정리해볼까
+Random을 눌렀을 때 position이 변경되면서도 일정한 간격을 가지도록 아래와 같이 구현함
+
+`src/ImagePanel.js`
+
+```jsx
+export class ImagePanel {
+  constructor(info) {
+    // ..
+
+    // Sphere 상태의 회전각을 저장
+    this.sphereRotationX = this.mesh.rotation.x;
+    this.sphereRotationY = this.mesh.rotation.y;
+    this.sphereRotationZ = this.mesh.rotation.z;
+
+    info.scene.add(this.mesh);
+  }
+}
+```
+
+`src/ex06.js`
+
+```jsx
+import gsap from "gsap";
+
+export default function example() {
+  // Renderer, Scene, Camera, Light, Controls, Mesh..
+	// ..
+
+  function setShape(e) {
+    let array;
+    const { type } = e.target.dataset;
+    switch (type) {
+      case "random":
+        array = randomPositionArray;
+        break;
+      case "sphere":
+        array = spherePositionArray;
+        break;
+    }
+
+    for(let i=0; i<imagePanels.length; i++){
+      gsap.to(imagePanels[i].mesh.position, {
+        duration: 2,
+        x: array[i * 3], 
+        y: array[i * 3 + 1],
+        z: array[i * 3 + 2],
+      });
+
+			// 회전
+      if (type === "random") {****
+				// random 일 때는 앞쪽을 바라보도록 정렬
+        gsap.to(imagePanels[i].mesh.rotation, {
+          duration: 2,
+          x: 0,
+          y: 0,
+          z: 0
+        });
+      } else if (type === "sphere") {
+				// 기존 Rotation으로 돌아가도록 처리
+        gsap.to(imagePanels[i].mesh.rotation, {
+          duration: 2,
+          x: imagePanels[i].sphereRotationX,
+          y: imagePanels[i].sphereRotationY,
+          z: imagePanels[i].sphereRotationZ
+        });
+      }
+    }
+  }
+
+  // Buttons..
+
+  // 이벤트
+  btnWrapper.addEventListener('click', setShape)
+	// ..
+}
+```
+
+![](../../img/230514-2.gif)
+
+위와 같이 Random 버튼을 눌렀을 때 정면을 바라보도록(x, y, z) = (0, 0, 0) 처리되는 것을 확인할 수 있다.
