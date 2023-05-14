@@ -9,6 +9,11 @@ export class ImagePanel {
     this.mesh.position.set(info.x, info.y, info.z); // mesh 위치 설정
     this.mesh.lookAt(0, 0, 0); // mesh의 z축을 카메라 방향으로 설정
 
+    // Sphere 상태의 회전각을 저장
+    this.sphereRotationX = this.mesh.rotation.x;
+    this.sphereRotationY = this.mesh.rotation.y;
+    this.sphereRotationZ = this.mesh.rotation.z;
+
     info.scene.add(this.mesh); // scene에 mesh 추가
   }
 }
