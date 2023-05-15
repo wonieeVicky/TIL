@@ -1,8 +1,30 @@
 body {
 	margin: 0;
 }
+
 #three-canvas {
-	position: absolute;
+	position: fixed;
 	left: 0;
 	top: 0;
+}
+
+.sections {
+	position: relative;
+	z-index: 1;
+}
+
+.section {
+	height: 100vh;
+	padding: 5rem;
+	box-sizing: border-box;
+}
+
+.section h2 {
+	margin: 0;
+	font-size: 7vmin;
+	/* vmin = viewport minimum, 가로, 세로 사이즈 중 작은 값 */
+}
+
+.section:nth-child(odd) {
+	text-align: right;
 }
