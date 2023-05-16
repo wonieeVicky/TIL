@@ -172,3 +172,111 @@ body {
 ```
 
 ![](../../img/230515-1.gif)
+
+### House 클래스 구현
+
+이제 배경을 흰색으로 돌려주고, 집을 놓아보자. 모듈로 집을 구현하려고 한다.
+먼저 집을 구현해야할 때 전달해야 하는 인자가 어떤 것들이 있을지 생각해보자.
+
+`src/main.js`
+
+```jsx
+import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
+import { House } from "./House";
+
+// Renderer, Scene, Camera, Light, SpotLight..
+
+// Mesh ..
+scene.add(floorMesh);
+
+const gltfLoader = new GLTFLoader();
+const houses = [];
+houses.push(
+  new House({
+    gltfLoader, // house.glb 로드를 위함
+    scene, // scene에 추가를 위함
+    modelSrc: "/models/house.glb", // House 객체에 적용될 glb 이미지
+    x: 0, // x 좌표
+    z: 0, // z 좌표
+    height: 2 // mesh 별 height 별도로 주입
+  })
+);
+```
+
+위와 같이 전달인자를 세팅해주었다. House 클래스를 구현해본다.
+
+`src/House.js`
+
+```jsx
+export class House {
+  constructor(info) {
+    this.x = info.x;
+    this.z = info.z;
+
+    this.height = info.height || 2;
+
+    info.gltfLoader.load(info.modelSrc, (glb) => {
+      this.mesh = glb.scene.children[0];
+      this.mesh.position.set(this.x, this.height / 2, this.z);
+      info.scene.add(this.mesh);
+    });
+  }
+}
+```
+
+집 하나를 일단 넣어보았음
+
+![](../../img/230516-1.png)
+
+그림자가 없어서 허전하다.
+
+```jsx
+// Renderer ..
+renderer.shadowMap.enabled = true; // 그림자 효과
+
+// Scene, Camera, Light..
+
+// Mesh..
+floorMesh.receiveShadow = true; // 그림자 효과
+scene.add(floorMesh);
+
+const gltfLoader = new GLTFLoader();
+const houses = [];
+houses.push(new House({ gltfLoader, scene, modelSrc: "/models/house.glb", x: 0, z: 0, height: 2 }));
+
+// ..
+```
+
+`src/House.js`
+
+```jsx
+export class House {
+  constructor(info) {
+    // ..
+
+    info.gltfLoader.load(info.modelSrc, (glb) => {
+      this.mesh = glb.scene.children[0];
+      this.mesh.castShadow = true; // 그림자 효과
+      // ..
+    });
+  }
+}
+```
+
+위처럼 renderer, floorMesh, gltfMesh에 Shadow 효과를 적용해주면 아래와 같이 된다.
+
+![](../../img/230516-2.png)
+
+그림자가 픽셀처럼 깨져보이는 현상.. 빛이 넓은 범위에서 비추기 때문인데, 빛이 가깝게 비추도록 설정할 수도 있고, renderer의 shadowMap type을 부드러운 타입으로 바꿔주는 방법도 있다.
+
+```jsx
+// Renderer ..
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap; // 추가
+
+// ..
+```
+
+그럼 이렇게 부드럽게 노출됨
+
+![](../../img/230516-3.png)
