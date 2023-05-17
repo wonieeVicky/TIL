@@ -1,6 +1,7 @@
 import * as THREE from "three";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 import { House } from "./House";
+import gsap from "gsap";
 
 // ----- 주제: 스크롤에 따라 움직이는 3D 페이지
 
@@ -17,12 +18,11 @@ renderer.shadowMap.type = THREE.PCFSoftShadowMap; // 그림자 효과
 
 // Scene
 const scene = new THREE.Scene();
-scene.background = new THREE.Color("white");
+scene.background = new THREE.Color("skyblue");
 
 // Camera
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-camera.position.y = 1.5;
-camera.position.z = 4;
+camera.position.set(-5, 2, 25);
 scene.add(camera);
 
 // Light
@@ -47,7 +47,11 @@ scene.add(floorMesh);
 
 const gltfLoader = new GLTFLoader();
 const houses = [];
-houses.push(new House({ gltfLoader, scene, modelSrc: "/models/house.glb", x: 0, z: 0, height: 2 }));
+houses.push(new House({ gltfLoader, scene, modelSrc: "/models/house.glb", x: -5, z: 20, height: 2 }));
+houses.push(new House({ gltfLoader, scene, modelSrc: "/models/house.glb", x: 7, z: 10, height: 2 }));
+houses.push(new House({ gltfLoader, scene, modelSrc: "/models/house.glb", x: -10, z: 0, height: 2 }));
+houses.push(new House({ gltfLoader, scene, modelSrc: "/models/house.glb", x: 10, z: -10, height: 2 }));
+houses.push(new House({ gltfLoader, scene, modelSrc: "/models/house.glb", x: -5, z: -20, height: 2 }));
 
 // 그리기
 const clock = new THREE.Clock();
@@ -66,7 +70,22 @@ function setSize() {
   renderer.render(scene, camera);
 }
 
+let currentSection = 0;
+
+function setSection() {
+  // console.log(window.scrollY); // window.scrollY === pageYOffset
+  const newSection = Math.round(window.scrollY / window.innerHeight);
+  if (currentSection === newSection) return; // 현재 섹션과 새로운 섹션이 같으면 리턴
+  gsap.to(camera.position, {
+    duration: 1,
+    x: houses[newSection].x,
+    z: houses[newSection].z + 5
+  });
+  currentSection = newSection;
+}
+
 // 이벤트
+window.addEventListener("scroll", setSection);
 window.addEventListener("resize", setSize);
 
 draw();
