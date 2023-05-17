@@ -280,3 +280,74 @@ renderer.shadowMap.type = THREE.PCFSoftShadowMap; // 추가
 그럼 이렇게 부드럽게 노출됨
 
 ![](../../img/230516-3.png)
+
+### 객체 배치 및 애니메이션 처리
+
+그럼 이제 집을 더 추가해보자.
+
+`src/main.js`
+
+```jsx
+import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
+import { House } from "./House";
+
+// Renderer, Scene
+// Camera
+const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+camera.position.set(-5, 2, 25);
+scene.add(camera);
+
+// Light, SpotLight..
+
+// Mesh ..
+const gltfLoader = new GLTFLoader();
+const houses = [];
+const gltfLoader = new GLTFLoader();
+const houses = [];
+houses.push(new House({ gltfLoader, scene, modelSrc: "/models/house.glb", x: -5, z: 20, height: 2 }));
+houses.push(new House({ gltfLoader, scene, modelSrc: "/models/house.glb", x: 7, z: 10, height: 2 }));
+houses.push(new House({ gltfLoader, scene, modelSrc: "/models/house.glb", x: -10, z: 0, height: 2 }));
+houses.push(new House({ gltfLoader, scene, modelSrc: "/models/house.glb", x: 10, z: -10, height: 2 }));
+houses.push(new House({ gltfLoader, scene, modelSrc: "/models/house.glb", x: -5, z: -20, height: 2 }));
+```
+
+위와 같이 첫 번째 집 위치로 camera 포지션을 설정해준 뒤 5개의 집을 나열하면 아래와 같이 노출됨
+
+![](../../img/230517-1.png)
+
+이제 스크롤에 따른 애니메이션만 넣어주면 되겠다. scrollEvent로 처리해줄 건데 애니메이션을 위해 gsap 부터 추가 설치해준다.
+
+```bash
+> npm i gsap
+```
+
+```jsx
+import gsap from "gsap";
+
+// ..
+
+let currentSection = 0;
+
+function setSection() {
+  // console.log(window.scrollY); // window.scrollY === pageYOffset
+  const newSection = Math.round(window.scrollY / window.innerHeight);
+
+  if (currentSection === newSection) return; // 현재 섹션과 새로운 섹션이 같으면 리턴
+
+  gsap.to(camera.position, {
+    duration: 1,
+    x: houses[newSection].x,
+    z: houses[newSection].z + 5
+  });
+  currentSection = newSection;
+}
+
+// 이벤트
+window.addEventListener("scroll", setSection);
+```
+
+스크롤에 따른 위치 이동이 부드럽게 구현됨
+
+![하늘도 하늘색으로 만들어 봄](../../img/230517-1.gif)
+
+활용해서 제품 소개 페이지 만들어도 좋을 듯 !
