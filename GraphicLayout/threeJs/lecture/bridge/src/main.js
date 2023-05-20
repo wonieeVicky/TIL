@@ -22,13 +22,22 @@ camera.position.z = 4;
 cm1.scene.add(camera);
 
 // Light
-const ambientLight = new THREE.AmbientLight("white", 0.5);
+const ambientLight = new THREE.AmbientLight(cm2.lightColor, 0.8);
 cm1.scene.add(ambientLight);
 
-const directionalLight = new THREE.DirectionalLight("white", 1);
-directionalLight.position.x = 1;
-directionalLight.position.z = 2;
-cm1.scene.add(directionalLight);
+const spotLightDistance = 50;
+const spotLight1 = new THREE.SpotLight(cm2.lightColor, 1);
+spotLight1.castShadow = true;
+const spotLight2 = spotLight1.clone(); // spotLight1을 복제
+const spotLight3 = spotLight1.clone(); // spotLight1을 복제
+const spotLight4 = spotLight1.clone(); // spotLight1을 복제
+
+spotLight1.position.set(-spotLightDistance, spotLightDistance, spotLightDistance);
+spotLight2.position.set(spotLightDistance, spotLightDistance, spotLightDistance);
+spotLight3.position.set(-spotLightDistance, spotLightDistance, -spotLightDistance);
+spotLight4.position.set(spotLightDistance, spotLightDistance, -spotLightDistance);
+
+cm1.scene.add(spotLight1, spotLight2, spotLight3, spotLight4);
 
 // Controls
 const controls = new OrbitControls(camera, renderer.domElement);
