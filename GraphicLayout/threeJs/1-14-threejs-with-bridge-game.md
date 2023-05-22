@@ -84,7 +84,11 @@ export const cm2 = {
 // ..
 import { cm1, cm2 } from "./common";
 
-// Renderer, scene, Camera..
+// Renderer ..
+renderer.shadowMap.enabled = true; // 그림자 속성 추가
+renderer.shadowMap.type = THREE.PCFSoftShadowMap; // 그림자를 부드럽게 보이게 함
+
+// scene, Camera..
 
 // Light..
 const ambientLight = new THREE.AmbientLight(cm2.lightColor, 0.8);
