@@ -11,6 +11,8 @@ const renderer = new THREE.WebGLRenderer({
 });
 renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.setPixelRatio(window.devicePixelRatio > 1 ? 2 : 1);
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
 // scene
 cm1.scene.background = new THREE.Color(cm2.backgroundColor);
