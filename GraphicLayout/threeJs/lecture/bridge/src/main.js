@@ -3,6 +3,8 @@ import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import { cm1, cm2 } from "./common";
 import { Pillar } from "./Pillar";
 import { Floor } from "./Floor";
+import { Bar } from "./Bar";
+import { SideLight } from "./SideLight";
 
 // ----- 주제: The Bridge 게임 만들기
 
@@ -67,6 +69,20 @@ const pillar2 = new Pillar({
 
 // 바닥
 const floor = new Floor({ name: "floor" });
+
+// 바
+const bar1 = new Bar({ name: "bar", x: -1.6, y: 10.3, z: 0 });
+const bar2 = new Bar({ name: "bar", x: -0.4, y: 10.3, z: 0 });
+const bar3 = new Bar({ name: "bar", x: 0.4, y: 10.3, z: 0 });
+const bar4 = new Bar({ name: "bar", x: 1.6, y: 10.3, z: 0 });
+
+// 사이드 라이트
+for (let i = 0; i < 49; i++) {
+  new SideLight({ name: "sideLight", container: bar1.mesh, z: i * 0.5 - glassUnitSize * 10 });
+}
+for (let i = 0; i < 49; i++) {
+  new SideLight({ name: "sideLight", container: bar4.mesh, z: i * 0.5 - glassUnitSize * 10 });
+}
 
 // 그리기
 const clock = new THREE.Clock();
