@@ -277,3 +277,145 @@ const floor = new Floor({ name: "floor" });
 위와 같이 기둥 2개 클래스와 바닥면에 대해 객체 데이터를 넣어주면 아래와 같이 정상적으로 노출된다.
 
 ![조명에 따른 기둥의 그림자 생성도 잘 됨](../../img/230522-1.gif)
+
+### 무대 설치 2
+
+다음에는 사이를 이어주는 다리를 그려본다.
+
+`src/Bar.js`
+
+```jsx
+import { Mesh } from "three";
+import { Stuff } from "./Stuff";
+import { cm1, geo, mat } from "./common";
+
+export class Bar extends Stuff {
+  constructor(info) {
+    super(info);
+
+    this.geometry = geo.bar;
+    this.material = mat.bar;
+
+    this.mesh = new Mesh(this.geometry, this.material);
+    this.mesh.position.set(this.x, this.y, this.z);
+    this.mesh.castShadow = true;
+    this.mesh.receiveShadow = true;
+    cm1.scene.add(this.mesh);
+  }
+}
+```
+
+`src/common.js`
+
+```jsx
+// ..
+
+export const cm2 = {
+  // ..
+  barColor: "#441c1d"
+};
+
+export const geo = {
+  // ..
+  bar: new BoxGeometry(0.1, 0.3, 1.2 * 21)
+};
+
+export const mat = {
+  // ..
+  bar: new MeshPhongMaterial({ color: cm2.barColor })
+};
+```
+
+`src/main.js`
+
+```jsx
+// ..
+import { Bar } from "./Bar";
+
+// Renderer, scene, Camera, Light, Controls
+
+// 기둥, 바닥..
+
+// 바 - x 값만 바뀐다/
+const bar1 = new Bar({ name: "bar", x: -1.6, y: 10.3, z: 0 });
+const bar2 = new Bar({ name: "bar", x: -0.4, y: 10.3, z: 0 });
+const bar3 = new Bar({ name: "bar", x: 0.4, y: 10.3, z: 0 });
+const bar4 = new Bar({ name: "bar", x: 1.6, y: 10.3, z: 0 });
+```
+
+위와 같이 설정해주면 아래와 같이 4개의 바가 생성됨
+
+![](../../img/230523-1.png)
+
+그 다음에는 바에 달린 불빛을 추가해본다. 본 기능과 다르므로 Stuff 객체에 상속받지 않는 SideLight 객체를 생성하도록 한다.
+
+`src/SideLight.js`
+
+```jsx
+import { Mesh } from "three";
+import { cm1, geo, mat } from "./common";
+
+export class SideLight {
+  constructor(info) {
+    const container = info.container || cm1.scene;
+
+    this.name = info.name || "";
+    this.x = info.x || 0;
+    this.y = info.y || 0;
+    this.z = info.z || 0;
+
+    this.geometry = geo.sideLight;
+    this.material = mat.sideLight;
+
+    this.mesh = new Mesh(this.geometry, this.material);
+    this.mesh.position.set(this.x, this.y, this.z);
+
+    // cm1.scene.add(this.mesh); // scene에 추가하지 않음
+    container.add(this.mesh); // container에 종속적 객체로 처리
+  }
+}
+```
+
+`src/common.js`
+
+```jsx
+// ..
+
+export const geo = {
+  // ..
+  sideLight: new SphereGeometry(0.1, 6, 6)
+};
+
+export const mat = {
+  // ..
+  sideLight: new MeshPhongMaterial({ color: cm2.lightColor })
+};
+```
+
+`src/main.js`
+
+```jsx
+// ..
+import { Bar } from "./Bar";
+
+// Renderer, scene, Camera, Light, Controls
+
+// 기둥, 바닥..
+// 바
+const bar1 = new Bar({ name: "bar", x: -1.6, y: 10.3, z: 0 });
+const bar2 = new Bar({ name: "bar", x: -0.4, y: 10.3, z: 0 });
+const bar3 = new Bar({ name: "bar", x: 0.4, y: 10.3, z: 0 });
+const bar4 = new Bar({ name: "bar", x: 1.6, y: 10.3, z: 0 });
+
+// 사이드 라이트 - 추가
+for (let i = 0; i < 49; i++) {
+  new SideLight({ name: "sideLight", container: bar1.mesh, z: i * 0.5 - glassUnitSize * 10 });
+}
+for (let i = 0; i < 49; i++) {
+  new SideLight({ name: "sideLight", container: bar4.mesh, z: i * 0.5 - glassUnitSize * 10 });
+}
+```
+
+위와 같이 처리해주면 1번째, 4번째 바에 불빛이 잘 들어오는 것 확인 가능
+
+![](../../img/230523-2.png)
