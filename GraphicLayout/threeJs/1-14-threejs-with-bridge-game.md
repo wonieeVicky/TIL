@@ -419,3 +419,185 @@ for (let i = 0; i < 49; i++) {
 위와 같이 처리해주면 1번째, 4번째 바에 불빛이 잘 들어오는 것 확인 가능
 
 ![](../../img/230523-2.png)
+
+### 일반 유리, 강화 유리 설치
+
+이제 유리판을 만들어본다. 유리판은 다른 애들보다 기능이 복잡하다. 강화유리, 일반유리에 따라 물리엔진이나 소리 등의 추가 애니메이션이 들어가기 때문.. Stuff를 상속한 기본 개념은 같다.
+
+`src/Glass.js`
+
+```jsx
+import { Mesh } from "three";
+import { Stuff } from "./Stuff";
+import { cm1, geo, mat } from "./common";
+
+export class Glass extends Stuff {
+  constructor(info) {
+    super(info);
+
+    this.type = info.type;
+
+    this.geometry = geo.glass;
+    this.material = mat.glass;
+
+    this.mesh = new Mesh(this.geometry, this.material);
+    this.mesh.position.set(this.x, this.y, this.z);
+    this.mesh.castShadow = true;
+    this.mesh.receiveShadow = true;
+
+    cm1.scene.add(this.mesh);
+  }
+}
+```
+
+`src/common.js`
+
+```jsx
+// ..
+
+export const cm2 = {
+  // ..
+  glassColor: "#9fdfff"
+};
+
+export const geo = {
+  // ..
+  glass: new BoxGeometry(1.2, 0.1, 1.2)
+};
+
+export const mat = {
+  // ..
+  glass: new MeshPhongMaterial({ color: cm2.glassColor, transparent: true, opacity: 0.1 }),
+};
+```
+
+위와 같이 Glass 클래스 객체를 만들어 준 뒤 아래와 같이 사용
+
+`src/main.js`
+
+```jsx
+// ..
+import { Glass } from "./Glass";
+
+// Renderer, scene, Camera, Light, Controls
+
+// 기둥, 바닥, 바, 사이드 라이트..
+
+const numberOfGlass = 10; // 추가
+
+// 유리판
+for (let i = 0; i < numberOfGlass; i++) {
+  const glass1 = new Glass({
+    name: "glass",
+    x: -1,
+    y: 10.3,
+    z: i * glassUnitSize * 2 - glassUnitSize * 9
+  });
+  const glass2 = new Glass({
+    name: "glass",
+    x: 1,
+    y: 10.3,
+    z: i * glassUnitSize * 2 - glassUnitSize * 9
+  });
+}
+
+```
+
+위와 같이 넣으면 유리판 설치가 완료된다.
+
+![](../../img/230524-1.png)
+
+다음으로는 랜덤하게 일반 유리, 강화 유리로 나눠야 함. 이건 0~1 숫자를 반환하는 `Math.random`에 반올림(round)하여 처리하면 된다.
+
+```jsx
+// ..
+import { Glass } from "./Glass";
+
+// Renderer, scene, Camera, Light, Controls
+
+// 기둥, 바닥, 바, 사이드 라이트..
+
+const numberOfGlass = 10; // cnrk
+
+// 유리판 - 아래와 같이 수정한다.
+let glassTypeNumber = 0;
+let glassTypes = [];
+for (let i = 0; i < numberOfGlass; i++) {
+  glassTypeNumber = Math.round(Math.random());
+  switch (glassTypeNumber) {
+    case 0:
+      glassTypes = ["normal", "strong"];
+      break;
+    case 1:
+      glassTypes = ["strong", "normal"];
+      break;
+  }
+
+  const glass1 = new Glass({
+    name: `glass-${glassTypes[0]}`,
+    x: -1,
+    y: 10.3,
+    z: i * glassUnitSize * 2 - glassUnitSize * 9,
+    type: glassTypes[0]
+  });
+  const glass2 = new Glass({
+    name: `glass-${glassTypes[1]}`,
+    x: 1,
+    y: 10.3,
+    z: i * glassUnitSize * 2 - glassUnitSize * 9,
+    type: glassTypes[1]
+  });
+}
+
+```
+
+다음 랜덤하게 들어온 값에 대한 표현 처리를 다르게 하기 위해 common.js에 아래 코드 추가
+
+```jsx
+// ..
+
+export const mat = {
+	// ..
+  glass1: new MeshPhongMaterial({ color: cm2.glassColor, transparent: true, opacity: 0.1 }),
+  glass2: new MeshPhongMaterial({ color: cm2.glassColor, transparent: true, opacity: 0.5 })
+};
+```
+
+위 glass1, glass2에 대한 material을 Glass 객체에 적용
+
+```jsx
+// ..
+
+export class Glass extends Stuff {
+  constructor(info) {
+    super(info);
+
+    this.type = info.type; // 타입 추가
+    this.geometry = geo.glass;
+
+		// type에 따른 추가
+    switch (this.type) {
+      case "normal":
+        this.material = mat.glass1;
+        break;
+      case "strong":
+        this.material = mat.glass2;
+        break;
+    }
+    // this.material = mat.glass;
+
+    this.mesh = new Mesh(this.geometry, this.material);
+    this.mesh.position.set(this.x, this.y, this.z);
+    this.mesh.castShadow = true;
+    this.mesh.receiveShadow = true;
+
+    cm1.scene.add(this.mesh);
+  }
+}
+```
+
+위와 같이 glass1은 normal 유리, glass2는 strong 유리로 노출되도록 코드를 추가되면 랜덤한 다리가 섞인 ui가 잘 그려진다.
+
+![](../../img/230524-2.png)
+
+그럴싸해졌다.
