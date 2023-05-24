@@ -5,6 +5,7 @@ import { Pillar } from "./Pillar";
 import { Floor } from "./Floor";
 import { Bar } from "./Bar";
 import { SideLight } from "./SideLight";
+import { Glass } from "./Glass";
 
 // ----- 주제: The Bridge 게임 만들기
 
@@ -52,6 +53,7 @@ controls.enableDamping = true;
 
 // 물체 만들기
 const glassUnitSize = 1.2; // 유리칸의 사이즈
+const numberOfGlass = 10;
 
 // 기둥
 const pillar1 = new Pillar({
@@ -82,6 +84,36 @@ for (let i = 0; i < 49; i++) {
 }
 for (let i = 0; i < 49; i++) {
   new SideLight({ name: "sideLight", container: bar4.mesh, z: i * 0.5 - glassUnitSize * 10 });
+}
+
+// 유리판
+let glassTypeNumber = 0;
+let glassTypes = [];
+for (let i = 0; i < numberOfGlass; i++) {
+  glassTypeNumber = Math.round(Math.random());
+  switch (glassTypeNumber) {
+    case 0:
+      glassTypes = ["normal", "strong"];
+      break;
+    case 1:
+      glassTypes = ["strong", "normal"];
+      break;
+  }
+
+  const glass1 = new Glass({
+    name: `glass-${glassTypes[0]}`,
+    x: -1,
+    y: 10.3,
+    z: i * glassUnitSize * 2 - glassUnitSize * 9,
+    type: glassTypes[0]
+  });
+  const glass2 = new Glass({
+    name: `glass-${glassTypes[1]}`,
+    x: 1,
+    y: 10.3,
+    z: i * glassUnitSize * 2 - glassUnitSize * 9,
+    type: glassTypes[1]
+  });
 }
 
 // 그리기
