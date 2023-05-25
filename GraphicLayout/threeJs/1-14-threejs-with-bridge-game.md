@@ -467,7 +467,7 @@ export const geo = {
 
 export const mat = {
   // ..
-  glass: new MeshPhongMaterial({ color: cm2.glassColor, transparent: true, opacity: 0.1 }),
+  glass: new MeshPhongMaterial({ color: cm2.glassColor, transparent: true, opacity: 0.1 })
 };
 ```
 
@@ -500,7 +500,6 @@ for (let i = 0; i < numberOfGlass; i++) {
     z: i * glassUnitSize * 2 - glassUnitSize * 9
   });
 }
-
 ```
 
 위와 같이 넣으면 유리판 설치가 완료된다.
@@ -548,7 +547,6 @@ for (let i = 0; i < numberOfGlass; i++) {
     type: glassTypes[1]
   });
 }
-
 ```
 
 다음 랜덤하게 들어온 값에 대한 표현 처리를 다르게 하기 위해 common.js에 아래 코드 추가
@@ -557,7 +555,7 @@ for (let i = 0; i < numberOfGlass; i++) {
 // ..
 
 export const mat = {
-	// ..
+  // ..
   glass1: new MeshPhongMaterial({ color: cm2.glassColor, transparent: true, opacity: 0.1 }),
   glass2: new MeshPhongMaterial({ color: cm2.glassColor, transparent: true, opacity: 0.5 })
 };
@@ -575,7 +573,7 @@ export class Glass extends Stuff {
     this.type = info.type; // 타입 추가
     this.geometry = geo.glass;
 
-		// type에 따른 추가
+    // type에 따른 추가
     switch (this.type) {
       case "normal":
         this.material = mat.glass1;
@@ -601,3 +599,199 @@ export class Glass extends Stuff {
 ![](../../img/230524-2.png)
 
 그럴싸해졌다.
+
+### 플레이어 만들기
+
+플레이어를 만들어보자. 일분이를 넣는 것임..! 이 경우 블렌더의 glb 파일을 불러와야 함
+glb 파일을 로드하기 위해서는 gltfLoader를 사용해야 함. 이것도 common.js에서 가져와 사용하는 걸로 만듦
+
+`src/commons.js`
+
+```jsx
+//..
+import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
+
+export const cm1 = {
+  // ..
+  gltfLoader: new GLTFLoader()
+};
+
+// ..
+```
+
+위 내용을 Player 클래스에서 가져와 사용
+
+`src/Player.js`
+
+```jsx
+import { Mesh } from "three";
+import { Stuff } from "./Stuff";
+import { cm1 } from "./common";
+
+export class Player extends Stuff {
+  constructor(info) {
+    super(info);
+
+    cm1.gltfLoader.load("/models/ilbuni.glb", (glb) => {
+      console.log(glb);
+    });
+  }
+}
+```
+
+그러면 콘솔에 glb가 잘 담기는 것을 확인할 수 있음. animations에 3가지 액션도 잘담겨이따
+
+![](../../img/230525-1.png)
+
+얠 다리에 얹어보자.
+
+`src/Player.js`
+
+```jsx
+import { Mesh } from "three";
+import { Stuff } from "./Stuff";
+import { cm1 } from "./common";
+
+export class Player extends Stuff {
+  constructor(info) {
+    super(info);
+
+    cm1.gltfLoader.load("/models/ilbuni.glb", (glb) => {
+      this.modelMesh = glb.scene.children[0];
+      this.modelMesh.position.set(this.x, this.y, this.z);
+      cm1.scene.add(this.modelMesh);
+    });
+  }
+}
+```
+
+`src/main.js`
+
+```jsx
+// ..
+import { Player } from "./Player";
+
+// Renderer, scene, Camera, Light, Controls
+// 기둥, 바닥, 바, 사이드 라이트, 유리판
+
+// 플레이어
+new Player({ name: "player", x: 0, y: 10.8, z: 13 });
+```
+
+요로코롬 팔벌려서 서있는다. 아마 첫번째 애니메이션이 적용된 채로 멈춰있는 듯.. 이를 수정해보자
+
+![](../../img/230525-2.png)
+
+`src/commons.js`
+
+```jsx
+export const cm1 = {
+  // ..
+  gltfLoader: new GLTFLoader(),
+  mixer: undefined
+};
+
+// ..
+```
+
+`src/Player.js`
+
+```jsx
+import { Mesh } from "three";
+import { Stuff } from "./Stuff";
+import { cm1 } from "./common";
+
+export class Player extends Stuff {
+  constructor(info) {
+    super(info);
+
+    cm1.gltfLoader.load("/models/ilbuni.glb", (glb) => {
+      this.modelMesh = glb.scene.children[0];
+      this.modelMesh.position.set(this.x, this.y, this.z);
+      this.modelMesh.rotation.set(this.rotationX, this.rotationY, this.rotationZ); // 방향 돌려준다.
+      cm1.scene.add(this.modelMesh);
+
+      this.modelMesh.animations = glb.animations; // 임의로 설정
+      cm1.mixer = new AnimationMixer(this.modelMesh); // 재활용 하기 위해 cm1.mixer에 저장
+      this.actions = [];
+      this.actions.push(cm1.mixer.clipAction(this.modelMesh.animations[0])); // default
+      this.actions.push(cm1.mixer.clipAction(this.modelMesh.animations[1])); // fall
+      this.actions.push(cm1.mixer.clipAction(this.modelMesh.animations[2])); // jump
+
+      this.actions[0].play(); // default action 실행 - draw 함수에도 적용 필요
+    });
+  }
+}
+```
+
+`src/main.js`
+
+```jsx
+ㅇ; // Renderer, scene, Camera, Light, Controls
+// 기둥, 바닥, 바, 사이드 라이트, 유리판
+
+// 플레이어 - rotationY로 glb 파일 뒤돌기
+new Player({ name: "player", x: 0, y: 10.9, z: 13, rotationY: Math.PI });
+
+// 그리기
+const clock = new THREE.Clock();
+function draw() {
+  const delta = clock.getDelta();
+
+  cm1.mixer?.update(delta); // cm1.mixer가 있으면 update를 실행
+  // ..
+}
+
+// ..
+draw();
+```
+
+위와 같이 처리하면 오뚝이처럼 준비자세로 변신한 + 돌아선 플레이어 발견
+
+![](../../img/230525-1.gif)
+
+그림자 효과도 추가해준다.
+
+`src/Player.js`
+
+```jsx
+import { Mesh } from "three";
+import { Stuff } from "./Stuff";
+import { cm1 } from "./common";
+
+export class Player extends Stuff {
+  constructor(info) {
+    super(info);
+
+    // 그림자 효과를 위한 추가
+    this.mesh = new Mesh(new BoxGeometry(0.5, 0.5, 0.5), new MeshBasicMaterial({ transparent: true, opacity: 0 }));
+    this.mesh.castShadow = true;
+    this.mesh.position.set(this.x, this.y, this.z);
+    cm1.scene.add(this.mesh);
+
+    cm1.gltfLoader.load("/models/ilbuni.glb", (glb) => {
+      // ..
+      this.actions[2].repetitions = 1; // jump 애니메이션은 한번만 수행하도록 추가
+    });
+  }
+}
+```
+
+`src/main.js`
+
+```jsx
+// Renderer, scene, Camera,
+
+// Light ..
+const spotLightDistance = 50;
+const spotLight1 = new THREE.SpotLight(cm2.lightColor, 1);
+spotLight1.castShadow = true;
+spotLight1.shadow.mapSize.width = 2048; // mapSize 크게해서 그림자 효과 주기
+spotLight1.shadow.mapSize.height = 2048; // mapSize 크게해서 그림자 효과 주기
+
+// Controls, 기둥, 바닥, 바, 사이드 라이트, 유리판, 플레이어...
+```
+
+위와 같이 처리하면 그림자도 잘 적용된 것으로 보인다.
+
+![](../../img/230525-3.png)
