@@ -11,8 +11,9 @@ import { Player } from "./Player";
 // ----- 주제: The Bridge 게임 만들기
 
 // Renderer
+const canvas = document.querySelector("#three-canvas");
 const renderer = new THREE.WebGLRenderer({
-  canvas: cm1.canvas,
+  canvas,
   antialias: true
 });
 renderer.setSize(window.innerWidth, window.innerHeight);
@@ -122,6 +123,28 @@ for (let i = 0; i < numberOfGlass; i++) {
 // 플레이어
 const player = new Player({ name: "player", x: 0, y: 10.9, z: 13, rotationY: Math.PI });
 
+// Raycaster
+const raycaster = new THREE.Raycaster();
+const mouse = new THREE.Vector2(); // 마우스 좌표를 저장할 벡터
+
+function checkIntersects() {
+  raycaster.setFromCamera(mouse, camera);
+
+  const intersects = raycaster.intersectObjects(cm1.scene.children, true);
+  for (const item of intersects) {
+    checkClickedObject(item.object.name);
+    break; // 처음 맞는 mesh만 처리
+  }
+}
+
+function checkClickedObject(objectName) {
+  if (objectName.indexOf("glass") >= 0) {
+    // 유리판을 클릭했을 때
+    const glass = cm1.scene.getObjectByName(objectName);
+    glass.break();
+  }
+}
+
 // 그리기
 const clock = new THREE.Clock();
 
@@ -145,5 +168,10 @@ function setSize() {
 
 // 이벤트
 window.addEventListener("resize", setSize);
+canvas.addEventListener("click", (e) => {
+  mouse.x = (e.clientX / canvas.innerWidth) * 2 - 1;
+  mouse.y = -((e.clientY / canvas.innerHeight) * 2 - 1);
+  checkIntersects();
+});
 
 draw();
