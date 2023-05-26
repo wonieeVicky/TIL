@@ -588,6 +588,7 @@ export class Glass extends Stuff {
     this.mesh.position.set(this.x, this.y, this.z);
     this.mesh.castShadow = true;
     this.mesh.receiveShadow = true;
+    this.mesh.name = this.name;
 
     cm1.scene.add(this.mesh);
   }
@@ -795,3 +796,68 @@ spotLight1.shadow.mapSize.height = 2048; // mapSize 크게해서 그림자 효�
 위와 같이 처리하면 그림자도 잘 적용된 것으로 보인다.
 
 ![](../../img/230525-3.png)
+
+### 클릭 처리(Raycaster)
+
+이번에는 Raycaster를 이용해 클릭 처리를 해본다.
+
+`src/commons.js`
+
+```jsx
+export const cm1 = {
+  // canvas: document.querySelector("#three-canvas"), // 제거
+  scene: new Scene(),
+  gltfLoader: new GLTFLoader(),
+  mixer: undefined
+};
+
+// ..
+```
+
+`src/main.js`
+
+```jsx
+// Renderer
+const canvas = document.querySelector("#three-canvas"); // canvas 정의 이동
+const renderer = new THREE.WebGLRenderer({
+  canvas,
+  antialias: true
+});
+
+// ..
+// scene, Camera, Light ..
+// Controls, 기둥, 바닥, 바, 사이드 라이트, 유리판, 플레이어...
+
+// Raycaster
+const raycaster = new THREE.Raycaster();
+const mouse = new THREE.Vector2(); // 마우스 좌표를 저장할 벡터
+
+function checkIntersects() {
+  raycaster.setFromCamera(mouse, camera);
+
+  const intersects = raycaster.intersectObjects(cm1.scene.children, true);
+  for (const item of intersects) {
+    checkClickedObject(item.object.name);
+    break; // 처음 맞는 mesh만 처리
+  }
+}
+
+function checkClickedObject(objectName) {
+  if (objectName.indexOf("glass") >= 0) {
+    // 유리판을 클릭했을 때
+  }
+}
+
+// 그리기..
+
+// 이벤트 ..
+canvas.addEventListener("click", (e) => {
+  mouse.x = (e.clientX / canvas.innerWidth) * 2 - 1;
+  mouse.y = -((e.clientY / canvas.innerHeight) * 2 - 1);
+  checkIntersects();
+});
+```
+
+- 기존 common에서 관리하던 canvas 엘리먼트를 그냥 main.js에서 정의해서 사용하도록 기능 변경
+- Raycaster 기본 정의 추가
+- canvas 클릭 이벤트에 실행되는 checkIntersects 함수 구현
