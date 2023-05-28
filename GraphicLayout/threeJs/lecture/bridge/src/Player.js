@@ -6,7 +6,12 @@ export class Player extends Stuff {
   constructor(info) {
     super(info);
 
-    this.mesh = new Mesh(new BoxGeometry(0.5, 0.5, 0.5), new MeshBasicMaterial({ transparent: true, opacity: 0 }));
+    // geometry의 내부 속성을 사용해서 사이즈를 설정
+    this.width = 0.5;
+    this.height = 0.5;
+    this.depth = 0.5;
+
+    this.mesh = new Mesh(new BoxGeometry(this.width, this.height, this.depth), new MeshBasicMaterial({ transparent: true, opacity: 0 }));
     this.mesh.castShadow = true;
     this.mesh.position.set(this.x, this.y, this.z);
     cm1.scene.add(this.mesh);

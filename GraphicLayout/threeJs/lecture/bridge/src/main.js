@@ -127,19 +127,28 @@ for (let i = 0; i < numberOfGlass; i++) {
     x: -1,
     y: 10.3,
     z: i * glassUnitSize * 2 - glassUnitSize * 9,
-    type: glassTypes[0]
+    type: glassTypes[0],
+    cannonMaterial: cm1.glassMaterial
   });
   const glass2 = new Glass({
     name: `glass-${glassTypes[1]}`,
     x: 1,
     y: 10.3,
     z: i * glassUnitSize * 2 - glassUnitSize * 9,
-    type: glassTypes[1]
+    type: glassTypes[1],
+    cannonMaterial: cm1.glassMaterial
   });
 }
 
 // 플레이어
-const player = new Player({ name: "player", x: 0, y: 10.9, z: 13, rotationY: Math.PI });
+const player = new Player({
+  name: "player",
+  x: 0,
+  y: 10.9,
+  z: 13,
+  rotationY: Math.PI,
+  cannonMaterial: cm1.playerMaterial
+});
 
 // Raycaster
 const raycaster = new THREE.Raycaster();
