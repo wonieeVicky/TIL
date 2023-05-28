@@ -1,4 +1,5 @@
 import * as THREE from "three";
+import * as CANNON from "cannon-es";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import { cm1, cm2 } from "./common";
 import { Pillar } from "./Pillar";
@@ -9,7 +10,6 @@ import { Glass } from "./Glass";
 import { Player } from "./Player";
 
 // ----- 주제: The Bridge 게임 만들기
-
 // Renderer
 const canvas = document.querySelector("#three-canvas");
 const renderer = new THREE.WebGLRenderer({
@@ -54,6 +54,24 @@ cm1.scene.add(spotLight1, spotLight2, spotLight3, spotLight4);
 // Controls
 const controls = new OrbitControls(camera, renderer.domElement);
 controls.enableDamping = true;
+
+// 물리 엔진 CANNON
+cm1.world.gravity.set(0, -10, 0); // 중력 설정
+const defaultContackMaterial = new CANNON.ContactMaterial(cm1.defaultMaterial, cm1.defaultMaterial, {
+  friction: 0.3, // 마찰
+  restitution: 0.3 // 반발
+});
+const glassDefaultContackMaterial = new CANNON.ContactMaterial(cm1.glassMaterial, cm1.defaultMaterial, {
+  friction: 1, // 마찰
+  restitution: 0 // 반발 - 튕기지 않도록
+});
+const playerGlassContackMaterial = new CANNON.ContactMaterial(cm1.playerMaterial, cm1.glassMaterial, {
+  friction: 1, // 마찰
+  restitution: 0 // 반발 - 튕기지 않도록
+});
+cm1.world.defaultContactMaterial = defaultContackMaterial;
+cm1.world.addContactMaterial(glassDefaultContackMaterial);
+cm1.world.addContactMaterial(playerGlassContackMaterial);
 
 // 물체 만들기
 const glassUnitSize = 1.2; // 유리칸의 사이즈
