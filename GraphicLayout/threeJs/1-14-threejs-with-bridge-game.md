@@ -861,3 +861,57 @@ canvas.addEventListener("click", (e) => {
 - 기존 common에서 관리하던 canvas 엘리먼트를 그냥 main.js에서 정의해서 사용하도록 기능 변경
 - Raycaster 기본 정의 추가
 - canvas 클릭 이벤트에 실행되는 checkIntersects 함수 구현
+
+### 물리 엔진 기본 설정
+
+이제 유리판을 클릭했을 때 이벤트에 대한 물리엔진을 설정해본다. cannon 설치 먼저..
+
+```jsx
+> npm i cannon-es
+```
+
+기본 world와 metarial 설정은 common.js에서 해준다.
+
+`src/commons.js`
+
+```jsx
+import { Material, World } from "cannon-es";
+
+export const cm1 = {
+  //..
+  world: new World(), // CANNON
+  defaultMaterial: new Material("default"),
+  glassMaterial: new Material("glass"),
+  playerMaterial: new Material("player")
+};
+
+// ..
+```
+
+다음 실제 CANNON 구현을 해본다.
+
+`src/main.js`
+
+```jsx
+// Renderer, scene, Camera, Light, Controls ...
+
+// 물리 엔진 CANNON
+cm1.world.gravity.set(0, -10, 0); // 중력 설정
+const defaultContackMaterial = new CANNON.ContactMaterial(cm1.defaultMaterial, cm1.defaultMaterial, {
+  friction: 0.3, // 마찰
+  restitution: 0.3 // 반발
+});
+const glassDefaultContackMaterial = new CANNON.ContactMaterial(cm1.glassMaterial, cm1.defaultMaterial, {
+  friction: 1, // 마찰
+  restitution: 0 // 반발 - 튕기지 않도록
+});
+const playerGlassContackMaterial = new CANNON.ContactMaterial(cm1.playerMaterial, cm1.glassMaterial, {
+  friction: 1, // 마찰
+  restitution: 0 // 반발 - 튕기지 않도록
+});
+cm1.world.defaultContactMaterial = defaultContackMaterial;
+cm1.world.addContactMaterial(glassDefaultContackMaterial);
+cm1.world.addContactMaterial(playerGlassContackMaterial);
+```
+
+위와 같이 기본 world의 중력 설정 + defaultMaterial 충돌에 대한 설정, glass-Player간, glass-default 간 충돌 설정을 위와 같이 해주면 기본 설정은 완료!
