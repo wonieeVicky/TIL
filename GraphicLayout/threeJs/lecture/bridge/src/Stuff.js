@@ -14,9 +14,11 @@ export class Stuff {
     this.rotationY = info.rotationY || 0;
     this.rotationX = info.rotationX || 0;
     this.rotationZ = info.rotationZ || 0;
+
+    this.cannonMaterial = info.cannonMaterial || cm1.defaultMaterial;
   }
   setCannonBody() {
-    const material = info.cannonMaterial || cm1.defaultMaterial;
+    const material = this.cannonMaterial;
     const shape = new Box(new Vec3(this.width / 2, this.height / 2, this.depth / 2));
   }
 }
