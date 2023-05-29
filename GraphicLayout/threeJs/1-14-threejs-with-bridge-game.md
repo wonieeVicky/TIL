@@ -915,3 +915,221 @@ cm1.world.addContactMaterial(playerGlassContackMaterial);
 ```
 
 위와 같이 기본 world의 중력 설정 + defaultMaterial 충돌에 대한 설정, glass-Player간, glass-default 간 충돌 설정을 위와 같이 해주면 기본 설정은 완료!
+
+### 각 객체들에 물리 엔진 적용하기
+
+이제 각 object에 물리엔진의 적용을 받아야하므로, cannon에서 body를 만들어준다.
+각 Object 들은 Stuff의 영향을 받으므로 Stuff 클래스에서 CannonBody 설정을 해준다!
+
+`src/Stuff.js`
+
+```jsx
+export class Stuff {
+  constructor(info = {}) {
+    // ..
+    this.cannonMaterial = info.cannonMaterial || cm1.defaultMaterial;
+  }
+  setCannonBody() {
+    const material = this.cannonMaterial;
+  }
+}
+```
+
+위와 같이 값이 없으면 기본 defaultMaterial을, 값이 있을 경우 해당 material을 전달받도록 하는 material 코드를 넣어준다. 그 이후 물체 생성 시 설정에 전달인자를 아래와 같이 추가함
+
+`src/main.js`
+
+```jsx
+// Renderer, scene, Camera, Light, Controls, CANNON..
+
+// 물체 만들기
+// 기둥, 바닥, 바, 사이드 라이트 ..
+// 유리판
+let glassTypeNumber = 0;
+let glassTypes = [];
+for (let i = 0; i < numberOfGlass; i++) {
+  // ..
+
+  const glass1 = new Glass({
+    // ..
+    cannonMaterial: cm1.glassMaterial // 추가
+  });
+  const glass2 = new Glass({
+    // ..
+    cannonMaterial: cm1.glassMaterial // 추가
+  });
+}
+
+// 플레이어
+const player = new Player({
+  // ..
+  cannonMaterial: cm1.playerMaterial // 추가
+});
+```
+
+그러면 잘 적용될 것이다. 다음으로 shape 설정도 추가한다. shape는 중심축에서부터 사이즈를 측정하므로 가로값이 1이라면 shape 설정 시에는 0.5로 해줘야 함. 이 사이즈는 각 material마다 다 다르기 때문에 각 클래스 객체에서 설정해주기로 한다.
+
+`src/Bar.js, Floor.js, Glass.js, Pillar.js`
+
+```jsx
+// Bar, Floor, Glass, Pillar 모두 동일
+export class Bar extends Stuff {
+  constructor(info) {
+    super(info);
+
+    this.geometry = geo.bar;
+    this.material = mat.bar;
+
+    // 추가 - geometry의 내부 속성을 사용해서 사이즈를 설정
+    this.width = this.geometry.parameters.width;
+    this.height = this.geometry.parameters.height;
+    this.depth = this.geometry.parameters.depth;
+  }
+}
+```
+
+`src/Player.js`
+
+```jsx
+export class Player extends Stuff {
+  constructor(info) {
+    super(info);
+
+    this.width = 0.5;
+    this.height = 0.5;
+    this.depth = 0.5;
+
+    this.mesh = new Mesh(new BoxGeometry(this.width, this.height, this.depth), new MeshBasicMaterial({ transparent: true, opacity: 0 }));
+    // ..
+  }
+}
+```
+
+위와 같이 모든 클래스 객체에 사이즈 설정(width, height, depth)을 해준 뒤 아래와 같이 Stuff 클래스에 추가해준다.
+
+`src/Stuff.js`
+
+```jsx
+import { Box, Vec3 } from "cannon-es";
+
+export class Stuff {
+  // ..
+  setCannonBody() {
+    const material = this.cannonMaterial;
+    // 추가
+    const shape = new Box(new Vec3(this.width / 2, this.height / 2, this.depth / 2));
+  }
+}
+```
+
+이제 cannonBody 설정을 마저해준다.
+
+`src/Stuff.js`
+
+```jsx
+import { Box, Vec3 } from "cannon-es";
+
+export class Stuff {
+	constructor(info = {}) {
+    // ..
+
+    this.mass = info.mass || 1;
+  }
+  setCannonBody() {
+    const material = this.cannonMaterial;
+    const shape = new Box(new Vec3(this.width / 2, this.height / 2, this.depth / 2));
+		this.cannonBody = new Body({
+      mass: this.mass,
+      position: new Vec3(this.x, this.y, this.z),
+      shape,
+      material
+    });
+    cm1.world.addBody(this.ca nnonBody);
+  }
+}
+```
+
+Bar, Floor, Glass, Pillar 에도 setCannonBody 메서드를 실행해준다.
+
+`src/Bar.js, Floor.js, Glass.js, Pillar.js`
+
+```jsx
+// Bar, Floor, Glass, Pillar 모두 동일
+export class Bar extends Stuff {
+  constructor(info) {
+    super(info);
+
+    //..
+    this.setCannonBody(); // 추가
+  }
+}
+```
+
+Player도 동일
+
+`src/Player.js`
+
+```jsx
+import { AnimationMixer, BoxGeometry, Mesh, MeshBasicMaterial } from "three";
+import { Stuff } from "./Stuff";
+import { cm1 } from "./common";
+
+export class Player extends Stuff {
+  constructor(info) {
+    //..
+
+    cm1.gltfLoader.load("/models/ilbuni.glb", (glb) => {
+      // ..
+      this.actions[0].play();
+
+      this.setCannonBody();
+    });
+  }
+}
+```
+
+이제 액션이 되도록 draw 함수를 조작해본다.
+우선 cannonBody의 값과 mesh의 값을 동기화 시켜줘야하므로 objects란 배열에 영향을 받을 물체들을 추가해준 뒤 draw함수 설정을 해준다.
+
+`src/main.js`
+
+```jsx
+// Renderer, scene, Camera, Light, Controls, CANNON..
+
+// 물체 만들기
+const glassUnitSize = 1.2;
+const numberOfGlass = 10;
+const objects = []; // 추가
+
+// 기둥..
+objects.push(pillar1, pillar2);
+// 바닥, 바, 사이드 라이트,
+
+// 유리판..
+for (let i = 0; i < numberOfGlass; i++) {
+  // ..
+  objects.push(glass1, glass2);
+}
+
+// 플레이어..
+objects.push(player);
+
+// ..
+function draw() {
+  // ..
+  cm1.world.step(1 / 60, delta, 3); // 1/60초마다 물리엔진을 업데이트
+  objects.forEach((item) => {
+    if (item.cannonBody) {
+      item.mesh.position.copy(item.cannonBody.position); // mesh의 위치를 cannonBody의 위치와 동기화
+      item.mesh.quaternion.copy(item.cannonBody.quaternion); // mesh의 회전값을 cannonBody의 회전값과 동기화
+    }
+  });
+
+  // ..
+}
+```
+
+위와 같이 한뒤 기본 mass 설정을 0으로 해주면 cannonBody가 mesh와 동기화되는 것을 확인할 수 있음
+
+![](../../img/230529-1.gif)
+
