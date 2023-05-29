@@ -74,8 +74,9 @@ cm1.world.addContactMaterial(glassDefaultContackMaterial);
 cm1.world.addContactMaterial(playerGlassContackMaterial);
 
 // 물체 만들기
-const glassUnitSize = 1.2; // 유리칸의 사이즈
-const numberOfGlass = 10;
+const glassUnitSize = 1.2; // 유리칸 크기
+const numberOfGlass = 10; // 유리판 개수
+const objects = [];
 
 // 기둥
 const pillar1 = new Pillar({
@@ -90,6 +91,7 @@ const pillar2 = new Pillar({
   y: 5.5,
   z: glassUnitSize * 12 + glassUnitSize / 2 // 1.2는 다리의 유리칸 하나의 사이즈, 12는 다리의 유리칸 개수, 0.6은 다리의 유리칸 사이의 간격
 });
+objects.push(pillar1, pillar2);
 
 // 바닥
 const floor = new Floor({ name: "floor" });
@@ -138,6 +140,8 @@ for (let i = 0; i < numberOfGlass; i++) {
     type: glassTypes[1],
     cannonMaterial: cm1.glassMaterial
   });
+
+  objects.push(glass1, glass2);
 }
 
 // 플레이어
@@ -149,6 +153,7 @@ const player = new Player({
   rotationY: Math.PI,
   cannonMaterial: cm1.playerMaterial
 });
+objects.push(player);
 
 // Raycaster
 const raycaster = new THREE.Raycaster();
@@ -179,6 +184,14 @@ function draw() {
   const delta = clock.getDelta();
 
   cm1.mixer?.update(delta); // cm1.mixer가 있으면 update를 실행
+
+  cm1.world.step(1 / 60, delta, 3); // 1/60초마다 물리엔진을 업데이트
+  objects.forEach((item) => {
+    if (item.cannonBody) {
+      item.mesh.position.copy(item.cannonBody.position); // mesh의 위치를 cannonBody의 위치와 동기화
+      item.mesh.quaternion.copy(item.cannonBody.quaternion); // mesh의 회전값을 cannonBody의 회전값과 동기화
+    }
+  });
 
   controls.update();
 
