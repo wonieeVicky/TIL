@@ -29,5 +29,7 @@ export class Glass extends Stuff {
     this.mesh.receiveShadow = true;
     this.mesh.name = this.name;
     cm1.scene.add(this.mesh);
+
+    this.setCannonBody();
   }
 }

@@ -19,5 +19,7 @@ export class Bar extends Stuff {
     this.mesh.castShadow = true;
     this.mesh.receiveShadow = true;
     cm1.scene.add(this.mesh);
+
+    this.setCannonBody();
   }
 }

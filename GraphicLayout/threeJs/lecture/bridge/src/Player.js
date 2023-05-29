@@ -32,6 +32,8 @@ export class Player extends Stuff {
 
       this.actions[2].repetitions = 1; // jump 애니메이션은 한번만 수행하도록
       this.actions[0].play();
+
+      this.setCannonBody();
     });
   }
 }

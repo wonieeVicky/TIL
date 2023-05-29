@@ -20,5 +20,6 @@ export class Pillar extends Stuff {
     this.mesh.receiveShadow = true;
 
     cm1.scene.add(this.mesh);
+    this.setCannonBody();
   }
 }
