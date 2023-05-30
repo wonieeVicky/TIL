@@ -1129,7 +1129,113 @@ function draw() {
 }
 ```
 
-위와 같이 한뒤 기본 mass 설정을 0으로 해주면 cannonBody가 mesh와 동기화되는 것을 확인할 수 있음
+위와 같이 한뒤 기본 mass 설정을 1으로 해주면 cannonBody가 mesh와 동기화되는 것을 확인할 수 있음
 
 ![](../../img/230529-1.gif)
 
+그런데 위 이미지를 보면 기둥 같은 것들도 다 mass에 영향을 받음.
+그런데 Player는 떨어지지 않는다. 왜? this.mesh는 일반 boxGeometry, this.modelMesh는 cannonBody에 따라가도록 설정되어있지 않기 때문이다. 따라서 아래 설정을 추가한다.
+
+`src/main.js`
+
+```jsx
+// Renderer, scene, Camera, Light, Controls, CANNON..
+
+// ..
+function draw() {
+  // ..
+  cm1.world.step(1 / 60, delta, 3);
+  objects.forEach((item) => {
+    if (item.cannonBody) {
+      item.mesh.position.copy(item.cannonBody.position);
+      item.mesh.quaternion.copy(item.cannonBody.quaternion);
+
+      // 추가
+      if (item.modelMesh) {
+        item.modelMesh.position.copy(item.cannonBody.position); // modelMesh 위치를 cannonBody의 위치와 동기화
+        item.modelMesh.quaternion.copy(item.cannonBody.quaternion); // modelMesh 회전값을 cannonBody의 회전값과 동기화
+      }
+    }
+  });
+
+  // ..
+}
+```
+
+위와 같이 설정 후 다시 화면을 확인해보면 player도 중력의 영향을 받는 것을 확인해볼 수 있다.
+
+![](../../img/230530-1.gif)
+
+그런데, player가 다시 뒤돌아있음. 아래의 설정을 추가해줘야한다.
+
+`src/Stuff.js`
+
+```jsx
+import { Body, Box, Vec3 } from "cannon-es";
+// ..
+
+export class Stuff {
+  constructor(info = {}) {
+    // ..
+    this.rotationY = info.rotationY || 0;
+
+    //..
+  }
+  setCannonBody() {
+    // ..
+    // player 회전을 위한 Y축 회전 설정
+    this.cannonBody.quaternion.setFromAxisAngle(new Vec3(0, 1, 0), this.rotationY);
+
+    cm1.world.addBody(this.cannonBody);
+  }
+}
+```
+
+player 생성시 회전값 설정을 rotationY로 줬기 때문에 위와 같이 값을 줬다.
+
+다음으로, Glass, Player를 제외한 Bar, Floor 등은 고정되어야 하므로 기본값은 `mass: 0`으로 설정을 돌려준 뒤 Glass에 중력 설정을 별도로 해본다.
+
+`src/main.js`
+
+```jsx
+// Renderer, scene, Camera, Light, Controls, CANNON..
+
+// 플레이어
+const player = new Player({
+  name: "player",
+  x: 0,
+  y: 10.9,
+  z: 13,
+  rotationY: Math.PI,
+  cannonMaterial: cm1.playerMaterial,
+  mass: 30 // mass 설정
+});
+objects.push(player);
+
+// ..
+
+function draw() {
+  // ..
+  cm1.world.step(1 / 60, delta, 3);
+  objects.forEach((item) => {
+    if (item.cannonBody) {
+      item.mesh.position.copy(item.cannonBody.position);
+      item.mesh.quaternion.copy(item.cannonBody.quaternion);
+
+      // 추가
+      if (item.modelMesh) {
+        item.modelMesh.position.copy(item.cannonBody.position);
+        item.modelMesh.quaternion.copy(item.cannonBody.quaternion);
+
+        if (item.name === "player") {
+          item.modelMesh.position.y += 0.2; // 파뭍힌 다리를 위로 올려주는 설정 추가
+        }
+      }
+    }
+  });
+
+  // ..
+}
+```
+
+중력 30으로 player의 물리엔진을 설정함
