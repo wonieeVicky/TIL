@@ -151,7 +151,8 @@ const player = new Player({
   y: 10.9,
   z: 13,
   rotationY: Math.PI,
-  cannonMaterial: cm1.playerMaterial
+  cannonMaterial: cm1.playerMaterial,
+  mass: 30
 });
 objects.push(player);
 
@@ -190,6 +191,15 @@ function draw() {
     if (item.cannonBody) {
       item.mesh.position.copy(item.cannonBody.position); // mesh의 위치를 cannonBody의 위치와 동기화
       item.mesh.quaternion.copy(item.cannonBody.quaternion); // mesh의 회전값을 cannonBody의 회전값과 동기화
+
+      if (item.modelMesh) {
+        item.modelMesh.position.copy(item.cannonBody.position); // modelMesh 위치를 cannonBody의 위치와 동기화
+        item.modelMesh.quaternion.copy(item.cannonBody.quaternion); // modelMesh 회전값을 cannonBody의 회전값과 동기화
+
+        if (item.name === "player") {
+          item.modelMesh.position.y += 0.2;
+        }
+      }
     }
   });
 

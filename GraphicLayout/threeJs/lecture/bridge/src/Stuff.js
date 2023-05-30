@@ -17,7 +17,7 @@ export class Stuff {
     this.rotationZ = info.rotationZ || 0;
 
     this.cannonMaterial = info.cannonMaterial || cm1.defaultMaterial;
-    this.mass = info.mass || 1;
+    this.mass = info.mass || 0;
   }
   setCannonBody() {
     const material = this.cannonMaterial;
@@ -28,6 +28,7 @@ export class Stuff {
       shape,
       material
     });
+    this.cannonBody.quaternion.setFromAxisAngle(new Vec3(0, 1, 0), this.rotationY); // player 회전을 위한 Y축 회전 설정
     cm1.world.addBody(this.cannonBody);
   }
 }
