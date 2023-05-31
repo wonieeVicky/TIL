@@ -18,7 +18,8 @@ export const cm2 = {
   pillarColor: "#071d28",
   floorColor: "#111",
   barColor: "#441c1d",
-  glassColor: "#9fdfff"
+  glassColor: "#9fdfff",
+  step: 0
 };
 
 export const geo = {
