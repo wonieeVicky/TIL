@@ -219,8 +219,8 @@ function setSize() {
 // 이벤트
 window.addEventListener("resize", setSize);
 canvas.addEventListener("click", (e) => {
-  mouse.x = (e.clientX / canvas.innerWidth) * 2 - 1;
-  mouse.y = -((e.clientY / canvas.innerHeight) * 2 - 1);
+  mouse.x = (e.clientX / canvas.clientWidth) * 2 - 1;
+  mouse.y = -((e.clientY / canvas.clientHeight) * 2 - 1);
   checkIntersects();
 });
 
