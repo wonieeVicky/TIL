@@ -1239,3 +1239,116 @@ function draw() {
 ```
 
 중력 30으로 player의 물리엔진을 설정함
+
+### 스텝(단계) 설정
+
+이제 앞전에 작업하던 checkClickedObject 액션을 작업해보자. 원하는 유리판을 클릭하면 해당 유리판으로 이동해야 한다. 여기서 이동은 x, y, z 좌표가 모두 이동하는 것을 의미한다. 타겟 위치는 유리판 위만 해당함
+
+이를 스텝 즉, 단계로 설정해보면 어떨까? 이동 시, x, y 좌표는 큰 변화가 있지 아니할 것으로 보이나, z는 유리판의 스텝과 같으므로 생각할 부분이 많다. 따라서 glass의 z 좌표를 따로 저장해놓으면 이동 위치를 쉽게 체크할 수 있을 것으로 보이므로 아래와 같이 glassZ 값을 추가한다.
+
+`src/main.js`
+
+```jsx
+// Renderer, scene, Camera, Light, Controls, CANNON..
+
+// 유리판
+let glassTypeNumber = 0;
+let glassTypes = [];
+const glassZ = []; // 10.8 ~ -10.8
+for (leti = 0; i < numberOfGlass; i++) {
+  glassZ.push(-(i * glassUnitSize * 2 - glassUnitSize * 9)); // Z 위치를 저장
+}
+for (let i = 0; i < numberOfGlass; i++) {
+  glassTypeNumber = Math.round(Math.random());
+  switch (glassTypeNumber) {
+    case 0:
+      glassTypes = ["normal", "strong"];
+      break;
+    case 1:
+      glassTypes = ["strong", "normal"];
+      break;
+  }
+
+  const glass1 = new Glass({
+    step: i + 1, // 현 step 체크를 위한 값 추가
+    name: `glass-${glassTypes[0]}`,
+    x: -1,
+    y: 10.3,
+    z: glassZ[i], // glassZ 값으로 적용
+    type: glassTypes[0],
+    cannonMaterial: cm1.glassMaterial
+  });
+  const glass2 = new Glass({
+    step: i + 1,
+    name: `glass-${glassTypes[1]}`,
+    x: 1,
+    y: 10.3,
+    z: glassZ[i], // glassZ 값으로 적용
+    type: glassTypes[1],
+    cannonMaterial: cm1.glassMaterial
+  });
+
+  objects.push(glass1, glass2);
+}
+
+// ..
+```
+
+위처럼 glassZ 값을 별도로 관리하도록 수정하였는데, 10.8 ~ -10.8까지의 값이 담긴다. 또한 Glass 객체 생성 시 현 step 정보도 추가로 넣어주었다.
+
+`src/Glass.js`
+
+```jsx
+// ..
+export class Glass extends Stuff {
+  constructor(info) {
+    super(info);
+
+    this.type = info.type;
+    this.step = info.step; // 추가
+
+    // ..
+    this.mesh.name = this.name;
+    this.mesh.step = this.step; // 추가
+    cm1.scene.add(this.mesh);
+
+    this.setCannonBody();
+  }
+}
+```
+
+다음으로 checkClicedObject에서 사용할 step 변수를 cm2 에 추가한다.
+
+`src/common.js`
+
+```jsx
+export const cm2 = {
+  //..
+  step: 0 // 추가
+};
+```
+
+`src/main.js`
+
+```jsx
+// Renderer, scene, Camera, Light, Controls, CANNON..
+
+function checkIntersects() {
+  raycaster.setFromCamera(mouse, camera);
+
+  const intersects = raycaster.intersectObjects(cm1.scene.children, true);
+  for (const item of intersects) {
+    checkClickedObject(item.object);
+    break; // 처음 맞는 mesh만 처리
+  }
+}
+
+function checkClickedObject(mesh) {
+  if (mesh.name.indexOf("glass") >= 0) {
+    // 유리판을 클릭했을 때
+    if (mesh.step - 1 === cm2.step) cm2.step++;
+  }
+}
+
+// ..
+```
