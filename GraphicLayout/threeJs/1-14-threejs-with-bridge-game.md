@@ -1352,3 +1352,86 @@ function checkClickedObject(mesh) {
 
 // ..
 ```
+
+### 점프 동작 구현
+
+이제 step을 가져왔으니 step에 맞는 위치로 이동을 시켜본다! gsap 설치한다.
+
+```
+> npm i gsap
+```
+
+`src/main.js`
+
+```jsx
+import gsap from "gsap";
+
+// Renderer, scene, Camera, Light, Controls, CANNON..
+// ..
+
+function checkClickedObject(mesh) {
+  if (mesh.name.indexOf("glass") >= 0) {
+    // 유리판을 클릭했을 때
+    if (mesh.step - 1 === cm2.step) {
+      cm2.step++;
+      gsap.to(player.cannonBody.position, { duration: 1, z: glassZ[cm2.step - 1], x: mesh.position.x });
+      gsap.to(player.cannonBody.position, { duration: 0.4, y: 12 });
+    }
+  }
+}
+
+// ..
+```
+
+위와 같이 gsap 애니메이션을 2개 만들어주었다. y축 즉, 위로 점프하는 애니메이션은 duration이 짧게 진행되어야 하기 때문임. z축 이동은 glassZ를 사용해 구현.
+
+위와 같이 하면 실제 스텝으로 이동까지는 완성된다. 떨어지는 애니메이션은 어떻게 하면 좋을까?
+Glass 컴포넌트에서 유리판의 mass 값을 수정해주면 된다.
+
+`src/Glass.js`
+
+```jsx
+import { Mesh } from "three";
+import { Stuff } from "./Stuff";
+import { cm1, geo, mat } from "./common";
+
+export class Glass extends Stuff {
+  constructor(info) {
+    super(info);
+
+    this.type = info.type;
+    this.step = info.step;
+
+    this.geometry = geo.glass;
+    switch (this.type) {
+      case "normal":
+        this.material = mat.glass1;
+        this.mass = 1; // normal이면 깨지도록
+        break;
+      case "strong":
+        this.material = mat.glass2;
+        this.mass = 1000; // strong이면 안깨지도록
+        break;
+    }
+
+    this.width = this.geometry.parameters.width;
+    this.height = this.geometry.parameters.height;
+    this.depth = this.geometry.parameters.depth;
+
+    this.mesh = new Mesh(this.geometry, this.material);
+    this.mesh.position.set(this.x, this.y, this.z);
+    this.mesh.castShadow = true;
+    this.mesh.receiveShadow = true;
+    this.mesh.name = this.name;
+    this.mesh.step = this.step;
+    this.mesh.type = this.type; // 어떤 타입의 glass를 클릭했는지 알기 위해 mesh.type값 추가
+    cm1.scene.add(this.mesh);
+
+    this.setCannonBody();
+  }
+}
+```
+
+위와 같이 switch 문에 type별로 유리판 중량을 달리하면 아래로 떨어지는 애니메이션이 완성된다.
+
+![](../../img/230601-1.gif)
