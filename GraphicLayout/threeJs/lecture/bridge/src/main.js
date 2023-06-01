@@ -1,6 +1,7 @@
 import * as THREE from "three";
 import * as CANNON from "cannon-es";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
+import gsap from "gsap";
 import { cm1, cm2 } from "./common";
 import { Pillar } from "./Pillar";
 import { Floor } from "./Floor";
@@ -179,8 +180,19 @@ function checkIntersects() {
 function checkClickedObject(mesh) {
   if (mesh.name.indexOf("glass") >= 0) {
     // 유리판을 클릭했을 때
-    if (mesh.step - 1 === cm2.step) cm2.step++;
-    console.log(cm2.step);
+    if (mesh.step - 1 === cm2.step) {
+      cm2.step++;
+      // switch (mesh.type) {
+      //   case "normal":
+      //     console.log("normal");
+      //     break;
+      //   case "strong":
+      //     console.log("strong");
+      //     break;
+      // }
+      gsap.to(player.cannonBody.position, { duration: 1, z: glassZ[cm2.step - 1], x: mesh.position.x });
+      gsap.to(player.cannonBody.position, { duration: 0.4, y: 12 });
+    }
   }
 }
 
