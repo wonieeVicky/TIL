@@ -66,11 +66,12 @@ const glassDefaultContackMaterial = new CANNON.ContactMaterial(cm1.glassMaterial
   friction: 1, // 마찰
   restitution: 0 // 반발 - 튕기지 않도록
 });
+// player와 glass 간
 const playerGlassContackMaterial = new CANNON.ContactMaterial(cm1.playerMaterial, cm1.glassMaterial, {
   friction: 1, // 마찰
   restitution: 0 // 반발 - 튕기지 않도록
 });
-cm1.world.defaultContactMaterial = defaultContackMaterial;
+cm1.world.defaultContactMaterial = defaultContackMaterial; // player - default(바닥) 간
 cm1.world.addContactMaterial(glassDefaultContackMaterial);
 cm1.world.addContactMaterial(playerGlassContackMaterial);
 
@@ -186,12 +187,20 @@ function checkClickedObject(mesh) {
 
     // 유리판을 클릭했을 때
     if (mesh.step - 1 === cm2.step) {
+      // 점프 동작 실행
+      player.actions[2].stop();
+      player.actions[2].play();
+
       jumping = true;
       cm2.step++;
       switch (mesh.type) {
         case "normal":
           // console.log("normal");
-          setTimeout(() => (fail = true), 700);
+          setTimeout(() => {
+            fail = true;
+            player.actions[0].stop();
+            player.actions[1].play();
+          }, 700);
           break;
         case "strong":
           // console.log("strong");
