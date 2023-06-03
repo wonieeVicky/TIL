@@ -1435,3 +1435,124 @@ export class Glass extends Stuff {
 위와 같이 switch 문에 type별로 유리판 중량을 달리하면 아래로 떨어지는 애니메이션이 완성된다.
 
 ![](../../img/230601-1.gif)
+
+### 동작 조건 제어
+
+추가적인 동작 제어를 해보자. 마구잡이 식으로 클릭을 할 경우 넘어지는 경우가 생김.
+먼저 안넘어지게 아래와 같이 수정한다. 넘어진다는 건 cannonBody.quaternion이 복제가 되기 때문이다. 따라서 위에 있을 때에는 quaternion 변동을 주지 않고, 떨어졌을 때에만 즉, 실패했을 때만 변동을 주도록 한다.
+
+`src/main.js`
+
+```jsx
+// Renderer, scene, Camera, Light, Controls, CANNON..
+
+let fail = false; // fail 변수 추가
+
+function checkClickedObject(mesh) {
+  if (mesh.name.indexOf("glass") >= 0) {
+    if (mesh.step - 1 === cm2.step) {
+      cm2.step++;
+      switch (mesh.type) {
+        case "normal":
+          // normal을 클릭한 경우 fail이 true이 상태
+          setTimeout(() => (fail = true), 700);
+          break;
+        case "strong":
+          break;
+      }
+      // ..
+    }
+  }
+}
+
+// ..
+function draw() {
+  //..
+
+  objects.forEach((item) => {
+    if (item.cannonBody) {
+      if (item.name === "player") {
+        item.mesh.position.copy(item.cannonBody.position);
+        // player가 fail 했을 때에만 mesh.quaternion을 copy하도록 처리
+        if (fail) item.mesh.quaternion.copy(item.cannonBody.quaternion);
+
+        if (item.modelMesh) {
+          item.modelMesh.position.copy(item.cannonBody.position);
+          // player가 fail 했을 때에만 mesh.quaternion을 copy하도록 처리
+          if (fail) item.modelMesh.quaternion.copy(item.cannonBody.quaternion);
+        }
+        item.modelMesh.position.y += 0.15;
+      } else {
+        item.mesh.position.copy(item.cannonBody.position);
+        item.mesh.quaternion.copy(item.cannonBody.quaternion);
+
+        if (item.modelMesh) {
+          item.modelMesh.position.copy(item.cannonBody.position);
+          item.modelMesh.quaternion.copy(item.cannonBody.quaternion);
+        }
+      }
+    }
+  });
+
+  // ..
+}
+```
+
+위와 같이 player의 동작이 fail일 때만 quaternion이 동작하도록 수행하면 떨어질 때만 휘리릭 회전함
+
+![](../../img/230603-1.gif)
+
+그 다음으로는 점프 동작이 끝났을 때 다음 점프가 실행되도록 코드를 추가해준다.
+
+`src/main.js`
+
+```jsx
+// Renderer, scene, Camera, Light, Controls, CANNON..
+
+let fail = false;
+let jumping = false;
+
+function checkClickedObject(mesh) {
+  if (mesh.name.indexOf("glass") >= 0) {
+    // 점프 중이면 클릭이벤트를 막는다.
+    if (jumping) return;
+
+    if (mesh.step - 1 === cm2.step) {
+      jumping = true; // jumping 중으로 표현
+      cm2.step++;
+      switch (mesh.type) {
+        case "normal":
+          setTimeout(() => (fail = true), 700);
+          break;
+        case "strong":
+          break;
+      }
+      // 1초 후 jumping 변수를 종료상태로 변경
+      setTimeout(() => (jumping = false), 1000);
+      // ..
+    }
+  }
+}
+```
+
+위와 같이 하면 점프는 1초 이후에 실행되도록 바뀜.
+그리고 떨어진 이후 다음 스텝으로 이동하는 현상이 발생(부활같이..) 이를 아래와 같이 개선해준다.
+
+`src/main.js`
+
+```jsx
+// Renderer, scene, Camera, Light, Controls, CANNON..
+
+let fail = false;
+let jumping = false;
+
+function checkClickedObject(mesh) {
+  if (mesh.name.indexOf("glass") >= 0) {
+    // 점프 중이거나 실패 상태면 클릭 중단
+    if (jumping || fail) return;
+    // ..
+  }
+}
+```
+
+점프중이거나 실패상태면 클릭이벤트를 return 해버린다.
