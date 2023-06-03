@@ -177,19 +177,27 @@ function checkIntersects() {
   }
 }
 
+let fail = false;
+let jumping = false;
 function checkClickedObject(mesh) {
   if (mesh.name.indexOf("glass") >= 0) {
+    // 점프 중이면 클릭이벤트를 막는다.
+    if (jumping || fail) return;
+
     // 유리판을 클릭했을 때
     if (mesh.step - 1 === cm2.step) {
+      jumping = true;
       cm2.step++;
-      // switch (mesh.type) {
-      //   case "normal":
-      //     console.log("normal");
-      //     break;
-      //   case "strong":
-      //     console.log("strong");
-      //     break;
-      // }
+      switch (mesh.type) {
+        case "normal":
+          // console.log("normal");
+          setTimeout(() => (fail = true), 700);
+          break;
+        case "strong":
+          // console.log("strong");
+          break;
+      }
+      setTimeout(() => (jumping = false), 1000);
       gsap.to(player.cannonBody.position, { duration: 1, z: glassZ[cm2.step - 1], x: mesh.position.x });
       gsap.to(player.cannonBody.position, { duration: 0.4, y: 12 });
     }
@@ -203,19 +211,26 @@ function draw() {
   const delta = clock.getDelta();
 
   cm1.mixer?.update(delta); // cm1.mixer가 있으면 update를 실행
-
   cm1.world.step(1 / 60, delta, 3); // 1/60초마다 물리엔진을 업데이트
+
   objects.forEach((item) => {
     if (item.cannonBody) {
-      item.mesh.position.copy(item.cannonBody.position); // mesh의 위치를 cannonBody의 위치와 동기화
-      item.mesh.quaternion.copy(item.cannonBody.quaternion); // mesh의 회전값을 cannonBody의 회전값과 동기화
+      if (item.name === "player") {
+        item.mesh.position.copy(item.cannonBody.position);
+        if (fail) item.mesh.quaternion.copy(item.cannonBody.quaternion);
 
-      if (item.modelMesh) {
-        item.modelMesh.position.copy(item.cannonBody.position); // modelMesh 위치를 cannonBody의 위치와 동기화
-        item.modelMesh.quaternion.copy(item.cannonBody.quaternion); // modelMesh 회전값을 cannonBody의 회전값과 동기화
+        if (item.modelMesh) {
+          item.modelMesh.position.copy(item.cannonBody.position);
+          if (fail) item.modelMesh.quaternion.copy(item.cannonBody.quaternion);
+        }
+        item.modelMesh.position.y += 0.15;
+      } else {
+        item.mesh.position.copy(item.cannonBody.position);
+        item.mesh.quaternion.copy(item.cannonBody.quaternion);
 
-        if (item.name === "player") {
-          item.modelMesh.position.y += 0.2;
+        if (item.modelMesh) {
+          item.modelMesh.position.copy(item.cannonBody.position);
+          item.modelMesh.quaternion.copy(item.cannonBody.quaternion);
         }
       }
     }

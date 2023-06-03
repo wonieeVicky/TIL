@@ -17,7 +17,7 @@ export class Glass extends Stuff {
         break;
       case "strong":
         this.material = mat.glass2;
-        this.mass = 1000;
+        this.mass = 0;
         break;
     }
 
