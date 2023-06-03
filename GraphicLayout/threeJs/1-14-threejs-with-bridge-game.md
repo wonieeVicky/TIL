@@ -1556,3 +1556,48 @@ function checkClickedObject(mesh) {
 ```
 
 점프중이거나 실패상태면 클릭이벤트를 return 해버린다.
+
+### glb 애니메이션
+
+점프하는 순간에는 점프 애니메이션, 추락 시에는 추락 애니메이션을 구현하도록 코드를 추가해본다.
+
+`src/main.js`
+
+```jsx
+// Renderer, scene, Camera, Light, Controls, CANNON..
+
+let fail = false;
+let jumping = false;
+
+function checkClickedObject(mesh) {
+  if (mesh.name.indexOf("glass") >= 0) {
+    if (jumping || fail) return;
+
+    if (mesh.step - 1 === cm2.step) {
+      // 점프 동작 실행(1회 이상 사용하므로 stop(reset) 후 play)
+      player.actions[2].stop();
+      player.actions[2].play();
+
+      jumping = true;
+      cm2.step++;
+      switch (mesh.type) {
+        case "normal":
+          setTimeout(() => {
+            fail = true;
+            player.actions[0].stop(); // 기존 동작 중지
+            player.actions[1].play(); // 파닥파닥 동작 실행
+          }, 700);
+          break;
+        case "strong":
+          // console.log("strong");
+          break;
+      }
+      setTimeout(() => (jumping = false), 1000);
+      gsap.to(player.cannonBody.position, { duration: 1, z: glassZ[cm2.step - 1], x: mesh.position.x });
+      gsap.to(player.cannonBody.position, { duration: 0.4, y: 12 });
+    }
+  }
+}
+```
+
+![](../../img/230603-2.gif)
