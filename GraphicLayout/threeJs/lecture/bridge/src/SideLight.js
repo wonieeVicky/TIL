@@ -1,5 +1,5 @@
 ﻿import { Mesh } from "three";
-import { cm1, geo, mat } from "./common";
+import { cm1, cm2, geo, mat } from "./common";
 
 export class SideLight {
   constructor(info) {
@@ -18,5 +18,9 @@ export class SideLight {
 
     // cm1.scene.add(this.mesh); // scene에 추가하지 않음
     container.add(this.mesh);
+  }
+
+  turnOff() {
+    this.mesh.material.color.set(cm2.lightOffColor);
   }
 }
