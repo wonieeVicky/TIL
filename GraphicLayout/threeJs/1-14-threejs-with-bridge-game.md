@@ -1601,3 +1601,79 @@ function checkClickedObject(mesh) {
 ```
 
 ![](../../img/230603-2.gif)
+
+### 실패 시 조명 끄기
+
+다음으로 실패 시 조명을 꺼주겠다. SideLight 클래스를 조금 수정해본다.
+
+`src/common.js`
+
+```jsx
+export const cm2 = {
+  backgroundColor: "#3e1322",
+  lightColor: "#ffe9ac",
+  lightOffColor: "#222222" // 추가
+  // ..
+};
+```
+
+`src/SideLight.js`
+
+```jsx
+export class SideLight {
+  //..
+
+  // 추가
+  turnOff() {
+    this.mesh.material.color.set(cm2.lightOffColor);
+  }
+}
+```
+
+`src/main.js`
+
+```jsx
+// Renderer, scene, Camera, Light, Controls, CANNON..
+
+// 사이드 라이트
+const sideLights = []; // 일괄적 관리를 위해 추가
+
+for (let i = 0; i < 49; i++) {
+  // sideLights 배열에 추가
+  sideLights.push(new SideLight({ name: "sideLight", container: bar1.mesh, z: i * 0.5 - glassUnitSize * 10 }));
+}
+for (let i = 0; i < 49; i++) {
+  // sideLights 배열에 추가
+  sideLights.push(new SideLight({ name: "sideLight", container: bar4.mesh, z: i * 0.5 - glassUnitSize * 10 }));
+}
+
+// ..
+function checkClickedObject(mesh) {
+  if (mesh.name.indexOf("glass") >= 0) {
+    if (jumping || fail) return;
+    if (mesh.step - 1 === cm2.step) {
+      // ..
+
+      switch (mesh.type) {
+        case "normal":
+          setTimeout(() => {
+            fail = true;
+            player.actions[0].stop();
+            player.actions[1].play();
+
+            // 실패 시 sideLights 불 Off
+            sideLights.forEach((light) => light.turnOff());
+          }, 700);
+          break;
+        case "strong":
+          break;
+      }
+      // ..
+    }
+  }
+}
+```
+
+fail 일 때 sideLight 정상 off되는 것 확인 완료!
+
+![](../../img/230603-3.gif)
