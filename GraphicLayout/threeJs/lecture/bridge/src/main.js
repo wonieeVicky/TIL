@@ -27,10 +27,16 @@ cm1.scene.background = new THREE.Color(cm2.backgroundColor);
 
 // Camera
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+const camera2 = camera.clone(); // camera를 복제
 camera.position.x = -4;
 camera.position.y = 19;
 camera.position.z = 14;
+
+camera2.position.y = 0; // 바닥에서 위를 촬영하므로
+camera2.lookAt(0, 1, 0); // 위를 바라보도록
+
 cm1.scene.add(camera);
+cm1.scene.add(camera2);
 
 // Light
 const ambientLight = new THREE.AmbientLight(cm2.lightColor, 0.8);
@@ -181,6 +187,7 @@ function checkIntersects() {
 
 let fail = false;
 let jumping = false;
+let onReplay = false;
 function checkClickedObject(mesh) {
   if (mesh.name.indexOf("glass") >= 0) {
     // 점프 중이면 클릭이벤트를 막는다.
@@ -202,6 +209,11 @@ function checkClickedObject(mesh) {
             player.actions[0].stop();
             player.actions[1].play();
             sideLights.forEach((light) => light.turnOff());
+            setTimeout(() => {
+              onReplay = true;
+              player.cannonBody.position.y = 9;
+              setTimeout(() => (onReplay = false), 3000);
+            }, 1500);
           }, 700);
           break;
         case "strong":
@@ -260,7 +272,13 @@ function draw() {
 
   controls.update();
 
-  renderer.render(cm1.scene, camera);
+  if (onReplay) {
+    renderer.render(cm1.scene, camera2);
+    camera2.position.z = player.cannonBody.position.z;
+    camera2.position.x = player.cannonBody.position.x;
+  } else {
+    renderer.render(cm1.scene, camera);
+  }
   renderer.setAnimationLoop(draw);
 }
 
