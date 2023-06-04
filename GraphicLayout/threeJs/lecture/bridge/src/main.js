@@ -77,7 +77,7 @@ cm1.world.addContactMaterial(playerGlassContackMaterial);
 
 // 물체 만들기
 const glassUnitSize = 1.2; // 유리칸 크기
-const numberOfGlass = 10; // 유리판 개수
+const numberOfGlasses = 10; // 유리판 개수
 const objects = [];
 
 // 기둥
@@ -117,10 +117,10 @@ for (let i = 0; i < 49; i++) {
 let glassTypeNumber = 0;
 let glassTypes = [];
 const glassZ = [];
-for (let i = 0; i < numberOfGlass; i++) {
+for (let i = 0; i < numberOfGlasses; i++) {
   glassZ.push(-(i * glassUnitSize * 2 - glassUnitSize * 9));
 }
-for (let i = 0; i < numberOfGlass; i++) {
+for (let i = 0; i < numberOfGlasses; i++) {
   glassTypeNumber = Math.round(Math.random());
   switch (glassTypeNumber) {
     case 0:
@@ -211,6 +211,17 @@ function checkClickedObject(mesh) {
       setTimeout(() => (jumping = false), 1000);
       gsap.to(player.cannonBody.position, { duration: 1, z: glassZ[cm2.step - 1], x: mesh.position.x });
       gsap.to(player.cannonBody.position, { duration: 0.4, y: 12 });
+
+      // 클리어 조건
+      if (cm2.step === numberOfGlasses && mesh.type === "strong") {
+        setTimeout(() => {
+          player.actions[2].stop();
+          player.actions[2].play();
+
+          gsap.to(player.cannonBody.position, { duration: 1, z: -14, x: 0 });
+          gsap.to(player.cannonBody.position, { duration: 0.4, y: 12 });
+        }, 1500);
+      }
     }
   }
 }

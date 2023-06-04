@@ -1677,3 +1677,37 @@ function checkClickedObject(mesh) {
 fail 일 때 sideLight 정상 off되는 것 확인 완료!
 
 ![](../../img/230603-3.gif)
+
+### 게임 클리어
+
+성공 시 게임 클리어는 checkClickedObject 함수의 가장 마지막 경우의 수로 추가하면 된다. 마지막 스텝은 numberOfGlasses로 체크한다.
+
+`src/main.js`
+
+```jsx
+// Renderer, scene, Camera, Light, Controls, CANNON..
+
+function checkClickedObject(mesh) {
+  if (mesh.name.indexOf("glass") >= 0) {
+    if (jumping || fail) return;
+
+    // 유리판을 클릭했을 때
+    if (mesh.step - 1 === cm2.step) {
+      // ...
+
+      // 클리어 조건
+      if (cm2.step === numberOfGlasses && mesh.type === "strong") {
+        // 1.5초 뒤 실행한다.
+        setTimeout(() => {
+          player.actions[2].stop();
+          player.actions[2].play();
+          gsap.to(player.cannonBody.position, { duration: 1, z: -14, x: 0 });
+          gsap.to(player.cannonBody.position, { duration: 0.4, y: 12 });
+        }, 1500);
+      }
+    }
+  }
+}
+```
+
+![](../../img/230604-1.gif)
