@@ -1711,3 +1711,83 @@ function checkClickedObject(mesh) {
 ```
 
 ![](../../img/230604-1.gif)
+
+### 추가 카메라 설치
+
+거의 다 완성되었음.. 완성 파일에 보면 실패 시 떨어질 때 추락 과정을 카메라가 포커싱해주는 애니메이션이 구현되어있다. 즉, 카메라가 2대라는 것임.. 우선 카메라를 추가해본다.
+
+`src/main.js`
+
+```jsx
+// Renderer, scene..
+
+// Camera
+const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+const camera2 = camera.clone(); // camera를 복제
+camera.position.x = -4;
+camera.position.y = 19;
+camera.position.z = 14;
+
+camera2.position.y = 0; // 바닥에서 위를 촬영하도록 설정
+camera2.lookAt(0, 1, 0); // 위를 바라보도록 설정
+
+cm1.scene.add(camera);
+cm1.scene.add(camera2); // camera2도 scene에 추가(명시적인 추가)
+
+// Light, Controls, CANNON..
+
+function checkClickedObject(mesh) {
+  if (mesh.name.indexOf("glass") >= 0) {
+    if (jumping || fail) return;
+
+    // 유리판을 클릭했을 때
+    if (mesh.step - 1 === cm2.step) {
+      // ...
+      switch (mesh.type) {
+        case "normal":
+          setTimeout(() => {
+            fail = true;
+            player.actions[0].stop();
+            player.actions[1].play();
+            sideLights.forEach((light) => light.turnOff());
+
+            // 실패 후 1.5초 뒤 카메라2 ON
+            setTimeout(() => {
+              onReplay = true;
+              // 떨어지는 화면 촬영을 위해서 다시 위로 올림
+              player.cannonBody.position.y = 9;
+              // 3초 뒤 카메라2 OFF
+              setTimeout(() => (onReplay = false), 3000);
+            }, 1500);
+          }, 700);
+          break;
+        case "strong":
+          break;
+      }
+
+      // ..
+    }
+  }
+
+  // ..
+
+  function draw() {
+    // ..
+    controls.update();
+
+    // onReplay 시 action 설정 추가
+    if (onReplay) {
+      renderer.render(cm1.scene, camera2);
+      camera2.position.z = player.cannonBody.position.z;
+      camera2.position.x = player.cannonBody.position.x;
+    } else {
+      renderer.render(cm1.scene, camera);
+    }
+    renderer.setAnimationLoop(draw);
+  }
+}
+```
+
+위와 같이 camera2 추가 후 실패 시 onReplay라는 변수를 관리하여 해당 시점에 동작 카메라를 변경하는 방식으로 구현 함. 특히 카메라가 cannonBody를 따라갈 수 있도록 draw 함수에서 설정해주는 부분, 떨어지는 장면을 보여주기 위한 y값 조절 부분이 포인트
+
+![](../../img/230604-2.gif)
