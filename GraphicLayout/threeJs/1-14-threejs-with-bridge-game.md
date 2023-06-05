@@ -1791,3 +1791,50 @@ function checkClickedObject(mesh) {
 위와 같이 camera2 추가 후 실패 시 onReplay라는 변수를 관리하여 해당 시점에 동작 카메라를 변경하는 방식으로 구현 함. 특히 카메라가 cannonBody를 따라갈 수 있도록 draw 함수에서 설정해주는 부분, 떨어지는 장면을 보여주기 위한 y값 조절 부분이 포인트
 
 ![](../../img/230604-2.gif)
+
+### 사운드 추가
+
+사운드를 추가해본다. 사운드는 강화유리, 일반유리에 따라 다른 소리를 내야 한다.
+기본 사운드 설정은 common.js에서 해준다.
+
+`src/common.js`
+
+```jsx
+const normalSound = new Audio();
+normalSound.src = "/sounds/Crash.mp3";
+const strongSound = new Audio();
+strongSound.src = "/sounds/Wood Hit Metal Crash.mp3";
+
+export const sounds = {
+  normal: normalSound,
+  strong: strongSound
+};
+```
+
+위와 같이 sounds 객체로 데이터를 내보내면 이를 Glass 클래스에서 사용한다.
+
+`src/Glass.js`
+
+```jsx
+import { cm1, geo, mat, sounds } from "./common";
+
+export class Glass extends Stuff {
+  constructor(info) {
+    // ..
+    this.setCannonBody();
+
+    this.cannonBody.addEventListener("collide", playSound);
+
+    const sound = sounds[this.type]; // 재생해야할 sound
+    function playSound(e) {
+      const strength = e.contact.getImpactVelocityAlongNormal(); // 충돌 시 속도
+      if (strength > 5) {
+        sound.currentTime = 0; // 충돌 시 처음부터 사운드 발생
+        sound.play();
+      }
+    }
+  }
+}
+```
+
+위와 같이 설정해주면 collide 시 사운드 이벤트가 제대로 발생하는 것을 알 수 있다.
