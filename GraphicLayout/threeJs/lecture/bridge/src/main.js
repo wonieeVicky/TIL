@@ -9,6 +9,7 @@ import { Bar } from "./Bar";
 import { SideLight } from "./SideLight";
 import { Glass } from "./Glass";
 import { Player } from "./Player";
+import { PreventDragClick } from "./PreventDragClick";
 
 // ----- 주제: The Bridge 게임 만들기
 // Renderer
@@ -290,8 +291,10 @@ function setSize() {
 }
 
 // 이벤트
+const preventDragClick = new PreventDragClick(canvas);
 window.addEventListener("resize", setSize);
 canvas.addEventListener("click", (e) => {
+  if (preventDragClick.mouseMoved) return;
   mouse.x = (e.clientX / canvas.clientWidth) * 2 - 1;
   mouse.y = -((e.clientY / canvas.clientHeight) * 2 - 1);
   checkIntersects();
