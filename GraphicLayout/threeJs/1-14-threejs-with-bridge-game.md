@@ -1838,3 +1838,42 @@ export class Glass extends Stuff {
 ```
 
 위와 같이 설정해주면 collide 시 사운드 이벤트가 제대로 발생하는 것을 알 수 있다.
+
+### 드래그 클릭 방지
+
+마지막으로 드래그 클릭방지 기능 넣어본다. 현재는 다음 스텝 유리판 위에서 화면 이동 드래그 시 점프가 되버림..PreventDragClick 넣어놨던거 적용
+
+`src/main.js`
+
+```jsx
+import { PreventDragClick } from "./PreventDragClick";
+
+const canvas = document.querySelector("#three-canvas");
+
+// ..
+
+canvas.addEventListener("click", (e) => {
+  if (preventDragClick.mouseMoved) return; // 추가
+  // ..
+});
+```
+
+잘 개선이 됨. 굿
+이제 어떤게 강화유리인지 아닌지 구별하지 못하도록 opacity 속성을 수정한다.
+
+`src/common.js`
+
+```jsx
+// ..
+
+export const mat = {
+  // ..
+  // opacity 통일
+  glass1: new MeshPhongMaterial({ color: cm2.glassColor, transparent: true, opacity: 0.1 }),
+  glass2: new MeshPhongMaterial({ color: cm2.glassColor, transparent: true, opacity: 0.1 })
+};
+```
+
+정말 어려운 게임이 되었다.
+
+![](../../img/230606-1.png)
