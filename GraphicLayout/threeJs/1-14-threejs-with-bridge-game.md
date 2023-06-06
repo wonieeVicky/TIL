@@ -1877,3 +1877,65 @@ export const mat = {
 정말 어려운 게임이 되었다.
 
 ![](../../img/230606-1.png)
+
+### 캐릭터 그림자 생성
+
+마무리로 캐릭터에 그림자를 생성해본다. (원래는 BoxGeometry를 투명하게 생성해서 만듦)
+
+`src/Player.js`
+
+```jsx
+// ..
+export class Player extends Stuff {
+  constructor(info) {
+    // ..
+
+    // 기존 그림자 코드 주석처리
+    // this.mesh = new Mesh(new BoxGeometry(this.width, this.height, this.depth), new MeshBasicMaterial({ transparent: true, opacity: 0 }));
+    // this.mesh.castShadow = true;
+    // this.mesh.position.set(this.x, this.y, this.z);
+    // cm1.scene.add(this.mesh);
+
+    cm1.gltfLoader.load("/models/ilbuni.glb", (glb) => {
+      // 그림자 생성
+      glb.scene.traverse((child) => {
+        if (child.isMesh) {
+          child.castShadow = true;
+        }
+      });
+      // ..
+    });
+  }
+}
+```
+
+main.js 내에 관련 mesh 조작 코드도 삭제해준다.
+
+`src/main.js`
+
+```jsx
+// Renderer, scene, Camera, Light, Controls, CANNON..
+
+// ..
+function draw() {
+  //..
+
+  objects.forEach((item) => {
+    if (item.cannonBody) {
+      if (item.name === "player") {
+        // item.mesh.position.copy(item.cannonBody.position);
+        // if (fail) item.mesh.quaternion.copy(item.cannonBody.quaternion);
+        // ..
+      } else {
+        // ..
+      }
+    }
+  });
+
+  // ..
+}
+```
+
+그러면 캐릭터 움직임에 따라 그미자도 자연스럽게 움직이도록 구현
+
+![](../../img/230606-1.gif)
