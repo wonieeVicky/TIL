@@ -1,8 +1,31 @@
 body {
 	margin: 0;
 }
+
+li {
+	list-style: none;
+}
+
 #three-canvas {
 	position: absolute;
 	left: 0;
 	top: 0;
+	z-index: -1;
+	background: gray;
+}
+
+.view-item {
+	display: flex;
+	margin: 30px;
+}
+
+.view-item:nth-child(even) .canvas-placeholder {
+	order: 2;
+}
+
+.canvas-placeholder {
+	width: 300px;
+	height: 200px;
+	margin-right: 30px;
+	border: 1px solid black;
 }
