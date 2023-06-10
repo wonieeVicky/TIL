@@ -123,3 +123,84 @@ li {
   border: 1px solid black;
 }
 ```
+
+이제 스크립트를 본격적으로 작성해본다. 위 main.js에서 renderer는 한개만 쓰지만 들어갈 박스마다 scene은 각각 생성할 것이다. 이를 공통 모듈로 만들어보고자 함
+
+scene을 따로 만든다는 것은 각 scene마다 카메라도 각각 배치되어야 하므로 setSize 안에 존재하는 camera 설정도 삭제해준다. 즉, setSize 에는 `renderer.setSize(window.innerWidth, window.innerHeight)`만 존재하게됨. draw 함수의 camera 설정도 제거해준다.
+
+`/src/main.js`
+
+```jsx
+// ..
+
+function draw() {
+  const delta = clock.getDelta();
+
+  // renderer.render(scene, camera);
+  renderer.setAnimationLoop(draw);
+}
+
+function setSize() {
+  // camera.aspect = window.innerWidth / window.innerHeight;
+  // camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  // renderer.render(scene, camera);
+}
+```
+
+이제 정말 각 scene을 CreateScene이라는 클래스 모듈로 구현해본다.
+먼저 해당 클래스에 어떤 값이 들어가야할까 고민해보면 아래와 같다.
+
+`src/main.js`
+
+```jsx
+import { CreateScene } from "./CreateScene";
+
+// Renderer..
+const scene1 = new CreateScene({
+  renderer,
+  bgColor: "pink",
+  placeholder: ".canvas-placeholder.a"
+});
+
+// ...
+```
+
+위와 같이 renderer는 기본적으로 포함, scene과 camera 생성에 필요한 최소한의 것을 넣었다.
+placeholder를 넣은 것은 camera 설정 시 해당 엘리먼트에 대한 width, height 값을 가져오기 위해 엘리먼트의 클래스 값을 직접 주입함..
+
+`src/CreateScene.js`
+
+```jsx
+import { Color, PerspectiveCamera, Scene } from "three";
+
+export class CreateScene {
+  constructor(info) {
+    this.renderer = info.renderer;
+    this.el = document.querySelector(info.placeholder);
+    const rect = this.el.getBoundingClientRect(); // DOMRect {x: 8, y: 8, width: 784, …}
+
+    const bgColor = info.bgColor || "white";
+    const fov = info.fov || 75; // field of view
+    const aspect = rect.width / rect.height;
+    const near = info.near || 0.1;
+    const far = info.far || 100;
+    const cameraPosition = info.cameraPosition || { x: 0, y: 0, z: 3 };
+
+    // Scene
+    this.scene = new Scene();
+    this.scene.background = new Color(bgColor);
+
+    // Camera
+    this.camera = new PerspectiveCamera(fov, aspect, near, far);
+    this.camera.position.set(cameraPosition.x, cameraPosition.y, cameraPosition.z);
+
+    this.scene.add(this.camera);
+  }
+}
+```
+
+위 기본 내용을 통해 CreateScene에서 Scene과 Camera를 직접 생성해보았다.
+위에서 참고할 사항은 element를 placeholder 값으로 가져와서 getBoundingClientRect 메서드로 필요한 데이터를 가져다 쓰는 부분과, camera 설정 시 fov, aspect, near, far 설정하는 부분에 주목한다.
+
+![getBoundingClientRect 메서드로 위의 값들을 가져올 수 있다.](../../img/230610-1.png)
