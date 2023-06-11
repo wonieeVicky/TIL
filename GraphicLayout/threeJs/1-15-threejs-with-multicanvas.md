@@ -204,3 +204,111 @@ export class CreateScene {
 위에서 참고할 사항은 element를 placeholder 값으로 가져와서 getBoundingClientRect 메서드로 필요한 데이터를 가져다 쓰는 부분과, camera 설정 시 fov, aspect, near, far 설정하는 부분에 주목한다.
 
 ![getBoundingClientRect 메서드로 위의 값들을 가져올 수 있다.](../../img/230610-1.png)
+
+scene에서 돌아갈 mesh와 조명 설정을 해보자. mesh와 조명은 각 씬마다 달라질 것이므로 CreateScene과 같은 공통적인 코드가 들어가는 곳에는 안넣는게 좋을 것 같다. 일단 설정을 위한 set 메서드 정의는 CreateScene에서 함
+
+`src/CreateScene.js`
+
+```jsx
+export class CreateScene {
+  constructor(info) {
+    //..
+  }
+
+  set(func) {
+    func();
+  }
+
+  //..
+}
+```
+
+`src/main.js`
+
+```jsx
+// ..
+
+const scene1 = new CreateScene({
+  renderer,
+  bgColor: "pink",
+  placeholder: ".canvas-placeholder.a",
+  cameraPosition: {
+    x: -1,
+    y: 1,
+    z: 2
+  }
+});
+
+// light, mesh 설정
+scene1.set(() => {
+  // 조명
+  const light = new THREE.DirectionalLight("white", 1);
+  light.position.set(-1, 2, 3);
+  scene1.scene.add(light);
+
+  // Mesh
+  const geometry = new THREE.BoxGeometry(1, 1, 1);
+  const material = new THREE.MeshStandardMaterial({ color: "green" });
+  const cube = new THREE.Mesh(geometry, material);
+  scene1.scene.add(cube);
+});
+
+// ..
+```
+
+위와 같이 set 메서드 안에서 light, mesh에 대한 설정을 해준다. 하지만 아직 화면으로 확인이 안됨.
+Renderer를 구현해주지 않았기 때문! 따라서 render 메서드도 마저 CreateScene에서 구현해준다.
+
+`src/CreateScene.js`
+
+```jsx
+export class CreateScene {
+  // ..
+
+  render() {
+    const renderer = this.renderer;
+    const rect = this.el.getBoundingClientRect();
+
+    // 영역이 화면에 포함되지 않은 경우 함수 종료
+    const isOffScreen =
+      rect.top > renderer.domElement.clientHeight || rect.bottom < 0 || rect.left > renderer.domElement.clientWidth || rect.right < 0;
+    if (isOffScreen) return;
+
+    // setScissor: true로 설정하면, 캔버스의 영역을 벗어나는 부분은 그리지 않는다.
+    const canvasBottom = renderer.domElement.clientHeight - rect.bottom;
+    renderer.setScissor(rect.left, canvasBottom, rect.width, rect.height);
+    renderer.setViewport(rect.left, canvasBottom, rect.width, rect.height);
+    renderer.setScissorTest(true);
+
+    renderer.render(this.scene, this.camera);
+  }
+}
+```
+
+render함수는 draw 내에서 계속 돌아가기 때문에 위치가 스크롤에 따라 항상 변하므로 rect 변수를 안에서 새로 가져와서 쓴다. 또한 영역에 박스가 100개쯤 된다고 했을 때 한번에 모두 렌더링하는 것이 매우 큰 부하이므로.. 스크롤 즉, 화면 내에 보이는 영역만 렌더링을 하도록 처리해주는 코드를 위처럼 넣었다. (isOffScreen 참고) setScissor라는 메서드로 원하는 영역에만 노출하도록 설정함
+
+setScissor의 bottom값은 아래와 같은 특징을 가지므로 별도의 canvasBottom이라는 값으로 계산해주었다.
+
+![](../../img/230611-1.png)
+
+위와 같이 모두 설정 후 해당 값을 main.js의 draw 내에서 실행해본다.
+
+`src/main.js`
+
+```jsx
+// ..
+
+// 그리기
+const clock = new THREE.Clock();
+
+function draw() {
+  const delta = clock.getDelta();
+
+  scene1.render(); // render 메서드 실행
+  renderer.setAnimationLoop(draw);
+}
+```
+
+그러면 짜잔 화면 리사이즈에도 모두 반응하는 첫번째 박스 렌더링이 잘 구현되는 것을 확인해볼 수 있음
+
+![](../../img/230611-2.png)
