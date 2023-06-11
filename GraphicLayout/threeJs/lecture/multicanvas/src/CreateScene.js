@@ -5,7 +5,6 @@ export class CreateScene {
     this.renderer = info.renderer;
     this.el = document.querySelector(info.placeholder);
     const rect = this.el.getBoundingClientRect(); // DOMRect {x: 8, y: 8, width: 784, …}
-    console.log("rect:", rect);
 
     const bgColor = info.bgColor || "white";
     const fov = info.fov || 75; // field of view
@@ -23,5 +22,27 @@ export class CreateScene {
     this.camera.position.set(cameraPosition.x, cameraPosition.y, cameraPosition.z);
 
     this.scene.add(this.camera);
+  }
+
+  set(func) {
+    func();
+  }
+
+  render() {
+    const renderer = this.renderer;
+    const rect = this.el.getBoundingClientRect();
+
+    // 영역이 화면에 포함되지 않은 경우 함수 종료
+    const isOffScreen =
+      rect.top > renderer.domElement.clientHeight || rect.bottom < 0 || rect.left > renderer.domElement.clientWidth || rect.right < 0;
+    if (isOffScreen) return;
+
+    // setScissor: true로 설정하면, 캔버스의 영역을 벗어나는 부분은 그리지 않는다.
+    const canvasBottom = renderer.domElement.clientHeight - rect.bottom;
+    renderer.setScissor(rect.left, canvasBottom, rect.width, rect.height);
+    renderer.setViewport(rect.left, canvasBottom, rect.width, rect.height);
+    renderer.setScissorTest(true);
+
+    renderer.render(this.scene, this.camera);
   }
 }
