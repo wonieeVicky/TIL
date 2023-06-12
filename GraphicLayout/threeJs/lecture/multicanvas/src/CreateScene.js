@@ -22,6 +22,7 @@ export class CreateScene {
     this.camera.position.set(cameraPosition.x, cameraPosition.y, cameraPosition.z);
 
     this.scene.add(this.camera);
+    this.meshes = []; // mesh들을 담아놓을 배열공간 추가
   }
 
   set(func) {
@@ -36,6 +37,9 @@ export class CreateScene {
     const isOffScreen =
       rect.top > renderer.domElement.clientHeight || rect.bottom < 0 || rect.left > renderer.domElement.clientWidth || rect.right < 0;
     if (isOffScreen) return;
+
+    this.camera.aspect = rect.width / rect.height;
+    this.camera.updateProjectionMatrix();
 
     // setScissor: true로 설정하면, 캔버스의 영역을 벗어나는 부분은 그리지 않는다.
     const canvasBottom = renderer.domElement.clientHeight - rect.bottom;
