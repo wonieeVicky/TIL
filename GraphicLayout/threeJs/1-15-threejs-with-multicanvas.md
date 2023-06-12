@@ -312,3 +312,214 @@ function draw() {
 그러면 짜잔 화면 리사이즈에도 모두 반응하는 첫번째 박스 렌더링이 잘 구현되는 것을 확인해볼 수 있음
 
 ![](../../img/230611-2.png)
+
+이제 내부에서 저 cube를 회전 시켜보자. 이를 조작하기 위해서는 draw 함수 내에서 각 mesh 들을 조작할 수 있도록 CreateScene에서 별도 정의를 추가해야 한다.
+
+`src/CreateScene.js`
+
+```jsx
+export class CreateScene {
+  constructor(info) {
+    // ..
+
+    this.scene.add(this.camera);
+    this.meshes = []; // mesh들을 담아놓을 배열공간 추가
+  }
+
+  // ..
+}
+```
+
+`src/main.js`
+
+```jsx
+//..
+scene1.set(() => {
+  //..
+  const geometry = new THREE.BoxGeometry(1, 1, 1);
+  const material = new THREE.MeshStandardMaterial({ color: "green" });
+  const cube = new THREE.Mesh(geometry, material);
+
+  scene1.meshes.push(cube); // scene1의 meshes 배열에 추가
+  scene1.meshes.forEach((mesh) => scene1.scene.add(mesh)); // 각 meshes를 순회하며 scene.add
+});
+
+// 그리기
+const clock = new THREE.Clock();
+function draw() {
+  const delta = clock.getDelta();
+
+  // scene1.meshes를 돌면서 rotation 값을 수정해주면 회전함
+  scene1.meshes.forEach((mesh) => {
+    mesh.rotation.y += delta;
+  });
+
+  scene1.render();
+  renderer.setAnimationLoop(draw);
+}
+
+// ..
+```
+
+위와 같이 this.meshes라는 배열을 추가하여 회전을 구현할 수 있다.
+
+![](../../img/230612-1.gif)
+
+그러면 위 상태에서 OrbitControl도 구현해본다.
+
+`src/main.js`
+
+```jsx
+import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
+
+//..
+scene1.set(() => {
+  //..
+
+  // Controls
+  scene1.controls = new OrbitControls(scene1.camera, scene1.el);
+});
+```
+
+![](../../img/230612-2.gif)
+
+위와 같이 scene1에서 controls를 추가 속성으로 붙여주면 마우스로 핸들링도 가능해진다. 크..
+
+그런데 큐브에 빛이 카메라 위치를 안따라와서 빛이 비추지 않는 부분은 어둡게 노출됨.. 이걸 고쳐본다.
+light를 scene에 붙어있던 것을 camera에 대입하면 된다.
+
+`src/main.js`
+
+```jsx
+import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
+
+//..
+scene1.set(() => {
+  // 조명
+  const light = new THREE.DirectionalLight("white", 1);
+  light.position.set(-1, 2, 3);
+  // scene1.scene.add(light);
+  scene1.camera.add(light);
+
+  // ..
+});
+```
+
+`scene1.scene` → `scene1.camera`
+
+![](../../img/230612-3.gif)
+
+잘 고쳐졌다. scene2도 비슷한 느낌으로 하나 더 추가해본 뒤, scene3에서는 glb 파일을 로드해서 사용한다.
+`model/glb` 파일 import 후 webpack 설정 추가한다.
+
+`multicanvas/webpack.config.js`
+
+```jsx
+// ..
+
+module.exports = {
+  //..
+    new CopyWebpackPlugin({
+      patterns: [
+        { from: "./src/main.css", to: "./main.css" },
+        { from: "./src/models", to: "./models" } // 추가
+      ]
+    })
+  ]
+};
+```
+
+`src/main.js`
+
+```jsx
+import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
+
+//..
+const scene2 = new CreateScene({
+  renderer,
+  placeholder: ".canvas-placeholder.b"
+});
+scene2.set(() => {
+  // 조명
+  const light = new THREE.DirectionalLight("white", 1);
+  light.position.set(-1, 2, 3);
+  scene2.camera.add(light);
+
+  scene2.controls = new OrbitControls(scene2.camera, scene2.el);
+
+  // Mesh
+  const geometry = new THREE.BoxGeometry(0.4, 1, 0.7);
+  const material = new THREE.MeshStandardMaterial({ color: "skyblue" });
+  const cube = new THREE.Mesh(geometry, material);
+
+  scene2.meshes.push(cube);
+  scene2.meshes.forEach((mesh) => scene2.scene.add(mesh));
+});
+
+// gltf 파일 로드
+const gltfLoader = new GLTFLoader();
+
+const scene3 = new CreateScene({
+  renderer,
+  placeholder: ".canvas-placeholder.c"
+});
+scene3.set(() => {
+  // 조명
+  const light = new THREE.DirectionalLight("white", 1);
+  light.position.set(-1, 2, 3);
+  scene3.camera.add(light);
+
+  scene3.controls = new OrbitControls(scene3.camera, scene3.el);
+
+  // glb 파일 로드
+  gltfLoader.load("./models/ilbuni.glb", (gltf) => {
+    const mesh = gltf.scene.children[0];
+    scene3.meshes.push(mesh);
+    scene3.scene.add(mesh);
+  });
+});
+
+// 그리기
+const clock = new THREE.Clock();
+
+function draw() {
+  // ..
+  scene2.meshes.forEach((mesh) => {
+    mesh.rotation.y += delta;
+  });
+
+  scene1.render();
+  scene2.render();
+  scene3.render();
+}
+```
+
+![](../../img/230612-4.gif)
+
+이렇게 한 판 안에서 여러 개의 scene을 독립적으로 구현하는 작업이 완료되었다!
+그런데 화면 해상도의 가로가 줄어들면 사물의 비율이 깨져보인다.. 이를 CreateScene의 render 시 카메라의 aspect를 수정 후 `updateProjectionMatrix`되도록 처리하여 개선할 수 있다.
+
+`src/CreateScene.js`
+
+```jsx
+import { Color, PerspectiveCamera, Scene } from "three";
+
+export class CreateScene {
+  // ..
+
+  render() {
+    // ..
+
+    // 카메라 비율 조정해준다.
+    this.camera.aspect = rect.width / rect.height;
+    this.camera.updateProjectionMatrix();
+
+    // ..
+    renderer.render(this.scene, this.camera);
+  }
+}
+```
+
+가로가 작아도 render 실행 시 해당 비율을 새롭게 업데이트 하므로 문제 없음
+
+![](../../img/230612-1.png)
