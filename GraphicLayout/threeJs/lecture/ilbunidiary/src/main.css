@@ -1,0 +1,9 @@
+body {
+	overflow: hidden;
+	margin: 0;
+}
+#three-canvas {
+	position: fixed;
+	left: 0;
+	top: 0;
+}
