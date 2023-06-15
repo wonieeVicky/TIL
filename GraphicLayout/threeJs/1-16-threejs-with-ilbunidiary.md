@@ -9,11 +9,11 @@
 `ilbunidiary/src/main.js`
 
 ```jsx
-import * as THREE from "three";
+import * as THREE from 'three';
 
 // Texture
 const textureLoader = new THREE.TextureLoader();
-const floorTexture = textureLoader.load("/images/grid.png");
+const floorTexture = textureLoader.load('/images/grid.png');
 floorTexture.wrapS = THREE.RepeatWrapping;
 floorTexture.wrapT = THREE.RepeatWrapping;
 floorTexture.repeat.x = 10;
@@ -26,7 +26,7 @@ floorTexture.repeat.y = 10;
 // ..
 
 // Renderer
-const canvas = document.querySelector("#three-canvas");
+const canvas = document.querySelector('#three-canvas');
 const renderer = new THREE.WebGLRenderer({
   canvas,
   antialias: true
@@ -53,6 +53,35 @@ const camera = new THREE.OrthographicCamera(
   -1000, // near
   1000 // far
 );
+
+const cameraPosition = new THREE.Vector3(1, 5, 5);
+camera.position.set(cameraPosition.x, cameraPosition.y, cameraPosition.z);
+camera.zoom = 0.2;
+camera.updateProjectionMatrix();
+scene.add(camera);
+
+// Light
+const ambientLight = new THREE.AmbientLight('white', 0.7);
+scene.add(ambientLight);
+
+const directionalLight = new THREE.DirectionalLight('white', 0.5);
+const directionalLightOriginPosition = new THREE.Vector3(1, 1, 1);
+directionalLight.position.x = directionalLightOriginPosition.x;
+directionalLight.position.y = directionalLightOriginPosition.y;
+directionalLight.position.z = directionalLightOriginPosition.z;
+directionalLight.castShadow = true;
+
+// mapSize 세팅으로 그림자 퀄리티 설정
+directionalLight.shadow.mapSize.width = 2048;
+directionalLight.shadow.mapSize.height = 2048;
+// 그림자 범위
+directionalLight.shadow.camera.left = -100;
+directionalLight.shadow.camera.right = 100;
+directionalLight.shadow.camera.top = 100;
+directionalLight.shadow.camera.bottom = -100;
+directionalLight.shadow.camera.near = -100;
+directionalLight.shadow.camera.far = 100;
+scene.add(directionalLight);
 ```
 
 기본 Scene 추가 후 Camera는 OrthographicCamera를 사용함.
