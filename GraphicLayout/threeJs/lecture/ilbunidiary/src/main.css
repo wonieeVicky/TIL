@@ -1,7 +1,9 @@
 body {
+	/* 넘치는 것을 숨길 수 있다. */
 	overflow: hidden;
 	margin: 0;
 }
+
 #three-canvas {
 	position: fixed;
 	left: 0;
