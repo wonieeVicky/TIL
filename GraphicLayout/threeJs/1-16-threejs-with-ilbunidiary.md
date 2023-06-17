@@ -262,3 +262,72 @@ canvas.addEventListener('touchmove', (e) => {
   }
 });
 ```
+
+그러면 이제 raycating에서 좌표 계산한 값을 사용하는 부분을 작업해보자. 기존에는 클릭 시 광선을 쏴서 그 시점의 좌표를 체크했는데, 이번에는 마우스가 움직일 때마다 해당 좌표를 UI로 노출해야하므로 draw 함수 안에서 tick 마다 계속 반복시켜줘야한다.
+
+![이렇게 마우스 이동 시 마다 해당 좌표를 보여줘야하므로 draw 함수 내부에서 동작](../../img/230617-1.png)
+
+drag의 상태가 isPressed 일때 raycasting이라는 함수를 시작하는데, 그 때 좌표를 캐치하는 코드가 들어간다.
+
+```jsx
+const raycaster = new THREE.Raycaster();
+let mouse = new THREE.Vector2();
+let destinationPoint = new THREE.Vector3();
+let angle = 0;
+let isPressed = false; // 마우스를 누르고 있는 상태
+
+const clock = new THREE.Clock();
+
+function draw() {
+  const delta = clock.getDelta();
+
+  //..
+  if (player.modelMesh) {
+    if (isPressed) {
+      raycasting(); // raycasting으로 해당 좌표 가져온다.
+    }
+    //..
+  }
+  renderer.render(scene, camera);
+  renderer.setAnimationLoop(draw);
+}
+
+// 변환된 마우스 좌표를 이용해 래이캐스팅
+function raycasting() {
+  raycaster.setFromCamera(mouse, camera);
+  checkIntersects();
+}
+```
+
+그럼 raycaster가 좌표를 얻어오는 checkIntersects 함수를 살펴보자
+
+```jsx
+function checkIntersects() {
+  // raycaster.setFromCamera(mouse, camera);
+
+  const intersects = raycaster.intersectObjects(meshes);
+
+  // 광선에 부딪힌 item들이 있으면
+  for (const item of intersects) {
+    // 부딪힌 item이 floor일 때만 동작
+    if (item.object.name === 'floor') {
+      destinationPoint.x = item.point.x;
+      destinationPoint.y = 0.3;
+      destinationPoint.z = item.point.z;
+      player.modelMesh.lookAt(destinationPoint); // 해당 좌표를 바라본다.
+
+      player.moving = true; // 움직이는 상태 추가
+
+      pointerMesh.position.x = destinationPoint.x; // 빨간색 포인터 mesh
+      pointerMesh.position.z = destinationPoint.z; // 빨간색 포인터 mesh
+    }
+    break;
+  }
+}
+```
+
+destinationPoint는 Vertor3로 생성한 변수로 해당 변수에 x, y, z 값을 저장한다.
+예를 들어 x의 경우 item.point.x가 저장되는데 item.point에는 광선이 부딪힌 지점의 x, y, z point 정보가 담겨있다. 이 정보로 캐릭터를 이동시키면 되기 때문에 해당 값을 사용한다.
+
+그런데 y값은 0.3으로 고정됨. y는 평면상에서만 움직이기 때문에 캐릭터의 키에 맞춰서 한번 설정하는 값임
+또 캐릭터는 해당 좌표를 자동으로 바라보고 따라오는데, 이는 위 코드에서 `player.modelMesh.lookAt(destinationPoint)`를 설정해줘서 가능함
