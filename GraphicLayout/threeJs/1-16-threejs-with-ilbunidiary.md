@@ -331,3 +331,94 @@ destinationPoint는 Vertor3로 생성한 변수로 해당 변수에 x, y, z 값�
 
 그런데 y값은 0.3으로 고정됨. y는 평면상에서만 움직이기 때문에 캐릭터의 키에 맞춰서 한번 설정하는 값임
 또 캐릭터는 해당 좌표를 자동으로 바라보고 따라오는데, 이는 위 코드에서 `player.modelMesh.lookAt(destinationPoint)`를 설정해줘서 가능함
+
+마지막으로 draw 함수를 살펴본다.
+
+`main.js`
+
+```jsx
+function draw() {
+  const delta = clock.getDelta();
+
+  if (player.mixer) player.mixer.update(delta); // 기본 애니메이션 동작 처리
+
+  if (player.modelMesh) {
+    // 플레이어가 생성되었을 때만 카메라가 플레이어를 바라보도록 실행
+    camera.lookAt(player.modelMesh.position);
+  }
+
+  // 플레이어가 생성되었을 때만
+  if (player.modelMesh) {
+    // 누르고 있는 상태라면 raycasting
+    if (isPressed) {
+      raycasting();
+    }
+
+    // 움직이는 상태일 때
+    if (player.moving) {
+      // 걸어가는 상태(angle은 플레이어가 걸어가는 각도 계산 - 이동할 위치와 현 위치 사이의 사이의 각도)
+      angle = Math.atan2(destinationPoint.z - player.modelMesh.position.z, destinationPoint.x - player.modelMesh.position.x);
+      player.modelMesh.position.x += Math.cos(angle) * 0.05;
+      player.modelMesh.position.z += Math.sin(angle) * 0.05;
+
+      // 카메라가 플레이어를 따라가도록 설정
+      camera.position.x = cameraPosition.x + player.modelMesh.position.x; // 카메라 포지션 + 플레이어 포지션
+      camera.position.z = cameraPosition.z + player.modelMesh.position.z;
+
+      player.actions[0].stop(); // 갸우뜽갸우뚱 멈추기
+      player.actions[1].play(); // 걷기 애니메이션 시작
+
+      // 해당 위치가 목표지점에 도착했을 때 멈추기
+      if (Math.abs(destinationPoint.x - player.modelMesh.position.x) < 0.03 && Math.abs(destinationPoint.z - player.modelMesh.position.z) < 0.03) {
+        player.moving = false;
+        console.log('멈춤');
+      }
+
+      // 집이 나오는 spotMesh에 도착하면 멈추기 - 크기가 크기 때문에 1.5로 처리
+      if (Math.abs(spotMesh.position.x - player.modelMesh.position.x) < 1.5 && Math.abs(spotMesh.position.z - player.modelMesh.position.z) < 1.5) {
+        if (!house.visible) {
+          console.log('나와');
+          house.visible = true; // 집 보이기
+          spotMesh.material.color.set('seagreen');
+          // 애니메이션 구현, 집이 뛰어나오게 하자
+          gsap.to(house.modelMesh.position, {
+            duration: 1,
+            y: 1,
+            ease: 'Bounce.easeOut' // 띠용 효과를 주기 위함
+          });
+          // 카메라의 위치를 바꿔준다.
+          gsap.to(camera.position, {
+            duration: 1,
+            y: 3
+          });
+        }
+      } else if (house.visible) {
+        console.log('들어가');
+        house.visible = false; // 집 숨기기
+        spotMesh.material.color.set('yellow');
+        gsap.to(house.modelMesh.position, {
+          // 집 들어가
+          duration: 0.5,
+          y: -1.3
+        });
+        gsap.to(camera.position, {
+          // 카메라 위치 원래대로
+          duration: 1,
+          y: 5
+        });
+      }
+    } else {
+      // 서 있는 상태
+      player.actions[1].stop();
+      player.actions[0].play();
+    }
+  }
+
+  renderer.render(scene, camera);
+  renderer.setAnimationLoop(draw);
+}
+```
+
+![이동할 위치에 대한 걸어갈 각도를 구한다.](../../img/230617-2.png)
+
+위 순서에 대해 단계별로 이해해보면 됨 😆 원리를 이해하자
