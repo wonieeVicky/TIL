@@ -72,6 +72,10 @@
     - [Node, Express 타입 분석](Typescript/4-9-ts-all-in-one-node-express-types.md)
     - [타입 지원이 안되는 라이브러리 직접 타이핑하기](Typescript/4-10-ts-all-in-one-library-self-typing.md)
 
+6.  타입스크립트 & OOP
+
+    - [타입스크립트 리마인드](Typescript/5-1-ts-with-oop-basic-remind.md)
+
 ## JavaScript
 
 - EcmaScript6
