@@ -42,7 +42,9 @@ client-side, server-side에서 모두 사용 가능함 → 어떻게? 타입스�
 - vscode 내 Implicit Project config: Strict Null Checks 활성화
 - [공식문서](https://www.typescriptlang.org/download) 항상 검토
 - 컴파일러 툴 추가
+
   - `index.html`
+
     ```html
     <!DOCTYPE html>
     <html lang="en">
@@ -56,7 +58,9 @@ client-side, server-side에서 모두 사용 가능함 → 어떻게? 타입스�
       <body></body>
     </html>
     ```
+
   - `main.ts`
+
     ```tsx
     console.log('hello world');
 
@@ -67,6 +71,7 @@ client-side, server-side에서 모두 사용 가능함 → 어떻게? 타입스�
       }
     }
     ```
+
     - Live Server로 브라우저에 띄워보면 에러 발생
       - Refused to execute script from 'http://127.0.0.1:5500/Typescript/ts-with-oop/main.ts' because its MIME type ('video/mp2t') is not executable.
       - JavaScript 코드로 변환해주어야 한다.
@@ -79,8 +84,9 @@ client-side, server-side에서 모두 사용 가능함 → 어떻게? 타입스�
         > tsc main.ts -w
         ```
     - 즉각적인 compiler 실행은 ts-node를 설치하여 해결한다.
-      ```bash
-      > npm i -g ts-node
-      > ts-node main.ts
-      hello world
-      ```
+
+    ```bash
+    > npm i -g ts-node
+    > npx ts-node main.ts
+    hello world
+    ```
