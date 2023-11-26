@@ -41,3 +41,46 @@ client-side, server-side에서 모두 사용 가능함 → 어떻게? 타입스�
 
 - vscode 내 Implicit Project config: Strict Null Checks 활성화
 - [공식문서](https://www.typescriptlang.org/download) 항상 검토
+- 컴파일러 툴 추가
+  - `index.html`
+    ```html
+    <!DOCTYPE html>
+    <html lang="en">
+      <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <script src="main.ts"></script>
+        <title>Document</title>
+      </head>
+
+      <body></body>
+    </html>
+    ```
+  - `main.ts`
+    ```tsx
+    console.log('hello world');
+
+    class Car {
+      engine: number;
+      constructor(engine: number) {
+        this.engine = engine;
+      }
+    }
+    ```
+    - Live Server로 브라우저에 띄워보면 에러 발생
+      - Refused to execute script from 'http://127.0.0.1:5500/Typescript/ts-with-oop/main.ts' because its MIME type ('video/mp2t') is not executable.
+      - JavaScript 코드로 변환해주어야 한다.
+        ```bash
+        > tsc main.ts
+        ```
+      - main.js 변환 완료 → index.html에 연결하면 정상 동작한다.
+      - 매번 main.js로 변환 시 불편하므로 watch 모드를 키면 더 쉽게 사용 가능
+        ```bash
+        > tsc main.ts -w
+        ```
+    - 즉각적인 compiler 실행은 ts-node를 설치하여 해결한다.
+      ```bash
+      > npm i -g ts-node
+      > ts-node main.ts
+      hello world
+      ```
