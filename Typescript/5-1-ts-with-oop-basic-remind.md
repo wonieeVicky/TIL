@@ -223,3 +223,48 @@ client-side, server-side에서 모두 사용 가능함 → 어떻게? 타입스�
 ```
 
 코드만 보고도 이해가 되도록..
+
+### 함수 타입 이용(spread, default, optional)
+
+함수를 활용할 수 있는 팁에 대해 알아보자
+
+```tsx
+// JavaScript ✨ => TypeScript
+// Optional parameter - 물음표를 붙여서 사용
+function printName(firstName: string, lastName?: string) {
+  console.log(firstName);
+  console.log(lastName);
+}
+printName('Vicky', 'Jobs');
+// Vicky
+// Jobs
+printName('Wonny');
+// Wonny
+// undefined
+printName('Anna', undefined);
+// Anna
+// undefined
+
+function printName2(firstName: string, lastName: string | undefined) {
+  console.log(firstName);
+  console.log(lastName);
+}
+printName2('Vicky', 'Jobs');
+printName2('Wonny'); // type error!
+printName2('Anna', undefined);
+
+// Default parameter - 기본값을 설정
+function printMessage(message: string = 'default message') {
+  console.log(message);
+}
+printMessage(); // default message
+printMessage('hello'); // hello
+
+// Rest parameter - 배열 형태로 전달
+function addNumbers(...numbers: number[]): number {
+  return numbers.reduce((a, b) => a + b);
+}
+console.log(addNumbers(1, 2, 3)); // 6
+console.log(addNumbers(1, 2, 3, 4, 5)); // 15
+console.log(addNumbers(1)); // 1
+```
