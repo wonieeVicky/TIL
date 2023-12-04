@@ -413,13 +413,13 @@ function printLoginState(state: LoginState): void {
  */
 // function: login -> success, fail
 type SuccessState = {
-  result: 'success';
+  result: 'success'; // Discriminated union
   response: {
     body: string;
   };
 };
 type FailState = {
-  result: 'fail';
+  result: 'fail'; // Discriminated union
   reason: string;
 };
 type LoginState = SuccessState | FailState;
@@ -451,4 +451,36 @@ function printLoginState(state: LoginState): void {
     console.log(`😭 ${state.reason}`);
   }
 }
+```
+
+### intersection type
+
+union과 전혀다른 intersection type에 대해 알아본다. 다양한 타입을 하나로 묶을 수 있음
+
+```tsx
+/**
+ * Intersection Types: &
+ */
+type Student = {
+  name: string;
+  score: number;
+};
+
+type Worker = {
+  employeeId: number;
+  work: () => void;
+};
+
+// 학생이기도 하면서 일을 함
+function internWork(person: Student & Worker) {
+  console.log(person.name, person.employeeId, person.work());
+}
+
+// 모든 type이 포함되어야 한다.
+internWork({
+  name: 'vicky',
+  score: 100,
+  employeeId: 235,
+  work: () => {}
+});
 ```
