@@ -552,3 +552,35 @@ dayOfweek = 'vicky'; // enum으로 선언된 변수에는 enum에 정의된 값�
 
 enum은 기본값이 숫자로 들어가도록 만들 수 있고, enum에 정의된 값만 할당할 수 있음
 enum보다는 union 타입을 많이 사용한다. (DaysOfWeek)
+
+### 타입 추론에 대하여
+
+```tsx
+/**
+ * Type Inference
+ */
+let text = 'hello';
+text = 'hi';
+text = 1; // type inference error
+
+function print(message = 'hello') {
+  console.log(message);
+}
+print('hello');
+print(); // ok. default parameter
+print(1); // type error
+
+function add(x: number, y: number) {
+  return x + y;
+}
+add(1, 2); // number
+add('aa', 22); // type error
+```
+
+타입스크립트가 알아서 타입을 추론해주지만 타입 추론만 믿는 것보다는 명확한 명시를 해주는 것이 좋다.
+
+```tsx
+function add(x: number, y: number): number {
+  return x + y;
+}
+```
