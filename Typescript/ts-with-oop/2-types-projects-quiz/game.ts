@@ -19,7 +19,7 @@ function move(direction: Direction) {
       position.x += 1;
       break;
     default:
-      throw Error('unknown direction');
+      throw Error(`unknown direction: ${direction}`);
   }
 }
 
