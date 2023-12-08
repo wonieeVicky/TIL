@@ -75,6 +75,8 @@
 6.  타입스크립트 & OOP
 
     - [타입스크립트 리마인드](Typescript/5-1-ts-with-oop-basic-remind.md)
+    - [기본함수 타이핑](Typescript/5-2-ts-with-oop-func-typing.md)
+    - [객체지향 프로그래밍(OOP) 개념 이해하기](Typescript/5-3-ts-with-oop-programming.md)
 
 ## JavaScript
 
