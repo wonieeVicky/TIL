@@ -45,3 +45,34 @@
   - object 생성
     - student Vicky instance 생성
     - student Wonny instance 생성
+
+### 객체지향 원칙
+
+클래스 정의, 객체만 만든다고 해서 객체 지향 프로그래밍이라고 할 수 없다.
+객체지향의 원칙을 지켜서 개발하는 것이 가장 중요
+
+객체 지향은 아래의 특성을 가진다.
+
+- 캡슐화(Encapsulation)
+  - 흩어져있는 관련있는 객체들을 가두는 것을 캡슐화라고 함.
+  - 감기약 캡슐 안에 여러 성분의 약이 있는 것과 같음 → 성분을 보지 않고 그냥 먹기만 하면 됨
+  - 서로 관련있는 데이터와 함수를 하나의 오브젝트 안에 담아두고 외부에서 볼 필요가 없는 데이터를 잘 숨겨서 캡슐화를 할 수 있음
+  - 고양이
+    - hungry, full, tired, happy 는 내부 상태(State)
+    - play, feed 라는 외부 function을 통해 내부 상태를 변경할 수 있음
+- 추상화(Abstraction)
+  - 추상성은 내부의 복잡한 기능을 다 이해하지 않고도 외부에서 다양한 인터페이스를 통해 쓸 수 있도록 하는 것을 의미
+  - 커피머신
+    - 내부 구조를 모두 이해하지 않아도 기계에서 제공하는 버튼만 누르면 커피를 만들 수 있다.
+    - 내부 사정을 몰라도 외부에서만 보이는 인터페이스를 이용해 오브젝트를 사용할 수 있도록 하는 것
+- 상속성(Inheritance)
+  - 상속을 이용하면 오브젝트를 활용해 다양한 오브젝트를 확장해나갈 수 있음
+  - coffee machine 을 상속받아 → coffee brewer, espresso machine 이 된다.
+  - animal을 상속받아(makeSound) → cat, dog, pig(makeSound 상속)이 된다.
+  - HTMLElement → Document. Element. Text → Node → EventTarget
+    - 모든 엘리먼트는 EventTarget을 가짐을 알 수 있다.
+  - parent ↔ child, super ↔ sub, base ↔ derived 관계로 불림
+- 다형성(Polymorphism)
+  - 다양한 형태를 의미함
+  - coffee machine.makeCoffee → coffee brewer, espresso machine 등 어떤 커피머신인지 알 필요 없이 공통된 makeCoffee 함수에 접근할 수 있는 것을 의미
+  - animal.makeSound → cat, dog, pig 등 어떤 동물인지 알 필요 없이 다양한 형태에 공통된 makeSound 를 실행할 수 있는 것을 의미
