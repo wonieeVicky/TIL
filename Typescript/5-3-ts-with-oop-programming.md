@@ -76,3 +76,32 @@
   - 다양한 형태를 의미함
   - coffee machine.makeCoffee → coffee brewer, espresso machine 등 어떤 커피머신인지 알 필요 없이 공통된 makeCoffee 함수에 접근할 수 있는 것을 의미
   - animal.makeSound → cat, dog, pig 등 어떤 동물인지 알 필요 없이 다양한 형태에 공통된 makeSound 를 실행할 수 있는 것을 의미
+
+### 절차지향적으로 커피머신 만들기
+
+```tsx
+{
+  type CoffeeCup = {
+    shots: number;
+    hasMilk: boolean;
+  };
+
+  const BEANS_GRAMM_PER_SHOT = 7; // 커피를 내릴 때 필요한 원두의 양
+  let coffeeBeans: number = 0;
+  function makeCoffee(shots: number): CoffeeCup {
+    if (coffeeBeans < shots * BEANS_GRAMM_PER_SHOT) {
+      throw new Error('Not enough coffee beans!');
+    }
+    coffeeBeans -= shots * BEANS_GRAMM_PER_SHOT;
+
+    return {
+      shots,
+      hasMilk: false
+    };
+  }
+
+  coffeeBeans += 3 * BEANS_GRAMM_PER_SHOT; // 초기 coffeeBeans 수량 정의
+  const coffee = makeCoffee(2);
+  console.log(coffee); // { shots: 2, hasMilk: false }
+}
+```
