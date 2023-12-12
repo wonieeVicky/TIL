@@ -105,3 +105,70 @@
   console.log(coffee); // { shots: 2, hasMilk: false }
 }
 ```
+
+### 객체지향적으로 커피머신 만들기
+
+```tsx
+type CoffeeCup = {
+  shots: number;
+  hasMilk: boolean;
+};
+
+class CoffeeMaker {
+  static BEANS_GRAMM_PER_SHOT: number = 7; // 중복적으로 사용되는 변수는 class level로 설정
+  coffeeBeans: number = 0; // instance (object) level
+
+  // instance를 만들 때 초기에 항상 호출되는 함수
+  constructor(coffeeBeans: number) {
+    this.coffeeBeans += coffeeBeans; // this.coffeeBeans !== coffeeBeans
+  }
+
+  makeCoffee(shots: number): CoffeeCup {
+    if (this.coffeeBeans < shots * CoffeeMaker.BEANS_GRAMM_PER_SHOT) {
+      throw new Error('Not enough coffee beans!');
+    }
+
+    this.coffeeBeans -= shots * CoffeeMaker.BEANS_GRAMM_PER_SHOT;
+
+    return {
+      shots,
+      hasMilk: false
+    };
+  }
+}
+
+const makerInstance = new CoffeeMaker(32);
+console.log(makerInstance); // CoffeeMaker { coffeeBeans: 32 }
+console.log(makerInstance.makeCoffee(2)); // { shots: 2, hasMilk: false }
+
+const makerInstance2 = new CoffeeMaker(14);
+console.log(makerInstance2); // CoffeeMaker { coffeeBeans: 14 }
+```
+
+위처럼 makeInstance 변수를 생성해서 인스턴스를 생성하는 방법 말고 아래와 같이 만들 수도 있음
+
+```tsx
+type CoffeeCup = {
+  shots: number;
+  hasMilk: boolean;
+};
+
+class CoffeeMaker {
+  static BEANS_GRAMM_PER_SHOT: number = 7;
+  coffeeBeans: number = 0;
+
+  // constructor를 사용하지 않고, static method를 사용하여 instance를 생성
+  static makeMachine(coffeeBeans: number): CoffeeMaker {
+    return new CoffeeMaker(coffeeBeans);
+  }
+
+  makeCoffee(shots: number): CoffeeCup {
+    // ..
+  }
+}
+
+const makerInstance = CoffeeMaker.makeMachine(3);
+console.log(makerInstance); // CoffeeMaker { coffeeBeans: 3 }
+```
+
+반드시 static method로 makeMachine을 선언해야 외부에서 바로 인스턴스를 생성할 수 있음. 참고
