@@ -172,3 +172,81 @@ console.log(makerInstance); // CoffeeMaker { coffeeBeans: 3 }
 ```
 
 반드시 static method로 makeMachine을 선언해야 외부에서 바로 인스턴스를 생성할 수 있음. 참고
+
+### Encapsulation 캡슐화 고도화
+
+위 CoffeeMaker 클래스에는 큰 문제가 있다. 인스턴스가 직접 coffeeBeans의 수를 수정할 수 있다는 것
+
+```tsx
+class CoffeeMaker {
+  static BEANS_GRAMM_PER_SHOT: number = 7;
+  coffeeBeans: number = 0;
+
+  // ..
+}
+
+const makerInstance = new CoffeeMaker(32);
+console.log(makerInstance); // CoffeeMaker { coffeeBeans: 32 }
+makerInstance.coffeeBeans = 3;
+console.log(makerInstance); // CoffeeMaker { coffeeBeans: 3 }
+makerInstance.coffeeBeans = -34;
+console.log(makerInstance); // invalid
+```
+
+위와 같이 말이다. 외부에서 보이면 안되는, 외부에서 조정이 불가능하도록 정보를 은닉해본다.
+
+어떻게 구현? public, private, protected를 사용함
+
+```tsx
+class CoffeeMaker {
+  private static BEANS_GRAMM_PER_SHOT: number = 7;
+  private coffeeBeans: number = 0;
+
+  // ..
+
+  // fillCoffeeBeans에서 coffeeBeans를 수정할 수 있음
+  fillCoffeeBeans(beans: number) {
+    if (beans < 0) {
+      throw new Error('value for beans should be greater than 0');
+    }
+
+    this.coffeeBeans += beans;
+  }
+}
+
+const makerInstance = new CoffeeMaker(32);
+
+makerInstance.coffeeBeans = 3; // error
+makerInstance.coffeeBeans = -34; // error
+```
+
+위와 같이 BEANS_GRAMM_PER_SHOT, coffeeBeans를 private으로 선언함으로써 외부에서 인스턴스에서 접근할 수 없도록 할 수 있다.
+`protected`의 경우는 동일하게 외부에서 접근은 불가능하지만 자식 클래스는 접근이 가능하도록 설정할 수 있다.
+
+그럼 이를 활용하는 방식은 뭐가 있을까?
+
+앞서 생성자를 만들기 위해 makeMachine를 만들었는데,
+실제 인스턴스를 발생시키는 방법을 makeMachine으로 가두기 위해 활용할 수도 있다.
+
+```tsx
+class CoffeeMaker {
+  private static BEANS_GRAMM_PER_SHOT: number = 7;
+  private coffeeBeans: number = 0;
+
+  // private으로 가려 외부에서 호출할 수 없도록 함
+  private constructor(coffeeBeans: number) {
+    this.coffeeBeans = coffeeBeans;
+  }
+
+  static makeMachine(coffeeBeans: number): CoffeeMaker {
+    return new CoffeeMaker(coffeeBeans);
+  }
+
+  // ..
+}
+
+const makerInstance = new CoffeeMaker(32); // error
+const makerInstance = CoffeeMaker.makeMachine(32); // ok
+```
+
+이렇듯 캡슐화는 클래스에서 외부/내부에서 접근할 수 있는 것을 명확하게 디자인할 수 있도록 해준다.
