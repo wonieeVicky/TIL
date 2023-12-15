@@ -250,3 +250,91 @@ const makerInstance = CoffeeMaker.makeMachine(32); // ok
 ```
 
 이렇듯 캡슐화는 클래스에서 외부/내부에서 접근할 수 있는 것을 명확하게 디자인할 수 있도록 해준다.
+
+### 유용한 Getter와 Setter
+
+```tsx
+class User {
+  firstName: string;
+  lastName: string;
+  fullName: string;
+  constructor(firstName: string, lastName: string) {
+    this.firstName = firstName;
+    this.lastName = lastName;
+    this.fullName = `${firstName} ${lastName}`;
+  }
+}
+
+const user = new User('Vicky', 'wonny');
+console.log(user.fullName); // Vicky wonny
+user.firstName = 'Vickiee';
+console.log(user.fullName); // Vicky wonny
+```
+
+아래와 같은 User 클래스가 있다고 할 때, user.fullName은 값을 지정해줘도 변경되지 않음. constructor에서만 선언 후 fullName이 갱신되지 않기 때문이다.
+
+이때 Getter를 유용히 사용할 수 있다.
+
+```tsx
+class User {
+  firstName: string;
+  lastName: string;
+  get fullName(): string {
+    return `${this.firstName} ${this.lastName}`;
+  }
+  constructor(firstName: string, lastName: string) {
+    this.firstName = firstName;
+    this.lastName = lastName;
+  }
+}
+
+const user = new User('Vicky', 'wonny');
+console.log(user.fullName); // Vicky wonny
+user.firstName = 'Vickiee';
+console.log(user.fullName); // Vickiee wonny
+```
+
+이렇듯 Getter와 Setter는 일반 변수처럼 사용이 가능하지만 어떠한 계산을 해야할 때 좀 더 유연하게 사용할 수 있다.
+
+또 firstName, lastName과 constructor에서 값을 할당해주는 것이 매우 번거로우므로 아래와 같이 짧게 줄여쓸 수 있다.
+
+```tsx
+class User {
+  get fullName(): string {
+    return `${this.firstName} ${this.lastName}`;
+  }
+
+  constructor(private firstName: string, private lastName: string) {
+    // 알아서 firstName, lastName이 private 변수로 선언됨
+  }
+}
+
+const user = new User('Vicky', 'wonny');
+console.log(user.fullName); // Vicky wonny
+```
+
+class 내 외부에서도 변경 가능한 public 변수는 앞에 public으로 붙이면 됨
+
+```tsx
+class User {
+  get fullName(): string {
+    return `${this.firstName} ${this.lastName}`;
+  }
+  private internalAge = 4;
+  get age(): number {
+    return this.internalAge;
+  }
+  set age(num: number) {
+    if (num < 0) {
+      throw new Error('Age can not be negative');
+    }
+    this.internalAge = num;
+  }
+  constructor(private firstName: string, private lastName: string) {}
+}
+
+const user = new User('Vicky', 'wonny');
+user.age = 6; // internalAge = 6으로 업데이트
+```
+
+Setter로 위와 같이 구현 가능. 멤버 변수 값을 직접 수정하지 않고, Setter를 통해 좀 더 안전하게 검증하고 관리할 수 있게 된다.
