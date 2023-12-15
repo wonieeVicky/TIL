@@ -40,5 +40,26 @@
     }
   }
 
-  const makerInstance = CoffeeMaker.makeMachine(32);
+  // const makerInstance = CoffeeMaker.makeMachine(32);
+  // makerInstance.fillCoffeeBeans(32);
+
+  class User {
+    get fullName(): string {
+      return `${this.firstName} ${this.lastName}`;
+    }
+    private internalAge = 4;
+    get age(): number {
+      return this.internalAge;
+    }
+    set age(num: number) {
+      if (num < 0) {
+        throw new Error('Age can not be negative');
+      }
+      this.internalAge = num;
+    }
+    constructor(private firstName: string, private lastName: string) {}
+  }
+
+  const user = new User('Vicky', 'wonny');
+  user.age = 6; // internalAge = 6으로 업데이트
 }
