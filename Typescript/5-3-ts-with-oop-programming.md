@@ -338,3 +338,112 @@ user.age = 6; // internalAge = 6으로 업데이트
 ```
 
 Setter로 위와 같이 구현 가능. 멤버 변수 값을 직접 수정하지 않고, Setter를 통해 좀 더 안전하게 검증하고 관리할 수 있게 된다.
+
+### Abstraction 추상화 몸소 느껴보기
+
+클래스를 추상화해보자. 외부에서 클래스를 봤을 때 인터페이스가 너무 복잡했을 때, 추상화를 통해 필요한 인터페이스만 노출하여 클래스를 사용하기 쉽게 만들 수 있다.
+
+복잡한 기계를 간단한 커피머신으로 바꿔주는 것.
+
+이전 시간에 만들었던 CoffeeMaker를 다시 한번 보자
+
+```tsx
+type CoffeeCup = {
+  shots: number;
+  hasMilk: boolean;
+};
+
+class CoffeeMaker {
+  private static BEANS_GRAMM_PER_SHOT: number = 7;
+  private coffeeBeans: number = 0;
+
+  // ..
+
+  grindBeans(shots: number) {
+    console.log(`grinding beans for ${shots}`);
+    if (this.coffeeBeans < shots * CoffeeMaker.BEANS_GRAMM_PER_SHOT) {
+      throw new Error('Not enough coffee beans!');
+    }
+    this.coffeeBeans -= shots * CoffeeMaker.BEANS_GRAMM_PER_SHOT;
+  }
+
+  preheat(): void {
+    console.log(`heating up... 🔥`);
+  }
+
+  extract(shots: number): CoffeeCup {
+    console.log(`Pulling ${shots} shots... ☕️`);
+    return {
+      shots,
+      hasMilk: false
+    };
+  }
+
+  makeCoffee(shots: number): CoffeeCup {
+    this.grindBeans(shots); // 원두를 갈고
+    this.preheat(); // 물을 데우고
+    return this.extract(shots); // 커피를 추출한다.
+  }
+}
+
+const makerInstance = CoffeeMaker.makeMachine(32);
+makerInstance.fillCoffeeBeans(32);
+makerInstance.makeCoffee(2);
+```
+
+위와 같이 makeCoffee라는 함수를 3단계의 기능별로 정의했을 때, 실제 하위 CoffeeMaker로 만든 makerInstance에는 grindBeans, preheat, extract 등을 모두 호출할 수 있게된다.
+
+![생성한 함수들이 모두 자동완성 snippet에 등장](../img/231217-1.png)
+
+인스턴스는 makeCoffee 함수만 알면 되므로 extract, grindBeans, preheat을 private을 지정해주면 정보은닉 및 추상화가 가능해진다.
+
+![두가지로 줄었음](../img/231217-2.png)
+
+인터페이스를 통해서도 추상화를 구현할 수 있다.
+인터페이스는 외부에 공개되어야 하는 것들을 명시하고 정의할 때 사용한다.
+
+```tsx
+interface CoffeeMaker {
+  makeCoffee(shots: number): CoffeeCup;
+}
+
+// CoffeeMachine은 CoffeeMaker 인터페이스를 구현하는 클래스이다.
+class CoffeeMachine implements CoffeeMaker {
+  private static BEANS_GRAMM_PER_SHOT: number = 7;
+  private coffeeBeans: number = 0;
+
+  // ..
+
+  fillCoffeeBeans(beans: number) {
+    if (beans < 0) {
+      throw new Error('value for beans should be greater than 0');
+    }
+
+    this.coffeeBeans += beans;
+  }
+
+  // private grindBeans, preheat, extract ...
+
+  makeCoffee(shots: number): CoffeeCup {
+    this.grindBeans(shots);
+    this.preheat();
+    return this.extract(shots);
+  }
+}
+
+// maker는 CoffeeMachine을 반환하는 인스턴스
+const maker: CoffeeMachine = CoffeeMachine.makeMachine(32);
+maker.fillCoffeeBeans(32); // fillCoffeeBeans 사용 가능
+maker.makeCoffee(2);
+
+// maker2는 CoffeeMaker를 반환하는 인스턴스 - CoffeeMachine은 CoffeeMaker를 구현하므로
+const maker2: CoffeeMaker = CoffeeMachine.makeMachine(32);
+maker2.fillCoffeeBeans(32); // error - CoffeeMaker 내에는 fillCoffeeBeans가 미존재
+maker2.makeCoffee(2);
+```
+
+위와 같이 maker, maker2가 반환하는 값에 대한 타입을 비교해보자.
+
+maker는 CoffeeMahcine을, maker2는 CoffeeMaker를 반환.
+
+즉, 인터페이스를 이용하면 얼마만큼의 행동을 허용/보장할지 결정할 수 있다.
