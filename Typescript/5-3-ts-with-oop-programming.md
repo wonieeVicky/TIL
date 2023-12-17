@@ -447,3 +447,91 @@ maker2.makeCoffee(2);
 maker는 CoffeeMahcine을, maker2는 CoffeeMaker를 반환.
 
 즉, 인터페이스를 이용하면 얼마만큼의 행동을 허용/보장할지 결정할 수 있다.
+
+### interface 더 깊이 알아보기
+
+이번에는 interface를 좀 더 알아보자. 한가지 더 인터페이스를 만들어본다.
+상업용 커피머신에 대한 인터페이스가 추가되었다고 가정해보자
+
+```tsx
+interface CoffeeMaker {
+  makeCoffee(shots: number): CoffeeCup;
+}
+
+interface CommercialCoffeeMaker {
+  makeCoffee(shots: number): CoffeeCup;
+  fillCoffeeBeans(beans: number): void;
+  clean(): void;
+}
+
+// CoffeeMaker, CommercialCoffeeMaker를 인터페이스로 가짐
+// CoffeeMachine 내 clean 함수가 없으면 타입 에러 발생
+class CoffeeMachine implements CoffeeMaker, CommercialCoffeeMaker {
+  private static BEANS_GRAMM_PER_SHOT: number = 7;
+  private coffeeBeans: number = 0;
+
+  // ..
+  // private grindBeans, preheat, extract ...
+
+  fillCoffeeBeans(beans: number) {
+    // ..
+  }
+
+  clean(): void {
+    console.log('cleaning the machine... 🧼');
+  }
+
+  makeCoffee(shots: number): CoffeeCup {
+    // ..
+  }
+}
+
+const maker2: CommercialCoffeeMaker = CoffeeMachine.makeMachine(32);
+maker2.fillCoffeeBeans(32); // ok
+maker2.makeCoffee(2); // ok
+maker2.clean(); // ok
+```
+
+위와 같이 makeCoffee, fillCoffeeBeans, clean을 반환하는 타입 인터페이스를 maker2에 할당하며 3가지 함수에 인스턴스가 접근할 수 있는 것을 확인해볼 수 있다.
+
+위 클래스를 확장하면 아래와 같이 생각해볼 수 있다.
+
+```tsx
+class AmateurUser {
+  constructor(private machine: CoffeeMaker) {}
+  makeCoffee() {
+    const coffee = this.machine.makeCoffee(2); // 추가 함수 미존재
+    console.log(coffee);
+  }
+}
+
+class ProBarista {
+  constructor(private machine: CommercialCoffeeMaker) {}
+  makeCoffee() {
+    const coffee = this.machine.makeCoffee(2);
+    console.log(coffee);
+    this.machine.fillCoffeeBeans(45);
+    this.machine.clean();
+  }
+}
+
+const maker: CoffeeMachine = CoffeeMachine.makeMachine(32);
+const amateur = new AmateurUser(maker);
+amateur.makeCoffee();
+// grinding beans for 2
+// heating up... 🔥
+// Pulling 2 shots... ☕️
+// { shots: 2, hasMilk: false }
+
+const pro = new ProBarista(maker);
+pro.makeCoffee();
+// grinding beans for 2
+// heating up... 🔥
+// Pulling 2 shots... ☕️
+// { shots: 2, hasMilk: false }
+// cleaning the machine... 🧼
+```
+
+아마추어 유저, 프로 유저에 따라 실제 커피머신의 기능이 달라진다고 했을 때, constructor내 machine에 부여되는 인터페이스 타입이 달라짐에 따라 실제 인스턴스의 makeCoffee가 수행하는 기능이 달라진다는 것을 알 수 있다. 실제 동작하는 함수의 로그도 달라짐.
+
+이처럼 인터페이스를 통해 클래스의 역할을 정확히 분리하고 제한할 수 있다는 장점. 기억해두자
