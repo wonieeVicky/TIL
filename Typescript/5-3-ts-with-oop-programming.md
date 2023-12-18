@@ -535,3 +535,60 @@ pro.makeCoffee();
 아마추어 유저, 프로 유저에 따라 실제 커피머신의 기능이 달라진다고 했을 때, constructor내 machine에 부여되는 인터페이스 타입이 달라짐에 따라 실제 인스턴스의 makeCoffee가 수행하는 기능이 달라진다는 것을 알 수 있다. 실제 동작하는 함수의 로그도 달라짐.
 
 이처럼 인터페이스를 통해 클래스의 역할을 정확히 분리하고 제한할 수 있다는 장점. 기억해두자
+
+### Inheritance, 상속
+
+상속에 대해 좀 더 알아보자. animal이란 클래스가 있다고 했을 때, 클래스 내부의 makeSound 함수를 dog, cat, pig라는 자식클래스에서 상속받는다면, 기본 makeSound를 가질 수 있고 각 동물에 맞는 소리가 나도록 커스터마이징 할 수도 있다.
+
+```tsx
+type CoffeeCup = {
+  shots: number;
+  hasMilk: boolean;
+};
+
+interface CoffeeMaker {
+  makeCoffee(shots: number): CoffeeCup;
+}
+
+// CoffeeMachine은 CoffeeMaker interface를 구현하는 클래스
+class CoffeeMachine implements CoffeeMaker {
+  // ..
+  constructor(coffeeBeans: number) {
+    this.coffeeBeans = coffeeBeans;
+  }
+
+  // ..
+}
+
+// CaffeLatteMachine은 CoffeeMachine을 상속받는 클래스(extends 사용)
+// CoffeeMachine이 상속하려면 constructor가 protected 혹은 public으로 선언되어야 함
+class CaffeLatteMachine extends CoffeeMachine {
+  constructor(coffeeBeans: number, public readonly serialNumber: string) {
+    super(coffeeBeans);
+  }
+  private steamMilk(): void {
+    console.log('Steaming some milk... 🥛');
+  }
+  makeCoffee(shots: number): CoffeeCup {
+    const coffee = super.makeCoffee(shots); // 부모 클래스의 makeCoffee 함수를 호출
+    this.steamMilk();
+    return {
+      ...coffee,
+      hasMilk: true
+    };
+  }
+}
+
+const machine = new CoffeeMachine(23);
+const latteMachine = new CaffeLatteMachine(23, '103-S-01');
+const coffee = latteMachine.makeCoffee(1);
+console.log(coffee);
+
+// grinding beans for 1
+// heating up... 🔥
+// Pulling 1 shots... ☕️
+// Steaming some milk... 🥛
+// { shots: 1, hasMilk: true }
+```
+
+이처럼 상속을 잘 이용하면 공통적 기능은 그대로 재사용하면서 자식클래스에서만 특화된 기능을 추가해나갈 수 있다.
