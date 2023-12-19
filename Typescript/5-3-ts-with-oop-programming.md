@@ -592,3 +592,79 @@ console.log(coffee);
 ```
 
 이처럼 상속을 잘 이용하면 공통적 기능은 그대로 재사용하면서 자식클래스에서만 특화된 기능을 추가해나갈 수 있다.
+
+### Polymorphism 다형성
+
+다형성은 animal 클래스 상속받고 자신의 클래스에 맞게 부모의 함수를 다시 구현함으로써 다형성을 구현해볼 수 있다.
+
+```tsx
+class CoffeeMachine implements CoffeeMaker {
+  // ..
+  makeCoffee(shots: number): CoffeeCup {
+    this.grindBeans(shots);
+    this.preheat();
+    return this.extract(shots);
+  }
+}
+
+class CaffeLatteMachine extends CoffeeMachine {
+  // ..
+  makeCoffee(shots: number): CoffeeCup {
+    const coffee = super.makeCoffee(shots);
+    this.steamMilk();
+    return {
+      ...coffee,
+      hasMilk: true
+    };
+  }
+}
+
+class SweetCoffeeMaker extends CoffeeMachine {
+  makeCoffee(shots: number): CoffeeCup {
+    const coffee = super.makeCoffee(shots);
+    return {
+      shots,
+      hasSugar: true,
+      hasMilk: false
+    };
+  }
+}
+```
+
+위와 같이 CoffeeMachine을 부모 클래스로 상속 받은 CaffeLatteMachine과 SweetCoffeeMaker라는 클래스가 있다고 하자. CaffeeLatteMachine, SweetCoffeeMaker에서는 makeCoffee 함수를 상속받아 각 머신의 성격에 맞게 기능을 재 구현하여 사용하고 있다.
+
+```tsx
+const machines: CoffeeMachine[] = [
+  new CoffeeMachine(16),
+  new CaffeLatteMachine(16, '1'),
+  new SweetCoffeeMaker(16)
+];
+
+// 다형성을 가진 각 machines들은 같은 API를 호출할 수 있으며
+// API는 클래스별로 각자 다른 내부 구현사항을 지님
+machines.forEach((machine) => {
+  console.log('------------------');
+  machine.makeCoffee(1);
+  machine.clean(); // ok - CoffeeMachine을 상속받으므로
+  machine.fillCoffeeBeans(45); // ok - CoffeeMachine을 상속받으므로
+});
+
+// ------------------
+// grinding beans for 1
+// heating up... 🔥
+// Pulling 1 shots... ☕️
+// cleaning the machine... 🧼
+// ------------------
+// grinding beans for 1
+// heating up... 🔥
+// Pulling 1 shots... ☕️
+// Steaming some milk... 🥛
+// cleaning the machine... 🧼
+// ------------------
+// grinding beans for 1
+// heating up... 🔥
+// Pulling 1 shots... ☕️
+// cleaning the machine... 🧼
+```
+
+다형성의 장점은 내부적으로 구현된 다양한 클래스들이 한가지의 인터페이스를 구현하거나 혹은 동일한 부모 클래스를 상속했을 때, 동일한 함수를 어떤 클래스인지 구분하지 않고 호출할 수 있다는 장점이 있다. 인터페이스와 부모 클래스에 있는 동일한 함수 API를 통해 각 구현된 자식클래스의 내부 구현사항을 디테일하게 신경쓰지 않고도 규약된 API를 호출함으로써 간편하게 다양한 기능을 활용할 수 있게 되는 것이다.
