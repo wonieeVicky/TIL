@@ -61,54 +61,84 @@
     }
   }
 
-  class CaffeLatteMachine extends CoffeeMachine {
-    constructor(coffeeBeans: number, public readonly serialNumber: string) {
-      super(coffeeBeans);
-    }
+  // 싸구려 우유 거품기
+  class CheapMilkSteamer {
     private steamMilk(): void {
-      console.log('Steaming some milk... 🥛');
+      console.log('Steaming some milk... 🥛'); // imagine complicate logic..
     }
-    makeCoffee(shots: number): CoffeeCup {
-      const coffee = super.makeCoffee(shots); // 부모 클래스의 makeCoffee 함수를 호출
+    makeMilk(cup: CoffeeCup): CoffeeCup {
       this.steamMilk();
       return {
-        ...coffee,
+        ...cup,
         hasMilk: true
       };
     }
   }
 
-  class SweetCoffeeMaker extends CoffeeMachine {
-    addSugar(): void {
-      console.log('Adding sugar... 🍭');
+  // 설탕 제조기
+  class AutomaticSugarMixer {
+    private getSugar() {
+      console.log('Getting some sugar from jar 🍭'); // imagine complicate logic..
+      return true;
     }
-    makeCoffee(shots: number): CoffeeCup {
-      const coffee = super.makeCoffee(shots);
+    addSugar(cup: CoffeeCup): CoffeeCup {
+      const sugar = this.getSugar();
       return {
-        shots,
-        hasSugar: true,
-        hasMilk: false
+        ...cup,
+        hasSugar: sugar
       };
     }
   }
 
-  const machines: CoffeeMachine[] = [
-    new CoffeeMachine(16),
-    new CaffeLatteMachine(16, '1'),
-    new SweetCoffeeMaker(16)
-  ];
-  // 다형성의 장점은 내부적으로 구현된 다양한 클래스들이 한가지의 인터페이스를 구현하거나
-  // 또는 동일한 부모 클래스를 상속했을 때, 동일한 함수를 어떤 클래스인지 구분하지 않고 호출할 수 있다는 장점이 있음
-  // 인터페이스와 부모 클래스에 있는 동일한 함수 API를 통해 각각 구현된 자식 클래스의 내부 구현사항을 신경쓰지 않고
-  // 약속된 API를 호출함으로써 간편하게 다양한 기능을 활용하도록 만들어줄 수 있다.
-  machines.forEach((machine) => {
-    console.log('------------------');
-    machine.makeCoffee(1);
-    machine.clean(); // ok
-    machine.fillCoffeeBeans(45); // ok
-  });
+  class CaffeLatteMachine extends CoffeeMachine {
+    constructor(
+      coffeeBeans: number,
+      public readonly serialNumber: string,
+      private milkFother: CheapMilkSteamer
+    ) {
+      super(coffeeBeans);
+    }
+    makeCoffee(shots: number): CoffeeCup {
+      const coffee = super.makeCoffee(shots);
+      return this.milkFother.makeMilk(coffee);
+    }
+  }
 
-  class SweetCaffeLatteMachine extends SweetCoffeeMaker, CaffeLatteMachine {
-    
+  class SweetCoffeeMaker extends CoffeeMachine {
+    constructor(beans: number, private sugar: AutomaticSugarMixer) {
+      super(beans);
+    }
+    makeCoffee(shots: number): CoffeeCup {
+      const coffee = super.makeCoffee(shots);
+      return this.sugar.addSugar(coffee);
+    }
+  }
+
+  // const machines: CoffeeMachine[] = [
+  //   new CoffeeMachine(16),
+  //   new CaffeLatteMachine(16, '1'),
+  //   new SweetCoffeeMaker(16)
+  // ];
+
+  // machines.forEach((machine) => {
+  //   console.log('------------------');
+  //   machine.makeCoffee(1);
+  //   machine.clean(); // ok
+  //   machine.fillCoffeeBeans(45); // ok
+  // });
+
+  class SweetCaffeLatteMachine extends CoffeeMachine {
+    constructor(
+      private beans: number,
+      private milk: CheapMilkSteamer,
+      private sugar: AutomaticSugarMixer
+    ) {
+      super(beans);
+    }
+    makeCoffee(shots: number): CoffeeCup {
+      const coffee = super.makeCoffee(shots);
+      const sugarAdded = this.sugar.addSugar(coffee);
+      return this.milk.makeMilk(sugarAdded);
+    }
   }
 }
