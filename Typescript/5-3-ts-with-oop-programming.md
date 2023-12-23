@@ -671,7 +671,9 @@ machines.forEach((machine) => {
 
 ### 상속의 문제
 
-상속의 깊이가 길어질수록 상속 클래스 간 관계가 매우 복잡해질 수 있다. 부모 클래스가 수정 시 하위 자식 클래스에 영향이 불가피하며, 추가 기능 개발 시 복잡도 증가, 한가지 이상의 부모클래스를 타입스크립트가 지원하지 않는 다는 점이 문제가 될 수 있다.
+상속의 깊이가 길어질수록 상속 클래스 간 관계는 매우 복잡해질 수 있다.
+
+부모 클래스 수정 시 하위 자식 클래스에 영향이 불가피하며, 추가 기능 개발 시 하위 영향을 고려해야 하므로 복잡도 증가, 한가지 이상의 부모 클래스를 타입스크립트가 지원하지 않는다는 점도 확장성 면에서 문제가 될 수 있다.
 
 ```tsx
 class SweetCaffeLatteMachine extends SweetCoffeeMaker, CaffeLatteMachine {
@@ -679,4 +681,83 @@ class SweetCaffeLatteMachine extends SweetCoffeeMaker, CaffeLatteMachine {
 }
 ```
 
-SweetCoffeeMaker, CaffeLatteMachine가 합쳐진 SweetCaffeLatteMachine가 만들고 싶다고 할 때 클래스는 단일 클래스로만 확장이 가능하므로 구현이 어려운 상황에 놓일 수도 있다.
+만약 SweetCoffeeMaker, CaffeLatteMachine가 합쳐진 SweetCaffeLatteMachine가 만들고 싶다고 할 때 어떻게 해야할까? 앞서 배운 상속만으로는 단일 클래스로만 확장이 가능한 구조이므로 구현이 어려운 상황에 놓일 수 있다.
+
+### Composition
+
+위와 같은 상황에서 우리는 composition을 고려해볼 수 있다.
+필요한 것만을 가져와 조립할 수 있는 것을 composition이라고 한다.
+
+이전 시간에 만든 CaffeLatteMachine와 SweetCoffeeMaker를 보자
+
+```tsx
+class CaffeLatteMachine extends CoffeeMachine {
+  // ..
+
+  // steamMilk 추가
+  private steamMilk(): void {
+    console.log('Steaming some milk... 🥛');
+  }
+  makeCoffee(shots: number): CoffeeCup {
+    const coffee = super.makeCoffee(shots);
+    this.steamMilk();
+    return {
+      ...coffee,
+      hasMilk: true
+    };
+  }
+}
+
+class SweetCoffeeMaker extends CoffeeMachine {
+  // ..
+
+  // getSugar 추가
+  getSugar() {
+    console.log('Getting some sugar...🍭');
+  }
+  makeCoffee(shots: number): CoffeeCup {
+    const coffee = super.makeCoffee(shots);
+    this.getSugar();
+    return {
+      shots,
+      hasSugar: true,
+      hasMilk: false
+    };
+  }
+}
+```
+
+위 클래스에는 각 머신별로 steamMilk, getSugar 등의 상세 기능 단위로 묶인 함수들이 클래스 내부에 묶여있다.
+만약 SweetCaffeLatteMachine를 만든다면, steamMilk, getSugar 등의 함수가 모두 필요한데, 단일 클래스만 상속이 가능한 구조라면 위 기능들의 일부는 SweetCaffeLatteMachine 클래스 내부에 별개로 생성해야 함
+
+그건 너무 복잡하다. 이때 composition을 아래와 같이 구현해볼 수 있다.
+
+1. 상세 기능을 정의한 기능 단위 클래스 생성
+1. 해당 기능 클래스를 필요한 클래스에서 composition
+
+위와 같이하면 기존 CoffeeCup 객체를 리턴하는 로직을 각 상세 클래스가 가지고 가도록 구현할 수 있음
+또한, 각 상세 기능을 중복하여 작업할 필요가 없으므로 매우 간단하다.
+
+이제 composition을 활용해서 SweetCaffeLatteMachine를 간단하게 구현할 수 있음
+
+```tsx
+class SweetCaffeLatteMachine extends CoffeeMachine {
+  constructor(
+    private beans: number,
+    private milk: CheapMilkSteamer,
+    private sugar: AutomaticSugarMixer
+  ) {
+    super(beans);
+  }
+  makeCoffee(shots: number): CoffeeCup {
+    const coffee = super.makeCoffee(shots);
+    const sugarAdded = this.sugar.addSugar(coffee);
+    return this.milk.makeMilk(sugarAdded);
+  }
+}
+```
+
+그런데 위 구조에서 치명적인 단점이 있음. CaffeLatteMachine와 SweetCoffeeMaker, SweetCaffeLatteMachine 모두 CheapMilkSteamer, AutomaticSugarMixer에 대한 의존성이 깊음
+
+다른 스티머, 다른 설탕 제조기를 사용하고 싶다면 클래스 로직 자체를 수정해야 함. 이용에 제한이 생김
+서로 다른 클래스 간에 서로 잘 알고 지내는 것은 좋지 않음. 어디서 어떤 재료가 붙는지 클래스가 알지 못하도록 하는 것이 바람직하다.
