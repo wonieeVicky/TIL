@@ -761,3 +761,166 @@ class SweetCaffeLatteMachine extends CoffeeMachine {
 
 다른 스티머, 다른 설탕 제조기를 사용하고 싶다면 클래스 로직 자체를 수정해야 함. 이용에 제한이 생김
 서로 다른 클래스 간에 서로 잘 알고 지내는 것은 좋지 않음. 어디서 어떤 재료가 붙는지 클래스가 알지 못하도록 하는 것이 바람직하다.
+
+### 강력한 Interface
+
+지난 시간 composition을 통해 복잡한 상속의 수직 구조를 피해 상속의 레벨을 1단계로 유지하면서 필요한 코드를 재사용하는 방법에 대해 알아보았다. 한 가지 문제점은 가져다 쓰는 클래스가 서로 간 강한 결합도로 인해 클래스의 값이 변경되거나 메서드를 교체하고 싶어도 한가지만 수정이 되면 클래스를 사용하는 모든 것들을 업데이트 해야하는 문제점이 있었다.
+
+만약 비싼 우유 거품기를 사용하고 싶다면? 비싼 설탕을 넣고 싶다면? 차가운 우유 거품기를 넣고 싶다면 어떻게 할까?
+그때마다 클래스를 새로 만들어야 하는 건 옳지 않다. 클래스 간 서로 상호작용을 하는 경우 클래스 자신을 노출하지 않고 인터페이스라는 계약서에 의거해 의사소통하는 것이 좋다.
+
+아래와 같이 interface를 정의한다.
+
+```tsx
+interface MilkFrother {
+  makeMilk(cup: CoffeeCup): CoffeeCup;
+}
+
+interface SugarProvider {
+  addSugar(cup: CoffeeCup): CoffeeCup;
+}
+```
+
+이후 다양한 우유 거품기도 만들어보자
+
+```tsx
+// 싸구려 우유 거품기 - MilkFrother 인터페이스와 연결
+class CheapMilkSteamer implements MilkFrother {
+  private steamMilk(): void {
+    console.log('Steaming some milk... 🥛');
+  }
+  makeMilk(cup: CoffeeCup): CoffeeCup {
+    this.steamMilk();
+    return {
+      ...cup,
+      hasMilk: true
+    };
+  }
+}
+
+// 고급 우유 거품기 - MilkFrother 인터페이스와 연결
+class FancyMilkSteamer implements MilkFrother {
+  private steamMilk(): void {
+    console.log('Fancy Steaming some milk... 🥛');
+  }
+  makeMilk(cup: CoffeeCup): CoffeeCup {
+    this.steamMilk();
+    return {
+      ...cup,
+      hasMilk: true
+    };
+  }
+}
+
+// 차가운 우유 거품기 - MilkFrother 인터페이스와 연결
+class ColdMilkSteamer implements MilkFrother {
+  private steamMilk(): void {
+    console.log('Fancy Steaming some milk... 🥛');
+  }
+  makeMilk(cup: CoffeeCup): CoffeeCup {
+    this.steamMilk();
+    return {
+      ...cup,
+      hasMilk: true
+    };
+  }
+}
+```
+
+다양한 설탕 제조기도 만든다.
+
+```tsx
+// 설탕 제조기 - SugarProvider 인터페이스와 연결
+class CandySugarMixer implements SugarProvider {
+  private getSugar() {
+    console.log('Getting some sugar from candy 🍭');
+    return true;
+  }
+  addSugar(cup: CoffeeCup): CoffeeCup {
+    const sugar = this.getSugar();
+    return {
+      ...cup,
+      hasSugar: sugar
+    };
+  }
+}
+
+// 제대로 된 설탕 제조기 - SugarProvider 인터페이스와 연결
+class SugarMixer implements SugarProvider {
+  private getSugar() {
+    console.log('Getting some sugar from jar 🍭');
+    return true;
+  }
+  addSugar(cup: CoffeeCup): CoffeeCup {
+    const sugar = this.getSugar();
+    return {
+      ...cup,
+      hasSugar: sugar
+    };
+  }
+}
+```
+
+이후 각 `CaffeLatteMachine`, `SweetCoffeeMaker`, `SweetCaffeLatteMachine`의 우유 거품기와 설탕들에 대한 타입 정의를 인터페이스로 바꿔준다.
+
+```tsx
+class CaffeLatteMachine extends CoffeeMachine {
+  constructor(
+    coffeeBeans: number,
+    public readonly serialNumber: string,
+    private milkFrother: MilkFrother // interface
+  ) {
+    super(coffeeBeans);
+  }
+  // ..
+}
+
+class SweetCoffeeMaker extends CoffeeMachine {
+  constructor(
+    beans: number,
+    private sugar: SugarProvider // interface
+  ) {
+    super(beans);
+  }
+  // ..
+}
+
+class SweetCaffeLatteMachine extends CoffeeMachine {
+  constructor(
+    private beans: number,
+    private milk: MilkFrother, // interface
+    private sugar: SugarProvider // interface
+  ) {
+    super(beans);
+  }
+  // ..
+}
+```
+
+위와 같이 하면 아래와 같은 구현이 가능해진다!
+
+```tsx
+// milk
+const cheapMilkMaker = new CheapMilkSteamer();
+const fancyMilkMaker = new FancyMilkSteamer();
+const coldMilkMaker = new ColdMilkSteamer();
+
+// sugar
+const candySugar = new CandySugarMixer();
+const sugar = new SugarMixer();
+
+const sweetCandyMachine = new SweetCoffeeMaker(12, candySugar);
+const sweetMachine = new SweetCoffeeMaker(12, sugar);
+
+const latteMachine = new CaffeLatteMachine(12, 'ss', cheapMilkMaker);
+const coldLatteMachine = new CaffeLatteMachine(12, 'ss', coldMilkMaker);
+
+const sweetLatteMachine = new SweetCaffeLatteMachine(
+  12,
+  cheapMilkMaker,
+  candySugar
+);
+const candyLatteMachine = new SweetCaffeLatteMachine(12, fancyMilkMaker, sugar);
+```
+
+다양한 타입의 기능 클래스를 연결해서 인스턴스를 구현할 수 있게 되었음!
