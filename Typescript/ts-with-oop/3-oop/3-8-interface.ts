@@ -14,12 +14,12 @@
     private coffeeBeans: number = 0;
 
     // instance를 만들 때 초기에 항상 호출되는 함수
-    constructor(coffeeBeans: number) {
+    constructor(
+      coffeeBeans: number,
+      private milk: MilkFrother,
+      private sugar: SugarProvider
+    ) {
       this.coffeeBeans = coffeeBeans;
-    }
-
-    static makeMachine(coffeeBeans: number): CoffeeMachine {
-      return new CoffeeMachine(coffeeBeans);
     }
 
     fillCoffeeBeans(beans: number) {
@@ -57,7 +57,9 @@
     makeCoffee(shots: number): CoffeeCup {
       this.grindBeans(shots);
       this.preheat();
-      return this.extract(shots);
+      const coffee = this.makeCoffee(shots);
+      const sugarAdded = this.sugar.addSugar(coffee);
+      return this.milk.makeMilk(sugarAdded);
     }
   }
 
@@ -111,6 +113,13 @@
     }
   }
 
+  // 우유 없음
+  class NoMilk implements MilkFrother {
+    makeMilk(cup: CoffeeCup): CoffeeCup {
+      return cup;
+    }
+  }
+
   // 설탕 제조기
   class CandySugarMixer implements SugarProvider {
     private getSugar() {
@@ -141,42 +150,9 @@
     }
   }
 
-  class CaffeLatteMachine extends CoffeeMachine {
-    constructor(
-      coffeeBeans: number,
-      public readonly serialNumber: string,
-      private milkFrother: MilkFrother
-    ) {
-      super(coffeeBeans);
-    }
-    makeCoffee(shots: number): CoffeeCup {
-      const coffee = super.makeCoffee(shots);
-      return this.milkFrother.makeMilk(coffee);
-    }
-  }
-
-  class SweetCoffeeMaker extends CoffeeMachine {
-    constructor(beans: number, private sugar: SugarProvider) {
-      super(beans);
-    }
-    makeCoffee(shots: number): CoffeeCup {
-      const coffee = super.makeCoffee(shots);
-      return this.sugar.addSugar(coffee);
-    }
-  }
-
-  class SweetCaffeLatteMachine extends CoffeeMachine {
-    constructor(
-      private beans: number,
-      private milk: MilkFrother,
-      private sugar: SugarProvider
-    ) {
-      super(beans);
-    }
-    makeCoffee(shots: number): CoffeeCup {
-      const coffee = super.makeCoffee(shots);
-      const sugarAdded = this.sugar.addSugar(coffee);
-      return this.milk.makeMilk(sugarAdded);
+  class NoSugar implements SugarProvider {
+    addSugar(cup: CoffeeCup): CoffeeCup {
+      return cup;
     }
   }
 
@@ -184,25 +160,20 @@
   const cheapMilkMaker = new CheapMilkSteamer();
   const fancyMilkMaker = new FancyMilkSteamer();
   const coldMilkMaker = new ColdMilkSteamer();
+  const noMilk = new NoMilk(); // add
 
   // sugar
   const candySugar = new CandySugarMixer();
   const sugar = new SugarMixer();
+  const noSugar = new NoSugar(); // add
 
-  //
-  const sweetCandyMachine = new SweetCoffeeMaker(12, candySugar);
-  const sweetMachine = new SweetCoffeeMaker(12, sugar);
+  // const sweetCandyMachine = new SweetCoffeeMaker(12, candySugar);
+  const sweetCandyMachine = new CoffeeMachine(12, noMilk, candySugar);
+  // const sweetMachine = new SweetCoffeeMaker(12, sugar);
+  const sweetMachine = new CoffeeMachine(12, noMilk, sugar);
 
-  const latteMachine = new CaffeLatteMachine(12, 'ss', cheapMilkMaker);
-  const coldLatteMachine = new CaffeLatteMachine(12, 'ss', coldMilkMaker);
-  const sweetLatteMachine = new SweetCaffeLatteMachine(
-    12,
-    cheapMilkMaker,
-    candySugar
-  );
-
-  // 만약 비싼 우유 거품기를 사용하고 싶다면? 비싼 설탕을 넣고 싶다면?
-  // 그때마다 클래스를 새로 만들어야 한다면?
-  // 클래스들 사이에 서로 상호작용할 경우 클래스 자신을 노출하지 않고 계약서에 의거해 의사소통하는 것이 좋다.
-  // 계약서는 interface
+  // const latteMachine = new CaffeLatteMachine(12, 'ss', cheapMilkMaker);
+  const latteMachine = new CoffeeMachine(12, cheapMilkMaker, noSugar);
+  const coldLatteMachine = new CoffeeMachine(12, coldMilkMaker, noSugar);
+  const sweetLatteMachine = new CoffeeMachine(12, fancyMilkMaker, candySugar);
 }
