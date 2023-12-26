@@ -924,3 +924,99 @@ const candyLatteMachine = new SweetCaffeLatteMachine(12, fancyMilkMaker, sugar);
 ```
 
 다양한 타입의 기능 클래스를 연결해서 인스턴스를 구현할 수 있게 되었음!
+우리가 원하는 기능을 조립해서 어떤 커피기계를 만들 것인지 다양하게 설계가 가능해진 것이다.
+
+### 한가지 더
+
+우리가 필요한 기능들을 클래스와 인터페이스로 정의했다.
+
+사용하는 사람들은 어떤 것이 전달되는지 알 필요가 없고, 정의된, 규약된 인터페이스로만 구현이 되면 원하는 다른 부품의 형태로 원하는 용도에 맞게 쓸 수 있게 된 것이다.
+
+여기서 한가지 더 생각해보자. 사실 위 SweetCoffeeMaker, CaffeLatteMachine, SweetCaffeLatteMachine는 필요치 않다. 클래스로 확장없이 CoffeeMachine로만 구현이 가능한 것이다.
+
+일단 작은 기능 단위를 묶은 클래스 중 noMilk, noSugar 클래스를 추가해주자
+
+```tsx
+// 우유 없음
+class NoMilk implements MilkFrother {
+  makeMilk(cup: CoffeeCup): CoffeeCup {
+    return cup;
+  }
+}
+
+// 설탕 없음
+class NoSugar implements SugarProvider {
+  addSugar(cup: CoffeeCup): CoffeeCup {
+    return cup;
+  }
+}
+```
+
+그리고 CoffeeMachine을 아래와 같이 리팩토링 해본다.
+
+```tsx
+class CoffeeMachine implements CoffeeMaker {
+  private static BEANS_GRAMM_PER_SHOT: number = 7;
+  private coffeeBeans: number = 0;
+
+  // MilkFrother, SugarProvider 추가
+  constructor(
+    coffeeBeans: number,
+    private milk: MilkFrother,
+    private sugar: SugarProvider
+  ) {
+    this.coffeeBeans = coffeeBeans;
+  }
+
+  fillCoffeeBeans(beans: number) {
+    // ..
+  }
+
+  clean(): void {
+    // ..
+  }
+
+  private grindBeans(shots: number) {
+    // ..
+  }
+
+  private preheat(): void {
+    // ..
+  }
+
+  private extract(shots: number): CoffeeCup {
+    // ..
+  }
+
+  makeCoffee(shots: number): CoffeeCup {
+    this.grindBeans(shots);
+    this.preheat();
+    const coffee = this.makeCoffee(shots);
+    const sugarAdded = this.sugar.addSugar(coffee);
+    return this.milk.makeMilk(sugarAdded);
+  }
+}
+```
+
+위와 같이 constructor에 정의된 클래스에 대한 값을 추가해준 뒤 아래와 같이 인스턴스를 생성해보자
+
+```tsx
+// const sweetCandyMachine = new SweetCoffeeMaker(12, candySugar);
+const sweetCandyMachine = new CoffeeMachine(12, noMilk, candySugar);
+// const sweetMachine = new SweetCoffeeMaker(12, sugar);
+const sweetMachine = new CoffeeMachine(12, noMilk, sugar);
+
+// const latteMachine = new CaffeLatteMachine(12, 'ss', cheapMilkMaker);
+const latteMachine = new CoffeeMachine(12, cheapMilkMaker, noSugar);
+// const coldLatteMachine = new CaffeLatteMachine(12, 'ss', coldMilkMaker);
+const coldLatteMachine = new CoffeeMachine(12, coldMilkMaker, noSugar);
+// const sweetLatteMachine = new SweetCaffeLatteMachine(12, cheapMilkMaker, candySugar);
+const sweetLatteMachine = new CoffeeMachine(12, cheapMilkMaker, candySugar);
+```
+
+위와 같이 하면 CoffeeMachine 클래스 하나로 다양한 타입의 machine instance를 생성할 수 있다. 원하는 다양한 객체를 설계할 수 있는 것이다.
+
+단, composition이 대세이고 상속이 유용하지 않다는 것이 아님
+수직적인 관계가 깊진 않은지 항상 주의깊게 보고 composition을 통해 확장이 가능하고 재사용성이 높아지고, 또, 퀄리티 높은 코드를 만들기 위해 고민하고 개선해보는 과정이 중요하다.
+
+오버 프로그래밍은 좋지 않다. 일정과 설계 방향에 맞춰 합리적인 방식을 선택해서 개발할 수 있어야 함
