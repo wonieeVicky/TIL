@@ -1020,3 +1020,73 @@ const sweetLatteMachine = new CoffeeMachine(12, cheapMilkMaker, candySugar);
 수직적인 관계가 깊진 않은지 항상 주의깊게 보고 composition을 통해 확장이 가능하고 재사용성이 높아지고, 또, 퀄리티 높은 코드를 만들기 위해 고민하고 개선해보는 과정이 중요하다.
 
 오버 프로그래밍은 좋지 않다. 일정과 설계 방향에 맞춰 합리적인 방식을 선택해서 개발할 수 있어야 함
+
+### Abstract 클래스에 대하여
+
+상속 관련 추상화를 할 수 있는 방법. Abstract 클래스
+
+우리가 상속 클래스를 이용할 때 무언가 반복되는 클래스 중에서 특정한 기능만 다른 클래스가 있다면,
+그 기능을 따로 빼는 abstract class를 활용해 볼 수 있다.
+
+```tsx
+// abstract class는 instance를 만들 수 없다.
+abstract class CoffeeMachine implements CoffeeMaker {
+  // ..
+
+  // extract 함수는 추상적인 abstract 함수로 만들어서 정의만하고
+  // 구현은 이 클래스를 상속하는 자식 클래스에서 구현하도록 한다.
+  protected abstract extract(shots: number): CoffeeCup;
+}
+
+class CaffeLatteMachine extends CoffeeMachine {
+  // ..
+
+  // 추상 클래스(abstract class)를 상속 받은 자식 클래스에서 직접 구현해준다.
+  // 구현하지 않으면 에러가 발생함
+  protected extract(shots: number): CoffeeCup {
+    this.steamMilk();
+    return {
+      shots,
+      hasMilk: true
+    };
+  }
+}
+
+class SweetCoffeeMaker extends CoffeeMachine {
+  // ..
+
+  // 추상 클래스(abstract class)를 상속 받은 자식 클래스에서 직접 구현해준다.
+  // 구현하지 않으면 에러가 발생함
+  protected extract(shots: number): CoffeeCup {
+    return {
+      shots,
+      hasSugar: true
+    };
+  }
+}
+
+const machines: CoffeeMachine[] = [
+  // new CoffeeMachine(16), // abstract class는 instance를 만들 수 없다.
+  new CaffeLatteMachine(16, '1'),
+  new SweetCoffeeMaker(16)
+];
+
+machines.forEach((machine) => {
+  console.log('------------------');
+  machine.makeCoffee(1);
+  machine.clean(); // ok
+  machine.fillCoffeeBeans(45); // ok
+});
+
+// ------------------
+// grinding beans for 1
+// heating up... 🔥
+// Steaming some milk... 🥛
+// cleaning the machine... 🧼
+// ------------------
+// grinding beans for 1
+// heating up... 🔥
+// cleaning the machine... 🧼
+```
+
+CoffeeMachine 클래스를 추상 클래스로 선언 후 각 클래스에서 추상클래스에서 정의한 기능을 자식 클래스에서 구현하도록 구성해주었다. 실제 추상 클래스에 대한 구현이 되지 않을 경우 에러도 발생하므로 이를 통해 다양한 클래스의 기능을 다채롭게 구현해줄 수 있음
