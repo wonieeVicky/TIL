@@ -78,6 +78,7 @@
     - [기본함수 타이핑](Typescript/5-2-ts-with-oop-func-typing.md)
     - [객체지향 프로그래밍(OOP) 개념 이해하기](Typescript/5-3-ts-with-oop-programming.md)
     - [OOP로 구현하는 Stack Class](Typescript/5-4-ts-with-oop-stack-class-playgrond.md)
+    - [제네릭 좀 더 이해하기](Typescript/5-5-ts-with-oop-stack-generic.md)
 
 ## JavaScript
 
