@@ -15,13 +15,17 @@
     }
     return arg;
   }
+  const result2 = checkNotNullAnyBad(123); // any로 추론함
 
-  function checkNoNull<GENERIC>(arg: GENERIC | null): GENERIC {
+  // 제네릭은 코딩 시 타입이 결정되므로, 타입 보장의 확장성을 가질 수 있다.
+  // generic = 통상적인, 일반적인
+  function checkNoNullWithGeneric<T>(arg: T | null): T {
     if (arg == null) {
       throw new Error('not valid number!');
     }
     return arg;
   }
-  const number = checkNoNull(123);
-  const string = checkNoNull('123');
+  const number = checkNoNullWithGeneric(123); // number로 타입 추론
+  const string = checkNoNullWithGeneric('123'); // string으로 타입 추론
+  const bool = checkNoNullWithGeneric(false); // boolean으로 타입 추론
 }
