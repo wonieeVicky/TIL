@@ -60,3 +60,62 @@ function checkNoNullWithGeneric<T>(arg: T | null): T {
   return arg;
 }
 ```
+
+### 클래스에서 제네릭 사용하기
+
+그럼 클래스 레벨에서 제네릭을 어떻게 사용하는지 알아보자!
+Either는 A or B라는 의미를 가지고 있는데, 이러한 의미를 담는 SimpleEither 클래스가 있다고 하자
+
+```tsx
+interface Either {
+  left: () => number;
+  right: () => number;
+}
+
+class SimpleEither implements Either {
+  constructor(private leftValue: number, private rightValue: number) {}
+
+  left(): number {
+    return this.leftValue;
+  }
+
+  right(): number {
+    return this.rightValue;
+  }
+}
+
+const either = new SimpleEither(4, 5);
+```
+
+위 클래스는 Either 인터페이스 타입을 상속받는 클래스로, leftValue, rightValue의 타입이 number로 지정되어 있다.
+이 클래스의 경우 반드시 number 타입의 인자만 넣어 사용할 수 있다.
+
+만약 인자를 다양한 타입으로 구성하고 싶다면? 제네릭을 쓴다.
+
+```tsx
+interface Either<L, R> {
+  left: () => L;
+  right: () => R;
+}
+
+class SimpleEither<L, R> implements Either<L, R> {
+  constructor(private leftValue: L, private rightValue: R) {}
+
+  left(): L {
+    return this.leftValue;
+  }
+
+  right(): R {
+    return this.rightValue;
+  }
+}
+
+const either: Either<number, number> = new SimpleEither(4, 5);
+either.left(); // 4
+either.right(); // 5
+
+const best = new SimpleEither(3, 'vicky'); // const best: SimpleEither<number, string>
+const name = new SimpleEither({ name: 'vicky' }, 'hello'); // const name: SimpleEither<{name: string}, string>
+```
+
+위와 같이 다양한 타입의 인자를 전달하고, 이에 따라 각 인자별 타입이 적절하게 추론된 것을 확인해볼 수 있음
