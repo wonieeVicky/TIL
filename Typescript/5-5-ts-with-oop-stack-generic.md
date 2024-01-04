@@ -119,3 +119,79 @@ const name = new SimpleEither({ name: 'vicky' }, 'hello'); // const name: Simple
 ```
 
 위와 같이 다양한 타입의 인자를 전달하고, 이에 따라 각 인자별 타입이 적절하게 추론된 것을 확인해볼 수 있음
+
+### 제네릭 조건
+
+제네릭에 조건을 줘보자. 아래와 같이 풀타임 고용인, 파트타임 고용인 클래스가 있다고 하자
+
+```tsx
+interface Employee {
+  pay(): void;
+}
+
+class FullTimeEmployee implements Employee {
+  pay() {
+    console.log(`full time!!`);
+  }
+  workFullTime() {}
+}
+
+class PartTimeEmployee implements Employee {
+  pay() {
+    console.log(`part time!!`);
+  }
+  workPartTime() {}
+}
+
+function pay(employee: Employee): Employee {
+  employee.pay();
+  return employee;
+}
+
+const vicky = new FullTimeEmployee();
+const wonny = new PartTimeEmployee();
+
+vicky.workFullTime(); // workFullTime을 사용할 수 있음
+wonny.workPartTime();
+```
+
+위와 같이 각 클래스별 생성자를 호출하여 내부 함수를 실행시켰다.
+이후 pay 지급을 한 뒤 반환된 객체를 아래와 같이 정의한다면.
+
+```tsx
+const vickyAfterPay = pay(vicky);
+const wonnyAfterPay = pay(wonny);
+
+vickyAfterPay.workFullTime(); // Error :: 'Employee' 형식에 'workFullTime' 속성이 없습니다.
+```
+
+`vickyAfterPay.workFullTime();` 에서 workFullTime 속성이 존재하지 않는다는 에러가 발생한다.
+pay 함수 실행 후 반환되는 `employee` 속성에서 각 세부 클래스 정보를 잃어버렸기 때문
+
+이것을 개선하기 위해선 아래와 같이 타입을 가두는 방법이 있다.
+
+```tsx
+const vickyAfterPay = pay(vicky) as FullTimeEmployee;
+const wonnyAfterPay = pay(wonny) as PartTimeEmployee;
+```
+
+하지만 `as` 사용은 비추이다.
+
+```tsx
+// 세부적인 타입을 인자로 받아서 추상적인 타입으로 다시 리턴하는 함수는 💩
+function pay(employee: Employee): Employee {
+  employee.pay();
+  return employee;
+}
+```
+
+즉 pay 함수가 잘못되었다는 것을 의미. 이를 제네릭을 활용해 개선해볼 수 있다.
+
+```tsx
+function pay<T extends Employee>(employee: T): T {
+  employee.pay();
+  return employee;
+}
+```
+
+`<T extends Employee>` 라는 뜻은 T가 Employee 인터페이스에서 확장한 객체만 전달할 수 있다고 정의하는 것임
