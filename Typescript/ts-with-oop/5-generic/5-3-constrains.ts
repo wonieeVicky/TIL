@@ -33,7 +33,23 @@ const wonny = new PartTimeEmployee();
 vicky.workFullTime(); // workFullTime을 사용할 수 있음
 wonny.workPartTime();
 
-const vickyAfterPay = payBad(vicky) as FullTimeEmployee;
-const wonnyAfterPay = payBad(wonny);
+const vickyAfterPay = pay(vicky);
+const wonnyAfterPay = pay(wonny);
 
-vickyAfterPay.workFullTime(); // Error :: 'Employee' 형식에 'workFullTime' 속성이 없습니다. 세부 클래스 정보를 잃어버림
+vickyAfterPay.workFullTime(); // Ok
+
+const obj = {
+  name: 'vicky',
+  age: 33
+};
+const obj2 = {
+  language: 'javascript'
+};
+
+function getValue<T, K extends keyof T>(obj: T, key: K): T[K] {
+  return obj[key];
+}
+
+console.log(getValue(obj, 'name')); // vicky
+console.log(getValue(obj, 'age')); // 33
+console.log(getValue(obj2, 'language')); // javascript
