@@ -195,3 +195,31 @@ function pay<T extends Employee>(employee: T): T {
 ```
 
 `<T extends Employee>` 라는 뜻은 T가 Employee 인터페이스에서 확장한 객체만 전달할 수 있다고 정의하는 것임
+
+### 제네릭 조건2
+
+위 조건 처리에 대한 추가 예제를 살펴보자
+
+```tsx
+const obj = {
+  name: 'vicky',
+  age: 33
+};
+const obj2 = {
+  language: 'javascript'
+};
+
+console.log(getValue(obj, 'name')); // vicky
+console.log(getValue(obj, 'age')); // 33
+console.log(getValue(obj2, 'language')); // javascript
+```
+
+위와 같이 각 속성 키가 다른 obj, obj2가 있을 때, 위 `getValue`라는 함수에 대한 타입 정의는 어떻게 할 수 있을까?
+
+```tsx
+function getValue<T, K extends keyof T>(obj: T, key: K): T[K] {
+  return obj[key];
+}
+```
+
+위와 같이 타입정의를 할 수 있음. `K extends keyof T`는 T의 object key 값이 K 값임을 의미함..
