@@ -260,4 +260,73 @@ interface Array<T> {
 읽고 해석하고 응용할 줄 알아야한다!
 
 - 오버 로딩된 타이핑 케이스도 있음. every 가 그러하다
+
   1. 첫 번째 every 타입 정의는 아래와 같음
+
+  ````tsx
+    /**
+     * Determines whether all the members of an array satisfy the specified test.
+    * @param predicate A function that accepts up to three arguments. The every method calls
+    * the predicate function for each element in the array until the predicate returns a value
+    * which is coercible to the Boolean value false, or until the end of the array.
+    * @param thisArg An object to which the this keyword can refer in the predicate function.
+    * If thisArg is omitted, undefined is used as the this value.
+    */
+    every(predicate: (value: T, index: number, array: T[]) => unknown, thisArg?: any): boolean;
+    ```
+    위 every 타입의 경우 아래의 연산을 수행 시 동작하는 타입이다.
+    ```tsx
+    type Student = {
+      passed: boolean;
+    };
+
+    const students: Student[] = [
+      {
+        passed: true
+      },
+      {
+        passed: true
+      },
+      {
+        passed: false
+      }
+    ];
+
+    console.log(students.every((student) => student.passed)); // false
+    ```
+  2.  두 번째 every 타입 정의는 아래와 같다.
+    ```tsx
+      /**
+      * Determines whether all the members of an array satisfy the specified test.
+      * @param predicate A function that accepts up to three arguments. The every method calls
+      * the predicate function for each element in the array until the predicate returns a value
+      * which is coercible to the Boolean value false, or until the end of the array.
+      * @param thisArg An object to which the this keyword can refer in the predicate function.
+      * If thisArg is omitted, undefined is used as the this value.
+      */
+      every<S extends T>(predicate: (value: T, index: number, array: T[]) => value is S, thisArg?: any): this is S[];
+      ```
+
+      위 every 타입의 경우 아래의 연산을 수행 시 동작하는 타입이다.
+
+      ```tsx
+      class Animal {}
+      class Cat extends Animal {
+        isCat: boolean = true;
+      }
+      class Dog extends Animal {
+        isDog: boolean = false;
+      }
+      const animals: Animal[] = [new Cat(), new Cat(), new Dog()];
+      function isCat(animal: Animal): animal is Cat {
+        return (animal as Cat).isCat !== undefined;
+      }
+      animals.every<Cat>(isCat); // false
+      ```
+
+      `animal is Cat` : 타입 가드
+  ````
+
+  ### 오픈소스 프로젝트 이용하기
+
+코딩 실력 향상 방법. 잘 만든 코드와 구조를 옅본다. 훑어보고 내 코드에 적용해본다.
