@@ -79,7 +79,8 @@
     - [객체지향 프로그래밍(OOP) 개념 이해하기](Typescript/5-3-ts-with-oop-programming.md)
     - [OOP로 구현하는 Stack Class](Typescript/5-4-ts-with-oop-stack-class-playgrond.md)
     - [제네릭 좀 더 이해하기](Typescript/5-5-ts-with-oop-stack-generic.md)
-    - [코딩 실력 높이기](Typescript/6-1-ts-with-oop-api.md)
+    - [코딩 실력 높이기](Typescript/5-6-ts-with-oop-api.md)
+    - [에러 처리 하기](Typescript/5-7-ts-with-oop-exception.md)
 
 ## JavaScript
 
