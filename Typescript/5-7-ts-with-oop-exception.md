@@ -71,3 +71,85 @@ function move(direction: 'up' | 'down' | 'left' | 'right' | 'he') {
 ```
 
 아래와 같이 he 케이스가 switch 문에서 미리 고려될 경우에는 invalid 케이스는 never 타입이 맞기 때문에 별도의 에러가 발생하지 않는다.
+
+### 에러 처리 기본(try, catch, finally)
+
+보통 에러 처리를 할 때 try, catch, finally를 사용한다.
+
+```tsx
+// Error(Exception) Handling: try -> catch -> finally
+function readFile(fileName: string): string {
+  if (fileName === 'not exist!💩') {
+    throw new Error(`file not exist! ${fileName}`);
+  }
+  return 'file contents 📃';
+}
+
+function closeFile(file: string) {
+  // ..
+}
+```
+
+아래와 같은 readFile, closeFile 함수가 있을 때 에러 발생이 예측되는 부분은 try, catch, finally문을 감싸서 사용함
+
+```tsx
+const fileName = 'file';
+try {
+  console.log(readFile(fileName));
+} catch (e) {
+  console.log('catched!');
+} finally {
+  closeFile(fileName);
+  console.log('finally!');
+}
+console.log('!!!');
+```
+
+finally에 굳이 가두지 않고 사용하지 않는 경우가 많은데 아래 예시를 보면 finally를 써야겠단 생각이 든다.
+
+```tsx
+function run() {
+  // const fileName = 'file';
+  const fileName = 'not exist!💩';
+
+  try {
+    console.log(readFile(fileName));
+  } catch (e) {
+    console.log('catched!');
+    return; // catch 안에서 돌아가는 로직으로 인해 하단 closeFile이 수행되지 않을 수 있음
+  }
+
+  closeFile(fileName);
+  console.log('finally!');
+}
+
+run();
+// catched!
+```
+
+만약 catch 문 안에 return 문이라도 들어간다면 아래 closeFile이 수행되지 않음
+
+```tsx
+function run() {
+  // const fileName = 'file';
+  const fileName = 'not exist!💩';
+
+  try {
+    console.log(readFile(fileName));
+  } catch (e) {
+    console.log('catched!');
+    // catch 안에서 돌아가는 로직으로 인해 하단 closeFile이 수행되지 않을 수 있음
+    return;
+  } finally {
+    closeFile(fileName);
+    console.log('finally!');
+  }
+}
+
+run();
+// catched!
+// finally!
+```
+
+위처럼 finally 안에 수행될 내용을 넣었을 때 catch에서 무엇이 수행되어도 문제없이 돌아감..
+에러 처리의 기본..
