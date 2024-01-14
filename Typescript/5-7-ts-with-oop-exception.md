@@ -153,3 +153,76 @@ run();
 
 위처럼 finally 안에 수행될 내용을 넣었을 때 catch에서 무엇이 수행되어도 문제없이 돌아감..
 에러 처리의 기본..
+
+### 에러 처리 핸들링 어디서 할까?
+
+```tsx
+class NetworkClient {
+  tryConnect(): void {
+    throw new Error('no network!');
+  }
+}
+
+class UserService {
+  constructor(private client: NetworkClient) {}
+
+  login() {
+    this.client.tryConnect();
+    // login...
+  }
+}
+
+class App {
+  constructor(private userService: UserService) {}
+  run() {
+    this.userService.login();
+  }
+}
+```
+
+위와 같이 NetworkClient, UserService, App 클래스가 있다고 했을 때 실행은 아래와 같이 한다.
+
+```tsx
+const client = new NetworkClient();
+const service = new UserService(client);
+const app = new App(service);
+app.run(); // Error 발생
+```
+
+이 때 발생하는 에러는 어떤 위치에서 에러 핸들링(try - catch)을 하는게 바람직할까?
+불필요하게 catch를 여러군데에서 쓰는 것은 바람직하지 않을 수 있음. 만약 UserService 클래스라면?
+
+```tsx
+class UserService {
+  constructor(private client: NetworkClient) {}
+
+  login() {
+    try {
+      this.client.tryConnect();
+      // login...
+    } catch (e) {
+      console.log(e); // Error: no network
+    }
+  }
+}
+```
+
+로그인 행위에 대한 에러 처리는 특별히 할게 없다. 만약 에러핸들링이 App 클래스에 있다면..
+
+```tsx
+class App {
+  constructor(private userService: UserService) {}
+  run() {
+    try {
+      this.userService.login();
+    } catch (e) {
+      console.log('error!');
+      // show dialog to user
+    }
+  }
+}
+```
+
+App 클래스에서 에러 핸들링을 하면, run 동작시 발생하는 에러에 따라 사용자에게 다이얼로그 등을 띄우는 등의 다양한 상황 처리를 할 수 있으므로 catch 할 위치로는 가장 적합함.
+
+위와 같이 적합한 위치에서 에러 핸들링을 할 수 있도록 하는 것이 바람직하다.
