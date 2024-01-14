@@ -226,3 +226,78 @@ class App {
 App 클래스에서 에러 핸들링을 하면, run 동작시 발생하는 에러에 따라 사용자에게 다이얼로그 등을 띄우는 등의 다양한 상황 처리를 할 수 있으므로 catch 할 위치로는 가장 적합함.
 
 위와 같이 적합한 위치에서 에러 핸들링을 할 수 있도록 하는 것이 바람직하다.
+
+### Error State
+
+언제 에러를 쓰고 언제 state를 써야하는지 생각해보자.
+만약 `NetworkClient.tryConnect` 클래스에서 에러가 발생한다면 아래와 같이 처리할 수 있다.
+
+```tsx
+// TimeoutError에 대한 별도 클래스 정의
+class TimeoutError extends Error {}
+// OfflineError에 대한 별도 클래스 정의
+class OfflineError extends Error {}
+
+class NetworkClient {
+  tryConnect(): void {
+    throw new OfflineError('no network!');
+    throw new TimeoutError('timeout!!');
+  }
+}
+```
+
+하지만 문제는 이러한 에러에 대해 실제 error를 캐치하는 App 클래스에서는 타입을 추론할 수 없다.
+
+```tsx
+class App {
+  constructor(private userService: UserService) {}
+  run() {
+    try {
+      this.userService.login();
+    } catch (e) {
+      console.log('error!');
+      // error는 any 타입으로 추론 > instanceof를 사용할 수 없다.
+      if (error instanceof OfflineError) {
+        // Type error!
+        // ..
+      }
+    }
+  }
+}
+```
+
+위와 같은 분기를 칠 수 없다. error의 추론이 any로 되기 때문.
+즉, Error exception은 가급적 정말 예상치 못했던 곳에서 에러 발생 시 사용하는 것이 좋다.
+
+그렇다면 어떻게 처리하면 좋을까? 바로 state를 활용하는 것이다.
+
+```tsx
+// 성공 state
+type SuccessState = {
+  result: 'success';
+};
+
+// 실패 state
+type NetworkErrorState = {
+  result: 'fail';
+  reason: 'offline' | 'down' | 'timeout'; // union type
+};
+
+// 결과 state
+type ResultState = SuccessState | NetworkErrorState;
+
+class NetworkClient {
+  tryConnect(): ResultState {
+    return {
+      result: 'fail',
+      reason: 'offline'
+    };
+    // 혹은
+    return {
+      result: 'success'
+    };
+  }
+}
+```
+
+위와 같이 에러에 대한 케이스별로 state를 지정해서 내려주면 App 클래스에서는 반환되는 값의 state를 추론해서 각 상황별 UI를 만들어나갈 수 있음
