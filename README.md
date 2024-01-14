@@ -81,6 +81,7 @@
     - [제네릭 좀 더 이해하기](Typescript/5-5-ts-with-oop-stack-generic.md)
     - [코딩 실력 높이기](Typescript/5-6-ts-with-oop-api.md)
     - [에러 처리 하기](Typescript/5-7-ts-with-oop-exception.md)
+    - [타입스크립트의 막강한 타입들](Typescript/5-8-ts-with-oop-advanced.md)
 
 ## JavaScript
 
