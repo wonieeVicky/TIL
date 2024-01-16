@@ -134,3 +134,50 @@ Type과 Interface의 정의를 한번 더 짚어보자
   ```
 
   - ex) 이 컴포넌트에 전달할 수 있는 Props 타입은 이 타입이다.
+
+### Utility Types이란? \***\*✮ → ✩\*\***
+
+TypeScript에서는 다른 일반적인 프로그래밍 언어에서는 찾을 수 없는 타입 변환이 가능하다.
+일부분 타입으로 변형하거나, 다른 타입과 조인하는 방법으로 변형할 수 있음
+
+### Index Type
+
+모든 것의 첫 출발인 Index type에 대해 알아보자
+
+```tsx
+const obj = {
+  name: 'vicky'
+};
+obj.name; // vicky
+obj['name']; // vicky
+```
+
+일반 객체에서는 위와 같은 방법으로 값을 가져올 수 있다. property를 직접 호출하거나 인덱스로 찾아옴
+type도 위와 같이 비슷하게 할 수 있다.
+
+```tsx
+type Animal = {
+  name: string;
+  age: number;
+  gender: 'male' | 'female';
+};
+
+type Name = Animal['name']; // string
+const text: Name = 'hello'; // Ok!
+const num: Name = 12; // Error!
+
+type Gender = Animal['gender']; // male | female
+type Keys = keyof Animal; // name | age | gender
+const key: Keys = 'gender'; // Ok
+
+type Person = {
+  name: string;
+  gender: Animal['gender'];
+};
+const person: Person = {
+  name: 'vicky',
+  gender: 'female'
+};
+```
+
+위처럼 인덱스 타입을 이용하면 타입의 키에 접근해서 그 키의 value의 타입을 다시 선언해서 사용할 수 있다.
