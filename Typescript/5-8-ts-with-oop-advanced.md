@@ -181,3 +181,154 @@ const person: Person = {
 ```
 
 위처럼 인덱스 타입을 이용하면 타입의 키에 접근해서 그 키의 value의 타입을 다시 선언해서 사용할 수 있다.
+
+### Mapped Type
+
+필수적인 Mapped Type에 대해 알아본다.
+Mapped Type은 기존의 타입을 이용하면서 다른 형태로 타입을 변환할 수 있다.
+
+아래와 같은 타입이 있다고 하자.
+
+```tsx
+type Video = {
+  title: string;
+  author: string;
+  description: string; // add
+};
+
+type VideoOptional = {
+  title?: string;
+  author?: string;
+  description?: string; // add
+};
+
+type VideoReadOnly = {
+  readonly title: string;
+  readonly author: string;
+  readonly description: string; // add
+};
+```
+
+초기에는 title, author 타입만 지정되어 있던 3가지 타입에 description이 추가되었다면? Video, VideoOptional, VideoReadOnly 타입에 모두 적용해줘야 함
+
+귀찮은 위의 방식을 Mapped Type으로 개선해볼 수 있다. 먼저 VidioOptional 타입을 먼저 바꿔보자
+
+```tsx
+type Optional<T> = {
+  // 괄호 안에 넣으면 map과 같은 역할을 함 - key를 순회할 수 있음
+  // P in keyof T: T가 가진 Key들을 순회하면서 타입을 정의
+  [P in keyof T]?: T[P]; // for...in
+};
+```
+
+위처럼 Key 자리에 괄호를 사용하면 map과 같은 역할로 key를 순회할 수 있게 되는데,
+즉 [P in keyof T] 란 T의 키들을 순회하는 것을 의미함. 거기에 optional로 T[P]를 주면 각 키의 타입을 대입할 수 있는 것이므로 상단 VideoOptional 타입으로 선언한 것과 같은 타입을 만들 수 있음
+![](../img/240117-1.png)
+
+```tsx
+const videoOp: VideoOptional = {
+  title: 'vicky video',
+  types: 'video' // error!
+};
+```
+
+위와 같이 videoOp이란 변수에 VideoOptional 타입을 지정해넣으면 위 타입이 그대로 반영됨.
+types란 데이터는 VideoOptional 타입에 정의되지 않았으므로 타입 에러가 발생한다.
+
+```tsx
+type Optional<T> = {
+  // 괄호 안에 넣으면 map과 같은 역할을 함 - key를 순회할 수 있음
+  // P in keyof T: T가 가진 Key들을 순회하면서 타입을 정의
+  [P in keyof T]?: T[P]; // for...in
+};
+
+type Animal = {
+  name: string;
+  age: number;
+};
+
+const animal: Optional<Animal> = {
+  name: 'dog'
+};
+```
+
+위와 같이 Animal의 mapped type으로 부분적 속성만 처리되도록 구현할 수 있음
+
+VideoReadOnly도 마찬가지임
+
+```tsx
+type ReadOnly<T> = {
+  readonly [P in keyof T]: T[P];
+};
+```
+
+위와 같이 처리해서 VideoReadOnly 타입을 지정하면 아래와 같이 도출
+
+![](../img/240117-2.png)
+
+```tsx
+const video: VidioReadOnly = {
+  title: 'hi',
+  author: 'vicky',
+  description: 'hello'
+};
+video.title = 'bye'; // error
+```
+
+위 코드에서 값을 직접 변경하는 것을 막도록 처리해줄 수 있다.
+
+```tsx
+type Nullable<T> = { [P in keyof T]: T[P] | null };
+```
+
+그럼 위 Nullable 타입은 무엇일까? 기존의 타입을 사용하거나 null 타입으로 처리할 수 있는 타입을 의미함
+
+```tsx
+const obj2: Nullable<Video> = {
+  title: null,
+  author: null,
+  description: 'hello'
+};
+```
+
+위와 같이 처리할 수도 있다는 것임!
+
+```tsx
+type Proxy<T> = {
+  get(): T;
+  set(value: T): void;
+};
+type Proxify<T> = { [P in keyof T]: Proxy<T[P]> };
+```
+
+위 Proxy, Proxify는 아래와 같이 활용해 볼 수 있음
+
+```tsx
+type ProxyWrapperFn = <T>(value: T) => Proxy<T>;
+
+const wrappedProxy: ProxyWrapperFn = (value) => {
+  let _value = value;
+  return {
+    get() {
+      return _value;
+    },
+    set(value) {
+      _value = value;
+    }
+  };
+};
+
+const videoProxy: Proxify<Video> = {
+  title: wrappedProxy('영상제목'),
+  author: wrappedProxy('작성자'),
+  description: wrappedProxy('설명')
+};
+
+videoProxy.title.get(); // 영상제목
+videoProxy.title.set('new title');
+videoProxy.title.get(); // new title
+videoProxy.description.set('new description');
+videoProxy.description.get(); // new description
+```
+
+다시 보자. 이해가 빠삭해질 때까지 보자
