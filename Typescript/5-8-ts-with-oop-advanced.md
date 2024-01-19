@@ -332,3 +332,37 @@ videoProxy.description.get(); // new description
 ```
 
 다시 보자. 이해가 빠삭해질 때까지 보자
+
+### Conditional Type
+
+Conditional Type은 조건부로 타입을 결정할 수 있는 타입을 의미함
+
+```tsx
+type Check<T> = T extends string ? boolean : number;
+type Type1 = Check<string>; // boolean
+type Type2 = Check<'aa'>; // boolean
+type Type3 = Check<number>; // number
+```
+
+위를 활용해 아래와 같이 conditional type을 구성할 수도 있음
+
+```tsx
+// T extends U ? X : Y
+type TypeName<T> = T extends string
+  ? 'string'
+  : T extends number
+  ? 'number'
+  : T extends boolean
+  ? 'boolean'
+  : T extends undefined
+  ? 'undefined'
+  : T extends Function
+  ? 'function'
+  : 'object';
+
+type T0 = TypeName<string>; // 'string' type
+type T1 = TypeName<'a'>; // 'string' type
+type T2 = TypeName<() => void>; // 'function' type
+```
+
+위 내용으로 다양한 활용을 해볼 수 있음
