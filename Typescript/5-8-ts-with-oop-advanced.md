@@ -366,3 +366,33 @@ type T2 = TypeName<() => void>; // 'function' type
 ```
 
 위 내용으로 다양한 활용을 해볼 수 있음
+
+### ReadOnly
+
+앞서 살펴본 Index Type, Mapped Type, Conditional Type은 모두 기존의 타입을 보장하고 유지하고 재사용하면서 조금 다른 종류의 타입을 만들고 싶을 때 활용할 수 있다.
+
+사용 예제를 더 살펴보자
+
+```tsx
+type Todo = {
+  title: string;
+  description: string;
+};
+
+function display(todo: Readonly<Todo>) {
+  todo.title = 'jaja'; // Error! 직접 데이터의 값을 수정하는 것은 불변성에 위배
+}
+```
+
+위와 같이 Todo 타입이 있을 때 이미 타입스크립트에서 Readonly라는 유틸리티 타입을 제공하므로 위와 같이 Readonly<Todo> 타입으로 지정 시 todo.title의 값이 자동으로 readonly 변수로 처리되어 에러가 발생한다.
+
+이를 통해 값의 불변성을 준수할 수 있게된다. 이 밖에도 다양한 공통 유틸리티 타입이 존재함
+
+```tsx
+type Required<T> = {
+  [P in keyof T]-?: T[P];
+};
+```
+
+위 Required 타입에서 `-?`라는 표현이 있는데, Optional이 아닌 절대적으로 존재해야 하는 것을 의미한다.
+위 공통 유틸리티 타입들에 대한 종류와 사용법을 자세히 읽어보는 것이 좋음
