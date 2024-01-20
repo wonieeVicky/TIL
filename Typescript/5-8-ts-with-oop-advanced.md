@@ -475,3 +475,61 @@ type Pick<T, K extends keyof T> = {
 ```
 
 `K extends keyof T` : K는 T 내부를 이루는 속성으로만 제한되도록 설정되어 있음을 의미
+
+### Omit Type
+
+Omit Type은 Pick과 반대로 원하는 것을 타입에서 제외해서 제한적 타입으로 사용할 수 있음
+
+```tsx
+type Video = {
+  id: string;
+  title: string;
+  url: string;
+  data: string;
+};
+
+type VideoMetadata = Omit<Video, 'url' | 'data'>;
+
+// 기존 Video 타입에서 url와 data를 제외하고 적용하는 함수
+function getVideoMetadata(id: string): VideoMetadata {
+  return {
+    id,
+    title: 'title'
+  };
+}
+```
+
+실제 Omit 은 아래와 같이 구성됨
+
+```tsx
+/**
+ * Construct a type with the properties of T except for those in type K.
+ */
+type Omit<T, K extends keyof any> = Pick<T, Exclude<keyof T, K>>;
+```
+
+위 코드를 보면 `K extends keyof any K`는 어떤 종류(any)도 모두 상속받을 수 있음. 그럼 반드시 타입 내부의 전달인자 키를 포함하지 않아도 되는걸까?
+
+```tsx
+type VideoMetadata = Omit<Video, 'url' | 'data' | 'vickyvicky'>;
+
+// 기존 Video 타입에서 url와 data를 제외하고 적용하는 함수
+function getVideoMetadata(id: string): VideoMetadata {
+  return {
+    id,
+    title: 'title'
+  };
+}
+```
+
+위와 같이 vickyvicky 라는 키를 추가해도 에러 발생하지 않음.
+
+```tsx
+/**
+ * Exclude from T those types that are assignable to U
+ */
+type Exclude<T, U> = T extends U ? never : T;
+```
+
+Exclude 타입의 경우 포함되면 never 사용하지 않고, 아니면 사용함을 의미한다.
+처음엔 해석이 좀 어려워도 최대한 타입 정의를 이해하는 것이 바람직. 유틸리티 사용법을 터득하는 수준으로 이해할 것
