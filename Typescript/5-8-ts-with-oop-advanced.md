@@ -396,3 +396,36 @@ type Required<T> = {
 
 위 Required 타입에서 `-?`라는 표현이 있는데, Optional이 아닌 절대적으로 존재해야 하는 것을 의미한다.
 위 공통 유틸리티 타입들에 대한 종류와 사용법을 자세히 읽어보는 것이 좋음
+
+### Partial Type
+
+Partial Type은 타입 중 부분적 요소만 적용하도록 만들어주는 유틸리티 타입
+
+```tsx
+type Todo = {
+  title: string;
+  description: string;
+  label: string;
+  priority: 'high' | 'low';
+};
+
+function updateTodo(todo: Todo, fieldsToUpdated: Partial<Todo>): Todo {
+  return { ...todo, ...fieldsToUpdated };
+}
+const todo: Todo = {
+  title: 'learn TypeScript',
+  description: 'learn utility types',
+  label: 'study',
+  priority: 'high'
+};
+const updated = updateTodo(todo, { priority: 'low' });
+console.log(updated);
+/*
+  {
+    title: 'learn TypeScript',
+    description: 'learn utility types',
+    label: 'study',
+    priority: 'low'
+  }
+*/
+```
