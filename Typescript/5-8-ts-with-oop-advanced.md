@@ -429,3 +429,49 @@ console.log(updated);
   }
 */
 ```
+
+### Pick Type
+
+Pick Type은 기존의 타입에서 원하는 속성만 뽑아서 제한적 타입으로 사용할 수 있다.
+
+```tsx
+type Video = {
+  id: string;
+  title: string;
+  url: string;
+  data: string;
+};
+
+type VideoMetadata = Pick<Video, 'id' | 'title'>;
+
+// data를 모두 가져오므로 무거운 함수
+function getVideo(id: string): Video {
+  return {
+    id,
+    title: 'video',
+    url: 'https://..',
+    data: 'byte-data..'
+  };
+}
+
+// 기존 Video 타입에서 id와 title만 가져오는 함수
+function getVideoMetadata(id: string): VideoMetadata {
+  return {
+    id,
+    title: 'title'
+  };
+}
+```
+
+실제 Pick 타입은 아래와 같이 구성되어 있음
+
+```tsx
+/**
+ * From T, pick a set of properties whose keys are in the union K
+ */
+type Pick<T, K extends keyof T> = {
+  [P in K]: T[P];
+};
+```
+
+`K extends keyof T` : K는 T 내부를 이루는 속성으로만 제한되도록 설정되어 있음을 의미
