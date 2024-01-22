@@ -533,3 +533,22 @@ type Exclude<T, U> = T extends U ? never : T;
 
 Exclude 타입의 경우 포함되면 never 사용하지 않고, 아니면 사용함을 의미한다.
 처음엔 해석이 좀 어려워도 최대한 타입 정의를 이해하는 것이 바람직. 유틸리티 사용법을 터득하는 수준으로 이해할 것
+
+### Record
+
+Record 타입은 두 타입을 묶어 사용할 때 쓴다.
+
+```tsx
+type PageInfo = {
+  title: string;
+};
+
+type Page = 'home' | 'about' | 'contact';
+
+// Record<key, value> : key는 string, value는 PageInfo
+const nav: Record<Page, PageInfo> = {
+  home: { title: 'Home' },
+  about: { title: 'About' },
+  contact: { title: 'Contact' }
+};
+```
