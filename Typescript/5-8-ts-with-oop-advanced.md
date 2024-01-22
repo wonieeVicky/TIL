@@ -552,3 +552,12 @@ const nav: Record<Page, PageInfo> = {
   contact: { title: 'Contact' }
 };
 ```
+
+### 기타
+
+```tsx
+type Product = 'cat' | 'dog';
+type NewProudct = Capitalize<Product>; // 'Cat' | 'Dog'
+```
+
+별별 타입이 많으니 찾아보면서 작업하자
