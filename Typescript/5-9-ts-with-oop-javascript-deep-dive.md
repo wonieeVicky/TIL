@@ -103,3 +103,101 @@ latteMachine.makeCoffee(); // make coffee - CoffeeMachine2의 Prototype을 상�
 ```
 
 `Object.create`로 `CoffeeMachine2`의 prototype을 연결해주면 LatteMachine 내부에서도 makeCoffee 함수를 사용할 수 있게됨. 상속받았기 때문!
+
+### This
+
+JavaScript에서 This가 어려운 이유는 다른 프로그래밍 언어에서의 this와 다르기 때문임
+
+다른 객체 지향에서의 this란 바로 클래스 자신, 생성된 객체 그 자신을 의미함
+
+반대로 자바스크립트에서 this란 누가 호출하는지에 따라 this가 동적으로 달라짐..
+
+```jsx
+console.log(this); // Window
+
+function simpleFunc() {
+  console.log(this);
+}
+
+window.simpleFunc(); // Window
+simpleFunc(); // Window
+```
+
+위와 같은 코드가 있다고 했을 때 this는 Window 객체를 가리킨다.
+simpleFunc를 윈도우 하위에서 호출해도 무방함
+
+```jsx
+function helloWorld() {
+  console.log('hello');
+}
+window.helloWorld(); // hello
+
+const vicky = 'vicky';
+let bob = 'bob';
+console.log(window.vicky); // undefined
+console.log(window.bob); // undefined
+
+var wonny = 'wonny';
+console.log(window.wonny); // wonny - var로 선언한 변수는 window에 등록된다.
+```
+
+단 위와 같이 const, let으로 선언한 변수의 경우 window에 등록되지 않기 때문에, 위와 같이 `window.vicky`, `window.bob`을 호출 시 어떤 object도 연결되어 있지 않으므로 undefined가 반환된다.
+
+반면 var로 선언된 wonny는 window에 등록되어 여전히 호출이 잘되고 있음(호이스팅 이슈 발생)
+
+```jsx
+class Counter {
+  count = 0;
+  increase = function () {
+    console.log(this);
+  };
+}
+const counter = new Counter();
+counter.increase(); // Counter
+
+const caller = counter.increase;
+caller(); // undefined
+```
+
+위와 같이 선언했을 때 caller는 별도의 const 변수로 선언했기 때문에 this가 동일하게 undefined가 나옴
+
+```jsx
+class Vicky1 {}
+const vicky1 = new Vicky1();
+vicky1.run = counter.increase;
+vicky1.run(); // Vicky1 { run: ƒ }
+```
+
+위와 같은 코드가 있다고 했을 때 run에서 반환되는 this의 값은 vicky1 object가 됨
+
+위처럼 javaScript에서는 this 정보를 다른 정보를 가진 함수 등에 할당하는 순간 잃어버릴 수 있음
+
+만약 this 관계를 변경되지 않도록 묶으려면? bind 메서드를 쓴다.
+
+```jsx
+class Vicky1 {}
+const vicky1 = new Vicky1();
+vicky1.run = counter.increase.bind(counter);
+vicky1.run(); // Counter {count: 0, increase: ƒ}
+```
+
+혹은 아래와 같이 increase 함수 사용 방법을 바꾸면 된다.
+
+```jsx
+class Counter {
+  count = 0;
+  // arrow func를 사용하면 this 컨텍스트를 유지할 수 있음
+  increase = () => {
+    console.log(this);
+  };
+}
+const counter = new Counter();
+
+class Vicky1 {}
+const vicky1 = new Vicky1();
+
+vicky1.run = counter.increase;
+vicky1.run(); // Counter {count: 0, increase: ƒ}
+```
+
+위처럼 increase 함수에 arrow func을 사용하면 this 컨텍스트가 유지되므로 실제 vicky1.run(); 이 실행되면 Counter 객체가 this로 연결된 것을 확인할 수 있다.
