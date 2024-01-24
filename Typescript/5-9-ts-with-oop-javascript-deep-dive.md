@@ -201,3 +201,140 @@ vicky1.run(); // Counter {count: 0, increase: ƒ}
 ```
 
 위처럼 increase 함수에 arrow func을 사용하면 this 컨텍스트가 유지되므로 실제 vicky1.run(); 이 실행되면 Counter 객체가 this로 연결된 것을 확인할 수 있다.
+
+### 모듈에 관하여
+
+타입스크립트에서도 활용할 수 있는 모듈에 대해 알아본다.
+
+한 모듈은 한 파일 안에 작성된 코드를 의미. 모듈화해서 작성한 코드는 그 모듈만의 스코프를 가짐
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <!-- ... -->
+    <script src="./9-3-module1.js"></script>
+    <script src="./9-3-module2.js"></script>
+  </head>
+
+  <!-- ... -->
+</html>
+```
+
+위와 같이 두 개의 파일이 연결된 html에서 js가 각 아래와 같은 코드를 가지고 있다면
+
+`9-3-module1.js`
+
+```jsx
+function add(a, b) {
+  return a + b;
+}
+```
+
+`9-3-module2.js`
+
+```jsx
+console.log(add(1, 2)); // 3
+```
+
+위와 같이 각 파일에 적힌 코드가 정상 실행됨. 모듈화를 하지 않으면 기본적으로 함수가 글로벌 스코프를 가지기 때문. 만약 add 함수가 각 파일에 동일하게 적혀있다면 오버라이드 함수로 인해 예상치 못한 에러가 발생할 수 있음
+
+이를 모듈로 해결할 수 있다.
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <!-- ... -->
+    <script type="module" src="./9-3-module1.js"></script>
+    <script type="module" src="./9-3-module2.js"></script>
+  </head>
+
+  <!-- ... -->
+</html>
+```
+
+`9-3-module1.js`
+
+```jsx
+function add(a, b) {
+  return a + b;
+}
+```
+
+`9-3-module2.js`
+
+```jsx
+console.log(add(1, 2)); // 9-3-module2.js:1 Uncaught ReferenceError: add is not defined
+```
+
+module 타입으로 선언한 순간 서로 접근할 수 없는 상태가 됨. 다른 모듈에서 사용하고 싶다면 아래와 같이함
+
+`9-3-module1.js`
+
+```jsx
+export default function add(a, b) {
+  return a + b;
+}
+```
+
+`9-3-module2.js`
+
+```jsx
+import add from './9-3-module1.js';
+
+console.log(add(1, 2)); // 3
+```
+
+위 import 별칭은 아무거나 골라도 됨. export default 로는 한 가지만 export 가능.
+만약 두 가지를 보내려면 아래와 같이 한다.
+
+`9-3-module1.js`
+
+```jsx
+export default function add(a, b) {
+  return a + b;
+}
+
+export function print() {
+  console.log('print');
+}
+```
+
+`9-3-module2.js`
+
+```jsx
+import add, { print } from './9-3-module1.js';
+
+console.log(add(1, 2)); // 3
+print(); // print
+```
+
+export default 없이 여러가지 것들을 내보내려면 아래와 같이도 할 수 있음
+
+`9-3-module1.js`
+
+```jsx
+export function add(a, b) {
+  return a + b;
+}
+
+export function print() {
+  console.log('print');
+}
+
+export const number = 10;
+```
+
+`9-3-module2.js`
+
+```jsx
+// import * as ~ 로 alias 설정
+import * as calculator from './9-3-module1.js';
+
+console.log(calculator.add(1, 2)); // 3
+calculator.print(); // print
+calculator.number; // 10
+```
+
+위와 같이 각 변수 및 함수에 문제없이 접근이 가능함
