@@ -83,6 +83,7 @@
     - [에러 처리 하기](Typescript/5-7-ts-with-oop-exception.md)
     - [타입스크립트의 막강한 타입들](Typescript/5-8-ts-with-oop-advanced.md)
     - [자바스크립트 딥다이브](Typescript/5-9-ts-with-oop-javascript-deep-dive.md)
+    - [TSConfig & TS Compiler](Typescript/5-10-ts-with-oop-ts-compiler.md)
 
 ## JavaScript
 
