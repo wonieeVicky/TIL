@@ -99,3 +99,156 @@ Found 0 errors. Watching for file changes.
 ```
 
 위와 같이 하면 변경되는 파일이 모두 `tsconfig.json`에 의해 watch mode가 실행되고, 변경 시마다 ts → js 업데이트
+
+### 프로젝트 구조 정리
+
+프로젝트 구조화에 대해 알아본다.
+
+현재는 tsconfig.json을 통해 생성되는 js. ts 파일이 한 루트에서 섞이므로 이 구조를 정리해본다.
+
+`tsconfig.json`
+
+```json
+{
+  // ..
+  "outDir": "./build" /* Redirect output structure to the directory. */
+  // ..
+}
+```
+
+위처럼 설정 후 `tsc -w`를 재실행하면 ./build 구조 아래애 js이 컴파일 되는 것을 확인할 수 있음.
+
+만약 아래와 같이 ts 파일이 ./src 하위에 존재하게 된다면 js 컴파일 파일도 ./build/src/\*로 생성될까?
+
+```bash
+.
+├── build
+│   ├── logging.ts
+│   └── main.js
+├── src
+│   ├── logging.ts
+│   └── main.ts
+├── index.html
+└── tsconfig.json
+```
+
+아님. 첫 시작이 되는 타입스크립트 파일이 ./src/\*부터 존재하므로 가장 최상위인 곳부터 컴파일 생성.
+
+동일하게 ./build/\* 하위에 파일이 생성된다.
+
+```bash
+.
+├── build
+│   ├── logging
+│   │   └── test.js
+│   └── src
+│       ├── logging.js
+│       └── main.js
+├── index.html
+├── logging
+│   └── test.ts
+├── src
+│   ├── logging.ts
+│   └── main.ts
+└── tsconfig.json
+```
+
+만약 컴파일 루트가 ./logging, ,./src 두 개라면? build 내에서도 분리됨
+
+즉, 타입스크립트가 있는 최상위부터 컴파일되어서 넘어온다. 보통 src 폴더 하위에 다양한 구조로 분리되므로 아래와 같은 구조를 가짐
+
+```bash
+.
+├── build
+│   ├── logging
+│   │   └── logging.js
+│   └── main.js
+├── index.html
+├── src
+│   ├── logging
+│   │   └── logging.ts
+│   └── main.ts
+└── tsconfig.json
+```
+
+이에 따라 index.html에 Js 연결 경로도 수정해줘야함. 그런데 만약 이를 어기고 src 외부에 ts 파일을 생성한다면? (하위 app.ts 참고)
+
+```bash
+.
+├── build
+│   ├── app.js
+│   └── src
+│       ├── logging
+│       │   └── logging.js
+│       └── main.js
+├── index.html
+├── app.ts
+├── src
+│   ├── logging
+│   │   └── logging.ts
+│   └── main.ts
+└── tsconfig.json
+```
+
+빌드 구조가 app.js, ./src/\*로 분리되어버림. 이는 우리가 원하는 것이 아님..
+
+root 디렉토리 외에서는 빌드가 되지 않도록 설정하는 것이 좋다.
+
+`tsconfig.json`
+
+```json
+{
+	// ..
+	"rootDir": "./src" /* Specify the root directory of input files. Use to control the output directory structure with --outDir.
+	// ..
+}
+```
+
+이후 tsc를 실행시키면 아래와 같은 에러 발생
+
+```bash
+> tsc
+error TS6059: File '/Users/study/TIL/Typescript/ts-with-oop/10-config/app.ts' is not under 'rootDir' '/Users/uneedcomms/study/TIL/Typescript/ts-with-oop/10-config/src'. 'rootDir' is expected to contain all source files.
+
+Found 1 error.
+```
+
+`app.ts` 파일의 위치가 문제가 있다고 타입스크립트에서 알려준다..!
+
+컴파일러 옵션 말고도 다른 것을 설정해볼 수도 있다.
+
+tsconfig.json으로 어떤 파일을 추가하고 제외할 것인지도 설정할 수 있음
+
+`tsconfig.json`
+
+```json
+{
+  // "compilerOptions": {}a
+  "exclude": ["./src/dev.ts"]
+}
+```
+
+위와 같이 하면 `./src/dev.ts`파일은 빌드 파일에 포함되지 않는다. 반면 include에 끼워넣으면?
+
+```json
+{
+  // "compilerOptions": {}a
+  "include": ["./src/dev.ts"]
+}
+```
+
+```bash
+.
+├── app.ts
+├── build
+│   └── dev.js
+├── index.html
+├── src
+│   ├── dev.ts
+│   ├── logging
+│   │   └── logging.ts
+│   └── main.ts
+└── tsconfig.json
+```
+
+dev.js 만 컴파일 된 것을 확인할 수 있다.
