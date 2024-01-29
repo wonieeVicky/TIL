@@ -252,3 +252,49 @@ tsconfig.json으로 어떤 파일을 추가하고 제외할 것인지도 설정�
 ```
 
 dev.js 만 컴파일 된 것을 확인할 수 있다.
+
+### 컴파일러 옵션 더 알아보기
+
+이번에는 tsconfig.json의 여러가지 설정에 대해서 좀 더 알아본다.
+
+```bash
+{
+  "compilerOptions": {
+    /* Visit https://aka.ms/tsconfig.json to read more about this file */
+
+    /* Basic Options */
+    // "incremental": true,                   /* 컴파일 시 수정된 내용만 컴파일 - 컴파일된 속도 증가 가능, 기존 컴파일한 데이터와 비교하므로 디스크 사용량이 증가할 수 있  */
+    "target": "es5",                          /* 어떤 버전으로 컴파일할 것인가? 낮은 버전일수록 코드량이 많아짐. 적정선 유지가 중요 */
+    "module": "commonjs",                     /* node 환경 - commonjs, 브라우저 환경 - ES5-6  */
+    // "lib": [],                             /* 세부적으로 사용할 라이브러리 설정 */
+    // "allowJs": true,                       /* Allow javascript files to be compiled. */
+    // "checkJs": true,                       /* js 파일에도 에러/경고 발생시킴 */
+    // "jsx": "preserve",                     /* Specify JSX code generation: 'preserve', 'react-native', or 'react'. */
+    // "declaration": true,                   /* 타입 정의, 일반 제품의 경우 사용하지 않으므로 주석 */
+    // "declarationMap": true,                /* Generates a sourcemap for each corresponding '.d.ts' file. */
+    // "sourceMap": true,                     /* Generates corresponding '.map' file. */
+    // "outFile": "./",                       /* Concatenate and emit output to single file. */
+    // "outDir": "./",                        /* 작성한 ts파일을 하나의 js파일로 만들때 사용 */
+    // "rootDir": "./",                       /* Specify the root directory of input files. Use to control the output directory structure with --outDir. */
+    // "composite": true,                     /* 이전 빌드 정보를 기억해서 빠른 빌드 가능 */
+    // "tsBuildInfoFile": "./",               /* Specify file to store incremental compilation information */
+    // "removeComments": true,                /* 코멘트 전체 삭제 */
+    // "noEmit": true,                        /* 컴파일 에러 체크만 하고 js 변환 않도록 설정 */
+    // "importHelpers": true,                 /* Import emit helpers from 'tslib'. */
+    // "downlevelIteration": true,            /* Provide full support for iterables in 'for-of', spread, and destructuring when targeting 'ES5' or 'ES3'. */
+    // "isolatedModules": true,               /* 각각의 파일을 다른 모듈로 변환 */
+
+    /* Strict Type-Checking Options */
+    "strict": true,                           /* 엄격모드 false 시 아래 항목을 선택적으로 설정해서 이용. 기본 true이면 아래걸 건들지 않아도 됨*/
+    // "noImplicitAny": true,                 /* Raise error on expressions and declarations with an implied 'any' type. */
+    // "strictNullChecks": true,              /* Enable strict null checks. */
+    // "strictFunctionTypes": true,           /* Enable strict checking of function types. */
+    // "strictBindCallApply": true,           /* Enable strict 'bind', 'call', and 'apply' methods on functions. */
+    // "strictPropertyInitialization": true,  /* Enable strict checking of property initialization in classes. */
+    // "noImplicitThis": true,                /* Raise error on 'this' expressions with an implied 'any' type. */
+    // "alwaysStrict": true,                  /* Parse in strict mode and emit "use strict" for each source file. */
+
+    /* ... */
+  }
+}
+```
