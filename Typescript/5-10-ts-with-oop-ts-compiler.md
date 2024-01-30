@@ -298,3 +298,137 @@ dev.js 만 컴파일 된 것을 확인할 수 있다.
   }
 }
 ```
+
+### 디버깅은 어떻게?
+
+`logging.ts`
+
+```tsx
+console.log('hello');
+```
+
+`main.ts`
+
+```tsx
+'use strict';
+
+class Car {
+  engine = 0;
+  move() {
+    const engine = this.engine + 1;
+    console.log(engine);
+  }
+}
+
+const car = new Car();
+car.move();
+```
+
+위 파일은 `tsc -w` 명령어로 실행시켜서 로컬에서 실행시킨 상황이라고 가정하자.
+
+작성하고 있는 코드는 타입스크립트이지만 w 모드를 켜두었기 때문에 해당 내용이 컴파일되어서 js로 컴파일됨
+
+`main.ts` → `main.js` 로 변경된 상태라고 할 때 소스를 열어보면 아래와 같음
+
+```jsx
+'use strict';
+var Car = /** @class */ (function () {
+  function Car() {
+    this.engine = 0;
+  }
+  Car.prototype.move = function () {
+    var engine = this.engine + 1;
+    console.log(engine);
+  };
+  return Car;
+})();
+var car = new Car();
+car.move();
+```
+
+prototype 문법으로 컴파일되어있는 것을 확인할 수 있음.
+만약 ts 파일에서 버그 발생 시 디버깅은 어떻게 함이 좋을까?
+
+`main.ts`
+
+```jsx
+'use strict';
+
+class Car {
+  engine = 0;
+  move() {
+    const engine = this.engine + 1;
+    console.log('Engine Bug🐛'); // Error!
+    console.log(engine);
+  }
+}
+
+const car = new Car();
+car.move();
+```
+
+실제 버그가 실행되는 부분을 개발자 도구 Sources 탭에서 소스를 열어보면 js 파일만 존재하므로 컴파일 된 js 파일을 하나씩 확인하는 것은 매우 번거롭다.
+
+![js 파일만 존재](../img/240130-1.png)
+
+이때 sourceMap을 사용하면 좋음
+
+`tsconfig.json`
+
+```json
+{
+  "compilerOptions": {
+    // ..
+    "sourceMap": true
+  }
+}
+```
+
+sourceMap을 활성화하는 것은 map이란 파일을 생성함을 의미함. map 파일에서는 작성한 ts 코드와 js 코드를 연결시켜주는 파일. 각 문제가 되는 지점이 어디인지 상세하게 확인해볼 수 있다.
+
+실제 만들어진 .map 파일은 아래와 같음
+
+`logging.js.map`
+
+```jsx
+{
+  "version": 3,
+  "file": "logging.js",
+  "sourceRoot": "",
+  "sources": [
+    "../src/logging.ts"
+  ],
+  "names": [],
+  "mappings": ";AAAA,OAAO,CAAC,GAAG,CAAC,OAAO,CAAC,CAAC"
+}
+```
+
+`main.js.map`
+
+```jsx
+{
+  "version": 3,
+  "file": "main.js",
+  "sourceRoot": "",
+  "sources": [
+    "../src/main.ts"
+  ],
+  "names": [],
+  "mappings": "AAAA,YAAY,CAAC;AAEb;IAAA;QACE,WAAM,GAAG,CAAC,CAAC;IAMb,CAAC;IALC,kBAAI,GAAJ;QACE,IAAM,MAAM,GAAG,IAAI,CAAC,MAAM,GAAG,CAAC,CAAC;QAC/B,OAAO,CAAC,GAAG,CAAC,cAAc,CAAC,CAAC;QAC5B,OAAO,CAAC,GAAG,CAAC,MAAM,CAAC,CAAC;IACtB,CAAC;IACH,UAAC;AAAD,CAAC,AAPD,IAOC;AAED,IAAM,GAAG,GAAG,IAAI,GAAG,EAAE,CAAC;AACtB,GAAG,CAAC,IAAI,EAAE,CAAC"
+}
+```
+
+굉장히 난해해보임. 그러다 브라우저는 난해하지 않다. 브라우저의 Sources 파일을 다시 가보면 아래와 같음
+
+![.map 파일 덕분에 ts 파일도 존재](../img/240130-2.png)
+
+실제 src 폴더가 생성되어, 에러로 추측되는 타입스크립트 파일 지점에 breakpoint를 걸어서 디버깅을 실행해 볼 수 있음. 디버깅 시 개발자 도구를 잘 활용하는 것이 바람직하다.
+
+<aside>
+💡 Tip! Elements 에서 특정 노드를 선택 후 $0으로 console.log에서 바로 접근 가능
+
+</aside>
+
+vsCode에서 extension을 이용할 수 있음. Debugger for Chrome install
+
+---
