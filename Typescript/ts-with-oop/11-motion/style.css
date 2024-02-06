@@ -52,4 +52,24 @@
   cursor: pointer;
 }
 
-#root #MotionModal {}
+#root #MotionContent {
+  width: 80vw;
+  height: 100vh;
+  margin: 30px 0;
+  background: rgba(255, 255, 255, .2);
+}
+
+#root #MotionModal {
+  position: fixed;
+  width: 700px;
+  height: 30vh;
+  background: rgba(255, 255, 255, .7);
+  border-radius: 10px;
+  top: calc(50% - 15vh);
+  display: none;
+  transition: all 0.5s;
+}
+
+#root #MotionModal.active {
+  display: block;
+}
