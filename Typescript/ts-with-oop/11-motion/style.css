@@ -1,8 +1,35 @@
-﻿#root {
+﻿:root {
+  --bg-main-color: #00000080;
+  --bg-accent-color: #2d2d2d;
+  --accent-color: #29580e;
+  --text-accent-color: #ffe498;
+  --text-edit-bg-color: #575757;
+  --border-color: #3f3f3f;
+  --shadow-color: #202020;
+  --document-bg-color: #68686850;
+  --component-bg-gradient: radial-gradient(circle, #646464e6 0%, #363636e6 100%);
+  --smokywhite: #dddbd8;
+  --black: #000000;
+  --translucent-black: #00000099;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Roboto', sans-serif;
+}
+
+#root {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: start;
+  color: var(--smokywhite);
+  width: 100vw;
+  height: 100vh;
+  background: url('./build/static/background.png') no-repeat center center fixed;
+  background-size: cover;
 }
 
 #root #MotionLogo {
@@ -10,11 +37,11 @@
   font-weight: bolder;
   letter-spacing: -1px;
   margin: 20px;
-  color: #de0f0f;
+  color: var(--accent-color);
 }
 
 #root .motionBtn {
-  background-color: #de0f0f;
+  background-color: var(--accent-color);
   display: inline-block;
   padding: 10px 25px;
   color: white;
@@ -24,3 +51,5 @@
   font-size: 16px;
   cursor: pointer;
 }
+
+#root #MotionModal {}
