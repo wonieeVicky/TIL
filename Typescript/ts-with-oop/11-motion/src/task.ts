@@ -2,8 +2,9 @@
   constructor() {
     console.log('Task class created');
   }
-  render() {
+  static render(): MotionTask {
     document.querySelector('#MotionFunc')!.innerHTML +=
-      '<button class="motionBtn">TASK</button>';
+      '<button class="task" id="MotionBtn">TASK</button>';
+    return new MotionTask();
   }
 }

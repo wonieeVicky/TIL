@@ -1,13 +1,7 @@
 ﻿window.addEventListener('load', () => {
-  const image = new MotionImage();
-  image.render();
+  const image = MotionImage.render().addClickEvent();
 
-  const video = new MotionVideo();
-  video.render();
-
-  const note = new MotionNote();
-  note.render();
-
-  const task = new MotionTask();
-  task.render();
+  const video = MotionVideo.render();
+  const note = MotionNote.render();
+  const task = MotionTask.render();
 });

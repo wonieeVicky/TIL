@@ -1,9 +1,10 @@
 ﻿class MotionImage {
-  constructor() {
-    console.log('Image class created');
-  }
-  render() {
+  private title: string = '';
+  private url: string = '';
+
+  static render(): MotionImage {
     document.querySelector('#MotionFunc')!.innerHTML +=
-      '<button class="motionBtn">IMAGE</button>';
+      '<button class="image" id="MotionBtn">IMAGE</button>';
+    return new MotionImage();
   }
 }

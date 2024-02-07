@@ -2,8 +2,9 @@
   constructor() {
     console.log('Note class created');
   }
-  render() {
+  static render(): MotionNote {
     document.querySelector('#MotionFunc')!.innerHTML +=
-      '<button class="motionBtn">NOTE</button>';
+      '<button class="note" id="MotionBtn">NOTE</button>';
+    return new MotionNote();
   }
 }

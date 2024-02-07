@@ -2,8 +2,9 @@
   constructor() {
     console.log('Video class created');
   }
-  render() {
+  static render(): MotionVideo {
     document.querySelector('#MotionFunc')!.innerHTML +=
-      '<button class="motionBtn">VIDEO</button>';
+      '<button class="video" id="MotionBtn">VIDEO</button>';
+    return new MotionVideo();
   }
 }
