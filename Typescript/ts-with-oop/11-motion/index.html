@@ -6,20 +6,26 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
     <link href="./style.css" rel="stylesheet" />
-    <script src="./build/image.js"></script>
-    <script src="./build/video.js"></script>
-    <script src="./build/note.js"></script>
-    <script src="./build/task.js"></script>
     <script src="./build/motion.js"></script>
   </head>
 
   <body>
     <div id="root">
-      <div id="MotionLogo">MOTION</div>
-      <div id="MotionFunc"></div>
-      <div id="MotionModal"></div>
-      <div id="MotionContent">
+      <header>
+        <div id="logo">MOTION</div>
+        <div id="menues">
+          <button id="Image">Image</button>
+          <button id="Video">Video</button>
+          <button id="Note">Note</button>
+          <button id="Task">Task</button>
+      </header>
+      <div id="document">
+        <article></article>
+        <div id="modal"></div>
       </div>
+      <footer>
+        Copyright by Vicky. All rights reserved.
+      </footer>
     </div>
   </body>
 
