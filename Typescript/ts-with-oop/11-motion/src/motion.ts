@@ -9,9 +9,31 @@ class MotionFunction {
     this.type = type;
   }
 
-  addClickEvent() {}
+  getData = () => {
+    const title = (
+      document.querySelector('input[name="title"]') as HTMLInputElement
+    ).value;
+    const url = (
+      document.querySelector('input[name="url"]') as HTMLInputElement
+    ).value;
+    this.title = title;
+    this.url = url;
+    this.saveData();
+  };
 
-  drawModal() {
+  saveData() {
+    const data: MotionData = {
+      title: this.title,
+      url: this.url,
+      type: this.type
+    };
+    console.log(data);
+  }
+
+  toggleModal() {
+    if (document.querySelector('.modalInner')) {
+      return;
+    }
     const $modalContent = document.createElement('div');
     $modalContent.className = 'modalInner';
     $modalContent.innerHTML = `
@@ -27,12 +49,21 @@ class MotionFunction {
         <button class="add">ADD</button>
       </div>
     `;
-    document.querySelector('#MotionModal')!.appendChild($modalContent);
-    const modal = document.querySelector('#MotionModal') as HTMLElement;
+    document.querySelector('#modal')!.appendChild($modalContent);
+    const modal = document.querySelector('#modal') as HTMLElement;
     modal.classList.add('active');
+    document.querySelector('.add')!.addEventListener('click', () => {
+      this.getData();
+      modal.classList.remove('active');
+    });
   }
 }
 
 {
   const image = new MotionFunction('image');
+  window.addEventListener('load', () => {
+    document
+      .querySelector('#Image')!
+      .addEventListener('click', image.toggleModal);
+  });
 }
