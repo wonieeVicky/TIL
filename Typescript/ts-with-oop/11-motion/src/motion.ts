@@ -1,4 +1,7 @@
-﻿type MotionData = {};
+﻿type MotionData = {
+  title: string;
+  url: string;
+};
 
 class MotionFunction {
   title: string = '';
@@ -9,54 +12,87 @@ class MotionFunction {
     this.type = type;
   }
 
-  getData = () => {
-    const title = (
-      document.querySelector('input[name="title"]') as HTMLInputElement
-    ).value;
-    const url = (
-      document.querySelector('input[name="url"]') as HTMLInputElement
-    ).value;
-    this.title = title;
-    this.url = url;
-    this.saveData();
-  };
+  saveData = () => {
+    const title = document.querySelector('#title') as HTMLInputElement;
+    const url = document.querySelector('#url') as HTMLInputElement;
+    this.title = title.value;
+    this.url = url.value;
 
-  saveData() {
-    const data: MotionData = {
-      title: this.title,
-      url: this.url,
-      type: this.type
-    };
-    console.log(data);
-  }
-
-  toggleModal() {
-    if (document.querySelector('.modalInner')) {
+    if (!this.title || !this.url) {
+      alert('Please fill out the form');
       return;
     }
-    const $modalContent = document.createElement('div');
-    $modalContent.className = 'modalInner';
-    $modalContent.innerHTML = `
-      <div>
+
+    const newData = {
+      title: this.title,
+      url: this.url
+    };
+
+    if (localStorage.getItem(this.type)) {
+      const data = JSON.parse(localStorage.getItem(this.type) as string);
+
+      if (
+        data.some(
+          (item: MotionData) =>
+            item.title === this.title && item.url === this.url
+        )
+      ) {
+        alert('The data is already exist');
+        return;
+      }
+
+      localStorage.setItem(this.type, JSON.stringify([...data, newData]));
+    } else {
+      localStorage.setItem(this.type, JSON.stringify([newData]));
+    }
+
+    this.toggleModal();
+  };
+
+  toggleModal = () => {
+    const modal = document.querySelector('#modal')!;
+    modal.classList.remove('active');
+    const modalBackground = document.querySelector('.modal-background')!;
+    modalBackground.classList.remove('active');
+    const modalContent = document.querySelector('.modal-content')!;
+    modalContent.innerHTML = '';
+  };
+
+  activeModal = () => {
+    // add classList
+    const $modal = document.querySelector('#modal')!;
+    $modal.classList.add('active');
+    const $modalContent = document.querySelector('.modal-content')!;
+    $modalContent.classList.add('active');
+    const $modalBackground = document.querySelector('.modal-background')!;
+    $modalBackground.classList.add('active');
+
+    // add event listener
+    $modalBackground.addEventListener('click', this.toggleModal);
+    const $modalClose = document.querySelector('.modal-close')!;
+    $modalClose.addEventListener('click', this.toggleModal);
+    const $modalSave = document.querySelector('.modal-save')!;
+    $modalSave.addEventListener('click', this.saveData);
+  };
+
+  addModalContent = () => {
+    const modalContent = document.querySelector('.modal-content')!;
+    modalContent.innerHTML = `
+      <div class="modal-header">
+        <button class="modal-close"></button>
+      </div>
+      <div class="modal-body">
         <label for="title">Title</label>
-        <input type="text" name="title" />
+        <input type="text" id="title" placeholder="Title" required />
+        <label for="url">URL</label>
+        <input type="text" id="url" placeholder="URL" required />
       </div>
-      <div>
-        <label for="url">Url</label>
-        <input type="text" name="url" />
+      <div class="modal-footer">
+        <button class="modal-save">ADD</button>
       </div>
-      <div>
-        <button class="add">ADD</button>
-      </div>
-    `;
-    document.querySelector('#modal')!.appendChild($modalContent);
-    const modal = document.querySelector('#modal') as HTMLElement;
-    modal.classList.add('active');
-    document.querySelector('.add')!.addEventListener('click', () => {
-      this.getData();
-      modal.classList.remove('active');
-    });
-  }
+      `;
+    this.activeModal();
+  };
 }
 
 {
@@ -64,6 +100,6 @@ class MotionFunction {
   window.addEventListener('load', () => {
     document
       .querySelector('#Image')!
-      .addEventListener('click', image.toggleModal);
+      .addEventListener('click', image.addModalContent);
   });
 }
