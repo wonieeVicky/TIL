@@ -47,6 +47,29 @@ class MotionFunction {
     }
 
     this.toggleModal();
+    this.updateData();
+  };
+
+  updateData = () => {
+    if (!localStorage.getItem(this.type)) {
+      return;
+    }
+    const data = JSON.parse(localStorage.getItem(this.type) as string);
+    const $motionContent = document.querySelector(
+      `#document article`
+    ) as HTMLDivElement;
+    $motionContent.innerHTML = '';
+    data.forEach((item: MotionData) => {
+      $motionContent.innerHTML += `
+        <div class="motion-item">
+          <div class="motion-item-close"></div>
+          <img src="${item.url}" alt="${item.title}" />
+          <div class="motion-item-content">
+            <h3>${item.title}</h3>
+          </div>
+        </div>
+      `;
+    });
   };
 
   toggleModal = () => {
@@ -98,6 +121,7 @@ class MotionFunction {
 {
   const image = new MotionFunction('image');
   window.addEventListener('load', () => {
+    image.updateData();
     document
       .querySelector('#Image')!
       .addEventListener('click', image.addModalContent);
