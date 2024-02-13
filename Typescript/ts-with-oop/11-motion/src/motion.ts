@@ -47,29 +47,38 @@ class MotionFunction {
     }
 
     this.toggleModal();
-    this.updateData();
+    this.updateDocument(newData);
   };
 
-  updateData = () => {
+  private generateContent = (data: MotionData) => `
+      <div class="motion-item">
+        <div class="motion-item-close"></div>
+        <img src="${data.url}" alt="${data.title}" />
+        <div class="motion-item-content">
+          <h3>${data.title}</h3>
+        </div>
+      </div>`;
+
+  updateDocument = (updateData?: MotionData) => {
     if (!localStorage.getItem(this.type)) {
       return;
     }
+
     const data = JSON.parse(localStorage.getItem(this.type) as string);
     const $motionContent = document.querySelector(
       `#document article`
     ) as HTMLDivElement;
-    $motionContent.innerHTML = '';
-    data.forEach((item: MotionData) => {
-      $motionContent.innerHTML += `
-        <div class="motion-item">
-          <div class="motion-item-close"></div>
-          <img src="${item.url}" alt="${item.title}" />
-          <div class="motion-item-content">
-            <h3>${item.title}</h3>
-          </div>
-        </div>
-      `;
-    });
+
+    if (!updateData) {
+      $motionContent.innerHTML = '';
+      data.forEach((item: MotionData) => {
+        $motionContent.innerHTML += this.generateContent(item);
+      });
+      return;
+    }
+
+    $motionContent.innerHTML += this.generateContent(updateData);
+    // data에 추가된 데이터를 innerHTML로 추가
   };
 
   toggleModal = () => {
@@ -121,7 +130,7 @@ class MotionFunction {
 {
   const image = new MotionFunction('image');
   window.addEventListener('load', () => {
-    image.updateData();
+    image.updateDocument();
     document
       .querySelector('#Image')!
       .addEventListener('click', image.addModalContent);
