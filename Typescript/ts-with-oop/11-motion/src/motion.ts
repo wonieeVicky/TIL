@@ -57,7 +57,15 @@ class MotionFunction {
         <div class="motion-item-content">
           <h3>${data.title}</h3>
         </div>
-      </div>`;
+      </div>
+  `;
+
+  deleteData = (index: number) => {
+    const data = JSON.parse(localStorage.getItem(this.type) as string);
+    data.splice(index, 1);
+    localStorage.setItem(this.type, JSON.stringify(data));
+    this.updateDocument();
+  };
 
   updateDocument = (updateData?: MotionData) => {
     if (!localStorage.getItem(this.type)) {
@@ -74,11 +82,13 @@ class MotionFunction {
       data.forEach((item: MotionData) => {
         $motionContent.innerHTML += this.generateContent(item);
       });
-      return;
+    } else {
+      $motionContent.innerHTML += this.generateContent(updateData);
     }
 
-    $motionContent.innerHTML += this.generateContent(updateData);
-    // data에 추가된 데이터를 innerHTML로 추가
+    document.querySelectorAll('.motion-item-close').forEach((item, index) => {
+      item.addEventListener('click', () => this.deleteData(index));
+    });
   };
 
   toggleModal = () => {
