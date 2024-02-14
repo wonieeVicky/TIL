@@ -1,9 +1,9 @@
-﻿type MotionData = {
+﻿type Motion = 'image' | 'video' | 'note' | 'task' | 'root';
+type MotionData = {
   title: string;
   url: string;
+  type: Motion;
 };
-
-type Motion = 'image' | 'video' | 'note' | 'task' | 'root';
 
 class MotionFunction {
   title: string = '';
@@ -27,7 +27,7 @@ class MotionFunction {
       return;
     }
 
-    const newData = {
+    const newData: MotionData = {
       title: this.title,
       url: this.url,
       type: this.type
@@ -104,15 +104,21 @@ class MotionFunction {
     modalContent.innerHTML = '';
   }
 
-  private generateContent = (data: MotionData) => `
-    <div class="motion-item">
-      <div class="motion-item-close"></div>
-      <img src="${data.url}" alt="${data.title}" />
-      <div class="motion-item-content">
-        <h3>${data.title}</h3>
+  private generateContent = (data: MotionData) => {
+    const mapTypeToRenderHtml: Record<string, string> = {
+      image: `<img src=${data.url} alt=${data.title} />`,
+      video: `<video src=${data.url} alt=${data.title} />`
+    };
+    return `
+      <div class="motion-item">
+        <div class="motion-item-close"></div>
+        ${mapTypeToRenderHtml[data.type]}
+        <div class="motion-item-content">
+          <h3>${data.title}</h3>
+        </div>
       </div>
-    </div>
-  `;
+    `;
+  };
 
   activeModal(): void {
     // add classList
@@ -167,15 +173,44 @@ class MotionImage extends MotionFunction {
   }
 }
 
+class MotionVideo extends MotionFunction {
+  constructor(public readonly type: Motion) {
+    super(type);
+  }
+
+  addModalContent(): void {
+    const modalContent = document.querySelector('.modal-content')!;
+    modalContent.innerHTML = `
+      <div class="modal-header">
+        <button class="modal-close"></button>
+      </div>
+      <div class="modal-body">
+        <label for="title">Title</label>
+        <input type="text" id="title" placeholder="Title" required />
+        <label for="url">Video URL</label>
+        <input type="text" id="url" placeholder="URL" required />
+      </div>
+      <div class="modal-footer">
+        <button class="modal-save">ADD</button>
+      </div>
+      `;
+    super.addModalContent();
+  }
+}
+
 {
   const root = new MotionFunction('root');
   const image = new MotionImage('image');
+  const video = new MotionImage('video');
 
   window.addEventListener('load', () => {
     root.updateDocument();
 
     document.querySelector('#Image')!.addEventListener('click', function () {
       image.addModalContent();
+    });
+    document.querySelector('#Video')!.addEventListener('click', function () {
+      video.addModalContent();
     });
   });
 }
