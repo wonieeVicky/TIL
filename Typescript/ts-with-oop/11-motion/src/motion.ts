@@ -3,16 +3,19 @@
   url: string;
 };
 
+type Motion = 'image' | 'video' | 'note' | 'task';
+
 class MotionFunction {
   title: string = '';
   url: string = '';
   type: string = ''; // image, video, note, task
+  private readonly MOTION_STORAGE_KEY: string = 'motionData';
 
-  constructor(type: string) {
+  constructor(type: Motion) {
     this.type = type;
   }
 
-  saveData = () => {
+  saveData() {
     const title = document.querySelector('#title') as HTMLInputElement;
     const url = document.querySelector('#url') as HTMLInputElement;
     this.title = title.value;
@@ -41,34 +44,27 @@ class MotionFunction {
         return;
       }
 
-      localStorage.setItem(this.type, JSON.stringify([...data, newData]));
+      localStorage.setItem(
+        this.MOTION_STORAGE_KEY,
+        JSON.stringify([...data, newData])
+      );
     } else {
-      localStorage.setItem(this.type, JSON.stringify([newData]));
+      localStorage.setItem(this.MOTION_STORAGE_KEY, JSON.stringify([newData]));
     }
 
     this.toggleModal();
     this.updateDocument(newData);
-  };
+  }
 
-  private generateContent = (data: MotionData) => `
-      <div class="motion-item">
-        <div class="motion-item-close"></div>
-        <img src="${data.url}" alt="${data.title}" />
-        <div class="motion-item-content">
-          <h3>${data.title}</h3>
-        </div>
-      </div>
-  `;
-
-  deleteData = (index: number) => {
+  deleteData(index: number) {
     const data = JSON.parse(localStorage.getItem(this.type) as string);
     data.splice(index, 1);
     localStorage.setItem(this.type, JSON.stringify(data));
     this.updateDocument();
-  };
+  }
 
-  updateDocument = (updateData?: MotionData) => {
-    if (!localStorage.getItem(this.type)) {
+  updateDocument(updateData?: MotionData) {
+    if (!localStorage.getItem('motionData')) {
       return;
     }
 
@@ -89,18 +85,28 @@ class MotionFunction {
     document.querySelectorAll('.motion-item-close').forEach((item, index) => {
       item.addEventListener('click', () => this.deleteData(index));
     });
-  };
+  }
 
-  toggleModal = () => {
+  toggleModal(): void {
     const modal = document.querySelector('#modal')!;
     modal.classList.remove('active');
     const modalBackground = document.querySelector('.modal-background')!;
     modalBackground.classList.remove('active');
     const modalContent = document.querySelector('.modal-content')!;
     modalContent.innerHTML = '';
-  };
+  }
 
-  activeModal = () => {
+  private generateContent = (data: MotionData) => `
+    <div class="motion-item">
+      <div class="motion-item-close"></div>
+      <img src="${data.url}" alt="${data.title}" />
+      <div class="motion-item-content">
+        <h3>${data.title}</h3>
+      </div>
+    </div>
+  `;
+
+  activeModal(): void {
     // add classList
     const $modal = document.querySelector('#modal')!;
     $modal.classList.add('active');
@@ -110,14 +116,29 @@ class MotionFunction {
     $modalBackground.classList.add('active');
 
     // add event listener
-    $modalBackground.addEventListener('click', this.toggleModal);
+    $modalBackground.addEventListener('click', () => {
+      this.toggleModal();
+    });
     const $modalClose = document.querySelector('.modal-close')!;
-    $modalClose.addEventListener('click', this.toggleModal);
+    $modalClose.addEventListener('click', () => {
+      this.toggleModal();
+    });
     const $modalSave = document.querySelector('.modal-save')!;
-    $modalSave.addEventListener('click', this.saveData);
-  };
+    $modalSave.addEventListener('click', () => {
+      this.saveData();
+    });
+  }
 
-  addModalContent = () => {
+  addModalContent(): void {
+    this.activeModal();
+  }
+}
+
+class MotionImage extends MotionFunction {
+  constructor(public readonly type: Motion) {
+    super(type);
+  }
+  addModalContent(): void {
     const modalContent = document.querySelector('.modal-content')!;
     modalContent.innerHTML = `
       <div class="modal-header">
@@ -133,16 +154,16 @@ class MotionFunction {
         <button class="modal-save">ADD</button>
       </div>
       `;
-    this.activeModal();
-  };
+    super.addModalContent();
+  }
 }
 
 {
-  const image = new MotionFunction('image');
+  const image = new MotionImage('image');
   window.addEventListener('load', () => {
     image.updateDocument();
-    document
-      .querySelector('#Image')!
-      .addEventListener('click', image.addModalContent);
+    document.querySelector('#Image')!.addEventListener('click', function () {
+      image.addModalContent();
+    });
   });
 }
