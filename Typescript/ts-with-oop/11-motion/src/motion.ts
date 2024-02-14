@@ -3,12 +3,13 @@
   url: string;
 };
 
-type Motion = 'image' | 'video' | 'note' | 'task';
+type Motion = 'image' | 'video' | 'note' | 'task' | 'root';
 
 class MotionFunction {
   title: string = '';
   url: string = '';
   type: string = ''; // image, video, note, task
+
   private readonly MOTION_STORAGE_KEY: string = 'motionData';
 
   constructor(type: Motion) {
@@ -28,11 +29,14 @@ class MotionFunction {
 
     const newData = {
       title: this.title,
-      url: this.url
+      url: this.url,
+      type: this.type
     };
 
-    if (localStorage.getItem(this.type)) {
-      const data = JSON.parse(localStorage.getItem(this.type) as string);
+    if (localStorage.getItem(this.MOTION_STORAGE_KEY)) {
+      const data = JSON.parse(
+        localStorage.getItem(this.MOTION_STORAGE_KEY) as string
+      );
 
       if (
         data.some(
@@ -57,18 +61,22 @@ class MotionFunction {
   }
 
   deleteData(index: number) {
-    const data = JSON.parse(localStorage.getItem(this.type) as string);
+    const data = JSON.parse(
+      localStorage.getItem(this.MOTION_STORAGE_KEY) as string
+    );
     data.splice(index, 1);
-    localStorage.setItem(this.type, JSON.stringify(data));
+    localStorage.setItem(this.MOTION_STORAGE_KEY, JSON.stringify(data));
     this.updateDocument();
   }
 
-  updateDocument(updateData?: MotionData) {
-    if (!localStorage.getItem('motionData')) {
+  public updateDocument(updateData?: MotionData) {
+    if (!localStorage.getItem(this.MOTION_STORAGE_KEY)) {
       return;
     }
 
-    const data = JSON.parse(localStorage.getItem(this.type) as string);
+    const data = JSON.parse(
+      localStorage.getItem(this.MOTION_STORAGE_KEY) as string
+    );
     const $motionContent = document.querySelector(
       `#document article`
     ) as HTMLDivElement;
@@ -138,6 +146,7 @@ class MotionImage extends MotionFunction {
   constructor(public readonly type: Motion) {
     super(type);
   }
+
   addModalContent(): void {
     const modalContent = document.querySelector('.modal-content')!;
     modalContent.innerHTML = `
@@ -159,9 +168,12 @@ class MotionImage extends MotionFunction {
 }
 
 {
+  const root = new MotionFunction('root');
   const image = new MotionImage('image');
+
   window.addEventListener('load', () => {
-    image.updateDocument();
+    root.updateDocument();
+
     document.querySelector('#Image')!.addEventListener('click', function () {
       image.addModalContent();
     });
