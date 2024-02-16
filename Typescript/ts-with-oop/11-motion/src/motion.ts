@@ -155,21 +155,12 @@ class MotionImage extends MotionFunction {
   }
 
   addModalContent(): void {
-    const modalContent = document.querySelector('.modal-content')!;
-    modalContent.innerHTML = `
-      <div class="modal-header">
-        <button class="modal-close"></button>
-      </div>
-      <div class="modal-body">
-        <label for="title">Title</label>
-        <input type="text" id="title" placeholder="Title" required />
-        <label for="url">URL</label>
-        <input type="text" id="url" placeholder="https://picsum.photos/500/300" required />
-      </div>
-      <div class="modal-footer">
-        <button class="modal-save">ADD</button>
-      </div>
-      `;
+    const modalBody = document.querySelector('.modal-body')!;
+    modalBody.innerHTML = `
+      <label for="title">Title</label>
+      <input type="text" id="title" placeholder="Title" required />
+      <label for="url">URL</label>
+      <input type="text" id="url" placeholder="https://picsum.photos/500/300" required />`;
     super.addModalContent();
   }
 }
@@ -180,21 +171,12 @@ class MotionVideo extends MotionFunction {
   }
 
   addModalContent(): void {
-    const modalContent = document.querySelector('.modal-content')!;
-    modalContent.innerHTML = `
-      <div class="modal-header">
-        <button class="modal-close"></button>
-      </div>
-      <div class="modal-body">
-        <label for="title">Title</label>
-        <input type="text" id="title" placeholder="Title" required />
-        <label for="url">URL</label>
-        <input type="text" id="url" placeholder="https://www.youtube.com/watch?v=2YjixJqvMfA" required />
-      </div>
-      <div class="modal-footer">
-        <button class="modal-save">ADD</button>
-      </div>
-      `;
+    const modalBody = document.querySelector('.modal-body')!;
+    modalBody.innerHTML = `
+      <label for="title">Title</label>
+      <input type="text" id="title" placeholder="Title" required />
+      <label for="url">URL</label>
+      <input type="text" id="url" placeholder="https://www.youtube.com/watch?v=2YjixJqvMfA" required />`;
     super.addModalContent();
   }
 }
