@@ -181,10 +181,26 @@ class MotionVideo extends MotionFunction {
   }
 }
 
+class MotionNote extends MotionFunction {
+  constructor(public readonly type: Motion) {
+    super(type);
+  }
+  addModalContent(): void {
+    const modalBody = document.querySelector('.modal-body')!;
+    modalBody.innerHTML = `
+      <label for="title">Title</label>
+      <input type="text" id="title" placeholder="Title" required />
+      <label for="url">Body</label>
+      <textarea id="url" placeholder="Write your note here" required></textarea>`;
+    super.addModalContent();
+  }
+}
+
 {
   const root = new MotionFunction('root');
   const image = new MotionImage('image');
   const video = new MotionVideo('video');
+  const note = new MotionNote('note');
 
   window.addEventListener('load', () => {
     root.updateDocument();
@@ -194,6 +210,9 @@ class MotionVideo extends MotionFunction {
     });
     document.querySelector('#Video')!.addEventListener('click', function () {
       video.addModalContent();
+    });
+    document.querySelector('#Note')!.addEventListener('click', function () {
+      note.addModalContent();
     });
   });
 }

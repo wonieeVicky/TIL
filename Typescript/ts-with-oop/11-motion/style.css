@@ -202,7 +202,8 @@
   margin-top: 15px;
 }
 
-#modal .modal-body input {
+#modal .modal-body input,
+#modal .modal-body textarea {
   display: block;
   width: 100%;
   padding: 15px;
