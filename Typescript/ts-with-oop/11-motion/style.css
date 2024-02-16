@@ -84,14 +84,19 @@
   position: relative;
 }
 
-#document article .motion-item img {
-  display: inline-block;
+#document article .motion-item img,
+#document article .motion-item iframe {
+  display: block;
   width: 100%;
   max-width: 60%;
   max-height: 200px;
   height: auto;
   object-fit: cover;
   border-radius: 10px;
+}
+
+#document article .motion-item iframe {
+  height: 200px;
 }
 
 #document article .motion-item .motion-item-content {

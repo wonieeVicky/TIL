@@ -8,7 +8,7 @@ type MotionData = {
 class MotionFunction {
   title: string = '';
   url: string = '';
-  type: string = ''; // image, video, note, task
+  type: Motion; // image, video, note, task
 
   private readonly MOTION_STORAGE_KEY: string = 'motionData';
 
@@ -107,11 +107,12 @@ class MotionFunction {
   private generateContent = (data: MotionData) => {
     const mapTypeToRenderHtml: Record<string, string> = {
       image: `<img src=${data.url} alt=${data.title} />`,
-      video: `<video src=${data.url} alt=${data.title} />`
+      video: `<iframe width="100%" src="${data.url}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>`
     };
     return `
       <div class="motion-item">
         <div class="motion-item-close"></div>
+        
         ${mapTypeToRenderHtml[data.type]}
         <div class="motion-item-content">
           <h3>${data.title}</h3>
@@ -163,7 +164,7 @@ class MotionImage extends MotionFunction {
         <label for="title">Title</label>
         <input type="text" id="title" placeholder="Title" required />
         <label for="url">URL</label>
-        <input type="text" id="url" placeholder="URL" required />
+        <input type="text" id="url" placeholder="https://picsum.photos/500/300" required />
       </div>
       <div class="modal-footer">
         <button class="modal-save">ADD</button>
@@ -187,8 +188,8 @@ class MotionVideo extends MotionFunction {
       <div class="modal-body">
         <label for="title">Title</label>
         <input type="text" id="title" placeholder="Title" required />
-        <label for="url">Video URL</label>
-        <input type="text" id="url" placeholder="URL" required />
+        <label for="url">URL</label>
+        <input type="text" id="url" placeholder="https://www.youtube.com/watch?v=2YjixJqvMfA" required />
       </div>
       <div class="modal-footer">
         <button class="modal-save">ADD</button>
@@ -201,7 +202,7 @@ class MotionVideo extends MotionFunction {
 {
   const root = new MotionFunction('root');
   const image = new MotionImage('image');
-  const video = new MotionImage('video');
+  const video = new MotionVideo('video');
 
   window.addEventListener('load', () => {
     root.updateDocument();
