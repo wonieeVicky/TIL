@@ -1,13 +1,18 @@
 ﻿type Motion = 'image' | 'video' | 'note' | 'task' | 'root';
+enum MotionUrlTypeEnum {
+  Image = 'image',
+  Video = 'video'
+}
+
 type MotionData = {
   title: string;
-  url: string;
+  content: string;
   type: Motion;
 };
 
 class MotionFunction {
   title: string = '';
-  url: string = '';
+  content: string = '';
   type: Motion; // image, video, note, task
 
   private readonly MOTION_STORAGE_KEY: string = 'motionData';
@@ -17,19 +22,24 @@ class MotionFunction {
   }
 
   saveData() {
+    const isUrlType =
+      this.type === MotionUrlTypeEnum.Image ||
+      this.type === MotionUrlTypeEnum.Video;
     const title = document.querySelector('#title') as HTMLInputElement;
-    const url = document.querySelector('#url') as HTMLInputElement;
+    const content = document.querySelector(
+      isUrlType ? '#url' : '#body'
+    ) as HTMLInputElement;
     this.title = title.value;
-    this.url = url.value;
+    this.content = content.value;
 
-    if (!this.title || !this.url) {
+    if (!this.title || !this.content) {
       alert('Please fill out the form');
       return;
     }
 
     const newData: MotionData = {
       title: this.title,
-      url: this.url,
+      content: this.content,
       type: this.type
     };
 
@@ -41,7 +51,7 @@ class MotionFunction {
       if (
         data.some(
           (item: MotionData) =>
-            item.title === this.title && item.url === this.url
+            item.title === this.title && item.content === this.content
         )
       ) {
         alert('The data is already exist');
@@ -106,13 +116,13 @@ class MotionFunction {
 
   private generateContent = (data: MotionData) => {
     const mapTypeToRenderHtml: Record<string, string> = {
-      image: `<img src=${data.url} alt=${data.title} />`,
-      video: `<iframe width="100%" src="${data.url}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>`
+      image: `<img src=${data.content} alt=${data.title} />`,
+      video: `<iframe width="100%" src="${data.content}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>`,
+      note: `<p>${data.content}</p>`
     };
     return `
-      <div class="motion-item">
+      <div class="motion-item motion-${data.type}">
         <div class="motion-item-close"></div>
-        
         ${mapTypeToRenderHtml[data.type]}
         <div class="motion-item-content">
           <h3>${data.title}</h3>
@@ -190,8 +200,8 @@ class MotionNote extends MotionFunction {
     modalBody.innerHTML = `
       <label for="title">Title</label>
       <input type="text" id="title" placeholder="Title" required />
-      <label for="url">Body</label>
-      <textarea id="url" placeholder="Write your note here" required></textarea>`;
+      <label for="body">Body</label>
+      <textarea id="body" placeholder="Write your note here" required></textarea>`;
     super.addModalContent();
   }
 }
