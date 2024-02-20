@@ -110,29 +110,43 @@ class MotionFunction {
     modal.classList.remove('active');
     const modalBackground = document.querySelector('.modal-background')!;
     modalBackground.classList.remove('active');
-    const modalContent = document.querySelector('.modal-content')!;
-    modalContent.innerHTML = '';
+    const modalBody = document.querySelector('.modal-body')!;
+    modalBody.innerHTML = '';
   }
 
   private generateContent = (data: MotionData) => {
     const mapTypeToRenderHtml: Record<string, string> = {
       image: `<img src=${data.content} alt=${data.title} />`,
       video: `<iframe width="100%" src="${data.content}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>`,
-      note: `<p>${data.content}</p>`
+      note: `<h3>${data.title}</h3>`,
+      task: `<h3>${data.title}</h3>`
     };
     return `
       <div class="motion-item motion-${data.type}">
         <div class="motion-item-close"></div>
         ${mapTypeToRenderHtml[data.type]}
         <div class="motion-item-content">
-          <h3>${data.title}</h3>
+          ${
+            data.type === 'task'
+              ? data.content
+                  .split('\n')
+                  .map((content) => {
+                    return `
+              <div>
+                <input type="checkbox" value="content" />
+                ${content}
+              </div>
+            `;
+                  })
+                  .join('')
+              : data.content.replace(/\n/g, '<br>')
+          }
         </div>
       </div>
     `;
   };
 
   activeModal(): void {
-    // add classList
     const $modal = document.querySelector('#modal')!;
     $modal.classList.add('active');
     const $modalContent = document.querySelector('.modal-content')!;
@@ -161,7 +175,7 @@ class MotionFunction {
 
 class MotionImage extends MotionFunction {
   constructor(public readonly type: Motion) {
-    super(type);
+    super('image');
   }
 
   addModalContent(): void {
@@ -206,23 +220,44 @@ class MotionNote extends MotionFunction {
   }
 }
 
-{
-  const root = new MotionFunction('root');
-  const image = new MotionImage('image');
-  const video = new MotionVideo('video');
-  const note = new MotionNote('note');
+class MotionTask extends MotionFunction {
+  constructor(public readonly type: Motion) {
+    super(type);
+  }
+  addModalContent(): void {
+    const modalBody = document.querySelector('.modal-body')!;
+    modalBody.innerHTML = `
+      <label for="title">Title</label>
+      <input type="text" id="title" placeholder="Title" required />
+      <label for="body">Body</label>
+      <textarea id="body" placeholder="Write your note here" required></textarea>`;
+    super.addModalContent();
+  }
+}
 
+{
   window.addEventListener('load', () => {
+    const root = new MotionFunction('root');
     root.updateDocument();
 
+    const image = new MotionImage('image');
     document.querySelector('#Image')!.addEventListener('click', function () {
       image.addModalContent();
     });
+
+    const video = new MotionVideo('video');
     document.querySelector('#Video')!.addEventListener('click', function () {
       video.addModalContent();
     });
+
+    const note = new MotionNote('note');
     document.querySelector('#Note')!.addEventListener('click', function () {
       note.addModalContent();
+    });
+
+    const task = new MotionTask('task');
+    document.querySelector('#Task')!.addEventListener('click', function () {
+      task.addModalContent();
     });
   });
 }

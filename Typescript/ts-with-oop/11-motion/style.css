@@ -73,8 +73,6 @@
 }
 
 #document article .motion-item {
-  display: flex;
-  flex-direction: row;
   margin: 20px 0;
   padding: 20px;
   background: var(--document-bg-color);
@@ -82,6 +80,26 @@
   box-shadow: 0 0 10px var(--shadow-color);
   transition: all 0.3s;
   position: relative;
+}
+
+#document article .motion-item:not(.motion-note) {
+  display: flex;
+  flex-direction: row;
+}
+
+#document article .motion-item.motion-note,
+#document article .motion-item.motion-task {
+  flex-direction: column;
+}
+
+#document article .motion-item.motion-note h3,
+#document article .motion-item.motion-task h3 {
+  margin-bottom: 10px;
+}
+
+#document article .motion-item.motion-note .motion-item-content,
+#document article .motion-item.motion-task .motion-item-content {
+  padding: 0;
 }
 
 #document article .motion-item img,
