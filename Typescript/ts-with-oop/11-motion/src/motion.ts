@@ -139,6 +139,9 @@ class MotionFunction {
             `;
                   })
                   .join('')
+              : data.type === MotionUrlTypeEnum.Image ||
+                data.type === MotionUrlTypeEnum.Video
+              ? data.title
               : data.content.replace(/\n/g, '<br>')
           }
         </div>
