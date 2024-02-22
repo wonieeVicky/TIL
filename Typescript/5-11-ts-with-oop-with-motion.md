@@ -74,3 +74,48 @@ MoSCoW 방식 (Must have: 있어야 함, Should have: 가져야 함, Could have:
 - header
 - document
 - footer
+
+### 프로젝트 환경 설정
+
+`tsconfig.json`
+
+```json
+{
+  "compilerOptions": {
+    "target": "es6" /* Specify ECMAScript target version: 'ES3' (default), 'ES5', 'ES2015', 'ES2016', 'ES2017', 'ES2018', 'ES2019', 'ES2020', or 'ESNEXT'. */,
+    "module": "ES2015" /* Specify module code generation: 'none', 'commonjs', 'amd', 'system', 'umd', 'es2015', 'es2020', or 'ESNext'. */,
+    "outDir": "./dist" /* Redirect output structure to the directory. */,
+    "rootDir": "./src" /* Specify the root directory of input files. Use to control the output directory structure with --outDir. */,
+    "removeComments": true /* Do not emit comments to output. */,
+    "noEmitOnError": true /* Do not emit outputs if any errors were reported. */,
+
+    /* Strict Type-Checking Options */
+    "strict": true /* Enable all strict type-checking options. */,
+
+    /* Additional Checks */
+    "noUnusedLocals": true /* Report errors on unused locals. */,
+    "noUnusedParameters": true /* Report errors on unused parameters. */,
+    "noImplicitReturns": true /* Report error when not all code paths in function return a value. */,
+    "noFallthroughCasesInSwitch": true /* Report errors for fallthrough cases in switch statement. */,
+    "noUncheckedIndexedAccess": true /* Include 'undefined' in index signature results */,
+
+    /* Module Resolution Options */
+    "esModuleInterop": true /* Enables emit interoperability between CommonJS and ES Modules via creation of namespace objects for all imports. Implies 'allowSyntheticDefaultImports'. */,
+
+    /* Advanced Options */
+    "skipLibCheck": true /* Skip type checking of declaration files. */,
+    "forceConsistentCasingInFileNames": true /* Disallow inconsistently-cased references to the same file. */
+  }
+}
+```
+
+### 프로젝트 구현 플랜
+
+전반적 전략과 흐름
+
+- App
+  - App 클래스는 상태를 가지고 있고, 상태를 변화시킬 수 있는 함수로 묶여져 있음
+  - header, footer, document로 나뉜다.
+  - document ⇒ PageComponent 클래스
+    - ImageComponent, NoteComponent, VideoComponent, TodoComponent
+- 컴포넌트의 캡슐화, 추상화, 상속, 유연한 확장성을 고려한다.
