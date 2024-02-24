@@ -290,3 +290,8 @@ MoSCoW 방식 (Must have: 있어야 함, Should have: 가져야 함, Could have:
   ```
 
   🪄 BaseComponent의 Generic Type, Interface 정의 복기 필요
+
+![](../img/240225-1.png)
+
+여러 클래스에 걸쳐 공통적으로 사용되는 코드를 하나의 컴포넌트로 정의해두면,
+동일한 코드를 반복할 필요 없이 상속만으로 코드의 중복을 줄이고, 재사용성을 높일 수 있다.
