@@ -1,9 +1,9 @@
-﻿import { BaseComponent } from './../../base.js';
+﻿import { BaseComponent } from '../../component.js';
 
 /**
  * ImageComponent
  */
-export class ImageComponent extends BaseComponent {
+export class ImageComponent extends BaseComponent<HTMLElement> {
   constructor(readonly title: string, readonly url: string) {
     super(`
       <section class="image">
@@ -23,9 +23,5 @@ export class ImageComponent extends BaseComponent {
       '.image__title'
     )! as HTMLParagraphElement;
     titleElement.textContent = title;
-  }
-
-  attachTo(parent: HTMLElement, position: InsertPosition = 'afterbegin') {
-    super.attachTo(parent, position);
   }
 }
