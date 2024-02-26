@@ -1,5 +1,6 @@
 ﻿import { ImageComponent } from './components/page/item/image.js';
 import { NoteComponent } from './components/page/item/note.js';
+import { TodoComponent } from './components/page/item/todo.js';
 import { VideoComponent } from './components/page/item/video.js';
 import { PageComponent } from './components/page/page.js';
 
@@ -23,6 +24,9 @@ class App {
 
     const note = new NoteComponent('Note Title', 'This is a simple note');
     note.attachTo(appRoot, 'beforeend');
+
+    const todo = new TodoComponent('Todo Title', 'This is a simple todo item');
+    todo.attachTo(appRoot, 'beforeend');
   }
 }
 
