@@ -4,11 +4,11 @@
  * TodoComponent
  */
 export class TodoComponent extends BaseComponent<HTMLElement> {
-  constructor(readonly title: string, readonly body: string) {
+  constructor(readonly title: string, readonly todo: string) {
     super(`
       <section class="todo">
         <h2 class="todo__title"></h2>
-        <p class="todo__body"></p>
+        <input type="checkbox" class="todo__checkbox">
       </section>`);
 
     const titleElement = this.element.querySelector(
@@ -17,8 +17,8 @@ export class TodoComponent extends BaseComponent<HTMLElement> {
     titleElement.textContent = title;
 
     const bodyElement = this.element.querySelector(
-      '.todo__body'
-    )! as HTMLParagraphElement;
-    bodyElement.textContent = body;
+      '.todo__checkbox'
+    )! as HTMLInputElement;
+    bodyElement.insertAdjacentText('afterend', todo);
   }
 }
