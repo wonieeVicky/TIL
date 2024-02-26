@@ -1,4 +1,5 @@
 ﻿import { ImageComponent } from './components/page/item/image.js';
+import { NoteComponent } from './components/page/item/note.js';
 import { VideoComponent } from './components/page/item/video.js';
 import { PageComponent } from './components/page/page.js';
 
@@ -19,6 +20,9 @@ class App {
       'https://www.youtube.com/embed/uTuuz__8gUM'
     );
     video.attachTo(appRoot, 'beforeend');
+
+    const note = new NoteComponent('Note Title', 'This is a simple note');
+    note.attachTo(appRoot, 'beforeend');
   }
 }
 
