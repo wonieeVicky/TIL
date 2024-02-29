@@ -1,4 +1,4 @@
-﻿import { BaseComponent } from '../component.js';
+﻿import { BaseComponent, Component } from '../component.js';
 
 /**
  * PageComponent
@@ -9,5 +9,22 @@
 export class PageComponent extends BaseComponent<HTMLUListElement> {
   constructor() {
     super('<ul class="page">This is PageComponent</ul>');
+  }
+}
+
+class PageItemComponent extends BaseComponent<HTMLLIElement> {
+  constructor() {
+    super(`<li class="page-item">
+            <section class="page-item__body"></section>
+            <div class="page-item__controls">
+              <button class="close">&times;</button>
+            </div>
+          </li>`);
+  }
+  addChild(child: Component) {
+    const container = this.element.querySelector(
+      '.page-item__body'
+    )! as HTMLElement;
+    child.attachTo(container);
   }
 }
