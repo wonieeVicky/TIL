@@ -295,3 +295,104 @@ MoSCoW 방식 (Must have: 있어야 함, Should have: 가져야 함, Could have:
 
 여러 클래스에 걸쳐 공통적으로 사용되는 코드를 하나의 컴포넌트로 정의해두면,
 동일한 코드를 반복할 필요 없이 상속만으로 코드의 중복을 줄이고, 재사용성을 높일 수 있다.
+
+### 페이지 아이템 컨테이너 만들기
+
+각 클래스별 엘리먼트를 공통으로 뿌려주는 PageItemComponent 구현
+
+`src/components/page/page.ts`
+
+```tsx
+export interface Composable {
+  addChild(child: Component): void;
+}
+
+class PageItemComponent
+  extends BaseComponent<HTMLLIElement>
+  implements Composable
+{
+  constructor() {
+    super(`<li class="page-item">
+            <section class="page-item__body"></section>
+            <div class="page-item__controls">
+              <button class="close">&times;</button>
+            </div>
+          </li>`);
+  }
+  addChild(child: Component) {
+    const container = this.element.querySelector(
+      '.page-item__body'
+    )! as HTMLElement;
+    child.attachTo(container);
+  }
+}
+```
+
+위 클래스 호출부는 아래 PageComponent에서 addChild 함수 구현 시
+
+`src/componetns/page/page.ts`
+
+```tsx
+/**
+ * PageComponent
+ * - PageComponent는 HTMLUListElement를 상속받아 만들어진 커스텀 엘리먼트이다.
+ * - PageComponent는 생성자를 통해 생성된 HTMLUListElement를 가지고 있다.
+ * - addChild 메서드는 section을 받아서 PageItemComponent를 생성하고, section을 PageItemComponent에 붙인다.
+ */
+export class PageComponent
+  extends BaseComponent<HTMLUListElement>
+  implements Composable
+{
+  constructor() {
+    super('<ul class="page"></ul>');
+  }
+
+  addChild(section: Component) {
+    const item = new PageItemComponent(); // PageItemComponent를 생성
+    item.addChild(section);
+    item.attachTo(this.element, 'beforeend'); // 마지막에 붙인다.
+  }
+}
+```
+
+위 변경에 따라 App 클래스 구현부도 아래와 같이 실행
+
+`src/app.ts`
+
+```tsx
+//..
+
+class App {
+  private readonly page: PageComponent;
+  constructor(appRoot: HTMLElement) {
+    this.page = new PageComponent();
+    this.page.attachTo(appRoot);
+
+    const image = new ImageComponent(
+      'Image Title',
+      'https://picsum.photos/600/300'
+    );
+    // image.attachTo(appRoot, 'beforeend');
+    this.page.addChild(image);
+
+    const video = new VideoComponent(
+      'Video Title',
+      'https://www.youtube.com/watch?v=HfaIcB4Ogxk'
+    );
+    // video.attachTo(appRoot, 'beforeend');
+    this.page.addChild(video);
+
+    const note = new NoteComponent('Note Title', 'This is a simple note');
+    // note.attachTo(appRoot, 'beforeend');
+    this.page.addChild(note);
+
+    const todo = new TodoComponent('Todo Title', 'This is a simple todo item');
+    // todo.attachTo(appRoot, 'beforeend');
+    this.page.addChild(todo);
+  }
+}
+
+new App(document.querySelector('.document')! as HTMLElement);
+```
+
+기존 BaseComponent에서 정의된 attachTo를 그대로 사용하는 것이 아닌, PageComponent.addChild 함수에서 새롭게 정의된 PageItemComponent 내에 데이터를 주입하는 함수를 공통함수로 구현
