@@ -421,3 +421,95 @@ Component나 Composable 등을 별도의 인터페이스로 정의하는 이유�
 
 모든 사용하는 곳으로 찾아가서 타입을 일일이 바꾸지 않아도 되니 좋다.
 인터페이스로 정의해서 클래스 간에 인터페이스를 통해 대화하는 것이 좋은 이유..
+
+### 아이템 삭제 기능 구현하기
+
+- closeBtn 내 삭제 이벤트 등록 - PageItemComponent
+    - 상위에서 삭제 이벤트가 관리되도록 listener를 전달하는 형태로 구현
+    
+    ```tsx
+    type OnCloseListener = () => void;
+    
+    class PageItemComponent
+      extends BaseComponent<HTMLLIElement>
+      implements Composable
+    {
+    	// closeListener 라는 private 데이터 정의
+      private closeListener?: OnCloseListener | undefined;
+    
+      constructor() {
+        super(`<li class="page-item">
+                <section class="page-item__body"></section>
+                <div class="page-item__controls">
+                  <button class="close">&times;</button>
+                </div>
+              </li>`);
+    
+    		// closeBtn을 찾아 삭제 이벤트 등록
+        const closeBtn = this.element.querySelector('.close')! as HTMLButtonElement;
+        closeBtn.onclick = () => {
+          this.closeListener && this.closeListener();
+        };
+      }
+      addChild(child: Component) {
+        // ..
+      }
+      // listener를 외부에서 전달받아 실행시킴 (PageComponent에서 전달받음)
+      setOnCloseListener(listener: OnCloseListener) {
+        this.closeListener = listener;
+      }
+    }
+    ```
+    
+- 삭제 이벤트 listener를 전달하는 주체 - PageComponent
+    
+    ```tsx
+    export class PageComponent
+      extends BaseComponent<HTMLUListElement>
+      implements Composable
+    {
+      constructor() {
+        super('<ul class="page"></ul>');
+      }
+    
+      addChild(section: Component) {
+        const item = new PageItemComponent(); 
+        item.addChild(section);
+        item.attachTo(this.element, 'beforeend');
+    		// 삭제 이벤트 listener 전달
+        item.setOnCloseListener(() => item.removeFrom(this.element));
+      }
+    }
+    ```
+    
+- 삭제 기능의 실제 실행 구현 - BaseComponent
+    
+    ```tsx
+    export interface Component {
+      attachTo(parent: HTMLElement, position?: InsertPosition): void;
+      removeFrom(parent: HTMLElement): void; // add
+    }
+    
+    export class BaseComponent<T extends HTMLElement> implements Component {
+      protected readonly element: T;
+    
+      constructor(htmlString: string) {
+        const template = document.createElement('template');
+        template.innerHTML = htmlString;
+        this.element = template.content.firstElementChild! as T;
+      }
+    
+      attachTo(parent: HTMLElement, position: InsertPosition = 'afterbegin') {
+        parent.insertAdjacentElement(position, this.element);
+      }
+    
+    	// removeFrom으로 구현
+      removeFrom(parent: HTMLElement) {
+    		// 현재 삭제하려는 parent가 this.element.parentElement와 동일한지 검증
+        if (parent !== this.element.parentElement) {
+          throw new Error('Parent mismatch!');
+        }
+        parent.removeChild(this.element); // parent에서 element 삭제
+      }
+    }
+    ```
