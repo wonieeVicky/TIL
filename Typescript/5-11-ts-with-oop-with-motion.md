@@ -425,91 +425,226 @@ Component나 Composable 등을 별도의 인터페이스로 정의하는 이유�
 ### 아이템 삭제 기능 구현하기
 
 - closeBtn 내 삭제 이벤트 등록 - PageItemComponent
-    - 상위에서 삭제 이벤트가 관리되도록 listener를 전달하는 형태로 구현
-    
-    ```tsx
-    type OnCloseListener = () => void;
-    
-    class PageItemComponent
-      extends BaseComponent<HTMLLIElement>
-      implements Composable
-    {
-    	// closeListener 라는 private 데이터 정의
-      private closeListener?: OnCloseListener | undefined;
-    
-      constructor() {
-        super(`<li class="page-item">
-                <section class="page-item__body"></section>
-                <div class="page-item__controls">
-                  <button class="close">&times;</button>
-                </div>
-              </li>`);
-    
-    		// closeBtn을 찾아 삭제 이벤트 등록
-        const closeBtn = this.element.querySelector('.close')! as HTMLButtonElement;
-        closeBtn.onclick = () => {
-          this.closeListener && this.closeListener();
-        };
-      }
-      addChild(child: Component) {
-        // ..
-      }
-      // listener를 외부에서 전달받아 실행시킴 (PageComponent에서 전달받음)
-      setOnCloseListener(listener: OnCloseListener) {
-        this.closeListener = listener;
-      }
+
+  - 상위에서 삭제 이벤트가 관리되도록 listener를 전달하는 형태로 구현
+
+  ```tsx
+  type OnCloseListener = () => void;
+
+  class PageItemComponent
+    extends BaseComponent<HTMLLIElement>
+    implements Composable
+  {
+    // closeListener 라는 private 데이터 정의
+    private closeListener?: OnCloseListener | undefined;
+
+    constructor() {
+      super(`<li class="page-item">
+              <section class="page-item__body"></section>
+              <div class="page-item__controls">
+                <button class="close">&times;</button>
+              </div>
+            </li>`);
+
+      // closeBtn을 찾아 삭제 이벤트 등록
+      const closeBtn = this.element.querySelector(
+        '.close'
+      )! as HTMLButtonElement;
+      closeBtn.onclick = () => {
+        this.closeListener && this.closeListener();
+      };
     }
-    ```
-    
+    addChild(child: Component) {
+      // ..
+    }
+    // listener를 외부에서 전달받아 실행시킴 (PageComponent에서 전달받음)
+    setOnCloseListener(listener: OnCloseListener) {
+      this.closeListener = listener;
+    }
+  }
+  ```
+
 - 삭제 이벤트 listener를 전달하는 주체 - PageComponent
-    
-    ```tsx
-    export class PageComponent
-      extends BaseComponent<HTMLUListElement>
-      implements Composable
-    {
-      constructor() {
-        super('<ul class="page"></ul>');
-      }
-    
-      addChild(section: Component) {
-        const item = new PageItemComponent(); 
-        item.addChild(section);
-        item.attachTo(this.element, 'beforeend');
-    		// 삭제 이벤트 listener 전달
-        item.setOnCloseListener(() => item.removeFrom(this.element));
-      }
+
+  ```tsx
+  export class PageComponent
+    extends BaseComponent<HTMLUListElement>
+    implements Composable
+  {
+    constructor() {
+      super('<ul class="page"></ul>');
     }
-    ```
-    
+
+    addChild(section: Component) {
+      const item = new PageItemComponent();
+      item.addChild(section);
+      item.attachTo(this.element, 'beforeend');
+      // 삭제 이벤트 listener 전달
+      item.setOnCloseListener(() => item.removeFrom(this.element));
+    }
+  }
+  ```
+
 - 삭제 기능의 실제 실행 구현 - BaseComponent
-    
-    ```tsx
-    export interface Component {
-      attachTo(parent: HTMLElement, position?: InsertPosition): void;
-      removeFrom(parent: HTMLElement): void; // add
+
+  ```tsx
+  export interface Component {
+    attachTo(parent: HTMLElement, position?: InsertPosition): void;
+    removeFrom(parent: HTMLElement): void; // add
+  }
+
+  export class BaseComponent<T extends HTMLElement> implements Component {
+    protected readonly element: T;
+
+    constructor(htmlString: string) {
+      const template = document.createElement('template');
+      template.innerHTML = htmlString;
+      this.element = template.content.firstElementChild! as T;
     }
-    
-    export class BaseComponent<T extends HTMLElement> implements Component {
-      protected readonly element: T;
-    
-      constructor(htmlString: string) {
-        const template = document.createElement('template');
-        template.innerHTML = htmlString;
-        this.element = template.content.firstElementChild! as T;
-      }
-    
-      attachTo(parent: HTMLElement, position: InsertPosition = 'afterbegin') {
-        parent.insertAdjacentElement(position, this.element);
-      }
-    
-    	// removeFrom으로 구현
-      removeFrom(parent: HTMLElement) {
-    		// 현재 삭제하려는 parent가 this.element.parentElement와 동일한지 검증
-        if (parent !== this.element.parentElement) {
-          throw new Error('Parent mismatch!');
-        }
-        parent.removeChild(this.element); // parent에서 element 삭제
-      }
+
+    attachTo(parent: HTMLElement, position: InsertPosition = 'afterbegin') {
+      parent.insertAdjacentElement(position, this.element);
     }
-    ```
+
+    // removeFrom으로 구현
+    removeFrom(parent: HTMLElement) {
+      // 현재 삭제하려는 parent가 this.element.parentElement와 동일한지 검증
+      if (parent !== this.element.parentElement) {
+        throw new Error('Parent mismatch!');
+      }
+      parent.removeChild(this.element); // parent에서 element 삭제
+    }
+  }
+  ```
+
+### dependency Component 인젝션 리팩토링
+
+위 구조에서 PageComponent를 보면, addChild 시 PageItemComponent를 불러와 생성자 함수를 실행함.
+
+`src/component/page/page.ts`
+
+```tsx
+export class PageComponent
+  extends BaseComponent<HTMLUListElement>
+  implements Composable
+{
+  constructor() {
+    super('<ul class="page"></ul>');
+  }
+
+  addChild(section: Component) {
+    // PageComponent는 PageItemComponent만 생성.
+    // 만약 다른 타입의 PageItemComponent가 생겼다면 ??
+    // PageComponent를 재사용하면서 원하는 컴포넌트를 생성하도록 리팩토링 해본다.
+    const item = new PageItemComponent();
+    item.addChild(section);
+    item.attachTo(this.element, 'beforeend');
+    item.setOnCloseListener(() => item.removeFrom(this.element));
+  }
+}
+```
+
+위와 같이 다양한 타입의 PageItemComponent가 생긴다면, PageComponent를 재사용하기 어려운 구조.
+어떻게 하면 다양한 타입을 넣어 구현할 수 있을까? constructor에서 생성자 함수 초기 실행 시 인자로 받아오는 구조로 구현한다면 아래와 같이 할 수 있다.
+
+먼저 PageItemComponent를 인자로 받을 것이므로 PageItemComponent의 타입을 조금 변경한다.
+
+`src/component/page/page.ts`
+
+```tsx
+// Component, Composable 타입에서 추가된 SectionContainer 인터페이스 생성
+// setOnCloseListener를 타입으로 받아서 처리함.
+interface SectionContainer extends Component, Composable {
+  setOnCloseListener(listener: OnCloseListener): void;
+}
+
+// 다른 모드의 pageItemcomponent가 생성된다면?
+// export class DarkModePageItemComponent
+// 	extends BaseComponent<HTMLLIElement>
+//  implements SectionContainer { ... }
+
+export class PageItemComponent
+  extends BaseComponent<HTMLLIElement>
+  implements SectionContainer
+{
+  // SectionContainer 타입 적용
+  private closeListener?: OnCloseListener | undefined;
+
+  constructor() {
+    super(`<li class="page-item">
+            <section class="page-item__body"></section>
+            <div class="page-item__controls">
+              <button class="close">&times;</button>
+            </div>
+          </li>`);
+    const closeBtn = this.element.querySelector('.close')! as HTMLButtonElement;
+    closeBtn.onclick = () => {
+      this.closeListener && this.closeListener();
+    };
+  }
+
+  addChild(child: Component) {
+    const container = this.element.querySelector(
+      '.page-item__body'
+    )! as HTMLElement;
+    child.attachTo(container);
+  }
+
+  setOnCloseListener(listener: OnCloseListener) {
+    this.closeListener = listener;
+  }
+}
+```
+
+위와 같이 기존 Composable 인터페이스를 상속받던 PageItemComponent를 별도의 SectionContainer 인터페이스를 정의하도록 리팩토링. PageComponent 를 아래와 같이 변경한다.
+
+```tsx
+// 생성자 함수 타입을 아래와 같이 정의
+type SectionContainerConstructor = {
+  new (): SectionContainer;
+};
+
+export class PageComponent
+  extends BaseComponent<HTMLUListElement>
+  implements Composable
+{
+  // 생성자 함수 실행 시 사용할 PageItemComponent를 인자로 받음
+  constructor(private pageItemConstructor: SectionContainerConstructor) {
+    super('<ul class="page"></ul>');
+  }
+
+  addChild(section: Component) {
+    // this.pageItemContructor를 통해 인자로 전달받은 PageItemComponent를 실행
+    // 어떤 PageItemComponent이든 인터페이스는 언제나 SectionContainer를 만족해야 함
+    const item = new this.pageItemConstructor();
+    item.addChild(section);
+    item.attachTo(this.element, 'beforeend'); // 마지막에 붙인다.
+    item.setOnCloseListener(() => item.removeFrom(this.element));
+  }
+}
+```
+
+`src/app.ts`
+
+```tsx
+import {
+  Composable,
+  PageComponent,
+  PageItemComponent
+} from './components/page/page.js';
+
+class App {
+  private readonly page: Component & Composable;
+  constructor(appRoot: HTMLElement) {
+    // 전달인자로 PageItemComponent를 주입
+    this.page = new PageComponent(PageItemComponent);
+    this.page.attachTo(appRoot);
+
+    // ..
+  }
+}
+
+new App(document.querySelector('.document')! as HTMLElement);
+```
+
+위와 같이 처리하면 미래에 나오게 될 다양한 PageItemComponent를 수렴할 수 있는 재사용 가능한 PageComponent로의 진화가 가능해짐.. 두번 보자
