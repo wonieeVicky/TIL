@@ -7,9 +7,16 @@ export interface Composable {
 
 type OnCloseListener = () => void;
 
-class PageItemComponent
+interface SectionContainer extends Component, Composable {
+  setOnCloseListener(listener: OnCloseListener): void;
+}
+
+// 다른 모드의 pageItemcomponent가 생성된다면?
+// export class DarkModePageItemComponent extends BaseComponent<HTMLLIElement> implements SectionContainer { ... }
+
+export class PageItemComponent
   extends BaseComponent<HTMLLIElement>
-  implements Composable
+  implements SectionContainer
 {
   private closeListener?: OnCloseListener | undefined;
   constructor() {
@@ -42,16 +49,22 @@ class PageItemComponent
  * - PageComponent는 생성자를 통해 생성된 HTMLUListElement를 가지고 있다.
  * - addChild 메서드는 section을 받아서 PageItemComponent를 생성하고, section을 PageItemComponent에 붙인다.
  */
+
+type SectionContainerConstructor = {
+  new (): SectionContainer;
+};
+
 export class PageComponent
   extends BaseComponent<HTMLUListElement>
   implements Composable
 {
-  constructor() {
+  constructor(private pageItemConstructor: SectionContainerConstructor) {
     super('<ul class="page"></ul>');
   }
 
   addChild(section: Component) {
-    const item = new PageItemComponent(); // PageItemComponent를 생성
+    // TODO: PageComponent는 PageItemComponent만 생성. PageComponent를 재사용하면서 원하는 컴포넌트를 생성하도록 리팩토링
+    const item = new this.pageItemConstructor();
     item.addChild(section);
     item.attachTo(this.element, 'beforeend'); // 마지막에 붙인다.
     item.setOnCloseListener(() => item.removeFrom(this.element));
