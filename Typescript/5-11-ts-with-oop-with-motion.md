@@ -648,3 +648,95 @@ new App(document.querySelector('.document')! as HTMLElement);
 ```
 
 위와 같이 처리하면 미래에 나오게 될 다양한 PageItemComponent를 수렴할 수 있는 재사용 가능한 PageComponent로의 진화가 가능해짐.. 두번 보자
+
+### 기본 Dialog 컴포넌트 구현하기
+
+`src/components/dialog/dialog.ts`
+
+```tsx
+import { BaseComponent, Component } from '../../components/component.js';
+import { Composable } from '../page/page';
+
+type OnCloseListener = () => void;
+type OnSubmitListener = () => void;
+
+export class InputDialog
+  extends BaseComponent<HTMLElement>
+  implements Composable
+{
+  private closeListener?: OnCloseListener;
+  private submitListener?: OnSubmitListener;
+
+  constructor() {
+    super(`<section class="dialog">
+            <div class="dialog__container">
+              <button class="close">&times;</button>
+              <div id="dialog__body"></div>
+              <button class="dialog__submit">ADD</button>
+            </div>
+          </section>`);
+    const closeBtn = this.element.querySelector('.close')! as HTMLElement;
+    // 버튼을 다른 곳에서 활용할 경우 addEventListener를 사용하는 것이 좋다.
+    closeBtn.onclick = () => {
+      this.closeListener && this.closeListener();
+    };
+
+    const submitBtn = this.element.querySelector(
+      '.dialog__submit'
+    )! as HTMLElement;
+    submitBtn.onclick = () => {
+      this.submitListener && this.submitListener();
+    };
+  }
+
+  setOnCloseListener(listener: OnCloseListener): void {
+    this.closeListener = listener;
+  }
+
+  setOnSubmitListener(listener: OnSubmitListener): void {
+    this.submitListener = listener;
+  }
+
+  addChild(child: Component): void {
+    const body = this.element.querySelector('#dialog__body')! as HTMLElement;
+    child.attachTo(body);
+  }
+}
+```
+
+`src/app.ts`
+
+```tsx
+// ..
+import { InputDialog } from './components/dialog/dialog.js';
+
+class App {
+  private readonly page: Component & Composable;
+  constructor(appRoot: HTMLElement) {
+    this.page = new PageComponent(PageItemComponent);
+    this.page.attachTo(appRoot);
+
+    // ..
+
+    // image button에 dialog 이벤트 적용
+    const imageBtn = document.querySelector('#new-image')! as HTMLButtonElement;
+    imageBtn.addEventListener('click', () => {
+      const dialog = new InputDialog();
+      // close event 추가
+      dialog.setOnCloseListener(() => {
+        dialog.removeFrom(document.body);
+      });
+      // submit event 추가
+      dialog.setOnSubmitListener(() => {
+        // TODO: 섹션 구현 후 페이지 추가
+        dialog.removeFrom(document.body);
+      });
+      dialog.attachTo(document.body);
+    });
+  }
+}
+
+new App(document.querySelector('.document')! as HTMLElement);
+```
+
+eventListener는 dialog에서 직접 구현하는 것이 아닌 이벤트 자체를 인자로 받아서 처리하도록 구성..
