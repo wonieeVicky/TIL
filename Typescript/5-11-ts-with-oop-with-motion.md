@@ -653,6 +653,8 @@ new App(document.querySelector('.document')! as HTMLElement);
 
 `src/components/dialog/dialog.ts`
 
+InputDialog 또한 동적으로 HTML 요소를 생성하므로 BaseComponent를 상속. 다이얼로그 안에 또 다른 컴포넌트(다이얼로그 안에서 사용자에게 보여줄 각 컨텐츠)를 담을 수 있어야 하므로 Composable 인터페이스를 구현함.
+
 ```tsx
 import { BaseComponent, Component } from '../../components/component.js';
 import { Composable } from '../page/page';
@@ -740,3 +742,5 @@ new App(document.querySelector('.document')! as HTMLElement);
 ```
 
 eventListener는 dialog에서 직접 구현하는 것이 아닌 이벤트 자체를 인자로 받아서 처리하도록 구성..
+
+즉, InputDialog가 자체적으로 무엇을 보여줄지 결정 or InputDialog가 자체적으로 닫힘 버튼이 눌리면 무엇을 할지 결정하는 로직이 아님. 실제 행동에 대해서는 외부에서 받아와서 사용하므로 어디서 쓰이냐에 따라 유연하게, 재사용성이 높도록 구성하는 것이 포인트임.
