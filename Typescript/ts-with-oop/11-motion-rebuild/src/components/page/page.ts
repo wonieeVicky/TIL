@@ -63,7 +63,7 @@ export class PageComponent
   }
 
   addChild(section: Component) {
-    // TODO: PageComponent는 PageItemComponent만 생성. PageComponent를 재사용하면서 원하는 컴포넌트를 생성하도록 리팩토링
+    // PageComponent는 PageItemComponent만 생성. PageComponent를 재사용하면서 원하는 컴포넌트를 생성하도록 리팩토링
     const item = new this.pageItemConstructor();
     item.addChild(section);
     item.attachTo(this.element, 'beforeend'); // 마지막에 붙인다.
