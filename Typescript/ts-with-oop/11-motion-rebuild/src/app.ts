@@ -1,6 +1,6 @@
 ﻿import { Component } from './components/component.js';
 import { InputDialog } from './components/dialog/dialog.js';
-import { ImageDialogComponent } from './components/dialog/item/image.js';
+import { InputDialogContent } from './components/dialog/dialogContent.js';
 import { ImageComponent } from './components/page/item/image.js';
 import { NoteComponent } from './components/page/item/note.js';
 import { TodoComponent } from './components/page/item/todo.js';
@@ -17,38 +17,61 @@ class App {
     this.page = new PageComponent(PageItemComponent);
     this.page.attachTo(appRoot);
 
-    const image = new ImageComponent(
-      'Image Title',
-      'https://picsum.photos/600/300'
-    );
-    this.page.addChild(image);
-
-    const video = new VideoComponent(
-      'Video Title',
-      'https://www.youtube.com/watch?v=HfaIcB4Ogxk'
-    );
-    video.attachTo(appRoot, 'beforeend');
-    this.page.addChild(video);
-
-    const note = new NoteComponent('Note Title', 'This is a simple note');
-    this.page.addChild(note);
-
-    const todo = new TodoComponent('Todo Title', 'This is a simple todo item');
-    this.page.addChild(todo);
-
     const imageBtn = document.querySelector('#new-image')! as HTMLButtonElement;
-
     imageBtn.addEventListener('click', () => {
       const dialog = new InputDialog();
-      const image = new ImageDialogComponent();
+      const image = new InputDialogContent('image');
       dialog.addChild(image);
-      dialog.setOnCloseListener(() => {
+      dialog.setOnCloseListener(() => dialog.removeFrom(document.body));
+      dialog.setOnSubmitListener(() => {
+        const { title, value } = image.getValues();
+        const imageComponent = new ImageComponent(title, value);
+        this.page.addChild(imageComponent);
         dialog.removeFrom(document.body);
       });
+      dialog.attachTo(document.body);
+    });
+
+    const videoBtn = document.querySelector('#new-video')! as HTMLButtonElement;
+    videoBtn.addEventListener('click', () => {
+      const dialog = new InputDialog();
+      const video = new InputDialogContent('video');
+      dialog.addChild(video);
+      dialog.setOnCloseListener(() => dialog.removeFrom(document.body));
       dialog.setOnSubmitListener(() => {
-        const { title, url } = image.getValues();
-        const imageComponent = new ImageComponent(title, url);
-        this.page.addChild(imageComponent);
+        const { title, value } = video.getValues();
+        const videoComponent = new VideoComponent(title, value);
+        this.page.addChild(videoComponent);
+        dialog.removeFrom(document.body);
+      });
+      dialog.attachTo(document.body);
+    });
+
+    const noteBtn = document.querySelector('#new-note')! as HTMLButtonElement;
+    noteBtn.addEventListener('click', () => {
+      const dialog = new InputDialog();
+      const note = new InputDialogContent('note');
+      dialog.addChild(note);
+      dialog.setOnCloseListener(() => dialog.removeFrom(document.body));
+      dialog.setOnSubmitListener(() => {
+        const { title, value } = note.getValues();
+        const videoComponent = new NoteComponent(title, value);
+        this.page.addChild(videoComponent);
+        dialog.removeFrom(document.body);
+      });
+      dialog.attachTo(document.body);
+    });
+
+    const todoBtn = document.querySelector('#new-todo')! as HTMLButtonElement;
+    todoBtn.addEventListener('click', () => {
+      const dialog = new InputDialog();
+      const todo = new InputDialogContent('todo');
+      dialog.addChild(todo);
+      dialog.setOnCloseListener(() => dialog.removeFrom(document.body));
+      dialog.setOnSubmitListener(() => {
+        const { title, value } = todo.getValues();
+        const videoComponent = new TodoComponent(title, value);
+        this.page.addChild(videoComponent);
         dialog.removeFrom(document.body);
       });
       dialog.attachTo(document.body);
