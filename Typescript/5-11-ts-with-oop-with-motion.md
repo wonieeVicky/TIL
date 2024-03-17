@@ -744,3 +744,169 @@ new App(document.querySelector('.document')! as HTMLElement);
 eventListener는 dialog에서 직접 구현하는 것이 아닌 이벤트 자체를 인자로 받아서 처리하도록 구성..
 
 즉, InputDialog가 자체적으로 무엇을 보여줄지 결정 or InputDialog가 자체적으로 닫힘 버튼이 눌리면 무엇을 할지 결정하는 로직이 아님. 실제 행동에 대해서는 외부에서 받아와서 사용하므로 어디서 쓰이냐에 따라 유연하게, 재사용성이 높도록 구성하는 것이 포인트임.
+
+### 다이얼로그 컨텐츠 채우기
+
+이제 다이얼로그 내부 컨텐츠를 채우는 일이 남았다.
+
+`src/components/input/media-input.ts`
+
+```tsx
+import { BaseComponent } from '../../component.js';
+
+export class MediaSectionInput extends BaseComponent<HTMLElement> {
+  constructor() {
+    super(`<div>
+            <div class="form__container">
+              <label for="title">Title</label>
+              <input type="text" id="title" />
+            </div>
+            <div class="form__container">
+              <label for="url">URL</label>
+              <input type="text" id="url" />
+            </div>
+          </div>`);
+  }
+
+  // getter
+  get url(): string {
+    const element = this.element.querySelector('#url')! as HTMLInputElement;
+    return element.value;
+  }
+  get title(): string {
+    const element = this.element.querySelector('#title')! as HTMLInputElement;
+    return element.value;
+  }
+}
+```
+
+`src/components/input/text-input.ts`
+
+```tsx
+import { BaseComponent } from '../../component.js';
+
+export class TextSectionInput extends BaseComponent<HTMLElement> {
+  constructor() {
+    super(`<div>
+            <div class="form__container">
+              <label for="title">Title</label>
+              <input type="text" id="title" />
+            </div>
+            <div class="form__container">
+              <label for="body">Body</label>
+              <textarea type="text" row="3" id="body"></textarea>
+            </div>
+          </div>`);
+  }
+
+  // getter
+  get body(): string {
+    const element = this.element.querySelector('#body')! as HTMLInputElement;
+    return element.value;
+  }
+  get title(): string {
+    const element = this.element.querySelector('#title')! as HTMLInputElement;
+    return element.value;
+  }
+}
+```
+
+`src/app.ts`
+
+```tsx
+// ..
+import { InputDialog } from './components/dialog/dialog.js';
+import { MediaSectionInput } from './components/dialog/input/media-input.js';
+import { TextSectionInput } from './components/dialog/input/text-input.js';
+
+class App {
+  private readonly page: Component & Composable;
+
+  constructor(appRoot: HTMLElement, dialogRoot: HTMLElement) {
+    this.page = new PageComponent(PageItemComponent);
+    this.page.attachTo(appRoot);
+
+    const imageBtn = document.querySelector('#new-image')! as HTMLButtonElement;
+    imageBtn.addEventListener('click', () => {
+      const dialog = new InputDialog();
+      const inputSection = new MediaSectionInput();
+      dialog.addChild(inputSection);
+      dialog.attachTo(dialogRoot);
+
+      dialog.setOnCloseListener(() => {
+        dialog.removeFrom(dialogRoot);
+      });
+      dialog.setOnSubmitListener(() => {
+        const imageComponent = new ImageComponent(
+          inputSection.title,
+          inputSection.url
+        );
+        this.page.addChild(imageComponent);
+        dialog.removeFrom(dialogRoot);
+      });
+    });
+
+    const videoBtn = document.querySelector('#new-video')! as HTMLButtonElement;
+    videoBtn.addEventListener('click', () => {
+      const dialog = new InputDialog();
+      const inputSection = new MediaSectionInput();
+      dialog.addChild(inputSection);
+      dialog.attachTo(dialogRoot);
+
+      dialog.setOnCloseListener(() => {
+        dialog.removeFrom(dialogRoot);
+      });
+      dialog.setOnSubmitListener(() => {
+        const videoComponent = new VideoComponent(
+          inputSection.title,
+          inputSection.url
+        );
+        this.page.addChild(videoComponent);
+        dialog.removeFrom(dialogRoot);
+      });
+    });
+
+    const noteBtn = document.querySelector('#new-note')! as HTMLButtonElement;
+    noteBtn.addEventListener('click', () => {
+      const dialog = new InputDialog();
+      const inputSection = new TextSectionInput();
+      dialog.addChild(inputSection);
+      dialog.attachTo(dialogRoot);
+
+      dialog.setOnCloseListener(() => {
+        dialog.removeFrom(dialogRoot);
+      });
+      dialog.setOnSubmitListener(() => {
+        const noteComponent = new NoteComponent(
+          inputSection.title,
+          inputSection.body
+        );
+        this.page.addChild(noteComponent);
+        dialog.removeFrom(dialogRoot);
+      });
+    });
+
+    const todoBtn = document.querySelector('#new-todo')! as HTMLButtonElement;
+    todoBtn.addEventListener('click', () => {
+      const dialog = new InputDialog();
+      const inputSection = new TextSectionInput();
+      dialog.addChild(inputSection);
+      dialog.attachTo(dialogRoot);
+
+      dialog.setOnCloseListener(() => {
+        dialog.removeFrom(dialogRoot);
+      });
+      dialog.setOnSubmitListener(() => {
+        const todoComponent = new TodoComponent(
+          inputSection.title,
+          inputSection.body
+        );
+        this.page.addChild(todoComponent);
+        dialog.removeFrom(dialogRoot);
+      });
+    });
+  }
+}
+
+new App(document.querySelector('.document')! as HTMLElement, document.body);
+```
