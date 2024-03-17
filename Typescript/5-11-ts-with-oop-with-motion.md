@@ -910,3 +910,212 @@ class App {
 
 new App(document.querySelector('.document')! as HTMLElement, document.body);
 ```
+
+### 코드 중복 제거. 리팩토링
+
+위 app.ts를 보면 각 버튼마다 동일한 코드가 중복으로 들어간 부분이 보인다. 리팩토링 해보자.
+위 공통 이벤트를 수행하는 private 함수를 App 클래스에 추가한다.
+
+`src/app.ts`
+
+```tsx
+// MediaSectionInput과 TextSectionInput을 포함하는 InputComponentConstructor 타입 생성
+type InputComponentConstructor<T = MediaSectionInput | TextSectionInput> = {
+  new (): T;
+};
+
+class App {
+  private readonly page: Component & Composable;
+
+  constructor(appRoot: HTMLElement, private dialogRoot: HTMLElement) {
+    this.page = new PageComponent(PageItemComponent);
+    this.page.attachTo(appRoot);
+
+    /* const imageBtn = document.querySelector('#new-image')! as HTMLButtonElement;
+    imageBtn.addEventListener('click', () => {
+      const dialog = new InputDialog();
+      const inputSection = new MediaSectionInput();
+      dialog.addChild(inputSection);
+      dialog.attachTo(dialogRoot);
+
+      dialog.setOnCloseListener(() => {
+        dialog.removeFrom(dialogRoot);
+      });
+      dialog.setOnSubmitListener(() => {
+        const imageComponent = new ImageComponent(
+          inputSection.title,
+          inputSection.url
+        );
+        this.page.addChild(imageComponent);
+        dialog.removeFrom(dialogRoot);
+      });
+    }); */
+  }
+
+  /* 공통화 리팩토링 시에는 반복적인 부분을 찾아내고, 그 중에 인자로 받아야 할 부분을 적절히 나누는 것이 중요함 */
+  /* 위 imageBtn 이벤트를 비교하면서 아래 내용 확인해보자 */
+  private bindElementToDialog<T extends MediaSectionInput | TextSectionInput>(
+    selector: string,
+    InputComponent: InputComponentConstructor<T>, // Contructor 유형으로 분리
+    makeSection: (input: T) => Component
+  ) {
+    const element = document.querySelector(selector)! as HTMLButtonElement;
+    element.addEventListener('click', () => {
+      const dialog = new InputDialog();
+      const input = new InputComponent();
+      dialog.addChild(input);
+      dialog.attachTo(this.dialogRoot);
+
+      dialog.setOnCloseListener(() => {
+        dialog.removeFrom(this.dialogRoot);
+      });
+      dialog.setOnSubmitListener(() => {
+        const imageComponent = makeSection(input);
+        this.page.addChild(imageComponent);
+        dialog.removeFrom(this.dialogRoot);
+      });
+    });
+  }
+}
+
+new App(document.querySelector('.document')! as HTMLElement, document.body);
+```
+
+위와 같이 bindElementToDialog 함수를 구현하면 아래와 같은 코드 중복을 개선할 수 있다.
+
+```tsx
+class App {
+  private readonly page: Component & Composable;
+
+  // dialogRoot을 bindElementToDialog에서 사용하기 위해 인자 타입을 private으로 변경
+  constructor(appRoot: HTMLElement, private dialogRoot: HTMLElement) {
+    this.page = new PageComponent(PageItemComponent);
+    this.page.attachTo(appRoot);
+
+    this.bindElementToDialog<MediaSectionInput>(
+      '#new-image',
+      MediaSectionInput,
+      (input: MediaSectionInput) => new ImageComponent(input.title, input.url)
+    );
+    this.bindElementToDialog<MediaSectionInput>(
+      '#new-video',
+      MediaSectionInput,
+      (input: MediaSectionInput) => new VideoComponent(input.title, input.url)
+    );
+    this.bindElementToDialog<TextSectionInput>(
+      '#new-note',
+      TextSectionInput,
+      (input: TextSectionInput) => new NoteComponent(input.title, input.body)
+    );
+    this.bindElementToDialog<TextSectionInput>(
+      '#new-todo',
+      TextSectionInput,
+      (input: TextSectionInput) => new TodoComponent(input.title, input.body)
+    );
+  }
+
+  // private bindElementToDialog ...
+}
+```
+
+그런데 조금 아쉬운 부분 존재. 매 컴포넌트마다 MediaSectionInput, TextSectionInput 등 제네릭을 채워줘야하기 때문. 만약 다른 SectiontInput 타입이 나온다면 똑같이 추가해줘야하므로 귀찮을 수 있다.
+
+이럴 땐 별도의 타입으로 정의해주면 좋다.
+
+`src/components/dialog/dialog.ts`
+
+```
+export interface MediaData {
+  readonly title: string;
+  readonly url: string;
+}
+export interface TextData {
+  readonly title: string;
+  readonly body: string;
+}
+```
+
+`src/components/dialog/input/media-input.ts`
+
+```tsx
+// ..
+import { MediaData } from '../dialog.js';
+
+// MediaData 인터페이스 추가
+export class MediaSectionInput
+  extends BaseComponent<HTMLElement>
+  implements MediaData {
+  // ..
+}
+```
+
+`src/components/dialog/input/text-input.ts`
+
+```tsx
+// ..
+import { TextData } from '../dialog.js';
+
+// TextData 인터페이스 추가
+export class TextSectionInput
+  extends BaseComponent<HTMLElement>
+  implements TextData {
+  // ..
+}
+```
+
+`src/app.ts`
+
+```tsx
+import { Component } from './components/component.js';
+import {
+  InputDialog,
+  MediaData,
+  TextData
+} from './components/dialog/dialog.js';
+
+// (MediaData | TextData) & Component 타입 반영
+type InputComponentConstructor<T = (MediaData | TextData) & Component> = {
+  new (): T;
+};
+
+class App {
+  private readonly page: Component & Composable;
+
+  constructor(appRoot: HTMLElement, private dialogRoot: HTMLElement) {
+    this.page = new PageComponent(PageItemComponent);
+    this.page.attachTo(appRoot);
+
+    this.bindElementToDialog(
+      '#new-image',
+      MediaSectionInput,
+      (input) => new ImageComponent(input.title, input.url)
+    );
+    this.bindElementToDialog(
+      '#new-video',
+      MediaSectionInput,
+      (input) => new VideoComponent(input.title, input.url)
+    );
+    this.bindElementToDialog(
+      '#new-note',
+      TextSectionInput,
+      (input) => new NoteComponent(input.title, input.body)
+    );
+    this.bindElementToDialog(
+      '#new-todo',
+      TextSectionInput,
+      (input) => new TodoComponent(input.title, input.body)
+    );
+  }
+
+  // (MediaData | TextData) & Component 타입 반영
+  private bindElementToDialog<T extends (MediaData | TextData) & Component>(
+    selector: string,
+    InputComponent: InputComponentConstructor<T>,
+    makeSection: (input: T) => Component
+  ) {
+    // ..
+  }
+}
+```
+
+위와 같이하면 확장성을 높인 타이핑 처리가 가능해짐. 두 번 보자.. 세 번 보자..!!
