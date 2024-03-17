@@ -1,5 +1,9 @@
 ﻿import { Component } from './components/component.js';
-import { InputDialog } from './components/dialog/dialog.js';
+import {
+  InputDialog,
+  MediaData,
+  TextData
+} from './components/dialog/dialog.js';
 import { MediaSectionInput } from './components/dialog/input/media-input.js';
 import { ImageComponent } from './components/page/item/image.js';
 import { VideoComponent } from './components/page/item/video.js';
@@ -12,7 +16,7 @@ import {
 } from './components/page/page.js';
 import { TextSectionInput } from './components/dialog/input/text-input.js';
 
-type InputComponentConstructor<T = MediaSectionInput | TextSectionInput> = {
+type InputComponentConstructor<T = (MediaData | TextData) & Component> = {
   new (): T;
 };
 
@@ -23,29 +27,29 @@ class App {
     this.page = new PageComponent(PageItemComponent);
     this.page.attachTo(appRoot);
 
-    this.bindElementToDialog<MediaSectionInput>(
+    this.bindElementToDialog(
       '#new-image',
       MediaSectionInput,
-      (input: MediaSectionInput) => new ImageComponent(input.title, input.url)
+      (input) => new ImageComponent(input.title, input.url)
     );
-    this.bindElementToDialog<MediaSectionInput>(
+    this.bindElementToDialog(
       '#new-video',
       MediaSectionInput,
-      (input: MediaSectionInput) => new VideoComponent(input.title, input.url)
+      (input) => new VideoComponent(input.title, input.url)
     );
-    this.bindElementToDialog<TextSectionInput>(
+    this.bindElementToDialog(
       '#new-note',
       TextSectionInput,
-      (input: TextSectionInput) => new NoteComponent(input.title, input.body)
+      (input) => new NoteComponent(input.title, input.body)
     );
-    this.bindElementToDialog<TextSectionInput>(
+    this.bindElementToDialog(
       '#new-todo',
       TextSectionInput,
-      (input: TextSectionInput) => new TodoComponent(input.title, input.body)
+      (input) => new TodoComponent(input.title, input.body)
     );
   }
 
-  private bindElementToDialog<T extends MediaSectionInput | TextSectionInput>(
+  private bindElementToDialog<T extends (MediaData | TextData) & Component>(
     selector: string,
     InputComponent: InputComponentConstructor<T>,
     makeSection: (input: T) => Component
