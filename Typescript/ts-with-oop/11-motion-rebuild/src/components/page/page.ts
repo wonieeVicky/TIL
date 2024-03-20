@@ -20,7 +20,7 @@ export class PageItemComponent
 {
   private closeListener?: OnCloseListener | undefined;
   constructor() {
-    super(`<li class="page-item">
+    super(`<li draggable="true" class="page-item">
             <section class="page-item__body"></section>
             <div class="page-item__controls">
               <button class="close">&times;</button>
@@ -30,6 +30,21 @@ export class PageItemComponent
     closeBtn.onclick = () => {
       this.closeListener && this.closeListener();
     };
+
+    // drag and drop
+    this.element.addEventListener('dragstart', (event: DragEvent) => {
+      this.onDragStart(event);
+    });
+    this.element.addEventListener('dragend', (event: DragEvent) => {
+      this.onDragEnd(event);
+    });
+  }
+
+  onDragStart(event: DragEvent) {
+    console.log('dragstart', event);
+  }
+  onDragEnd(event: DragEvent) {
+    console.log('dragend', event);
   }
   addChild(child: Component) {
     const container = this.element.querySelector(
@@ -60,8 +75,23 @@ export class PageComponent
 {
   constructor(private pageItemConstructor: SectionContainerConstructor) {
     super('<ul class="page"></ul>');
+    // drag and drop
+    this.element.addEventListener('dragover', (event: DragEvent) => {
+      this.onDragOver(event);
+    });
+    this.element.addEventListener('drop', (event: DragEvent) => {
+      this.onDrop(event);
+    });
   }
-
+  // dragover, drop event는 prevent default를 해줘야 한다.
+  onDragOver(event: DragEvent) {
+    event.preventDefault();
+    console.log('onDragOver');
+  }
+  onDrop(event: DragEvent) {
+    event.preventDefault();
+    console.log('onDrop');
+  }
   addChild(section: Component) {
     // PageComponent는 PageItemComponent만 생성. PageComponent를 재사용하면서 원하는 컴포넌트를 생성하도록 리팩토링
     const item = new this.pageItemConstructor();
