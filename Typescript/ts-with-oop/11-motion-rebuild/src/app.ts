@@ -47,6 +47,30 @@ class App {
       TextSectionInput,
       (input) => new TodoComponent(input.title, input.body)
     );
+
+    this.page.addChild(
+      new ImageComponent('Image Title', 'https://picsum.photos/800/400')
+    );
+    this.page.addChild(
+      new VideoComponent(
+        'Video Title',
+        'https://www.youtube.com/watch?v=2b57fyasALY&t=22s'
+      )
+    );
+    this.page.addChild(new NoteComponent('Note Title', 'Note Body'));
+    this.page.addChild(new TodoComponent('Todo Title', 'TypeScript 공부하기'));
+    this.page.addChild(
+      new ImageComponent('Image Title', 'https://picsum.photos/800/400')
+    );
+    this.page.addChild(
+      new VideoComponent(
+        'Video Title',
+        'https://www.youtube.com/watch?v=SUm2mJBaiEo'
+      )
+    );
+    this.page.addChild(
+      new TodoComponent('Todo Title', '사이드 프로젝트 해보기')
+    );
   }
 
   private bindElementToDialog<T extends (MediaData | TextData) & Component>(
