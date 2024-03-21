@@ -6,6 +6,11 @@ export interface Composable {
 }
 
 type OnCloseListener = () => void;
+type DragState = 'start' | 'stop' | 'enter' | 'leave';
+type OnDragStateListener<T extends Component> = (
+  target: T,
+  state: DragState
+) => void;
 
 interface SectionContainer extends Component, Composable {
   setOnCloseListener(listener: OnCloseListener): void;
@@ -19,6 +24,7 @@ export class PageItemComponent
   implements SectionContainer
 {
   private closeListener?: OnCloseListener | undefined;
+  private dragStateListener?: OnDragStateListener<PageItemComponent>;
   constructor() {
     super(`<li draggable="true" class="page-item">
             <section class="page-item__body"></section>
@@ -38,14 +44,31 @@ export class PageItemComponent
     this.element.addEventListener('dragend', (event: DragEvent) => {
       this.onDragEnd(event);
     });
+    this.element.addEventListener('dragenter', (event: DragEvent) => {
+      this.onDragEnter(event);
+    });
+    this.element.addEventListener('dragleave', (event: DragEvent) => {
+      this.onDragLeave(event);
+    });
   }
 
   onDragStart(event: DragEvent) {
-    console.log('dragstart', event);
+    this.notifyDragObservers('start');
   }
   onDragEnd(event: DragEvent) {
-    console.log('dragend', event);
+    this.notifyDragObservers('stop');
   }
+  onDragEnter(event: DragEvent) {
+    this.notifyDragObservers('enter');
+  }
+  onDragLeave(event: DragEvent) {
+    this.notifyDragObservers('leave');
+  }
+
+  notifyDragObservers(state: DragState) {
+    this.dragStateListener && this.dragStateListener(this, state);
+  }
+
   addChild(child: Component) {
     const container = this.element.querySelector(
       '.page-item__body'
@@ -55,6 +78,9 @@ export class PageItemComponent
   // listener를 외부에서 전달받아 실행시킴 (PageComponent에서 전달받음)
   setOnCloseListener(listener: OnCloseListener) {
     this.closeListener = listener;
+  }
+  setOnDragStateListener(listener: OnDragStateListener<PageItemComponent>) {
+    this.dragStateListener = listener;
   }
 }
 
