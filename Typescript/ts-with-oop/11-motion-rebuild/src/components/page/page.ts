@@ -14,6 +14,7 @@ type OnDragStateListener<T extends Component> = (
 
 interface SectionContainer extends Component, Composable {
   setOnCloseListener(listener: OnCloseListener): void;
+  setOnDragStateListener(listener: OnDragStateListener<SectionContainer>): void;
 }
 
 // 다른 모드의 pageItemcomponent가 생성된다면?
@@ -52,16 +53,16 @@ export class PageItemComponent
     });
   }
 
-  onDragStart(event: DragEvent) {
+  onDragStart(_: DragEvent) {
     this.notifyDragObservers('start');
   }
-  onDragEnd(event: DragEvent) {
+  onDragEnd(_: DragEvent) {
     this.notifyDragObservers('stop');
   }
-  onDragEnter(event: DragEvent) {
+  onDragEnter(_: DragEvent) {
     this.notifyDragObservers('enter');
   }
-  onDragLeave(event: DragEvent) {
+  onDragLeave(_: DragEvent) {
     this.notifyDragObservers('leave');
   }
 
@@ -124,5 +125,10 @@ export class PageComponent
     item.addChild(section);
     item.attachTo(this.element, 'beforeend'); // 마지막에 붙인다.
     item.setOnCloseListener(() => item.removeFrom(this.element));
+    item.setOnDragStateListener(
+      (target: SectionContainer, state: DragState) => {
+        console.log('?:', target, state);
+      }
+    );
   }
 }
