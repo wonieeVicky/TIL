@@ -85,6 +85,7 @@
     - [자바스크립트 딥다이브](Typescript/5-9-ts-with-oop-javascript-deep-dive.md)
     - [TSConfig & TS Compiler](Typescript/5-10-ts-with-oop-ts-compiler.md)
     - [TS&OOP를 활용한 사이드 프로젝트 구현](Typescript/5-11-ts-with-oop-with-motion.md)
+    - [TS&OOP를 활용한 사이드 프로젝트 구현](Typescript/5-12-ts-with-oop-with-motion-with-drag-and-drop.md)
 
 ## JavaScript
 
