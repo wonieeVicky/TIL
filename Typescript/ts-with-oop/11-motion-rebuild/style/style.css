@@ -250,3 +250,8 @@ body {
   padding: 1em;
   color: var(--smokywhite);
 }
+
+/* -- Drag and Drop -- */
+.mute-children * {
+  pointer-events: none;
+}

@@ -15,6 +15,7 @@ type OnDragStateListener<T extends Component> = (
 interface SectionContainer extends Component, Composable {
   setOnCloseListener(listener: OnCloseListener): void;
   setOnDragStateListener(listener: OnDragStateListener<SectionContainer>): void;
+  muteChildren(state: 'mute' | 'unmute'): void;
 }
 
 // 다른 모드의 pageItemcomponent가 생성된다면?
@@ -83,6 +84,13 @@ export class PageItemComponent
   setOnDragStateListener(listener: OnDragStateListener<PageItemComponent>) {
     this.dragStateListener = listener;
   }
+  muteChildren(state: 'mute' | 'unmute'): void {
+    if (state === 'mute') {
+      this.element.classList.add('mute-children');
+    } else {
+      this.element.classList.remove('mute-children');
+    }
+  }
 }
 
 /**
@@ -100,6 +108,7 @@ export class PageComponent
   extends BaseComponent<HTMLUListElement>
   implements Composable
 {
+  private children = new Set<SectionContainer>();
   private dropTarget?: SectionContainer;
   private dragTarget?: SectionContainer;
 
@@ -136,15 +145,21 @@ export class PageComponent
     const item = new this.pageItemConstructor();
     item.addChild(section);
     item.attachTo(this.element, 'beforeend'); // 마지막에 붙인다.
-    item.setOnCloseListener(() => item.removeFrom(this.element));
+    item.setOnCloseListener(() => {
+      item.removeFrom(this.element);
+      this.children.delete(item);
+    });
+    this.children.add(item);
     item.setOnDragStateListener(
       (target: SectionContainer, state: DragState) => {
         switch (state) {
           case 'start':
             this.dragTarget = target;
+            this.updateSections('mute');
             break;
           case 'stop':
             this.dragTarget = undefined;
+            this.updateSections('unmute');
             break;
           case 'enter':
             console.log('enter:', target);
@@ -159,5 +174,11 @@ export class PageComponent
         }
       }
     );
+  }
+
+  private updateSections(state: 'mute' | 'unmute') {
+    this.children.forEach((section: SectionContainer) => {
+      section.muteChildren(state);
+    });
   }
 }
