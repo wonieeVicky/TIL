@@ -100,6 +100,9 @@ export class PageComponent
   extends BaseComponent<HTMLUListElement>
   implements Composable
 {
+  private dropTarget?: SectionContainer;
+  private dragTarget?: SectionContainer;
+
   constructor(private pageItemConstructor: SectionContainerConstructor) {
     super('<ul class="page"></ul>');
     // drag and drop
@@ -118,6 +121,15 @@ export class PageComponent
   onDrop(event: DragEvent) {
     event.preventDefault();
     console.log('onDrop');
+    // 위치를 바꿔준다.
+    if (!this.dropTarget) {
+      return;
+    }
+
+    if (this.dragTarget && this.dragTarget !== this.dropTarget) {
+      this.dragTarget.removeFrom(this.element);
+      this.dropTarget.attach(this.dragTarget, 'beforebegin');
+    }
   }
   addChild(section: Component) {
     // PageComponent는 PageItemComponent만 생성. PageComponent를 재사용하면서 원하는 컴포넌트를 생성하도록 리팩토링
@@ -127,7 +139,24 @@ export class PageComponent
     item.setOnCloseListener(() => item.removeFrom(this.element));
     item.setOnDragStateListener(
       (target: SectionContainer, state: DragState) => {
-        console.log('?:', target, state);
+        switch (state) {
+          case 'start':
+            this.dragTarget = target;
+            break;
+          case 'stop':
+            this.dragTarget = undefined;
+            break;
+          case 'enter':
+            console.log('enter:', target);
+            this.dropTarget = target;
+            break;
+          case 'leave':
+            console.log('leave:', target);
+            this.dropTarget = undefined;
+            break;
+          default:
+            throw new Error(`unsupported state: ${state}`);
+        }
       }
     );
   }
