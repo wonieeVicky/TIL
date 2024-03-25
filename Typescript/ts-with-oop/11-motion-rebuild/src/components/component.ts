@@ -4,6 +4,7 @@
   // - 외부에서 사용할 필요가 없으므로 알 필요가 없다.
   attachTo(parent: HTMLElement, position?: InsertPosition): void;
   removeFrom(parent: HTMLElement): void;
+  attach(component: Component, position?: InsertPosition): void;
 }
 
 /**
@@ -30,5 +31,9 @@ export class BaseComponent<T extends HTMLElement> implements Component {
       throw new Error('Parent mismatch!');
     }
     parent.removeChild(this.element); // parent에서 element를 지운다.
+  }
+
+  attach(component: Component, position?: InsertPosition) {
+    component.attachTo(this.element, position);
   }
 }
