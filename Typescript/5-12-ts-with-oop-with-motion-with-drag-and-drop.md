@@ -88,3 +88,108 @@ export class PageComponent
   }
 }
 ```
+
+### drag & drop 기본 이벤트 구현
+
+최대한 성능에 무리가 가지 않는 방법으로, 복잡하지 않은 방법으로 이벤트를 구현한다. (onDragOver 등을 사용 x)
+
+페이지에 드래그가 되고 있는 주체(dragging)와 어디로 지나가고 있는지 어디에서 드래그가 발생하고 있는지(dragover)를 체크해야 한다.
+
+PageComponent에서 어떤 요소에서 드래그가 되고 있고, 어디에 위치해야 하는지 알고 있으면 된다.
+
+`src/components/page/page.ts`
+
+```tsx
+/* 드래그 상태를 4가지 타입으로 정의 */
+type DragState = 'start' | 'stop' | 'enter' | 'leave';
+
+/* OnDragStateListener 타입 추가 - Component를 상속받는 제네릭 T 타입 지정 */
+type OnDragStateListener<T extends Component> = (
+  target: T,
+  state: DragState
+) => void;
+
+export class PageItemComponent
+  extends BaseComponent<HTMLElement>
+  implements SectionContainer
+{
+  private closeListener?: OnCloseListener;
+  /* dragStateListener 정의 추가 */
+  private dragStateListener?: OnDragStateListener<PageItemComponent>;
+
+  constructor() {
+    // ..
+
+    this.element.addEventListener('dragstart', (event: DragEvent) => {
+      this.onDragStart(event);
+    });
+    this.element.addEventListener('dragend', (event: DragEvent) => {
+      this.onDragEnd(event);
+    });
+    // dragenter 이벤트에 별도 onDragEnter 이벤트 적용
+    this.element.addEventListener('dragenter', (event: DragEvent) => {
+      this.onDragEnter(event);
+    });
+    // dragleave 이벤트에 별도 onDragLeave 이벤트 적용
+    this.element.addEventListener('dragleave', (event: DragEvent) => {
+      this.onDragLeave(event);
+    });
+  }
+
+  onDragStart(_: DragEvent) {
+    this.notifyDragObservers('start');
+  }
+  onDragEnd(_: DragEvent) {
+    this.notifyDragObservers('stop');
+  }
+  onDragEnter(_: DragEvent) {
+    this.notifyDragObservers('enter');
+  }
+  onDragLeave(_: DragEvent) {
+    this.notifyDragObservers('leave');
+  }
+
+  /* drag 상태를 알려주기 위한 observer 이벤트 추가 - 하나의 함수로 관리함 */
+  notifyDragObservers(state: DragState) {
+    // dragStateListener를 실행
+    this.dragStateListener && this.dragStateListener(this, state);
+  }
+
+  // ..
+  // drag state를 알려주는 리스너 이벤트 생성
+  setOnDragStateListener(listener: OnDragStateListener<PageItemComponent>) {
+    this.dragStateListener = listener;
+  }
+}
+```
+
+이제 PageComponent에서 이벤트를 등록해본다.
+
+```tsx
+interface SectionContainer extends Component, Composable {
+  setOnCloseListener(listener: OnCloseListener): void;
+  setOnDragStateListener(listener: OnDragStateListener<SectionContainer>): void;
+}
+
+export class PageComponent extends BaseComponent<HTMLUListElement> implements Composable {
+  constructor(private pageItemConstructor: SectionContainerConstructor) {
+    // ..
+  }
+  // ..
+
+  addChild(section: Component) {
+    const item = new this.pageItemConstructor();
+    item.addChild(section);
+    item.attachTo(this.element, 'beforeend'); // 마지막에 붙인다.
+    item.setOnCloseListener(() => {
+      item.removeFrom(this.element);
+    });
+    item.setOnDragStateListener((target: SectionContainer, state: DragState) => {
+        console.log(target, state); // PageItemComponent, start, enter, leave..
+    );
+  }
+
+}
+```
+
+위와 같이 카드 이동에 따라 PageComponent에서 실제 움직이는 target과 state를 확인할 수 있음
