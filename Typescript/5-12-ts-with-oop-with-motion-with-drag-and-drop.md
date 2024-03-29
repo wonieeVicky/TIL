@@ -193,3 +193,229 @@ export class PageComponent extends BaseComponent<HTMLUListElement> implements Co
 ```
 
 위와 같이 카드 이동에 따라 PageComponent에서 실제 움직이는 target과 state를 확인할 수 있음
+
+### 버그 처리하기
+
+PageItemComponent는 자기 자신이 드래그가 되거나 또는 드래그 되는 컴포넌트가 들어오거나 나가면 setOnDragStateListener에 등록된 이벤트에 현재 상태를 알려주도록 만들었다.
+
+부모 컴포넌트인 PageComponent는 addChild 로 pageItemContructor를 신규로 생성할 때마다 setOnDragStateListener로 리스너를 등록할 수 있는 구조로 만들었다.
+
+이제 위에서 console.log을 지우고 각 state에 맞는 행위를 코드로 구현만 하면 된다.
+
+`src/components/page/page.ts`
+
+```tsx
+export class PageComponent extends BaseComponent<HTMLUListElement> implements Composable {
+	/*
+	 * 특정 drag가 발생하거나 drag 아이템이 올라오게 되면
+	 * PageComponent에서 이를 기억했다가 drop이라는 이벤트가 발생하면 위치를 변경해주려고 함.
+	 * 상태를 간직하기 위한 dropTarget, dragTarget 변수 선언
+	 */
+  private dropTarget?: SectionContainer;
+  private dragTarget?: SectionContainer;
+
+  // ..
+
+  onDragOver(event: DragEvent) {
+    event.preventDefault();
+    console.log('onDragOver');
+  }
+  onDrop(event: DragEvent) {
+    event.preventDefault();
+    console.log('onDrop');
+    // 여기에서 위치를 바꿔준다.
+  }
+
+  addChild(section: Component) {
+    const item = new this.pageItemConstructor();
+    item.addChild(section);
+    item.attachTo(this.element, 'beforeend'); // 마지막에 붙인다.
+    item.setOnCloseListener(() => {
+      item.removeFrom(this.element);
+    });
+    item.setOnDragStateListener((target: SectionContainer, state: DragState) => {
+        switch (state) {
+          // update dragTarget
+          case 'start':
+            this.dragTarget = target;
+            break;
+          // update dragTarget
+          case 'stop':
+            this.dragTarget = undefined;
+            break;
+          // update dropTarget
+          case 'enter':
+            this.dropTarget = target;
+            break;
+          // update dropTarget
+          case 'leave':
+            this.dropTarget = undefined;
+            break;
+          default:
+            throw new Error(`unsupported state: ${state}`);
+        }
+    );
+  }
+
+}
+```
+
+가장 먼저 위와 같이 switch 문으로 state를 분류해둔 뒤, 특정 이벤트에 대한 상태를 기억하기 위해 private으로 선언한 변수를 onDrop 이벤트가 체크해서 위치를 바꿔주도록 설계했다.
+
+onDrop의 이벤트를 구현해보면 아래와 같다.
+
+```tsx
+export class PageComponent extends BaseComponent<HTMLUListElement> implements Composable {
+  private dropTarget?: SectionContainer;
+  private dragTarget?: SectionContainer;
+
+  // ..
+  onDrop(event: DragEvent) {
+    event.preventDefault();
+    console.log('onDrop');
+    // 여기에서 위치를 바꿔준다.
+    if (!this.dropTarget) {
+      return;
+    }
+
+    if (this.dragTarget && this.dragTarget !== this.dropTarget) {
+	    // dragTarget을 현재 페이지에서 삭제
+      this.dragTarget.removeFrom(this.element);
+      // dropTarget에 dragTarget을 attach - Component 클래스에 attach 함수 추가
+      this.dropTarget.attach(this.dragTarget, 'beforebegin');
+    }
+  }
+
+  addChild(section: Component) {
+    // ..
+    item.setOnDragStateListener((target: SectionContainer, state: DragState) => {
+        switch (state) {
+          // update dragTarget
+          case 'start':
+            this.dragTarget = target;
+            break;
+          // update dragTarget
+          case 'stop':
+            this.dragTarget = undefined;
+            break;
+          // update dropTarget
+          case 'enter':
+            this.dropTarget = target;
+            break;
+          // update dropTarget
+          case 'leave':
+            this.dropTarget = undefined;
+            break;
+          default:
+            throw new Error(`unsupported state: ${state}`);
+        }
+    );
+  }
+}
+```
+
+`src/components/component.ts`
+
+```tsx
+export interface Component {
+  attachTo(parent: HTMLElement, position?: InsertPosition): void;
+  removeFrom(parent: HTMLElement): void;
+  // attach 추가
+  attach(component: Component, position?: InsertPosition): void;
+}
+
+export class BaseComponent<T extends HTMLElement> implements Component {
+  protected readonly element: T;
+
+  // ..
+
+  attach(component: Component, position?: InsertPosition) {
+    component.attachTo(this.element, position);
+  }
+}
+```
+
+위 코드를 실제 적용해보니 문제가 하나 발생하고 있다. PageItem 의 모든 내부 자식 요소에도 이벤트가 발생해서 enter, leave 이벤트가 계속 발생. 이를 개선하기 위해서는 다양한 방법이 있는데 이번에 할 방법은 아래와 같다.
+
+컴포넌트 드래그를 시작하자마자 컴포넌트에 포인트 이벤트를 삭제하는 방법이다.
+이를 위해서는 children이라는 private 변수를 추가로 선언해야 한다.
+
+```tsx
+export class PageComponent extends BaseComponent<HTMLUListElement> implements Composable {
+	// Set은 중복 데이터를 가질 수 없는 자료 구조
+	private children = new Set<SectionContainer>();
+  private dropTarget?: SectionContainer;
+  private dragTarget?: SectionContainer;
+
+  addChild(section: Component) {
+    // ..
+    item.setOnCloseListener(() => {
+      item.removeFrom(this.element);
+      this.children.delete(item); // 추가된 item을 삭제
+    });
+    this.children.add(item); // item이 무엇이 추가되었는지 알 수 있도록 추가
+
+    item.setOnDragStateListener((target: SectionContainer, state: DragState) => {
+        switch (state) {
+          case 'start':
+            this.dragTarget = target;
+            this.updateSections('mute'); // add
+            break;
+          case 'stop':
+            this.dragTarget = undefined;
+            this.updateSections('unmute'); // add
+            break;
+          case 'enter':
+            this.dropTarget = target;
+            break;
+          case 'leave':
+            this.dropTarget = undefined;
+            break;
+          default:
+            throw new Error(`unsupported state: ${state}`);
+        }
+    );
+  }
+
+  private updateSections(state: 'mute' | 'unmute') {
+    this.children.forEach((section: SectionContainer) => {
+      section.muteChildren(state); // PageItemComponent 이벤트 추가
+    });
+  }
+}
+```
+
+```tsx
+interface SectionContainer extends Component, Composable {
+  // ..
+  muteChildren(state: 'mute' | 'unmute'): void;
+}
+
+export class PageItemComponent
+  extends BaseComponent<HTMLLIElement>
+  implements SectionContainer
+{
+  // ..
+
+  muteChildren(state: 'mute' | 'unmute'): void {
+    if (state === 'mute') {
+      this.element.classList.add('mute-children'); // 포인터 이벤트 mute
+    } else {
+      this.element.classList.remove('mute-children'); // 포인터 이벤트 활성화
+    }
+  }
+}
+```
+
+`style/style.css`
+
+```css
+/* -- Drag and Drop -- */
+.mute-children * {
+  pointer-events: none;
+}
+```
+
+![](../img/240329-1.gif)
+
+위와 같이 드래그 시작 시 하위요소들에 mute-children 이벤트가 동작하도록 처리함

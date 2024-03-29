@@ -153,18 +153,22 @@ export class PageComponent
     item.setOnDragStateListener(
       (target: SectionContainer, state: DragState) => {
         switch (state) {
+          // update dragTarget
           case 'start':
             this.dragTarget = target;
             this.updateSections('mute');
             break;
+          // update dragTarget
           case 'stop':
             this.dragTarget = undefined;
             this.updateSections('unmute');
             break;
+          // update dropTarget
           case 'enter':
             console.log('enter:', target);
             this.dropTarget = target;
             break;
+          // update dropTarget
           case 'leave':
             console.log('leave:', target);
             this.dropTarget = undefined;
