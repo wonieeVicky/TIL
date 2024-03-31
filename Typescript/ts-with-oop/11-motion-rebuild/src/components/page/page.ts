@@ -16,6 +16,7 @@ interface SectionContainer extends Component, Composable {
   setOnCloseListener(listener: OnCloseListener): void;
   setOnDragStateListener(listener: OnDragStateListener<SectionContainer>): void;
   muteChildren(state: 'mute' | 'unmute'): void;
+  getBoudingRect(): DOMRect;
 }
 
 // 다른 모드의 pageItemcomponent가 생성된다면?
@@ -91,6 +92,9 @@ export class PageItemComponent
       this.element.classList.remove('mute-children');
     }
   }
+  getBoudingRect(): DOMRect {
+    return this.element.getBoundingClientRect();
+  }
 }
 
 /**
@@ -136,8 +140,14 @@ export class PageComponent
     }
 
     if (this.dragTarget && this.dragTarget !== this.dropTarget) {
+      const dropY = event.clientY;
+      const srcElement = this.dragTarget.getBoudingRect();
+
       this.dragTarget.removeFrom(this.element);
-      this.dropTarget.attach(this.dragTarget, 'beforebegin');
+      this.dropTarget.attach(
+        this.dragTarget,
+        dropY < srcElement.y ? 'beforebegin' : 'afterend'
+      );
     }
   }
   addChild(section: Component) {
