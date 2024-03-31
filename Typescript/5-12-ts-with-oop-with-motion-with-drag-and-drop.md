@@ -419,3 +419,56 @@ export class PageItemComponent
 ![](../img/240329-1.gif)
 
 위와 같이 드래그 시작 시 하위요소들에 mute-children 이벤트가 동작하도록 처리함
+
+### 위치 바꾸기
+
+위에서 아래로의 이동은 구현되었으나 아래에서 위로 이동은 구현되지 않음. 위치 이동을 최적화해보자
+
+target.y < drop.y ⇒ afterend, target.y > drop.y ⇒ beforebegin
+
+`src/components/page/page.ts`
+
+```tsx
+interface SectionContainer extends Component, Composable {
+  // ..
+  getBoudingRect(): DOMRect; // add
+}
+
+export class PageItemComponent
+  extends BaseComponent<HTMLLIElement>
+  implements SectionContainer
+{
+  // ..
+  getBoudingRect(): DOMRect {
+    return this.element.getBoundingClientRect();
+  }
+}
+
+export class PageComponent
+  extends BaseComponent<HTMLUListElement>
+  implements Composable
+{
+  // ..
+  onDrop(event: DragEvent) {
+    event.preventDefault();
+    console.log('onDrop');
+    // 위치를 바꿔준다.
+    if (!this.dropTarget) {
+      return;
+    }
+
+    if (this.dragTarget && this.dragTarget !== this.dropTarget) {
+      // 드래그 앤 드랍 위치 설정을 위한 dropY, srcElement 변수 추가
+      const dropY = event.clientY; // drop 시점의 y 위치
+      const srcElement = this.dragTarget.getBoudingRect(); // 기존 엘리먼트의 위치
+
+      this.dragTarget.removeFrom(this.element);
+      this.dropTarget.attach(
+        this.dragTarget,
+        dropY < srcElement.y ? 'beforebegin' : 'afterend' // update!
+      );
+    }
+  }
+  // ..
+}
+```
