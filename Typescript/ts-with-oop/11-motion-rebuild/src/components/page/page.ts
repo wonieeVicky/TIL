@@ -17,6 +17,7 @@ interface SectionContainer extends Component, Composable {
   setOnDragStateListener(listener: OnDragStateListener<SectionContainer>): void;
   muteChildren(state: 'mute' | 'unmute'): void;
   getBoudingRect(): DOMRect;
+  onDropped(): void;
 }
 
 // 다른 모드의 pageItemcomponent가 생성된다면?
@@ -57,15 +58,19 @@ export class PageItemComponent
 
   onDragStart(_: DragEvent) {
     this.notifyDragObservers('start');
+    this.element.classList.add('lifted');
   }
   onDragEnd(_: DragEvent) {
     this.notifyDragObservers('stop');
+    this.element.classList.remove('lifted');
   }
   onDragEnter(_: DragEvent) {
     this.notifyDragObservers('enter');
+    this.element.classList.add('drop-area');
   }
   onDragLeave(_: DragEvent) {
     this.notifyDragObservers('leave');
+    this.element.classList.remove('drop-area');
   }
 
   notifyDragObservers(state: DragState) {
@@ -94,6 +99,9 @@ export class PageItemComponent
   }
   getBoudingRect(): DOMRect {
     return this.element.getBoundingClientRect();
+  }
+  onDropped() {
+    this.element.classList.remove('drop-area');
   }
 }
 
@@ -129,11 +137,9 @@ export class PageComponent
   // dragover, drop event는 prevent default를 해줘야 한다.
   onDragOver(event: DragEvent) {
     event.preventDefault();
-    console.log('onDragOver');
   }
   onDrop(event: DragEvent) {
     event.preventDefault();
-    console.log('onDrop');
     // 위치를 바꿔준다.
     if (!this.dropTarget) {
       return;
@@ -149,6 +155,7 @@ export class PageComponent
         dropY < srcElement.y ? 'beforebegin' : 'afterend'
       );
     }
+    this.dropTarget.onDropped();
   }
   addChild(section: Component) {
     // PageComponent는 PageItemComponent만 생성. PageComponent를 재사용하면서 원하는 컴포넌트를 생성하도록 리팩토링
@@ -175,12 +182,10 @@ export class PageComponent
             break;
           // update dropTarget
           case 'enter':
-            console.log('enter:', target);
             this.dropTarget = target;
             break;
           // update dropTarget
           case 'leave':
-            console.log('leave:', target);
             this.dropTarget = undefined;
             break;
           default:
