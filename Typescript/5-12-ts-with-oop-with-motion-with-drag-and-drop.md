@@ -472,3 +472,54 @@ export class PageComponent
   // ..
 }
 ```
+
+### Decorators
+
+JavaScript의 Mixin과 비슷함.
+기존 함수나 클래스를 다양한 형태로 재활용할 수 있는 방법(dynamic composition)
+
+```tsx
+function Log(
+  _: any,
+  name: string,
+  descriptor: PropertyDescriptor
+): PropertyDescriptor {
+  const newDescriptor = {
+    ...descriptor,
+    value: function (...args: any[]): any {
+      console.log(`Calling ${name} with arguments.`);
+      console.dir(args);
+      const result = descriptor.value.apply(this, args);
+      console.log(`Result:`);
+      console.dir(result);
+      return result;
+    }
+  };
+
+  return newDescriptor;
+}
+```
+
+이런 함수가 있다고 할 때 위 함수를 데코레이터로 아래와 같이 사용할 수 있음
+(물론 tsconfig.json 내 `"experimentalDecorators": true` 로 변경해야 함)
+
+```tsx
+class Calculator {
+  @Log
+  add(x: number, y: number) {
+    return x + y;
+  }
+}
+
+const calculator = new Calculator();
+console.log(calculator.add(2, 3));
+
+// Calling add with arguments:
+// [1, 2]
+// Result:
+// 3
+
+// 3
+```
+
+위와 같이 Calculator 내에 @Log를 추가한 뒤 ts-node로 실행하면 Log 함수가 적절히 실행되는 것을 확인할 수 있다. 이처럼 데코레이터를 이용하면 기존의 클래스나 함수를 한 단계 감싸는, 꾸며줄 수 있는 Wrapper Class를 만들 수 있음. 이를 앵귤러에서는 데코레이터를 대부분의 영역에서 활용하고 있음
