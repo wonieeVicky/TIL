@@ -1,4 +1,10 @@
-﻿import { BaseComponent, Component } from '../component.js';
+﻿import {
+  EnableDragging,
+  EnableHover,
+  EnableDrop
+} from '../../decorators/draggable.js';
+import { Draggable, Hoverable } from '../common/type.js';
+import { BaseComponent, Component } from '../component.js';
 
 // Composable 다른 녀석과 조합할 수 있음을 의미함
 export interface Composable {
@@ -12,7 +18,7 @@ type OnDragStateListener<T extends Component> = (
   state: DragState
 ) => void;
 
-interface SectionContainer extends Component, Composable {
+interface SectionContainer extends Component, Composable, Draggable, Hoverable {
   setOnCloseListener(listener: OnCloseListener): void;
   setOnDragStateListener(listener: OnDragStateListener<SectionContainer>): void;
   muteChildren(state: 'mute' | 'unmute'): void;
@@ -23,6 +29,8 @@ interface SectionContainer extends Component, Composable {
 // 다른 모드의 pageItemcomponent가 생성된다면?
 // export class DarkModePageItemComponent extends BaseComponent<HTMLLIElement> implements SectionContainer { ... }
 
+@EnableDragging
+@EnableHover
 export class PageItemComponent
   extends BaseComponent<HTMLLIElement>
   implements SectionContainer
@@ -42,18 +50,18 @@ export class PageItemComponent
     };
 
     // drag and drop
-    this.element.addEventListener('dragstart', (event: DragEvent) => {
-      this.onDragStart(event);
-    });
-    this.element.addEventListener('dragend', (event: DragEvent) => {
-      this.onDragEnd(event);
-    });
-    this.element.addEventListener('dragenter', (event: DragEvent) => {
-      this.onDragEnter(event);
-    });
-    this.element.addEventListener('dragleave', (event: DragEvent) => {
-      this.onDragLeave(event);
-    });
+    // this.element.addEventListener('dragstart', (event: DragEvent) => {
+    //   this.onDragStart(event);
+    // });
+    // this.element.addEventListener('dragend', (event: DragEvent) => {
+    //   this.onDragEnd(event);
+    // });
+    // this.element.addEventListener('dragenter', (event: DragEvent) => {
+    //   this.onDragEnter(event);
+    // });
+    // this.element.addEventListener('dragleave', (event: DragEvent) => {
+    //   this.onDragLeave(event);
+    // });
   }
 
   onDragStart(_: DragEvent) {
@@ -116,6 +124,7 @@ type SectionContainerConstructor = {
   new (): SectionContainer;
 };
 
+@EnableDrop
 export class PageComponent
   extends BaseComponent<HTMLUListElement>
   implements Composable
@@ -127,19 +136,19 @@ export class PageComponent
   constructor(private pageItemConstructor: SectionContainerConstructor) {
     super('<ul class="page"></ul>');
     // drag and drop
-    this.element.addEventListener('dragover', (event: DragEvent) => {
-      this.onDragOver(event);
-    });
-    this.element.addEventListener('drop', (event: DragEvent) => {
-      this.onDrop(event);
-    });
+    // this.element.addEventListener('dragover', (event: DragEvent) => {
+    //   this.onDragOver(event);
+    // });
+    // this.element.addEventListener('drop', (event: DragEvent) => {
+    //   this.onDrop(event);
+    // });
   }
   // dragover, drop event는 prevent default를 해줘야 한다.
   onDragOver(event: DragEvent) {
-    event.preventDefault();
+    // event.preventDefault();
   }
   onDrop(event: DragEvent) {
-    event.preventDefault();
+    // event.preventDefault();
     // 위치를 바꿔준다.
     if (!this.dropTarget) {
       return;
