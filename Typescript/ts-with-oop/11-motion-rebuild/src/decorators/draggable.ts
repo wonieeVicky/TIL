@@ -4,10 +4,11 @@ import { Component } from './../components/component';
 type GConstructor<T = {}> = new (...args: any[]) => T;
 type DraggableClass = GConstructor<Component & Draggable>;
 
+// EanbleDragging는 DraggableClass를 받아서 DraggableItem을 리턴한다.
 export function EnableDragging<TBase extends DraggableClass>(Base: TBase) {
   return class DraggableItem extends Base {
     constructor(...args: any[]) {
-      super(...args);
+      super(...args); // 기존 생성자를 호출한다.
       this.registerEventListener('dragstart', (event: DragEvent) => {
         this.onDragStart(event);
       });

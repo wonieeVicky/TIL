@@ -523,3 +523,229 @@ console.log(calculator.add(2, 3));
 ```
 
 위와 같이 Calculator 내에 @Log를 추가한 뒤 ts-node로 실행하면 Log 함수가 적절히 실행되는 것을 확인할 수 있다. 이처럼 데코레이터를 이용하면 기존의 클래스나 함수를 한 단계 감싸는, 꾸며줄 수 있는 Wrapper Class를 만들 수 있음. 이를 앵귤러에서는 데코레이터를 대부분의 영역에서 활용하고 있음
+
+### @Decorators Motion에 적용해보기
+
+데코레이터를 Motion 코드에 적용해보자. 어떤 부분을 개선할 수 있을까
+
+`src/components/page/page.ts`
+
+```tsx
+export class PageItemComponent
+  extends BaseComponent<HTMLLIElement>
+  implements SectionContainer
+{
+  private closeListener?: OnCloseListener | undefined;
+  private dragStateListener?: OnDragStateListener<PageItemComponent>;
+  constructor() {
+    super(`<li draggable="true" class="page-item">
+            <section class="page-item__body"></section>
+            <div class="page-item__controls">
+              <button class="close">&times;</button>
+            </div>
+          </li>`);
+    const closeBtn = this.element.querySelector('.close')! as HTMLButtonElement;
+    closeBtn.onclick = () => {
+      this.closeListener && this.closeListener();
+    };
+
+    // drag and drop
+    // this.element.addEventListener('dragstart', (event: DragEvent) => {
+    //   this.onDragStart(event);
+    // });
+    // this.element.addEventListener('dragend', (event: DragEvent) => {
+    //   this.onDragEnd(event);
+    // });
+    // this.element.addEventListener('dragenter', (event: DragEvent) => {
+    //   this.onDragEnter(event);
+    // });
+    // this.element.addEventListener('dragleave', (event: DragEvent) => {
+    //   this.onDragLeave(event);
+    // });
+  }
+
+  // ..
+}
+```
+
+위 주석한 dragstart, dragend, dragenter, dragleave 함수를 @EnableDragging, @EnableHover로 정의해서 클래스를 감싸주도록 구현하면 어떨까? 바로 아래와 같이 말이다.
+
+```tsx
+import { Component } from './../components/component';
+
+/**
+ * Set of callbacks that a draggable component must implement to get notified when dragging starts and stops
+ */
+export interface Draggable {
+  // Item reacts when dragging has started
+  onDragStart(event: DragEvent): void;
+  // Item reacts when the dragging has finished
+  onDragEnd(event: DragEvent): void;
+}
+
+type GConstructor<T = {}> = new (...args: any[]) => T;
+type DraggableClass = GConstructor<Component & Draggable>;
+
+export function EnableDragging<TBase extends DraggableClass>(Base: TBase) {
+  return class DraggableItem extends Base {
+    constructor(...args: any[]) {
+      super(...args);
+      this.registerEventListener('dragstart', (event: DragEvent) => {
+        this.onDragStart(event);
+      });
+      this.registerEventListener('dragend', (event: DragEvent) => {
+        this.onDragEnd(event);
+      });
+    }
+  };
+}
+
+/**
+ * Set of callbacks that an item that listens for drag hover needs to implement to get notified
+ */
+export interface Hoverable {
+  // Notify when dragged item enters the area
+  onDragEnter(event: DragEvent): void;
+  // Notify when dragged item leaves the area
+  onDragLeave(event: DragEvent): void;
+}
+
+type DragHoverClass = GConstructor<Component & Hoverable>;
+
+export function EnableHover<TBase extends DragHoverClass>(Base: TBase) {
+  return class DragHoverArea extends Base {
+    constructor(...args: any[]) {
+      super(...args);
+      this.registerEventListener('dragenter', (event: DragEvent) => {
+        event.preventDefault();
+        this.onDragEnter(event);
+      });
+      this.registerEventListener('dragleave', (event: DragEvent) => {
+        this.onDragLeave(event);
+      });
+    }
+  };
+}
+```
+
+위 `EnableDragging`, `EnableHover`는 각각 `DraggableClass`, `DragHoverClass` 타입을 상속받는다.
+위 `registerEventListener`을 데코레이터에서 적용 후 상속시켜주려면 `Component` 인터페이스 내부에서 해당 이벤트가 선언되어야 함. 따라서 `BaseComponent`도 아래와 같이 수정한다.
+
+`src/components/component.ts`
+
+```tsx
+export interface Component {
+  // ...
+  registerEventListener<K extends keyof HTMLElementEventMap>(
+    type: K,
+    listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any
+  ): void;
+}
+
+export class BaseComponent<T extends HTMLElement> implements Component {
+  // ..
+
+  // The same signature as the HTMLElement.addEventListener method
+  registerEventListener<K extends keyof HTMLElementEventMap>(
+    type: K,
+    listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any
+  ): void {
+    this.element.addEventListener(type, listener);
+  }
+}
+```
+
+위와 같이 수정하면 아래와 같이 PageItemComponent를 데코레이터로 적용하여 간단히 구현할 수 있다.
+
+`src/components/page/page.ts`
+
+```tsx
+// @Decorator 추가
+@EnableDragging
+@EnableHover
+export class PageItemComponent
+  extends BaseComponent<HTMLLIElement>
+  implements SectionContainer
+{
+  private closeListener?: OnCloseListener | undefined;
+  private dragStateListener?: OnDragStateListener<PageItemComponent>;
+  constructor() {
+    super(`<li draggable="true" class="page-item">
+            <section class="page-item__body"></section>
+            <div class="page-item__controls">
+              <button class="close">&times;</button>
+            </div>
+          </li>`);
+    const closeBtn = this.element.querySelector('.close')! as HTMLButtonElement;
+    closeBtn.onclick = () => {
+      this.closeListener && this.closeListener();
+    };
+  }
+
+  // ..
+}
+```
+
+그렇다면 PageComponent의 dragover, drop 이벤트도 줄일 수 있을 것 같다.
+
+```tsx
+import { Component } from './../components/component';
+
+/**
+ * Set of callbacks that a component needs to implement to receive drops of dragged items
+ */
+export interface Droppable {
+  // Method that takes care of what happens when a draggable item is hovered over the host widget
+  onDragOver(event: DragEvent): void;
+  //   Method that handles the dropping of a draggable item
+  onDrop(event: DragEvent): void;
+}
+
+type DropTargetClass = GConstructor<Component & Droppable>;
+
+export function EnableDrop<TBase extends DropTargetClass>(Base: TBase) {
+  return class DropArea extends Base {
+    constructor(...args: any[]) {
+      super(...args);
+      this.registerEventListener('dragover', (event: DragEvent) => {
+        event.preventDefault();
+        this.onDragOver(event);
+      });
+      this.registerEventListener('drop', (event: DragEvent) => {
+        event.preventDefault();
+        this.onDrop(event);
+      });
+    }
+  };
+}
+```
+
+`src/components/page/page.ts`
+
+```tsx
+// @Decorator 추가
+@EnableDrop
+export class PageComponent
+  extends BaseComponent<HTMLUListElement>
+  implements Composable
+{
+  private children = new Set<SectionContainer>();
+  private dropTarget?: SectionContainer;
+  private dragTarget?: SectionContainer;
+
+  constructor(private pageItemConstructor: SectionContainerConstructor) {
+    super('<ul class="page"></ul>'); // 단순 상속만 추가
+    // drag and drop
+    // this.element.addEventListener('dragover', (event: DragEvent) => {
+    //   this.onDragOver(event);
+    // });
+    // this.element.addEventListener('drop', (event: DragEvent) => {
+    //   this.onDrop(event);
+    // });
+  }
+}
+```
+
+EnableDrop이라는 데코레이터를 추가함에 따라 생성자 함수 실행 시 로직을 간편하게 줄일 수 있게 됨.
+
+데코레이터라는 간단한 어노테이션을 사용하면 클래스를 사용하는 곳마다 일일히 이벤트 리스너를 등록할 필요없이 데코레이터 안에서 각 이벤트 리스너를 등록하는 로직을 넣어 감싸주면, 실제 실행되는 이벤트에만 집중하도록 구조를 개선할 수 있게됨
