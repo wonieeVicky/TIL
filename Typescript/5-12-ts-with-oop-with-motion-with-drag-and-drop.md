@@ -749,3 +749,26 @@ export class PageComponent
 EnableDrop이라는 데코레이터를 추가함에 따라 생성자 함수 실행 시 로직을 간편하게 줄일 수 있게 됨.
 
 데코레이터라는 간단한 어노테이션을 사용하면 클래스를 사용하는 곳마다 일일히 이벤트 리스너를 등록할 필요없이 데코레이터 안에서 각 이벤트 리스너를 등록하는 로직을 넣어 감싸주면, 실제 실행되는 이벤트에만 집중하도록 구조를 개선할 수 있게됨
+
+**PageItemComponent**
+
+- **Hoverable** (호버가 가능한, 무언가 올라올 수 있는) 인터페이스
+- **Draggable** (드래깅이 가능한) 인터페이스
+
+⇒ PageItem은 드래깅이 가능하고, 다른 것이 그 위로 올라올 수 있음을 의미함
+
+**PageComponent**
+
+- **Droppable** (무언가 떨어트릴 수 있는) 인터페이스
+
+⇒ PageComponent는 드래깅 하는 어떤 아이템을 Page 안에 떨어트리는걸 처리할 수 있음을 의미함
+
+### 유용한 라이브러리 사이트
+
+https://sortablejs.github.io/Sortable/
+
+https://github.com/haltu/muuri
+
+https://codepen.io/retrofuturistic/pen/tlbHE
+
+https://github.com/atlassian/react-beautiful-dnd
