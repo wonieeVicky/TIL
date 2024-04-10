@@ -2,6 +2,7 @@
 import { feedbackMachine } from "./feedbackMachine";
 import { useMachine } from "@xstate/react";
 import { createBrowserInspector } from "@statelyai/inspect";
+import { cartMachine } from "./cartMachine";
 
 const { inspect } = createBrowserInspector({
   // Comment out the line below to start the inspector
@@ -107,7 +108,21 @@ function Feedback() {
 }
 
 function App() {
-  return <Feedback />;
+  const [state, send] = useMachine(cartMachine);
+
+  return (
+    <div>
+      <p>{state.value}</p>
+      <button
+        onClick={() => {
+          send("ADD_ITEM");
+        }}
+      >
+        Add Item
+      </button>
+    </div>
+  );
+  // return <Feedback />;
 }
 
 export default App;
