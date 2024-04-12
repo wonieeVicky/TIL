@@ -109,6 +109,7 @@ function Feedback() {
 
 function App() {
   const [state, send] = useMachine(cartMachine);
+  console.log(state);
 
   return (
     <div>
