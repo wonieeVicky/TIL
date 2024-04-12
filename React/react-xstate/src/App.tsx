@@ -112,10 +112,12 @@ function App() {
 
   return (
     <div>
+      {/* 현재 상태에 대한 텍스트 정보 */}
       <p>{state.value}</p>
       <button
         onClick={() => {
-          send("ADD_ITEM");
+          // send 함수로 상태 기계에 이벤트 전달 - ADD_ITEM 이벤트 전달
+          send({ type: "ADD_ITEM" });
         }}
       >
         Add Item
