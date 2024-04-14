@@ -116,18 +116,17 @@ function App() {
       {/* 현재 상태에 대한 텍스트 정보 */}
       <p>{state.value}</p>
       <ul>
-        {state.context.items.map((name, index) => {
-          return <li key={index}>{name}</li>;
-        })}
+        {state.context.items.map((name, i) => (
+          <li key={i}>{name}</li>
+        ))}
       </ul>
       <button
-        onClick={() => {
-          // send 함수로 상태 기계에 이벤트 전달 - ADD_ITEM 이벤트 전달
-          send({ type: "ADD_ITEM", item: `item${Date.now()}` });
-        }}
+        onClick={() => send({ type: "ADD_ITEM", item: `item${Date.now()}` })}
       >
         Add Item
       </button>
+      &nbsp;&nbsp;
+      <button onClick={() => send({ type: "RESET_ITEMS" })}>Reset Item</button>
     </div>
   );
   // return <Feedback />;

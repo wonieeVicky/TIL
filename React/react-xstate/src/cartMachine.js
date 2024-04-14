@@ -1,4 +1,4 @@
-﻿import { createMachine } from "xstate";
+﻿import { assign, createMachine } from "xstate";
 
 // // 상태 기계 정의
 export const cartMachine = createMachine(
@@ -26,6 +26,10 @@ export const cartMachine = createMachine(
           ADD_ITEM: {
             actions: ["addItem"],
           },
+          RESET_ITEMS: {
+            target: "empty",
+            actions: ["resetItems"],
+          },
         },
       },
     },
@@ -37,10 +41,13 @@ export const cartMachine = createMachine(
      * 추가된 액션: addItem
      */
     actions: {
-      addItem: ({ context, event }) => {
-        console.log(context.items, event.item);
-        context.items.push(event.item);
-      },
+      // addItem: ({ context, event }) => context.items.push(event.item),
+      // assign 함수를 사용하여 items 배열에 새로운 아이템 추가 - 불변성 유지
+      addItem: assign({
+        items: ({ context, event }) => [...context.items, event.item],
+      }),
+      // context, event에 접근하지 않아도 될 경우 값이나 리터럴을 그대로 사용해도 된다.
+      resetItems: assign({ items: [] }),
     },
   }
 );
