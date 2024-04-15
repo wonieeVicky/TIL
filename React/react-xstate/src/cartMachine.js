@@ -21,6 +21,14 @@ export const cartMachine = createMachine(
         },
       },
       hold: {
+        // Eventless Transition: hold 상태에서 hold 상태로 전이될 때 실행되는 액션(항상 실행되는 always 액션)
+        always: [
+          {
+            target: "empty",
+            cond: "isEmpty",
+          },
+          { target: "full", cond: "isFull" },
+        ],
         on: {
           // 자기 전이(hold -> hold) - ADD_ITEM 이벤트 발생 시 hold 상태로 전이
           ADD_ITEM: {
@@ -56,6 +64,16 @@ export const cartMachine = createMachine(
         items: ({ context, event }) =>
           context.items.filter((item) => item !== event.name),
       }),
+    },
+
+    /**
+     * 2. guards 객체 생성 - 가드를 정의
+     * createMachine의 두 번째 인자로 정의됨
+     * 상황을 판단하는 함수를 따로 정의하여 가드로 사용, 재사용에 용의
+     */
+    guards: {
+      isEmpty: ({ context }) => context.items.length === 0,
+      isFull: ({ context }) => context.items.length >= 5,
     },
   }
 );
