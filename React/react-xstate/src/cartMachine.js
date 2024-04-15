@@ -30,6 +30,10 @@ export const cartMachine = createMachine(
             target: "empty",
             actions: ["resetItems"],
           },
+          // REMOVE_ITEM 이벤트가 발생하면 다시 Hold 상태로 자기 전이하므로 target은 필요없다.
+          REMOVE_ITEM: {
+            actions: ["removeItem"],
+          },
         },
       },
     },
@@ -48,6 +52,10 @@ export const cartMachine = createMachine(
       }),
       // context, event에 접근하지 않아도 될 경우 값이나 리터럴을 그대로 사용해도 된다.
       resetItems: assign({ items: [] }),
+      removeItem: assign({
+        items: ({ context, event }) =>
+          context.items.filter((item) => item !== event.name),
+      }),
     },
   }
 );

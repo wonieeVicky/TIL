@@ -117,7 +117,13 @@ function App() {
       <p>{state.value}</p>
       <ul>
         {state.context.items.map((name, i) => (
-          <li key={i}>{name}</li>
+          <li key={i}>
+            {name}
+            &nbsp;
+            <button onClick={() => send({ type: "REMOVE_ITEM", name })}>
+              X
+            </button>
+          </li>
         ))}
       </ul>
       <button
