@@ -1,5 +1,12 @@
 ﻿import { assign, createMachine } from "xstate";
 
+const postPurchase = (cart) =>
+  new Promise((res) =>
+    setTimeout(() => {
+      res(true);
+    }, 2000)
+  );
+
 // // 상태 기계 정의
 export const cartMachine = createMachine(
   {
@@ -42,7 +49,26 @@ export const cartMachine = createMachine(
           REMOVE_ITEM: {
             actions: ["removeItem"],
           },
+          PURCHASE: {
+            target: "purchasing",
+          },
         },
+      },
+      purchasing: {
+        // invoke: 상태에서 비동기 작업을 수행할 때 사용
+        invoke: {
+          id: "purchasing",
+          src: (context) => postPurchase(context.items), // Promise나 Observable을 반환하는 함수
+          onDone: {
+            target: "done",
+            action: ["purchased"],
+          },
+          onError: {},
+        },
+      },
+      done: {
+        type: "final",
+        entry: ["resetItems"],
       },
     },
   },

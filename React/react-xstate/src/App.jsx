@@ -108,8 +108,18 @@ function Feedback() {
 }
 
 function App() {
-  const [state, send] = useMachine(cartMachine);
-  console.log(state);
+  const [state, send, service] = useMachine(cartMachine, {
+    actions: {
+      purchased: ({ context }) => console.log(context.items.length),
+    },
+  });
+
+  useEffect(() => {
+    const listener = () => console.log("done");
+    service.onDone(listener);
+
+    return () => service.off(listener);
+  }, []);
 
   return (
     <div>
