@@ -1,14 +1,29 @@
-﻿import { useMachine } from "@xstate/react";
-import { createMachine } from "xstate";
+﻿import { createMachine } from "xstate";
+
+interface User {}
+
+interface UserContext {
+  user: User | null;
+}
+
+export type UserEvent =
+  | { type: "OAUTH" }
+  | { type: "EMAIL" }
+  | { type: "EMAIL" }
+  | { type: "CLEAR" }
+  | { type: "REGISTRY"; user: User }
+  | { type: "DONE" }
+  | { type: "BACK" };
 
 /**
  * 인증 도메인 상태 정의
  * selection > email or oauth > registry > done
  */
-export const signMachine = createMachine(
+export const signMachine = createMachine<UserContext, UserEvent>(
   {
     id: "sign",
     initial: "selection",
+    predictableActionArguments: true,
     context: {
       user: null,
     },
@@ -82,6 +97,7 @@ export const signMachine = createMachine(
   }
 );
 
-const [state, send, service] = useMachine(signMachine);
-const currentState = state.value;
-const onSend = () => send("REGISTRY");
+export type SignMachineType = typeof signMachine;
+// const [state, send, service] = useMachine(signMachine);
+// const currentState = state.value;
+// const onSend = () => send("REGISTRY");
