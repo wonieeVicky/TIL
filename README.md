@@ -158,17 +158,14 @@
   1. [Jest 개요](https://github.com/wonieeVicky/TIL/blob/main/TDD/2-1-jest-basic.md)
   2. [Matcher](https://github.com/wonieeVicky/TIL/blob/main/TDD/2-2-jest-matchers.md)
 
-<br />
-
-## Redux & MobX
+## Redux & MobX & XState
 
 1. [Redux](https://github.com/wonieeVicky/TIL/blob/main/Redux&MobX/1-redux.md)
 2. [React-redux](https://github.com/wonieeVicky/TIL/blob/main/Redux&MobX/2-react-redux.md)
 3. [Redux-toolkit](https://github.com/wonieeVicky/TIL/blob/main/Redux&MobX/3-redux-toolkit.md)
 4. [MobX](https://github.com/wonieeVicky/TIL/blob/main/Redux&MobX/4-mobx.md)
 5. [Mobx-react](https://github.com/wonieeVicky/TIL/blob/main/Redux&MobX/5-mobx-react.md)
-
-<br />
+6. [Xstate](React/react-xstate/react-xstate-basic.md)
 
 ## Svelte
 
