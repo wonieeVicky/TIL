@@ -73,20 +73,6 @@ const fetchMachine = createMachine({
 });
 ```
 
-위 저의 한 내용은 아래와 같이 사용
-
-`Component.tsx`
-
-```jsx
-import { useMachine } from "@xstate/react";
-import { fetchMachine } from "./fetchMachine";
-
-const Component = () => {
-  const [state, send, service] = useMachine(fetchMachine);
-  //..
-};
-```
-
 useMachine hook 구성
 
 - state : 상태 객체(StateNode)
@@ -98,13 +84,11 @@ StateNode에는 다른 상태로 전이하기 위한 transition 함수 존재. �
 - 상태 전이
 - 액션(혹은 side-effects) 실행
 - 지연/ 다중 이벤트
-- 상태 전이, context 변경 등 다중 이벤트 리스너
-- 이 외 많음
+- 상태 전이, context 변경 등 다중 이벤트 리스너 등
 
 ```jsx
 const machine = createMachine({
   states: {
-    // state node
     idle: {
       on: {
         FETCH: {
@@ -116,17 +100,77 @@ const machine = createMachine({
   }
 });
 
-// transition 함수는 현재의 상태와 전이할 이벤트를 명시합니다.
+// transition: 현재의 상태와 전이할 이벤트를 명시
 const nextState = machine.transition('idle', { type: 'FETCH'});
 // State { value: { 'pending' } ... }
 
-// 위 동작이랑 같음.
+// 위 transition과 같음
 const service = interpret(machine);
 service.start();
 service.send('FETCH');
 // State { value: { 'pending' } ... }
 
-// 현재 상태 확인
+// 현 상태 확인
 state.matches('loading');
+```
 
+위 내용을 회원가입 과정이라고 생각했을 때 아래와 같이 사용할 수 있다.
+
+```jsx
+import { useMachine } from "@xstate/react";
+import { useState } from "react";
+import { fetchMachine } from "./machines/fetchMachine";
+
+export default Join = () => {
+  // useMachine
+  const [state, send] = useMachine(fetchMachine);
+  const [id, setId] = useState("");
+  const [password, setPassword] = useState("");
+  const [invalidPassword, setInvalidPassword] = useState(false);
+  const [error, setError] = useState(null);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    send("FETCHING"); // send: 상태 전이
+    if (error) {
+      setError(null);
+    }
+    try {
+      await signUp({ id, password });
+      send("SUCCESS"); // send: 상태 전이
+    } catch (e) {
+      setError(e);
+      send("FAILURE"); // send: 상태 전이
+    }
+  };
+
+  const handleChangeId = (e) => setId(e.target.value);
+
+  const handleChangePassword = (e) => {
+    const pwd = e.target.value;
+    setInvalidPassword(pwd.length < 8);
+    setPassword(pwd);
+  };
+
+  // state.matches: 현 상태 확인
+  const isDisabled = state.matches("loading") || invalidPassword;
+
+  return (
+    <div className="app">
+      <h1>회원가입</h1>
+      <form onSubmit={handleSubmit}>
+        <label>id</label>
+        <input id="id" onChange={handleChangeId} />
+        <label htmlFor={"password"}>password</label>
+        <input id="password" type="password" onChange={handleChangePassword} />
+        <button disabled={isDisabled} type="submit">
+          OK
+        </button>
+      </form>
+      {state.matches("loading") && <p>Loading...</p>}
+      {state.matches("resolved") && <p>회원가입에 성공했습니다.</p>}
+      {state.matches("rejected") && <p>{error}</p>}
+    </div>
+  );
+};
 ```
