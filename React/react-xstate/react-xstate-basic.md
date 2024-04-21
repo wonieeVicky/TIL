@@ -174,3 +174,24 @@ export default Join = () => {
   );
 };
 ```
+
+### 상태 간의 조합 처리하기
+
+FSM은 단일 상태만을 허용하기 때문에 상태 간의 조합은 다른 상태로서 새롭게 관리하는 방법으로 접근해야 함
+만약 위 isDisabled를 FSM 상태로 관리하려면 연산인 loading 상태이거나 invalidPassword 상태를 모두 하나의 상태로서 관리 해야 한다.
+
+그런데 만약 여기서 disabled에 관여하는 다른 조건이 하나 더 추가된다면? 2배의 상태관리가 필요해짐
+이렇게 되면 모든 상태에 대한 변화를 인지해야 하므로 관리가 어려워지고 동시에 전이 조합이 복잡해져 도식화를 통한 이점도 사라지게 된다. 이를 state explosion이라고 함.
+
+1987년 컴퓨터 과학자 David Harrel은 FSM이 가지고 있는 문제 중 위 상태 머신의 규모가 커지는 것에 따른 state explosion 문제를 해결하고 유용한 FSM 모델을 가지져가기 위해 Statecharts를 제안함
+
+Statecharts는 FSM을 확장하여 아래의 개념을 추가
+
+1. Extended state(context)
+2. Actions(entry/exit/transition)
+3. Guards(conditional transitions)
+4. Hierarchical (nested) states
+5. Orthogonal (parallel) state
+6. History
+
+하나씩 알아보자
