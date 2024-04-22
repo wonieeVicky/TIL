@@ -4,8 +4,8 @@ import { fetchMachine } from "./machines/fetchMachine";
 
 export default Join = () => {
   const [state, send] = useMachine(fetchMachine);
-  const [id, setId] = useState("");
-  const [password, setPassword] = useState("");
+  // const [id, setId] = useState("");
+  // const [password, setPassword] = useState("");
   const [invalidPassword, setInvalidPassword] = useState(false);
   const [error, setError] = useState(null);
 
@@ -24,12 +24,13 @@ export default Join = () => {
     }
   };
 
-  const handleChangeId = (e) => setId(e.target.value);
+  const handleChangeId = (e) =>
+    send("UPDATE_ID", { data: { id: e.target.value } });
 
   const handleChangePassword = (e) => {
-    const pwd = e.target.value;
-    setInvalidPassword(pwd.length < 8);
-    setPassword(pwd);
+    const password = e.target.value;
+    setInvalidPassword(password.length > 8);
+    send("UPDATE_ID", { data: { password } });
   };
 
   const isDisabled = state.matches("loading") || invalidPassword;

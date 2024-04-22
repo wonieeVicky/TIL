@@ -3,14 +3,26 @@ const fetchMachine = createMachine({
   id: "fetch",
   initial: "idle",
   state: {
+    context: {
+      id: "",
+      password: "",
+      error: null,
+    },
     idle: {
       on: {
+        UPDATE_ID: {
+          actions: assign((context, event) => ({ id: event.data })),
+        },
+        UPDATE_PASSWORD: {
+          actions: assign((context, event) => ({ password: event.data })),
+        },
         FETCHING: {
           target: "loading",
         },
       },
     },
     loading: {
+      entry: assign((context, event) => ({ error: null })),
       on: {
         SUCCESS: {
           target: "resolved",
