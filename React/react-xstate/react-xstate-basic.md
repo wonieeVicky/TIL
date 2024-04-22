@@ -195,3 +195,71 @@ Statecharts는 FSM을 확장하여 아래의 개념을 추가
 6. History
 
 하나씩 알아보자
+
+### 1. Extended state(context)
+
+Xstate에는 context로 표현되는 확장된 상태가 존재.
+
+위 회원가입 예제에서 사용되는 id, password, error 등은 statecharts의 내부 값으로 관리가 가능하며, machine 내부에서 `assign` 함수로 context를 업데이틀 할 수 있음(외부에서 context 변경은 금지)
+
+`fetchMachine.js`
+
+```jsx
+// createMachine 팩토리 함수를 통해 FSM 및 Statechart를 정의
+const fetchMachine = createMachine({
+  id: "fetch",
+  initial: "idle",
+  state: {
+    context: {
+      id: "",
+      password: "",
+      error: null,
+    },
+    idle: {
+      on: {
+        UPDATE_ID: {
+          actions: assign((context, event) => ({ id: event.data })),
+        },
+        UPDATE_PASSWORD: {
+          actions: assign((context, event) => ({ password: event.data })),
+        },
+        // ..
+      },
+    },
+    loading: {
+      // loading에 초기 진입 시 error null로 초기화
+      entry: assign((context, event) => ({ error: null })),
+      // ..
+    },
+    // ..
+  },
+});
+```
+
+위와 같이 설정 시 기존에 useState로 id, password를 관리하던 로직을 수정할 수 있다.
+
+```jsx
+import { useMachine } from "@xstate/react";
+import { useState } from "react";
+import { fetchMachine } from "./machines/fetchMachine";
+
+export default Join = () => {
+  const [state, send] = useMachine(fetchMachine);
+  // const [id, setId] = useState("");
+  // const [password, setPassword] = useState("");
+
+  // ..
+  const handleChangeId = (e) =>
+    send("UPDATE_ID", { data: { id: e.target.value } });
+
+  const handleChangePassword = (e) => {
+    const password = e.target.value;
+    setInvalidPassword(password.length > 8);
+    send("UPDATE_ID", { data: { password } });
+  };
+
+  return <div className="app">{/* ... */}</div>;
+};
+```
+
+context를 활용해 useMachine 내부에서 상태관리를 할 수 있음
