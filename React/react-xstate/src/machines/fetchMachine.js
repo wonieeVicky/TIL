@@ -23,6 +23,17 @@ const fetchMachine = createMachine({
     },
     loading: {
       entry: assign((context, event) => ({ error: null })),
+      invoke: {
+        id: "signUpForm",
+        src: (context, event) => signUp(event.data),
+        onDone: {
+          target: "resolve",
+        },
+        onError: {
+          target: "rejected",
+          actions: assign((context, event) => ({ error: event.data })),
+        },
+      },
       on: {
         SUCCESS: {
           target: "resolved",

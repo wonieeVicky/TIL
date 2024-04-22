@@ -1,5 +1,5 @@
 ﻿import { useMachine } from "@xstate/react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { fetchMachine } from "./machines/fetchMachine";
 
 export default Join = () => {
@@ -12,17 +12,40 @@ export default Join = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     send("FETCHING");
-    if (error) {
-      setError(null);
-    }
-    try {
-      await signUp({ id, password });
-      send("SUCCESS");
-    } catch (e) {
-      setError(e);
-      send("FAILURE");
-    }
   };
+
+  useEffect(() => {
+    if (state.matches("LOADING")) {
+      const doFetch = async () => {
+        if (error) {
+          setError(null);
+        }
+        try {
+          await signUp({ id, password });
+          send("SUCCESS");
+        } catch (e) {
+          setError(e);
+          send("FAILURE");
+        }
+      };
+      doFetch();
+    }
+  }, [state]);
+
+  // const handleSubmit = async (e) => {
+  //   e.preventDefault();
+  //   send("FETCHING");
+  //   if (error) {
+  //     setError(null);
+  //   }
+  //   try {
+  //     await signUp({ id, password });
+  //     send("SUCCESS");
+  //   } catch (e) {
+  //     setError(e);
+  //     send("FAILURE");
+  //   }
+  // };
 
   const handleChangeId = (e) =>
     send("UPDATE_ID", { data: { id: e.target.value } });
