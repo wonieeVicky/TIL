@@ -263,3 +263,86 @@ export default Join = () => {
 ```
 
 context를 활용해 useMachine 내부에서 상태관리를 할 수 있음
+
+### 2. actions
+
+FSM의 경우 상태와 이벤트의 전이만으로 구성되어 있기 때문에 FSM만으로 구현하려면 상태와 함께 발생하는 side-effect는 별도로 처리해줘야 함. state의 상태변화를 감지 후 useEffect에서 fetch를 실행하는 방식으로 기존의 코드를 아래와 같이 개선할 수 있음
+
+```jsx
+export default Join = () => {
+  const [state, send] = useMachine(fetchMachine);
+  // ..
+
+  // const handleSubmit = async (e) => {
+  //   e.preventDefault();
+  //   send("FETCHING");
+  //   if (error) {
+  //     setError(null);
+  //   }
+  //   try {
+  //     await signUp({ id, password });
+  //     send("SUCCESS");
+  //   } catch (e) {
+  //     setError(e);
+  //     send("FAILURE");
+  //   }
+  // };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    send("FETCHING");
+  };
+
+  useEffect(() => {
+    if (state.matches("LOADING")) {
+      const doFetch = async () => {
+        if (error) {
+          setError(null);
+        }
+        try {
+          await signUp({ id, password });
+          send("SUCCESS");
+        } catch (e) {
+          setError(e);
+          send("FAILURE");
+        }
+      };
+      doFetch();
+    }
+  }, [state]);
+
+  // ..
+
+  return <div className="app">{/* ... */}</div>;
+};
+```
+
+FSM은 상태와 이벤트로만 구성되므로 상태에 반응하기 위해 위와 같이 구현. 이벤트를 통한 상태 전이가 발생할 때 다음 상태인 loading으로 변경 시 signUp 함수를 호출 (state + event → next state + effects)
+
+위 effects가 발생하는 타이밍은 상태에 진입(enter)/이탈(exit) 순간과 전이(transition) 이라는 3가지 발생 시점으로 정리할 수 있다.
+
+```jsx
+const fetchMachine = createMachine({
+  id: "fetch",
+  initial: "idle",
+  state: {
+    // ..
+    loading: {
+      entry: assign((context, event) => ({ error: null })),
+      invoke: {
+        id: "signUpForm",
+        src: (context, event) => signUp(event.data),
+        onDone: {
+          target: "resolve",
+        },
+        onError: {
+          target: "rejected",
+          actions: assign((context, event) => ({ error: event.data })),
+        },
+      },
+      // ..
+    },
+    // ..
+  },
+});
+```
