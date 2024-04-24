@@ -57,9 +57,9 @@ export default Join = () => {
   };
 
   // const isDisabled = state.matches("loading") || invalidPassword;
-  const isDisabled =
-    state.matches("loading") ||
-    fetchMachine.transition(state, "FETCHING").changed;
+  // disabled 조건 추가: machine이 다음 transition으로 변화했는지를 판단
+  // const isDisabled = state.matches("loading") || fetchMachine.transition(state, "FETCHING").changed;
+  const isDisabled = [{ idle: "errors" }, "loading"].some(state.matches);
 
   return (
     <div className="app">
@@ -73,6 +73,9 @@ export default Join = () => {
           OK
         </button>
       </form>
+      {state.maches("idle.errors.tooShort") && (
+        <p>비밀번호는 8장 이상으로 입력해주세요.</p>
+      )}
       {state.matches("loading") && <p>Loading...</p>}
       {state.matches("resolved") && <p>회원가입에 성공했습니다.</p>}
       {state.matches("rejected") && <p>{error}</p>}

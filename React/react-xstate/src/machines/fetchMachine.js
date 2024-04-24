@@ -10,13 +10,28 @@ const fetchMachine = createMachine(
         error: null,
       },
       idle: {
+        // idle 하위에 에러 관리를 위한 state 추가
+        state: {
+          noError: {},
+          errors: {
+            // 계층 구조가 필요한 경우, nested states 가능
+            states: {
+              tooShort: {},
+            },
+          },
+        },
         on: {
           UPDATE_ID: {
             actions: assign((context, event) => ({ id: event.data })),
           },
-          UPDATE_PASSWORD: {
-            actions: assign((context, event) => ({ password: event.data })),
-          },
+          UPDATE_PASSWORD: [
+            {
+              target: ".erros.tooShort",
+              cond: "isPasswordShort",
+              action: "cachePassword",
+            },
+            { target: ".noError", actions: "cachePassword" },
+          ],
           FETCHING: {
             target: "loading",
             cond: "isAvaliablePasswordLength",
@@ -52,7 +67,14 @@ const fetchMachine = createMachine(
     },
   },
   {
+    // actions에 호출되는 함수들을 config로 관리하도록 변경
+    actions: {
+      cachePassword: assign((context, event) => ({
+        password: event.data?.password,
+      })),
+    },
     guards: {
+      isPasswordShort: (context, evt) => evt.data?.password.length < 8,
       isAvaliablePasswordLength: (context, evt) =>
         evt.data?.password.length > 7,
     },
