@@ -434,3 +434,102 @@ const fetchMachine = createMachine({
   },
 });
 ```
+
+### Hierarchical states
+
+state explosion을 방지하기 위해 계층/병렬 상태 구조를 활용할 수 있음
+
+- state 세분(refinement)화
+- 유사한 전이에 대한 그룹화
+- 상태의 격리(isolation)
+- 컴포저블(composability) 권장
+
+위 guard를 적용한 machine 코드를 조금 수정해본다.
+
+```jsx
+const fetchMachine = createMachine(
+  {
+    // ..
+    state: {
+      // ..
+      idle: {
+        // idle 하위에 에러 관리를 위한 state 추가
+        state: {
+          noError: {},
+          errors: {
+            // 계층 구조가 필요한 경우, nested states 가능
+            states: {
+              tooShort: {},
+            },
+          },
+        },
+        // ..
+        on: {
+          UPDATE_ID: {
+            actions: assign((context, event) => ({ id: event.data })),
+          },
+          // 액션을 연속으로 호출하면서 cond로 조건을 추가할 수 있음.
+          // 먼저 true를 만나는 액션에서 행동이 종료 - password 조건 체크 시 에러 발생 상황을 먼저 체크 하도록 컴포넌트 코드 변경
+          UPDATE_PASSWORD: [
+            {
+              target: ".erros.tooShort",
+              cond: "isPasswordShort",
+              action: "cachePassword",
+            },
+            { target: ".noError", actions: "cachePassword" },
+          ],
+          FETCHING: {
+            target: "loading",
+            // FETCHING 시 조건 체크하던 것을 UPDATE_PASSWORD 이벤트로 변경
+            // cond: "isAvaliablePasswordLength",
+          },
+        },
+      },
+      // ..
+    },
+  },
+  {
+    // actions에 호출되는 함수들을 config로 관리하도록 변경
+    actions: {
+      cachePassword: assign((context, event) => ({
+        password: event.data?.password,
+      })),
+    },
+    guards: {
+      // isPassswordShort guards 속성에 추가
+      isPasswordShort: (context, evt) => evt.data?.password.length < 8,
+      isAvaliablePasswordLength: (context, evt) =>
+        evt.data?.password.length > 7,
+    },
+  }
+);
+```
+
+idle 내부에 noError, errors 계층 상태 생성. errors 내부는 tooShort로 한 번 더 계층 구조 추가
+
+Xstate에서는 무한대로 계층구조 생성이 가능
+
+위 UPDATE_PASSWORD에서 액션을 연속 호출하여 cond로 비밀번호 조건 체크를 진행. true를 만나는 액션에서 행동이 종료되므로 password 조건 체크 시 에러 발생 상황을 먼저 체크하도록 아래와 같이 컴포넌트 변경을 해준다.
+
+`Join.tsx`
+
+```jsx
+export default Join = () => {
+  // ..
+  // const isDisabled = state.matches("loading") || fetchMachine.transition(state, "FETCHING").changed;
+  const isDisabled = [{ idle: "errors" }, "loading"].some(state.matches);
+
+  return (
+    <div className="app">
+      {/* ... */}
+      {state.maches("idle.errors.tooShort") && (
+        <p>비밀번호는 8장 이상으로 입력해주세요.</p>
+      )}
+    </div>
+  );
+};
+```
+
+`isDisabled` 체크 시 기존에는 `matches`와 `transition`을 혼합해서 사용. 상태를 계층 구조로 변경하면서 idle의 내부 상태로 `idle.errors` 를 포함한 상태이거나 `loading` 상태이거나로 조건을 변경할 수 있음
+
+두 가지 이상의 상태 중 하나를 포함하는지 `some` 함수로 판단함
