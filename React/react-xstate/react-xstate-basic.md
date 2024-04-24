@@ -346,3 +346,91 @@ const fetchMachine = createMachine({
   },
 });
 ```
+
+### Guards(contiditonal transitions)
+
+상태 전이 발생 전 특정 조건들을 만족해야 전이가 가능하도록 조건을 설계하는 것도 가능함.
+
+```jsx
+const fetchMachine = createMachine({
+  id: "fetch",
+  initial: "idle",
+  state: {
+    // ..
+    idle: {
+      on: {
+        // ..
+        FETCHING: {
+          target: "loading",
+          cond: (context, evt) => {
+            return context.password.length > 7;
+          },
+        },
+      },
+    },
+    // ..
+    },
+		// ..
+  },
+});
+```
+
+위처럼 `cond` 속성을 활용해 기존 Join 컴포넌트의 `invalidPassword`를 수정할 수 있다.
+
+```jsx
+export default Join = () => {
+  // validation용 필드 삭제
+  // const [invalidPassword, setInvalidPassword] = useState(false);
+
+  // ..
+
+  // const isDisabled = state.matches("loading") || invalidPassword;
+  // disabled 조건 추가: machine이 다음 transition으로 변화했는지를 판단
+  const isDisabled =
+    state.matches("loading") ||
+    fetchMachine.transition(state, "FETCHING").changed;
+
+  return (
+    <div className="app">
+      <h1>회원가입</h1>
+      <form onSubmit={handleSubmit}>
+        {/* .... */}
+        <button disabled={isDisabled} type="submit">
+          OK
+        </button>
+      </form>
+    </div>
+  );
+};
+```
+
+뿐만 아니라 `cond` 속성에 사용한 함수는 machine의 옵션으로 `guards` 속성에 함수화하여 사용 가능
+
+```jsx
+const fetchMachine = createMachine({
+  id: "fetch",
+  initial: "idle",
+  state: {
+    // ..
+    idle: {
+      on: {
+        // ..
+        FETCHING: {
+          target: "loading",
+          cond: "isAvaliablePasswordLength",
+        },
+      },
+    },
+    // ..
+    },
+		// ..
+  },
+},
+{
+	// 두번째 인자값으로 guard 속성에 함수화
+  guards: {
+    isAvaliablePasswordLength: (context, evt) =>
+      evt.data?.password.length > 7,
+  },
+});
+```
