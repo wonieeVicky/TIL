@@ -6,7 +6,7 @@ export default Join = () => {
   const [state, send] = useMachine(fetchMachine);
   // const [id, setId] = useState("");
   // const [password, setPassword] = useState("");
-  const [invalidPassword, setInvalidPassword] = useState(false);
+  // const [invalidPassword, setInvalidPassword] = useState(false);
   const [error, setError] = useState(null);
 
   const handleSubmit = async (e) => {
@@ -56,7 +56,10 @@ export default Join = () => {
     send("UPDATE_ID", { data: { password } });
   };
 
-  const isDisabled = state.matches("loading") || invalidPassword;
+  // const isDisabled = state.matches("loading") || invalidPassword;
+  const isDisabled =
+    state.matches("loading") ||
+    fetchMachine.transition(state, "FETCHING").changed;
 
   return (
     <div className="app">
