@@ -2,40 +2,83 @@
 const fetchMachine = createMachine(
   {
     id: "fetch",
-    initial: "idle",
+    // initial: "idle",
     state: {
-      context: {
-        id: "",
-        password: "",
-        error: null,
-      },
+      // context: {
+      //   id: "",
+      //   password: "",
+      //   error: null,
+      // },
       idle: {
-        // idle 하위에 에러 관리를 위한 state 추가
-        state: {
-          noError: {},
-          errors: {
-            // 계층 구조가 필요한 경우, nested states 가능
+        type: "parallel", // 추가 및 하위 id, password 에러 상태를 병렬로 구성
+        states: {
+          id: {
+            initial: "noError",
             states: {
-              tooShort: {},
+              noError: {},
+              errors: {
+                states: {
+                  tooShort: {},
+                },
+              },
+            },
+          },
+          password: {
+            initial: "noError",
+            states: {
+              noError: {},
+              errors: {
+                states: {
+                  empty: {},
+                  tooShort: {},
+                },
+              },
             },
           },
         },
         on: {
-          UPDATE_ID: {
-            actions: assign((context, event) => ({ id: event.data })),
-          },
+          UPDATE_ID: [
+            // 상태는 idle 내부의 id, password 병렬 상태로 구성되므로 .id로 표현
+            {
+              target: ".id.errors.empty",
+              cond: "isInputIdEmpty",
+              actions: "cacheId",
+            },
+            {
+              target: ".id.noError",
+              actions: "cacheId",
+            },
+          ],
           UPDATE_PASSWORD: [
             {
-              target: ".erros.tooShort",
-              cond: "isPasswordShort",
-              action: "cachePassword",
+              target: ".password.errors.empty",
+              cond: "isInputPasswordEmpty",
+              actions: "cachePassword",
             },
-            { target: ".noError", actions: "cachePassword" },
+            {
+              target: ".password.errors.tooShort",
+              cond: "isInputPasswordTooShort",
+              actions: "cachePassword",
+            },
+            { target: ".password.noError", actions: "cachePassword" },
           ],
-          FETCHING: {
-            target: "loading",
-            cond: "isAvaliablePasswordLength",
-          },
+          FETCHING: [
+            {
+              target: ".id.errors.empty",
+              cond: "isContextIdEmpty",
+            },
+            {
+              target: ".passwrod.errors.empty",
+              cond: "isContextPasswordEmpty",
+            },
+            {
+              target: ".password.errors.tooShort",
+              cond: "isContextPasswordTooShort",
+            },
+            {
+              target: "loading",
+            },
+          ],
         },
       },
       loading: {
@@ -74,9 +117,11 @@ const fetchMachine = createMachine(
       })),
     },
     guards: {
-      isPasswordShort: (context, evt) => evt.data?.password.length < 8,
-      isAvaliablePasswordLength: (context, evt) =>
-        evt.data?.password.length > 7,
+      // guards에는 context와 event를 구분 짓게 나눠본다.
+      isContextIdEmpty: (context, _) => context.id?.length === 0,
+      isInputIdEmpty: (_, evt) => evt.data?.id.length === 0,
+      isPasswordTooShort: (_, evt) => evt.data?.password.length < 8,
+      isAvaliablePasswordLength: (_, evt) => evt.data?.password.length > 7,
     },
   }
 );

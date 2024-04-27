@@ -59,7 +59,13 @@ export default Join = () => {
   // const isDisabled = state.matches("loading") || invalidPassword;
   // disabled 조건 추가: machine이 다음 transition으로 변화했는지를 판단
   // const isDisabled = state.matches("loading") || fetchMachine.transition(state, "FETCHING").changed;
-  const isDisabled = [{ idle: "errors" }, "loading"].some(state.matches);
+  // const isDisabled = [{ idle: "errors" }, "loading"].some(state.matches);
+  // 에러에 대한 구분을 id.errors와 password.errors로 세분화
+  const isDisabled = [
+    { idle: "id.errors" },
+    { idle: "password.errors" },
+    "loading",
+  ].some(state.matches);
 
   return (
     <div className="app">
@@ -73,12 +79,24 @@ export default Join = () => {
           OK
         </button>
       </form>
-      {state.maches("idle.errors.tooShort") && (
-        <p>비밀번호는 8장 이상으로 입력해주세요.</p>
+      {/* 에러는 아래와 같이 추가 */}
+      {state.matches("idle.id.errors") && (
+        <>
+          {state.matches("idle.id.errors.empty") && (
+            <div>아이디 값이 없습니다.</div>
+          )}
+        </>
       )}
-      {state.matches("loading") && <p>Loading...</p>}
-      {state.matches("resolved") && <p>회원가입에 성공했습니다.</p>}
-      {state.matches("rejected") && <p>{error}</p>}
+      {state.matches("idle.password.errors") && (
+        <>
+          {state.matches("idle.password.errors.tooShort") && (
+            <div>비밀번호는 8자 이상이어야 합니다.</div>
+          )}
+          {state.matches("idle.password.errors.empty") && (
+            <div>비밀번호 값이 없습니다.</div>
+          )}
+        </>
+      )}
     </div>
   );
 };
