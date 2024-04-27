@@ -533,3 +533,167 @@ export default Join = () => {
 `isDisabled` 체크 시 기존에는 `matches`와 `transition`을 혼합해서 사용. 상태를 계층 구조로 변경하면서 idle의 내부 상태로 `idle.errors` 를 포함한 상태이거나 `loading` 상태이거나로 조건을 변경할 수 있음
 
 두 가지 이상의 상태 중 하나를 포함하는지 `some` 함수로 판단함
+
+### Orthogonal states
+
+Orthogonal는 직각, 직렬의 상태를 의미한다. 병렬 상태의 노드를 나타내는 말로, 병렬 상태는 동시에 모든 하위 상태에 있으면서, 자식 상태로서 존재하고, 서로 직접적으로 종속되지 않으면서 병렬 상태 노드 간에 전환이 없어야 함.
+
+XState에서 `type: parallel`로 선언할 수 있음. 선언부를 확인해보면 initial 값을 갖지 않는데 초깃값 선언이 불가능하며 상태 자체가 병렬 상태를 감싸고 있는 방식으로 구성
+
+```jsx
+const fileMachine = createMachine({
+  // ..
+  type: "parallel",
+  // initial: ?? // parallel state는 initial state를 가질 수 없다.
+  states: {
+    upload: {
+      initial: "idle",
+    },
+    download: {
+      initial: "idle",
+    },
+  },
+});
+```
+
+기존 fetchMachine에서 에러 상태에 대한 코드를 병렬 상태로 변경하면 아래와 같음.
+
+```jsx
+// createMachine 팩토리 함수를 통해 FSM 및 Statechart를 정의
+const fetchMachine = createMachine(
+  {
+    id: "fetch",
+    // initial: "idle",
+    state: {
+      idle: {
+        type: "parallel", // 추가 및 하위 id, password 에러 상태를 병렬로 구성
+        states: {
+          id: {
+            initial: "noError",
+            states: {
+              noError: {},
+              errors: {
+                states: {
+                  tooShort: {},
+                },
+              },
+            },
+          },
+          password: {
+            initial: "noError",
+            states: {
+              noError: {},
+              errors: {
+                states: {
+                  empty: {},
+                  tooShort: {},
+                },
+              },
+            },
+          },
+        },
+        on: {
+          UPDATE_ID: [
+            // 상태는 idle 내부의 id, password 병렬 상태로 구성되므로 .id로 표현
+            {
+              target: ".id.errors.empty",
+              cond: "isInputIdEmpty",
+              actions: "cacheId",
+            },
+            {
+              target: ".id.noError",
+              actions: "cacheId",
+            },
+          ],
+          UPDATE_PASSWORD: [
+            {
+              target: ".password.errors.empty",
+              cond: "isInputPasswordEmpty",
+              actions: "cachePassword",
+            },
+            {
+              target: ".password.errors.tooShort",
+              cond: "isInputPasswordTooShort",
+              actions: "cachePassword",
+            },
+            { target: ".password.noError", actions: "cachePassword" },
+          ],
+          FETCHING: [
+            {
+              target: ".id.errors.empty",
+              cond: "isContextIdEmpty",
+            },
+            {
+              target: ".passwrod.errors.empty",
+              cond: "isContextPasswordEmpty",
+            },
+            {
+              target: ".password.errors.tooShort",
+              cond: "isContextPasswordTooShort",
+            },
+            {
+              target: "loading",
+            },
+          ],
+        },
+      },
+      loading: { ... },
+      resolved: { ... },
+      rejected: { ... },
+    },
+  },
+  {
+    // actions에 호출되는 함수들을 config로 관리하도록 변경
+    actions: {
+      // ..
+    },
+    guards: {
+      // guards에는 context와 event를 구분 짓게 나눠본다.
+      isContextIdEmpty: (context, _) => context.id?.length === 0,
+      isInputIdEmpty: (_, evt) => evt.data?.id.length === 0,
+      isPasswordTooShort: (_, evt) => evt.data?.password.length < 8,
+      isAvaliablePasswordLength: (_, evt) => evt.data?.password.length > 7,
+    },
+  }
+);
+```
+
+id 속성에 빈 값을 허용하지 않도록 추가(isInputIdEmpty, isContextIdEmpty), password 도 빈 값을 허용하지 않음을 표현하기 위해 error 필드를 병렬로 구성함
+
+위 내용을 컴포넌트에 반영 하면 아래와 같다.
+
+```jsx
+export default Join = () => {
+  // ..
+  // 에러에 대한 구분을 id.errors와 password.errors로 세분화
+  const isDisabled = [
+    { idle: "id.errors" },
+    { idle: "password.errors" },
+    "loading",
+  ].some(state.matches);
+
+  return (
+    <div className="app">
+      {/* ... */}
+      {/* 에러는 아래와 같이 추가 */}
+      {state.matches("idle.id.errors") && (
+        <>
+          {state.matches("idle.id.errors.empty") && (
+            <div>아이디 값이 없습니다.</div>
+          )}
+        </>
+      )}
+      {state.matches("idle.password.errors") && (
+        <>
+          {state.matches("idle.password.errors.tooShort") && (
+            <div>비밀번호는 8자 이상이어야 합니다.</div>
+          )}
+          {state.matches("idle.password.errors.empty") && (
+            <div>비밀번호 값이 없습니다.</div>
+          )}
+        </>
+      )}
+    </div>
+  );
+};
+```
