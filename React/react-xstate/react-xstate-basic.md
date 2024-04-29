@@ -746,3 +746,46 @@ const spaceHeaterMachine = Machine({
   },
 });
 ```
+
+### Delayed event and transitions
+
+```jsx
+export const snackbarMachine = createMachine(
+  {
+    id: "snackbar",
+    initial: "invisible",
+    context: {
+      severity: undefined,
+      message: undefined,
+    },
+    states: {
+      invisible: {
+        entry: "resetSnackbar",
+        on: { SHOW: "visible" },
+      },
+      visible: {
+        entry: "setSnackbar",
+        on: { HIDE: "invisible" },
+        after: {
+          // 3초 후 invisible 상태로 변경
+          3000: "invisible",
+        },
+      },
+    },
+  },
+  {
+    actions: {
+      setSnackbar: assign((ctx, evt) => ({
+        severity: evt.severity,
+        message: evt.message,
+      })),
+      resetSnackbar: assign({
+        severity: undefined,
+        message: undefined,
+      }),
+    },
+  }
+);
+```
+
+이벤트 전이에 delay 기능도 존재. after 속성을 사용해 상태 변경의 지연을 추가. visualizer에서도 전이에 delay가 적용되는 것을 확인 할 수 있음
