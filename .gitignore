@@ -6,3 +6,5 @@ node_modules
 dist
 .env
 .idea
+.next
+.yarn
