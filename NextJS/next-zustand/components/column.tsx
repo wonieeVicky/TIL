@@ -1,3 +1,4 @@
+'use client';
 import { useTaskStore } from '@/lib/store';
 import Task from './task';
 import { useMemo } from 'react';
